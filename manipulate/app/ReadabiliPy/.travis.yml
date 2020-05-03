@@ -1,0 +1,33 @@
+sudo: enabled
+dist: xenial
+language: python
+python:
+  - 3.6
+  - 3.7
+
+before_install:
+  # Install node.js following instructions from
+  #   https://nodejs.org/en/download/package-manager/
+  - sudo apt install curl
+  - curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
+  - sudo apt install nodejs
+
+install:
+  # Install node.js dependencies
+  - npm install
+  # Install python dependencies
+  - pip install -r requirements-dev.txt
+
+script:
+  # Run all pytest unit tests
+  - python -m pytest -v tests --cov readabilipy --cov-report term-missing --benchmark-disable
+  # Run pyflakes for error detection
+  - pyflakes *.py readabilipy tests
+  # Check PEP8 compliance (ignoring long lines)
+  - pycodestyle --statistics --ignore=E501 --count *.py readabilipy tests
+  # Run pylint for stricter error checking
+  - pylint readabilipy tests
+
+after_success:
+  # Upload results to coveralls.io
+  - coveralls
