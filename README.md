@@ -14,5 +14,5 @@ At a very basic level, this process helps you remember more of what you read.
 
 More advanced functionality will exist too. 
 
-## status
+## Status
 Code currently runs a bit slow. It’s mostly using python, flask and makes call to a JS script to actually clean the text. Can and obviously should be optimized in the future. 
