@@ -1,0 +1,19 @@
+{
+  "title": null,
+  "byline": null,
+  "date": null,
+  "content": "<div><div id=\"ordered-lists\"><p>An unordered list inside a paragraph.</p><ul><li>Unordered thing one</li><li>Unordered thing two</li><li>Unordered thing three</li></ul><p>A paragraph with no list before an unordered list outside a paragraph.</p><ul><li>Unordered town A</li><li>Unordered town B</li><li>Unordered town C</li></ul><p>A paragraph with no list after an unordered list outside a paragraph.</p></div><div id=\"unordered-lists\"><p>An ordered list inside a paragraph.</p><ol><li>Ordered thing one</li><li>Ordered thing two</li><li>Ordered thing three</li></ol><p>A paragraph with no list before an ordered list outside a paragraph.</p><ol><li>Ordered town A</li><li>Ordered town B</li><li>Ordered town C</li></ol><p>A paragraph with no list after an ordered list outside a paragraph.</p></div></div>",
+  "plain_content": "<div data-node-index=\"0\"><div data-node-index=\"0.1\" id=\"ordered-lists\"><p data-node-index=\"0.1.1\">An unordered list inside a paragraph.</p><ul data-node-index=\"0.1.2\"><li data-node-index=\"0.1.2.1\">Unordered thing one</li><li data-node-index=\"0.1.2.2\">Unordered thing two</li><li data-node-index=\"0.1.2.3\">Unordered thing three</li></ul><p data-node-index=\"0.1.3\">A paragraph with no list before an unordered list outside a paragraph.</p><ul data-node-index=\"0.1.4\"><li data-node-index=\"0.1.4.1\">Unordered town A</li><li data-node-index=\"0.1.4.2\">Unordered town B</li><li data-node-index=\"0.1.4.3\">Unordered town C</li></ul><p data-node-index=\"0.1.5\">A paragraph with no list after an unordered list outside a paragraph.</p></div><div data-node-index=\"0.2\" id=\"unordered-lists\"><p data-node-index=\"0.2.1\">An ordered list inside a paragraph.</p><ol data-node-index=\"0.2.2\"><li data-node-index=\"0.2.2.1\">Ordered thing one</li><li data-node-index=\"0.2.2.2\">Ordered thing two</li><li data-node-index=\"0.2.2.3\">Ordered thing three</li></ol><p data-node-index=\"0.2.3\">A paragraph with no list before an ordered list outside a paragraph.</p><ol data-node-index=\"0.2.4\"><li data-node-index=\"0.2.4.1\">Ordered town A</li><li data-node-index=\"0.2.4.2\">Ordered town B</li><li data-node-index=\"0.2.4.3\">Ordered town C</li></ol><p data-node-index=\"0.2.5\">A paragraph with no list after an ordered list outside a paragraph.</p></div></div>",
+  "plain_text": [
+    {"node_index": "0.1.1", "text": "An unordered list inside a paragraph."},
+    {"node_index": "0.1.2", "text": "* Unordered thing one, * Unordered thing two, * Unordered thing three,"},
+    {"node_index": "0.1.3", "text": "A paragraph with no list before an unordered list outside a paragraph."},
+    {"node_index": "0.1.4", "text": "* Unordered town A, * Unordered town B, * Unordered town C,"},
+    {"node_index": "0.1.5", "text": "A paragraph with no list after an unordered list outside a paragraph."},
+    {"node_index": "0.2.1", "text": "An ordered list inside a paragraph."},
+    {"node_index": "0.2.2", "text": "* Ordered thing one, * Ordered thing two, * Ordered thing three,"},
+    {"node_index": "0.2.3", "text": "A paragraph with no list before an ordered list outside a paragraph."},
+    {"node_index": "0.2.4", "text": "* Ordered town A, * Ordered town B, * Ordered town C,"},
+    {"node_index": "0.2.5", "text": "A paragraph with no list after an ordered list outside a paragraph."}
+  ]
+}

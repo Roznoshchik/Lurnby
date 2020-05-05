@@ -1,0 +1,12 @@
+[
+  {"node_index": "0.1.1", "text": "An unordered list inside a paragraph."},
+  {"node_index": "0.1.2", "text": "* Unordered thing one, * Unordered thing two, * Unordered thing three,"},
+  {"node_index": "0.1.3", "text": "A paragraph with no list before an unordered list outside a paragraph."},
+  {"node_index": "0.1.4", "text": "* Unordered town A, * Unordered town B, * Unordered town C,"},
+  {"node_index": "0.1.5", "text": "A paragraph with no list after an unordered list outside a paragraph."},
+  {"node_index": "0.2.1", "text": "An ordered list inside a paragraph."},
+  {"node_index": "0.2.2", "text": "* Ordered thing one, * Ordered thing two, * Ordered thing three,"},
+  {"node_index": "0.2.3", "text": "A paragraph with no list before an ordered list outside a paragraph."},
+  {"node_index": "0.2.4", "text": "* Ordered town A, * Ordered town B, * Ordered town C,"},
+  {"node_index": "0.2.5", "text": "A paragraph with no list after an ordered list outside a paragraph."}
+]

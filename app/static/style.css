@@ -1,0 +1,269 @@
+.make-size{
+    background-color: white;
+    color:black;
+    padding: 8px;
+    height:64px;
+    text-align: center;
+    border: none;
+}
+.make-size:hover{
+    background-color: rgb(240, 230, 230);
+ 
+}
+#content{
+    font-size: 16px;
+    line-height: 24px;
+    margin-left:8px;
+    margin-right:8px;
+}
+
+
+
+
+.make-size-middle{
+    background-color: white;
+    color:black;
+    border-left: black 1px solid;
+    border-right: black 1px solid;
+    border-top: 0;
+    border-bottom: 0;
+    padding: 8px;
+    height:64px;
+    text-align: center;
+    font-size: large;
+    font-weight: bolder;
+    align-self: flex-end;
+}
+
+.sidebar-row{
+    max-width: 220px;
+    margin: 16px !important;
+}
+.font-preview{
+    font-size: xx-large;
+    font-weight: bolder;
+    padding: 8px;
+}
+.sidebarheading{
+    text-decoration: underline;
+    text-align: center;
+}
+
+.serif-mode{
+    background-color: white;
+    color:black;
+    font-family: serif !important;
+}
+#make-serif{
+    background-color: white;
+    color:black;
+    border:none;
+    font-family: serif !important;
+    font-size: large;
+    font-weight: bold;
+    padding: 8px;
+    width:220px;
+    height:64px;
+    margin: 8px;
+
+}
+#make-serif:hover{
+    background-color: rgb(240, 230, 230);
+ 
+}
+
+.sans-mode{
+    background-color: white;
+    color:black;
+    font-family: sans-serif !important;
+}
+#make-sans{
+    background-color: white;
+    color:black;
+    border:none;
+    font-family: sans-serif !important;
+    font-size: large;
+    font-weight: bold;
+    padding: 8px;
+    height:64px;
+    width:220px;
+    margin: 8px;
+
+}
+#make-sans:hover{
+    background-color: rgb(240, 230, 230);
+ 
+}
+
+
+.no-style{
+    list-style-type: none;
+    max-width: 250px;
+    margin:8px;
+}
+.sepia-mode{
+    background-color: #F7EFE1;
+    color:#705848;
+}
+.dark-mode{
+    background-color:#424242;
+    color:white;
+}
+.light-mode{
+    background-color: white;
+    color:black;
+}
+
+#make-sepia{
+    background-color: #F7EFE1;
+    color:#705848;
+    border: none;
+    margin:4px;
+}
+#make-sepia:hover{
+    background-color: rgb(245, 224, 188);
+    
+}
+#make-light{
+    background-color: white;
+    color:black;
+    border: none;
+    margin:4px;
+}
+#make-light:hover{
+    background-color:rgb(240, 230, 230);
+ 
+}
+#make-dark{
+    background-color:#424242;
+    color:white;
+    border: none;
+    margin:4px;
+}
+#make-dark:hover{
+    background-color:#202020;
+}
+.activebutton{
+    border-bottom:5px solid black !important;
+}
+
+
+.slide-left{
+    position: relative;
+    left: -20px;
+}
+
+.settings-button{
+    background-color: #FFEABD ;
+    color: black;
+}
+
+/*
+.settings-button-left{
+    background-color: #FFEABD ;
+    color: black;
+}
+*/
+
+.wrapper {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+    margin-left: -15px;
+}
+
+#sidebar {
+    min-width: 260px;
+    max-width: 260px;
+    min-height: 100vh;
+    padding-top: 16px;
+}
+
+#sidebar.active {
+    margin-left: -260px;
+}
+
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+}
+
+/*
+    ADDITIONAL DEMO STYLE, NOT IMPORTANT TO MAKE THINGS WORK BUT TO MAKE IT A BIT NICER :)
+*/
+
+
+#sidebar p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+    color: #999;
+}
+
+#sidebar a, a:hover, a:focus {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+#sidebar {
+    /* don't forget to add all the previously mentioned styles here too */
+    background: #EBC354;
+    color: black;
+    transition: all 0.3s;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: #FFEABD;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+}
+
+#sidebar ul p {
+    color: black;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+}
+#sidebar ul li a:hover {
+    color: white;
+    background:#1B4C45;
+}
+
+#sidebar ul li.active > a, a[aria-expanded="true"] {
+    color: black;
+    font-weight: bold;
+}
+#sidebar ul li.active a:hover {
+    color:white;
+    font-weight: bold;
+}
+ul ul a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+    background: #F2C5B0;
+}

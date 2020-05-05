@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <!-- Font Awesome prereq-->
+  
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
+  <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>A Learning Tool</title>
+</head>
+<body>
+  
+  <div class="wrapper container-fluid"">
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <!--
+      <div class="sidebar-header">
+            <h3><a href="{{ url_for('index' )}}">Home</a></h3>
+        </div>
+      -->   
+        <h6 class="sidebarheading">Set background:</h6> 
+        <ul class="list-group list-group-horizontal no-style">
+            <li>
+              <button id = "make-light" class="list-group-item-action"> Light Mode</button>
+            </li>
+            <li>
+              <button id = "make-dark" class="list-group-item-action"> Dark Mode</button>
+            </li>
+            <li>
+              <button id = "make-sepia" class="list-group-item-action"> Sepia mode </button>
+            </li>            
+        </ul>
+        <br>
+        <h6 class="sidebarheading">Set font:</h6> 
+        <ul class="list-group no-style d-flex justify-content-around">
+            <li>
+              <button id = "make-serif"><span class="font-preview">Aa </span>Serif</button>
+            </li>
+            <li>
+              <button id = "make-sans"><span class="font-preview">Aa </span>Sans Serif</button>
+            </li>    
+        </ul>
+        <br>
+        <h6 class="sidebarheading">Set sizing:</h6> 
+
+          <div class="d-flex align-middle sidebar-row">
+            <button id="p-less"class="p-2 flex-fill make-size font-preview">-</button>
+            <button class="p-2 flex-fill make-size-middle disabled">Size</button>
+            <button id="p-more"class="p-2 flex-fill make-size font-preview">+</button>
+          </div>
+          <div class="d-flex align-middle sidebar-row">
+            <button id="lheight-less"class="p-2 flex-fill make-size font-preview">-</button>
+            <button class="p-2 flex-fill make-size-middle disabled">Line Height</button>
+            <button id="lheight-more"class="p-2 flex-fill make-size font-preview">+</button>
+          </div>
+          <div class="d-flex align-middle sidebar-row">
+            <button id="margin-less" class="p-2 flex-fill make-size font-preview">-</button>
+            <button class="p-2 flex-fill make-size-middle disabled">Margins</button>
+            <button id="margin-more" class="p-2 flex-fill make-size font-preview">+</button>
+          </div>
+    </nav>
+   
+    <!-- Page Content -->
+    <div id="content" class="container">
+      <div class="row row-cols-1">
+        <nav class="navbar">
+                  <button type="button" id="sidebarCollapse" class="btn settings-button">
+                    <i id="collapse-icon" class= "fa fa-angle-double-left"></i>
+                    <span data-toggle="collapse" aria-expanded="false" id="inviz">Hide Controls</span>
+              </button>
+        </nav>
+      </div>
+      <div class="row row-cols-1">
+        <div class="col">
+          <h1>{{ title|safe}}</h1>
+
+          
+
+          <h3>{{ author|safe}}</h3>
+          <hr>
+          {{ content|safe }}
+        </div>
+      </div>
+    </div>
+
+</div>    
+
+  
+
+
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+  
+  <!-- My Custom JS  -->
+  <script type="text/javascript">
+    $(document).ready(function() {
+      
+      // add img-fluid class to all images
+      var list;
+      list = document.querySelectorAll("img");
+      for (var i = 0; i < list.length; ++i) {
+        list[i].classList.add('img-fluid');
+      }
+    });
+
+    var content = document.getElementById('content');
+
+    var currTextSize = 16;
+    var currlineheight = 24;
+    var currleft = 8;
+    var currright = 8;
+
+    content.style.fontSize = currTextSize + 'px';
+
+    function bigtext () {
+    ++currTextSize;
+    content.style.fontSize = currTextSize + 'px';
+    }
+    function biglineheight () {
+    ++currlineheight;
+    content.style.lineHeight = currlineheight + 'px';
+    }
+    function bigmargin () {
+    currleft += 8;
+    currright += 8;
+    content.style.marginLeft = currleft + 'px';
+    content.style.marginRight = currright + 'px';
+
+    }
+
+
+    function smalltext () {
+    --currTextSize;
+    content.style.fontSize = currTextSize + 'px';
+    }
+    function smalllineheight () {
+    --currlineheight;
+    content.style.lineHeight = currlineheight + 'px';
+    }
+    function smallmargin () {
+    currleft -= 8;
+    currright -= 8;
+    content.style.marginLeft = currleft + 'px';
+    content.style.marginRight = currright + 'px';
+
+    }
+
+
+
+
+
+      $('#sidebarCollapse').on('click', function () {
+
+        var x = document.getElementById("inviz");
+        if (x.style.display === "none") {
+          x.style.display = "inline";
+        } 
+        else {
+          x.style.display = "none";
+        }
+
+        $('#sidebar').toggleClass('active');
+        $('#sidebarCollapse').toggleClass('slide-left settings-button-left');
+
+    
+        if($("#collapse-icon").attr('class') == "fa fa-angle-double-right"){
+          $("#collapse-icon").attr('class', 'fa fa-angle-double-left');
+        }
+        else{
+          $("#collapse-icon").attr('class', "fa fa-angle-double-right");
+        }
+      });     
+
+      
+      $('#make-sepia').on('click', function () {
+        document.body.classList.remove("dark-mode");
+        document.getElementById("make-dark").classList.remove("activebutton");
+        document.body.classList.remove("light-mode");
+        document.getElementById("make-light").classList.remove("activebutton");
+        document.body.classList.add("sepia-mode");
+        $('#make-sepia').attr('class', "activebutton");
+
+      
+      });
+
+      $('#make-light').on('click', function () {
+        document.body.classList.remove("sepia-mode");
+        document.getElementById("make-sepia").classList.remove("activebutton");
+        document.body.classList.remove("dark-mode");
+        document.getElementById("make-dark").classList.remove("activebutton");
+        document.body.classList.add("light-mode");
+        $('#make-light').attr('class', "activebutton");
+
+      });
+      
+      $('#make-dark').on('click', function () {
+        document.body.classList.remove("sepia-mode");
+        document.getElementById("make-sepia").classList.remove("activebutton");
+        document.body.classList.remove("light-mode");
+        document.getElementById("make-light").classList.remove("activebutton");
+        document.body.classList.add("dark-mode");
+        $('#make-dark').attr('class', "activebutton");      
+      });
+      
+      $('#make-sans').on('click', function () {
+        document.body.classList.remove("serif-mode");
+        document.body.classList.add("sans-mode");
+      });  
+
+      $('#make-serif').on('click', function () {
+        document.body.classList.remove("sans-mode");
+        document.body.classList.add("serif-mode");
+      });  
+
+      $('#p-less').on('click', function () {
+        smalltext();       
+      });  
+      $('#p-more').on('click', function () {
+        bigtext();
+      });
+      $('#lheight-less').on('click', function () {
+        smalllineheight();       
+      });  
+      $('#lheight-more').on('click', function () {
+        biglineheight();
+      });    
+      $('#margin-less').on('click', function () {
+        smallmargin();       
+      });  
+      $('#margin-more').on('click', function () {
+        bigmargin();
+      }); 
+
+    
+  </script>
+
+
+</body>
+
+{% endblock %}
