@@ -15,3 +15,5 @@ Flask-wtf
 Readability-lxml
 Requests
 python-dotenv
+Wheel
+gunicorn
