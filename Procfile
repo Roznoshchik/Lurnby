@@ -1,1 +1,1 @@
-web: gunicorn app:learnbetter.py
+web: gunicorn app:app
