@@ -16,3 +16,6 @@ More advanced functionality will exist too.
 
 ## Status
 Code currently runs a bit slow. It’s mostly using python, flask and makes call to a JS script to actually clean the text. Can and obviously should be optimized in the future. 
+
+### 6 May 2020
+Trying to deploy to Heroku - might be having issue with the python + node builds. 
