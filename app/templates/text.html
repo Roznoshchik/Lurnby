@@ -17,7 +17,13 @@
   <title>A Learning Tool</title>
 </head>
 <body>
-  
+  <!-- tooltip-->
+  <div id="infoDiv" class="tooltipDiv">
+   <button id ="addcomment" class="btn actions-button"><i class="fa fa-comment"></i></button>
+   <button id="addtolist" class="btn actions-button"><i class="fa fa-list-alt"></i></button>
+  </div>
+
+
   <div class="wrapper container-fluid"">
 
     <!-- Sidebar -->
@@ -97,12 +103,12 @@
   
 
 
-  <!-- Optional JavaScript -->
-  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+  <!-- jQuery first, then Popper.js, then Bootstrap JS, then bootbox -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
+
   <!-- My Custom JS  -->
   <script type="text/javascript">
     $(document).ready(function() {
@@ -161,89 +167,141 @@
 
 
 
-      $('#sidebarCollapse').on('click', function () {
+    $('#sidebarCollapse').on('click', function () {
 
-        var x = document.getElementById("inviz");
-        if (x.style.display === "none") {
-          x.style.display = "inline";
-        } 
-        else {
-          x.style.display = "none";
-        }
+      var x = document.getElementById("inviz");
+      if (x.style.display === "none") {
+        x.style.display = "inline";
+      } 
+      else {
+        x.style.display = "none";
+      }
 
-        $('#sidebar').toggleClass('active');
-        $('#sidebarCollapse').toggleClass('slide-left settings-button-left');
+      $('#sidebar').toggleClass('active');
+      $('#sidebarCollapse').toggleClass('slide-left settings-button-left');
 
-    
-        if($("#collapse-icon").attr('class') == "fa fa-angle-double-right"){
-          $("#collapse-icon").attr('class', 'fa fa-angle-double-left');
-        }
-        else{
-          $("#collapse-icon").attr('class', "fa fa-angle-double-right");
-        }
-      });     
-
-      
-      $('#make-sepia').on('click', function () {
-        document.body.classList.remove("dark-mode");
-        document.getElementById("make-dark").classList.remove("activebutton");
-        document.body.classList.remove("light-mode");
-        document.getElementById("make-light").classList.remove("activebutton");
-        document.body.classList.add("sepia-mode");
-        $('#make-sepia').attr('class', "activebutton");
-
-      
-      });
-
-      $('#make-light').on('click', function () {
-        document.body.classList.remove("sepia-mode");
-        document.getElementById("make-sepia").classList.remove("activebutton");
-        document.body.classList.remove("dark-mode");
-        document.getElementById("make-dark").classList.remove("activebutton");
-        document.body.classList.add("light-mode");
-        $('#make-light').attr('class', "activebutton");
-
-      });
-      
-      $('#make-dark').on('click', function () {
-        document.body.classList.remove("sepia-mode");
-        document.getElementById("make-sepia").classList.remove("activebutton");
-        document.body.classList.remove("light-mode");
-        document.getElementById("make-light").classList.remove("activebutton");
-        document.body.classList.add("dark-mode");
-        $('#make-dark').attr('class', "activebutton");      
-      });
-      
-      $('#make-sans').on('click', function () {
-        document.body.classList.remove("serif-mode");
-        document.body.classList.add("sans-mode");
-      });  
-
-      $('#make-serif').on('click', function () {
-        document.body.classList.remove("sans-mode");
-        document.body.classList.add("serif-mode");
-      });  
-
-      $('#p-less').on('click', function () {
-        smalltext();       
-      });  
-      $('#p-more').on('click', function () {
-        bigtext();
-      });
-      $('#lheight-less').on('click', function () {
-        smalllineheight();       
-      });  
-      $('#lheight-more').on('click', function () {
-        biglineheight();
-      });    
-      $('#margin-less').on('click', function () {
-        smallmargin();       
-      });  
-      $('#margin-more').on('click', function () {
-        bigmargin();
-      }); 
+  
+      if($("#collapse-icon").attr('class') == "fa fa-angle-double-right"){
+        $("#collapse-icon").attr('class', 'fa fa-angle-double-left');
+      }
+      else{
+        $("#collapse-icon").attr('class', "fa fa-angle-double-right");
+      }
+    });     
 
     
+    $('#make-sepia').on('click', function () {
+      document.body.classList.remove("dark-mode");
+      document.getElementById("make-dark").classList.remove("activebutton");
+      document.body.classList.remove("light-mode");
+      document.getElementById("make-light").classList.remove("activebutton");
+      document.body.classList.add("sepia-mode");
+      $('#make-sepia').attr('class', "activebutton");
+
+    
+    });
+
+    $('#make-light').on('click', function () {
+      document.body.classList.remove("sepia-mode");
+      document.getElementById("make-sepia").classList.remove("activebutton");
+      document.body.classList.remove("dark-mode");
+      document.getElementById("make-dark").classList.remove("activebutton");
+      document.body.classList.add("light-mode");
+      $('#make-light').attr('class', "activebutton");
+
+    });
+    
+    $('#make-dark').on('click', function () {
+      document.body.classList.remove("sepia-mode");
+      document.getElementById("make-sepia").classList.remove("activebutton");
+      document.body.classList.remove("light-mode");
+      document.getElementById("make-light").classList.remove("activebutton");
+      document.body.classList.add("dark-mode");
+      $('#make-dark').attr('class', "activebutton");      
+    });
+    
+    $('#make-sans').on('click', function () {
+      document.body.classList.remove("serif-mode");
+      document.body.classList.add("sans-mode");
+    });  
+
+    $('#make-serif').on('click', function () {
+      document.body.classList.remove("sans-mode");
+      document.body.classList.add("serif-mode");
+    });  
+
+    $('#p-less').on('click', function () {
+      smalltext();       
+    });  
+    $('#p-more').on('click', function () {
+      bigtext();
+    });
+    $('#lheight-less').on('click', function () {
+      smalllineheight();       
+    });  
+    $('#lheight-more').on('click', function () {
+      biglineheight();
+    });    
+    $('#margin-less').on('click', function () {
+      smallmargin();       
+    });  
+    $('#margin-more').on('click', function () {
+      bigmargin();
+    }); 
+
+   
+    // got the following 2 functions here: https://stackoverflow.com/questions/28246522/how-to-position-popover-over-a-highlighted-portion-of-text/28246679 
+    /*
+    function getSelectedText() {
+      var text = "";
+      if (typeof window.getSelection != "undefined") {
+        text = window.getSelection().toString();
+      } 
+      else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
+        text = document.selection.createRange().text;
+      }
+      return text;
+    }    
+    */  
+  
+  var selectedText;
+  function textActions() {
+     var selectedObj = window.getSelection();
+
+     selectedText = selectedObj.getRangeAt(0);
+
+    if (selectedText != "") {
+
+      $('#infoDiv').css('display', 'block');
+      $('#infoDiv').css('position', 'absolute');
+      $('#infoDiv').css('left', event.clientX + 25);
+      $('#infoDiv').css('top', event.clientY - 15);
+    } 
+    
+    
+
+  }
+
+ 
+  $('#addcomment').click(function(){
+    $('#infoDiv').css('display', 'none');
+    var text = '<h4>Add following text to comment function:</h4>' + selectedText;
+    bootbox.alert(text);  
+    
+  });
+
+  $('#addtolist').click(function(){
+    $('#infoDiv').css('display', 'none');
+    var text = '<h4>Add following text to some list that will be searchable </h4>' + selectedText;
+    bootbox.alert(text);
+  });
+        
+  
+    
+  
+  document.addEventListener("mouseup", textActions);
+  document.addEventListener("keyup", textActions);
+  
   </script>
 
 

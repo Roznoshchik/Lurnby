@@ -1,3 +1,14 @@
+.tooltipDiv {
+    display: none;
+    width: auto;
+    z-index: 101;
+    background-color: rgb(61, 59, 59) ;
+    color: black;
+    padding: 12px 12px 12px 12px;
+    border-radius: 4px 4px 4px 4px;
+  }
+
+
 .make-size{
     background-color: white;
     color:black;
@@ -156,6 +167,11 @@
 .settings-button{
     background-color: #FFEABD ;
     color: black;
+}
+.actions-button{
+    background-color: #FFEABD ;
+    color: black;
+    border: 1px solid;
 }
 
 /*
