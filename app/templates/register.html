@@ -49,7 +49,7 @@
             {{ form.repeat_password(class="form-control", placeholder="Repeat Password", required=true, autofocus=true)}}
             {{ form.repeat_password.label}}
         </div>
-        {% for error in form.password.errors %}
+        {% for error in form.repeat_password.errors %}
             <div class="alert alert-danger" role="alert">
             {{ error }}
             </div>
