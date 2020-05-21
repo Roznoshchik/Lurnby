@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">   
+{% endblock %}
+
+{% block content %}
+<form class="form-signin" action="" method="post" novalidate>
+    <div class="text-center mb-4">
+        <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
+        <p>
+            <a class="button" href="/goog"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
+        </p>
+        <p>or</p>
+        {{ form.hidden_tag() }}
+    </div>
+    
+    <div class="form-label-group">
+      {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
+      {{ form.username.label}}
+    </div>
+    {% for error in form.username.errors %}
+    <div class="alert alert-danger" role="alert">
+    {{ error }}
+    </div>
+{% endfor %}
+    <div class="form-label-group">
+        {{ form.password(class="form-control", placeholder="Password", required=true, autofocus=true)}}
+        {{ form.password.label}}
+    </div>
+    {% for error in form.password.errors %}
+    <div class="alert alert-danger" role="alert">
+    {{ error }}
+    </div>
+{% endfor %}
+    <div class="form-check">
+        {{ form.remember_me(class = "form-check-input") }} 
+        {{ form.remember_me.label }}
+    </div>
+    <div>     
+        <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+    </div>
+    <div class="text-center mb-4">
+        <p>
+            <a href="{{ url_for('register') }}">Register</a>
+        </p>  
+    </div>
+</form>
+
+
+{% endblock %}
+
+{% block JS %}
+
+{% endblock %}
