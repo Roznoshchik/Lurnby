@@ -144,11 +144,17 @@ def callback():
 
 @app.route('/register.html', methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
     form = RegisterForm()
     if form.validate_on_submit():
-
-        return redirect(url_for('index'))
-    
+        user=User(username=form.username.data, email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!', 'message')
+        return redirect(url_for('login'))
+    return render_template('register.html', title='Register', form=form)
     return render_template('register.html', form=form)
 
 @app.route('/dashboard')
