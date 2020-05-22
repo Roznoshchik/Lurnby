@@ -9,7 +9,7 @@
     <div class="text-center mb-4">
         <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
         <p>
-            <a class="button" href="/goog"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
+            <a class="button" href="{{ url_for('google_login' )}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
         </p>
         <p>or</p>
         {{ form.hidden_tag() }}
