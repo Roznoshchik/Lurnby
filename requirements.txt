@@ -33,6 +33,7 @@ more-itertools==8.3.0
 oauthlib==3.1.0
 packaging==20.4
 pluggy==0.13.1
+psycopg2==2.8.5
 py==1.8.1
 py-cpuinfo==5.0.0
 pycodestyle==2.6.0
