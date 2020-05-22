@@ -5,7 +5,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-app/__pycache__/
+app/__pycache__/*
 
 
 #ssl stuff - not sure this should be added here or not. 
