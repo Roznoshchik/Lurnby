@@ -47,6 +47,14 @@
         </button>
           
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+          {% if current_user.is_authenticated %}
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('dashboard' )}}">Dashboard</a>
+            </li>
+          </ul>
+          {% endif %}
+          
           <ul class="navbar-nav ml-auto">
             {% if current_user.is_anonymous %}
             <li class="nav-item">

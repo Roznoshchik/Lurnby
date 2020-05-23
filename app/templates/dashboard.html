@@ -7,16 +7,28 @@
 {% block content %}
 <div class=" pushdown container">
     <h1> Hello {{ current_user.username }}</h1>
-
-    <div class = "articles">
-        <h2>Unread Articles</h2>
-        <hr>
-       
-        <h2>Read Articles</h2>
-        <hr>
+    <hr>
+    <div class="card" style="width: 18rem; margin-top: 2rem;">
+        <div class="card-header">
+            Unread
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for article in unread_articles %}
+            <a href="{{url_for('article', id=article.id)}}" class="list-group-item list-group-item-action">{{article.title}}</a>
+            {% endfor %}
+        </ul>
     </div>
     
-</main>
+    <div class="card" style="width: 18rem; margin-top: 2rem;">
+        <div class="card-header">
+            Read
+        </div>
+        <ul class="list-group list-group-flush">
+            {% for article in read_articles %}
+            <a href="{{url_for('article', id=article.id)}}" class="list-group-item list-group-item-action">{{article.title}}</a>
+            {% endfor %}
+        </ul>
+    </div>
 
 
 {% endblock%}

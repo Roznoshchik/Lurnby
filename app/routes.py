@@ -6,8 +6,10 @@ from flask import flash, redirect, url_for, render_template, request
 from app.forms import URLForm, LoginForm, RegisterForm
 from app.pulltext import pull_text
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Articles
 from werkzeug.urls import url_parse
+from datetime import datetime
+
 
 @app.route("/", methods=['GET','POST'])
 @app.route("/index", methods=['GET','POST'])
@@ -15,11 +17,23 @@ def index():
     form = URLForm()
     if form.validate_on_submit():
         
-
         if request.method =='POST':
             url = request.form['url']
             text = pull_text(url)
-            return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
+            
+            if (text["byline"] is not None):
+                author = text["byline"]
+            else:
+                author = ""
+            title = text["title"]
+            content = text["content"]
+
+            new_article = Articles(unread=True, title=title, url=url, content=content )
+            db.session.add(new_article)
+            db.session.commit()
+            flash('Article added!', 'message')
+
+            #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
             
         return redirect(url_for('index'))
 
@@ -155,10 +169,23 @@ def register():
         flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
-    return render_template('register.html', form=form)
 
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    unread_articles = Articles.query.filter_by(unread=True).all()
+    read_articles = Articles.query.filter_by(unread=False).all()
 
+
+    return render_template('dashboard.html', unread_articles=unread_articles, read_articles=read_articles)
+
+@app.route('/article/<id>')
+def article(id):
+    article = Articles.query.filter_by(id=id).first()
+    article.unread = False
+    article.last_reviewed = datetime.utcnow()
+    db.session.commit()
+    
+    content = article.content
+    title = article.title
+    return render_template('text.html', title =title, content=content)
