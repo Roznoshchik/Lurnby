@@ -21,14 +21,14 @@ def index():
             url = request.form['url']
             text = pull_text(url)
             
-            if (text["byline"] is not None):
-                author = text["byline"]
-            else:
-                author = ""
+            
             title = text["title"]
             content = text["content"]
-
-            new_article = Articles(unread=True, title=title, url=url, content=content )
+            
+            if current_user.is_anonymous:
+                 return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
+            
+            new_article = Articles(unread=True, title=title, url=url, content=content, user_id=current_user.id )
             db.session.add(new_article)
             db.session.commit()
             flash('Article added!', 'message')
@@ -173,8 +173,8 @@ def register():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    unread_articles = Articles.query.filter_by(unread=True).all()
-    read_articles = Articles.query.filter_by(unread=False).all()
+    unread_articles = Articles.query.filter_by(unread=True, user_id=current_user.id).all()
+    read_articles = Articles.query.filter_by(unread=False, user_id=current_user.id).all()
 
 
     return render_template('dashboard.html', unread_articles=unread_articles, read_articles=read_articles)
