@@ -10,7 +10,9 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
-    articles = db.relationship('Articles', backref='user', lazy='dynamic')
+    articles = db.relationship('Article', backref='user', lazy='dynamic')
+    highlights = db.relationship('Highlight', backref ='user', lazy ='dynamic')
+    topics = db.relationship('Topic', backref = 'user', lazy = 'dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -26,11 +28,32 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return User.query.get(int(id))
 
-class Articles(db.Model):
+class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     unread = db.Column(db.Boolean, index=True)
     title = db.Column(db.String(255), index=True)
     url = db.Column(db.String(500))
     content = db.Column(db.String)
-    last_reviewed = db.Column(db.DateTime, default=datetime.utcnow)
+    date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
+
+highlights_topics = db.Table('highlights_topics',
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), primary_key=True),
+    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True)
+)
+
+class Highlight(db.Model):
+    id = db.Column(db.Integer,primary_key=True)
+    text = db.Column(db.String, index=True) #should I set a max length?
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
+    topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
+
+
+class Topic(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(140), index=True) #how long should it be?
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
+

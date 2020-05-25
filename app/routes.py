@@ -6,7 +6,7 @@ from flask import flash, redirect, url_for, render_template, request
 from app.forms import URLForm, LoginForm, RegisterForm
 from app.pulltext import pull_text
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User, Articles
+from app.models import User, Article, Topic, Highlight, highlights_topics
 from werkzeug.urls import url_parse
 from datetime import datetime
 
