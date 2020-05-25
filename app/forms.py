@@ -19,3 +19,6 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     repeat_password = PasswordField('Repeat Password', validators=[EqualTo('password')])
     submit = SubmitField('Sign In')
+
+class AddTopicForm(FlaskForm):
+    title = StringField('Topic title ...', validators=[DataRequired()])

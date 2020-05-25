@@ -1,9 +1,71 @@
+body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-color: #f5f5f5;
+  }
+
+.dropdown-toggle::after {
+        border: none;
+        font: normal normal normal 12px/1 'Font Awesome 5 Free';
+        content:"\f141";
+        vertical-align: 0;
+      }
+
+
+
+.topics-col{
+    width: 18rem; 
+    display: inline-block;
+    float: none;
+}
+
+.topics-col-inner{
+    max-height: 60vh;
+    overflow: auto;
+}
+
+ .add-topic {
+    background: rgba(22, 28, 22, 0.26);
+    color: white;
+    padding-top: 0.75rem;
+    padding-right: 1.25rem;
+    padding-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    display: block;
+}
+
+.add-topic:hover {
+    background: rgba(22, 28, 22, 0.66);
+   
+}
+
+&::-webkit-scrollbar {
+    display: none;
+  }
+
+.topics-row{
+    overflow-x: scroll;
+    overflow-y: hidden;
+     white-space: nowrap;
+    -webkit-overflo`w-scrolling: touch;
+    
+    &::-webkit-scrollbar {
+        display: none;
+      }
+}
+
 .flash-messages {
     margin-top: 56px;
 }
 
 .pushdown {
-    margin-top: 56px;
+    margin-top: 80px;
+    margin-left: 24px;
+
 }
 #standard {
     margin-top: 56px;
