@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+<div class= "pushdown">
+    <h1>Topics</h1>
+    <hr>
+    <div class="topics-row">
+        {% for topic in topics %}
+        <div class="card topics-col">
+            <div class="card-header">
+                {{topic.title}}
+                <div class="dropdown">
+                    <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="#">Archive list</a>
+                    </div>
+                  </div>
+            </div>
+            <div class="card-body topics-col-inner">
+                <ul class="list-group list-group-flush">
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+                    <a href="#" class="list-group-item list-group-item-action">Item</a>
+               </ul>
+            </div>
+        </div>
+        
+        {% endfor %}
+
+        <div class="topics-col accordion align-top" id="addtopicheader">
+            <div class="card">
+                <a class="addtopicbutton" href="#"><span class="card-header add-topic" data-toggle="collapse" data-target="#addtopic" aria-expanded="true" aria-controls="addtopic"> + add a topic</span></a>
+                <div id="addtopic" class="collapse" aria-labelledby="addtopic" data-parent="#addtopicheader">
+                    <div class="card-body">
+                        <form action="" method="post">
+                            {{ form.hidden_tag() }}
+                            <div class="form-group">
+                                {{ form.title(class="form-control", placeholder="Topic title...", required=true, autofocus=true)}}
+                            </div>
+                        
+                            <button type="submit" class="btn btn-primary">add</button>
+                            <button type="button" class="close" data-toggle="collapse" data-target="#addtopic" id="add-topic-close" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>    
+                        </form>
+                    </div>
+                </div>   
+
+             </div>
+        </div>
+    </div>
+    
+</div>
+
+
+
+{% endblock%}
+
+{% block JS %}
+<script>
+var addtopicbutton = document.getElementsByClassName('addtopicbutton');
+
+$('#addtopicheader').on('click', function () {
+  addtopicbutton[0].style.display="none";
+})
+
+$('#add-topic-close').on('click', function () {
+  addtopicbutton[0].style.display="block";
+    
+})     
+
+</script>
+
+
+{% endblock %}
