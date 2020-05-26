@@ -56,7 +56,7 @@ class Topic(db.Model):
     title = db.Column(db.String(512), index=True) #how long should it be?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
-    archived = db.Column(db.Boolean, index=True, default=False)
+    archived = db.Column(db.Boolean, index=True)
 
 
 

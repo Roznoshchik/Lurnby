@@ -198,7 +198,7 @@ def topics():
     
     if form.validate_on_submit():
 
-        newtopic=Topic(title=form.title.data, user_id=current_user.id)
+        newtopic=Topic(title=form.title.data, user_id=current_user.id, archived=False)
         db.session.add(newtopic)
 
         db.session.commit()
@@ -206,3 +206,10 @@ def topics():
         return redirect(url_for('topics'))
 
     return render_template('topics.html', form=form, topics=topics)
+
+@app.route('/archivetopic/<id>')
+def archivetopic(id):
+    topic = Topic.query.filter_by(id=id).first()
+    topic.archived = True
+    db.session.commit()
+    return redirect(url_for('topics'))

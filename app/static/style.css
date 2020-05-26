@@ -8,14 +8,41 @@ body {
     background-color: #f5f5f5;
   }
 
-.dropdown-toggle::after {
-        border: none;
-        font: normal normal normal 12px/1 'Font Awesome 5 Free';
-        content:"\f141";
-        vertical-align: 0;
-      }
+#card-header-dropdown-menu-button.dropdown-toggle::after {
+    border: none;
+}
 
+.topics-col .dropdown-menu {
+    background-color:white;
+    padding: 0;
+}
+.topics-col .dropdown-header{
+    background-color: grey;
+    color: white;
+    height: 40px;
+}
+.topics-col .dropdown-header, h4{
+    font-size: 1rem;
+}
 
+button.topic-card-header-menu {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.topic-card-header-menu{
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
 
 .topics-col{
     width: 18rem; 

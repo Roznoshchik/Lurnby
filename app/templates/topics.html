@@ -11,15 +11,25 @@
     <div class="topics-row">
         {% for topic in topics %}
         <div class="card topics-col">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between">
                 {{topic.title}}
+                
                 <div class="dropdown">
-                    <a class="dropdown-toggle" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                      <a class="dropdown-item" href="#">Archive list</a>
-                    </div>
-                  </div>
+                    <button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu">
+                        <span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                          </svg></span>
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button">
+                          <h4 class="dropdown-header">Topic Actions</h4>
+                        <a class="dropdown-item" href="{{ url_for('archivetopic', id = topic.id)}}">Archive topic</a>
+                        
+                      </div>
+                </div>
+                    
+                    
+                    
+                
             </div>
             <div class="card-body topics-col-inner">
                 <ul class="list-group list-group-flush">
@@ -59,11 +69,11 @@
                         <form action="" method="post">
                             {{ form.hidden_tag() }}
                             <div class="form-group">
-                                {{ form.title(class="form-control", placeholder="Topic title...", required=true, autofocus=true)}}
+                                {{ form.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}}
                             </div>
                         
                             <button type="submit" class="btn btn-primary">add</button>
-                            <button type="button" class="close" data-toggle="collapse" data-target="#addtopic" id="add-topic-close" aria-label="Close">
+                            <button type="button" class="close"  id="add-topic-close" aria-label="Close" data-toggle="collapse" data-target="#addtopic">
                                 <span aria-hidden="true">&times;</span>
                             </button>    
                         </form>
@@ -83,15 +93,20 @@
 {% block JS %}
 <script>
 var addtopicbutton = document.getElementsByClassName('addtopicbutton');
+var field = document.getElementById('addtopicinput');
 
-$('#addtopicheader').on('click', function () {
-  addtopicbutton[0].style.display="none";
+
+$('#addtopicheader').on('shown.bs.collapse', function () {
+    field.focus();
 })
 
-$('#add-topic-close').on('click', function () {
-  addtopicbutton[0].style.display="block";
-    
-})     
+$('#addtopicheader').on('show.bs.collapse', function () {
+    addtopicbutton[0].style.display = "none";
+})
+$('#addtopicheader').on('hide.bs.collapse', function () {
+    addtopicbutton[0].style.display = "block";
+})
+
 
 </script>
 
