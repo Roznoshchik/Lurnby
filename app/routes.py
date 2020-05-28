@@ -192,7 +192,7 @@ def article(id):
 
 @app.route('/topics', methods=['GET', 'POST'])
 def topics():
-    topics = Topic.query.filter_by(archived=False ,user_id=current_user.id).all()
+    topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
     
     form = AddTopicForm()
     

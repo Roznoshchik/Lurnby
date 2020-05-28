@@ -9,8 +9,10 @@
 <main id="standard">
   <!-- tooltip-->
   <div id="infoDiv" class="tooltipDiv">
-    <button id ="addcomment" class="btn actions-button"><i class="fa fa-comment"></i></button>
-    <button id="addtolist" class="btn actions-button"><i class="fa fa-list-alt"></i></button>
+    <button id ="addcomment" class="btn actions-button"><svg class="bi bi-pencil" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M11.293 1.293a1 1 0 0 1 1.414 0l2 2a1 1 0 0 1 0 1.414l-9 9a1 1 0 0 1-.39.242l-3 1a1 1 0 0 1-1.266-1.265l1-3a1 1 0 0 1 .242-.391l9-9zM12 2l2 2-9 9-3 1 1-3 9-9z"/>
+      <path fill-rule="evenodd" d="M12.146 6.354l-2.5-2.5.708-.708 2.5 2.5-.707.708zM3 10v.5a.5.5 0 0 0 .5.5H4v.5a.5.5 0 0 0 .5.5H5v.5a.5.5 0 0 0 .5.5H6v-1.5a.5.5 0 0 0-.5-.5H5v-.5a.5.5 0 0 0-.5-.5H3z"/>
+    </svg></button>
   </div>
 
 
@@ -103,264 +105,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
 
 <!-- My Custom JS  -->
-<script type="text/javascript">
-  $(document).ready(function() {
-    
-    // add img-fluid class to all images
-    var list;
-    list = document.querySelectorAll("img");
-    for (var i = 0; i < list.length; ++i) {
-      list[i].classList.add('img-fluid');
-    }
-  });
 
-  var content = document.getElementById('content');
+<!-- Add sidebar js -->
+<script type="text/javascript" src="{{url_for('static', filename='sidebar.js')}}"></script>
 
-  var currTextSize = 16;
-  var currlineheight = 24;
-  var currleft = 8;
-  var currright = 8;
+<!-- Select and highlight js. -->
 
-  content.style.fontSize = currTextSize + 'px';
+<!--
+<script type="text/javascript" src="{{url_for( 'static', filename='rr-selecttext.js' )}}"
+-->
 
-  function bigtext () {
-  ++currTextSize;
-  content.style.fontSize = currTextSize + 'px';
-  }
-  function biglineheight () {
-  ++currlineheight;
-  content.style.lineHeight = currlineheight + 'px';
-  }
-  function bigmargin () {
-  currleft += 8;
-  currright += 8;
-  content.style.marginLeft = currleft + 'px';
-  content.style.marginRight = currright + 'px';
-
-  }
+<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"
 
 
-  function smalltext () {
-  --currTextSize;
-  content.style.fontSize = currTextSize + 'px';
-  }
-  function smalllineheight () {
-  --currlineheight;
-  content.style.lineHeight = currlineheight + 'px';
-  }
-  function smallmargin () {
-  currleft -= 8;
-  currright -= 8;
-  content.style.marginLeft = currleft + 'px';
-  content.style.marginRight = currright + 'px';
-
-  }
-
-
-  $('#sidebar-collapse').on('click', function() {
-    var sidebar = document.getElementById("sidebar");
-    var standard = document.getElementById("standard");
-
-
-    if (sidebar.style.width === "48px"){
-      sidebar.style.width = "300px";
-      standard.style.marginLeft = "300px";
-      sidebar.style.background = "#EBC354"
-
-    }
-    else{
-      sidebar.style.width = "48px";
-      standard.style.marginLeft = "48px";
-      sidebar.style.background = "none"
-    }
-
-    var x = document.getElementById("inviz");
-    if (x.style.display === "none") {
-      x.style.display = "inline";
-    } 
-    else {
-      x.style.display = "none";
-    }
-
-    if($("#collapse-icon").attr('class') == "fa fa-angle-double-right"){
-      $("#collapse-icon").attr('class', 'fa fa-angle-double-left');
-    }
-    else{
-      $("#collapse-icon").attr('class', "fa fa-angle-double-right");
-    }
-     
-    var sidebarContent = document.getElementsByClassName("sidebar-content");
-    if (sidebarContent[0].style.display === "none") {
-      sidebarContent[0].style.display = "block";
-    } 
-    else {
-      sidebarContent[0].style.display = "none";
-    }
-
-
-  });
-
-
-  $('#sidebarcollapse').on('click', function () {
-
-    var x = document.getElementById("inviz");
-    if (x.style.display === "none") {
-      x.style.display = "inline";
-    } 
-    else {
-      x.style.display = "none";
-    }
-
-    $('#sidebar').toggleClass('active');
-    $('#sidebarcollapse').toggleClass('slide-left settings-button-left');
-
-
-    if($("#collapse-icon").attr('class') == "fa fa-angle-double-right"){
-      $("#collapse-icon").attr('class', 'fa fa-angle-double-left');
-    }
-    else{
-      $("#collapse-icon").attr('class', "fa fa-angle-double-right");
-    }
-  });     
-
-  
-  $('#make-sepia').on('click', function () {
-    document.body.classList.remove("dark-mode");
-    document.getElementById("make-dark").classList.remove("activebutton");
-    document.body.classList.remove("light-mode");
-    document.getElementById("make-light").classList.remove("activebutton");
-    document.body.classList.add("sepia-mode");
-    $('#make-sepia').attr('class', "activebutton");
-
-  
-  });
-
-  $('#make-light').on('click', function () {
-    document.body.classList.remove("sepia-mode");
-    document.getElementById("make-sepia").classList.remove("activebutton");
-    document.body.classList.remove("dark-mode");
-    document.getElementById("make-dark").classList.remove("activebutton");
-    document.body.classList.add("light-mode");
-    $('#make-light').attr('class', "activebutton");
-
-  });
-  
-  $('#make-dark').on('click', function () {
-    document.body.classList.remove("sepia-mode");
-    document.getElementById("make-sepia").classList.remove("activebutton");
-    document.body.classList.remove("light-mode");
-    document.getElementById("make-light").classList.remove("activebutton");
-    document.body.classList.add("dark-mode");
-    $('#make-dark').attr('class', "activebutton");      
-  });
-  
-  $('#make-sans').on('click', function () {
-    document.getElementById("content").classList.remove("serif-mode");
-    document.getElementById("content").classList.add("sans-mode");
-  });  
-
-  $('#make-serif').on('click', function () {
-    document.getElementById("content").classList.remove("sans-mode");
-    document.getElementById("content").classList.add("serif-mode");
-  });  
-
-  $('#p-less').on('click', function () {
-    smalltext();       
-  });  
-  $('#p-more').on('click', function () {
-    bigtext();
-  });
-  $('#lheight-less').on('click', function () {
-    smalllineheight();       
-  });  
-  $('#lheight-more').on('click', function () {
-    biglineheight();
-  });    
-  $('#margin-less').on('click', function () {
-    smallmargin();       
-  });  
-  $('#margin-more').on('click', function () {
-    bigmargin();
-  }); 
-
-  
-  // got the following 2 functions here: https://stackoverflow.com/questions/28246522/how-to-position-popover-over-a-highlighted-portion-of-text/28246679 
-  /*
-  function getSelectedText() {
-    var text = "";
-    if (typeof window.getSelection != "undefined") {
-      text = window.getSelection().toString();
-    } 
-    else if (typeof document.selection != "undefined" && document.selection.type == "Text") {
-      text = document.selection.createRange().text;
-    }
-    return text;
-  }    
-  */  
-
-var selectedText;
-function textActions() {
-    var selectedObj = window.getSelection();
-
-    selectedText = selectedObj.getRangeAt(0);
-
-  if (selectedText != "") {
-    
-    /*
-    this doesn't work because those aren't dom elements that I can target with anything
-     - they don't have an attribute. 
-     - I probably need to figure out how to wrap that text in a div
-     and then I can call a popover on it. 
-     and possible I can also then add the highlights to it in the back. 
-
-     an alternative approach is to just copy and paste that text immediately into a popover
-     and give you an option to store it right away. 
-
-     but this won't help me then see what comments or highlights i already have in a document. 
-     should atleast start using pocket a little bit to see how they handle this. 
-
-    selectedText.setAttribute("data-toggle", "popover");
-    selectedText.setAttribute("data-container", "body");
-    selectedText.setAttribute("data-placement", "top");
-    selectedText.setAttribute("content", "This is the content that I am trying to add to this document!!!");
-    */
-
-    /*
-    this is the old logic that shows #infodiv
-
-    */
-
-    $('#infoDiv').css('display', 'block');
-    $('#infoDiv').css('position', 'absolute');
-    $('#infoDiv').css('left', event.clientX + 25);
-    $('#infoDiv').css('top', event.clientY - 15);
-   
-
-  } 
-  
-  
-
-}
-
-
-$('#addcomment').click(function(){
-  $('#infoDiv').css('display', 'none');
-  var text = '<h4>Add following text to comment function:</h4>' + selectedText;
-  bootbox.alert(text);  
-  
-});
-
-$('#addtolist').click(function(){
-  $('#infoDiv').css('display', 'none');
-  var text = '<h4>Add following text to some list that will be searchable </h4>' + selectedText;
-  bootbox.alert(text);
-});
-      
-
-  
-
-document.addEventListener("mouseup", textActions);
-document.addEventListener("keyup", textActions);
-
-</script>
 {% endblock %}

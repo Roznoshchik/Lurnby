@@ -111,7 +111,7 @@ button.topic-card-header-menu {
 
 
 
-.tooltipDiv {
+#infoDiv {
     display: none;
     width: auto;
     z-index: 101;
