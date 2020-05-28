@@ -305,11 +305,37 @@ function textActions() {
     selectedText = selectedObj.getRangeAt(0);
 
   if (selectedText != "") {
+    
+    /*
+    this doesn't work because those aren't dom elements that I can target with anything
+     - they don't have an attribute. 
+     - I probably need to figure out how to wrap that text in a div
+     and then I can call a popover on it. 
+     and possible I can also then add the highlights to it in the back. 
+
+     an alternative approach is to just copy and paste that text immediately into a popover
+     and give you an option to store it right away. 
+
+     but this won't help me then see what comments or highlights i already have in a document. 
+     should atleast start using pocket a little bit to see how they handle this. 
+
+    selectedText.setAttribute("data-toggle", "popover");
+    selectedText.setAttribute("data-container", "body");
+    selectedText.setAttribute("data-placement", "top");
+    selectedText.setAttribute("content", "This is the content that I am trying to add to this document!!!");
+    */
+
+    /*
+    this is the old logic that shows #infodiv
+
+    */
 
     $('#infoDiv').css('display', 'block');
     $('#infoDiv').css('position', 'absolute');
     $('#infoDiv').css('left', event.clientX + 25);
     $('#infoDiv').css('top', event.clientY - 15);
+   
+
   } 
   
   
