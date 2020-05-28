@@ -9,6 +9,8 @@ __pycache__/
 
 app/__pycache__/*
 
+.DS_Store
+
 
 #ssl stuff - not sure this should be added here or not. 
 *.pem
