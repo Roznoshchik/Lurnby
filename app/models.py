@@ -13,6 +13,7 @@ class User(UserMixin, db.Model):
     articles = db.relationship('Article', backref='user', lazy='dynamic')
     highlights = db.relationship('Highlight', backref ='user', lazy ='dynamic')
     topics = db.relationship('Topic', backref = 'user', lazy = 'dynamic')
+    tags = db.relationship('Tag', backref = 'user', lazy = 'dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -49,6 +50,8 @@ class Highlight(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
+    note = db.Column(db.String, index=True)
+
 
 
 class Topic(db.Model):
@@ -58,5 +61,9 @@ class Topic(db.Model):
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
 
-
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    archived = db.Column(db.Boolean, index=True)
 

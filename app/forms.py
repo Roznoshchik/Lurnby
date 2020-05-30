@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length
 
@@ -22,3 +22,8 @@ class RegisterForm(FlaskForm):
 
 class AddTopicForm(FlaskForm):
     title = StringField('Topic title ...', validators=[DataRequired()])
+
+class AddHighlightForm(FlaskForm):
+    text = TextAreaField('Highlight')
+    note = TextAreaField('Note')
+    

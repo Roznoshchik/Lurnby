@@ -74,11 +74,22 @@ function highlightSelection() {
 
 
 function highlightRange(range) {
-    var newNode = document.createElement("div");
+    var newNode = document.createElement("button");
     newNode.setAttribute(
        "style",
-       "background-color: yellow; display: inline;"
+       "background-color: yellow; display: inline; border: none;"
     );
+
+    newNode.setAttribute('type','button' );
+    newNode.setAttribute('class','button-inline' )
+
+    newNode.setAttribute('data-toggle','popover' );
+    newNode.setAttribute('data-container','body' );
+    newNode.setAttribute('data-placement','right' );
+    newNode.setAttribute('data-trigger','focus' );
+    newNode.setAttribute('title','OPTIONS' );
+    newNode.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
+
     range.surroundContents(newNode);
 }
 
@@ -112,7 +123,9 @@ if (selectedText != "") {
 
 }
 
-
+$(function () {
+    $('[data-toggle="popover"]').popover()
+  })
 
 content.addEventListener("mouseup", textActions);
 content.addEventListener("keyup", textActions);
