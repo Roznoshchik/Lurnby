@@ -2,7 +2,7 @@ from app import db, login
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-
+from sqlalchemy.sql.expression import not_
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,8 +40,8 @@ class Article(db.Model):
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
 
 highlights_topics = db.Table('highlights_topics',
-    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), primary_key=True),
-    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), primary_key=True)
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id')),
+    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'))
 )
 
 class Highlight(db.Model):
@@ -50,7 +50,35 @@ class Highlight(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
-    note = db.Column(db.String, index=True)
+    note = db.Column(db.String, index=True) 
+
+    def AddToTopic(self, topic):
+        if not self.is_added(topic):
+            self.topics.append(topic)
+       
+
+    def RemoveFromTopic(self, topic):  
+        if self.is_added(topic):
+            self.topics.remove(topic)
+      
+
+    def is_added(self, topic):
+        return self.topics.filter(
+            topic.id == highlights_topics.c.topic_id).count() > 0
+    
+    def in_topics(self):
+        return Topic.query.join(
+            highlights_topics, (highlights_topics.c.topic_id == Topic.id)
+            ).filter(
+               highlights_topics.c.highlight_id == self.id
+               ) 
+    
+    def not_in_topics(self):
+        return Topic.query.join(
+            highlights_topics, (highlights_topics.c.topic_id == Topic.id)
+            ).filter(
+                highlights_topics.c.highlight_id !=self.id
+                ) 
 
 
 
