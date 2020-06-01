@@ -14,7 +14,6 @@ class HighlightModelCase(unittest.TestCase):
     def test_highlights_topics(self):
         h1 = Highlight(text = "this is a highlight")
         h2 = Highlight(text = "This is a second highlight")
-
         t1 = Topic(title = "Canaries")
         t2 = Topic(title = "Bluejays")
 
@@ -77,17 +76,20 @@ class HighlightModelCase(unittest.TestCase):
         m3 = h3.in_topics().all()
         m4 = h4.in_topics().all()
 
-        nm1 = h1.not_in_topics().all()
-        nm2 = h2.not_in_topics().all()
-        nm3 = h3.not_in_topics().all()
-        nm4 = h4.not_in_topics().all()  
+        nm1 = h1.not_in_topics()
+        nm2 = h2.not_in_topics()
+        nm3 = h3.not_in_topics()
+        nm4 = h4.not_in_topics() 
 
         self.assertEqual(m1, [t1, t3])
         self.assertEqual(nm1, [t2, t4])
+        
         self.assertEqual(m2, [t2])
         self.assertEqual(nm2, [t1, t3, t4])
+        
         self.assertEqual(m3, [t1, t2, t3, t4])
         self.assertEqual(nm3, [])
+       
         self.assertEqual(m4, [])
         self.assertEqual(nm4, [t1, t2, t3, t4])
 

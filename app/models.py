@@ -2,7 +2,7 @@ from app import db, login
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from sqlalchemy.sql.expression import not_
+from sqlalchemy.sql import column
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -72,15 +72,21 @@ class Highlight(db.Model):
             ).filter(
                highlights_topics.c.highlight_id == self.id
                ) 
-    
+   
+
     def not_in_topics(self):
-        return Topic.query.join(
-            highlights_topics, (highlights_topics.c.topic_id == Topic.id)
-            ).filter(
-                highlights_topics.c.highlight_id !=self.id
-                ) 
+        query = Topic.query.filter(
+            Topic.id.notin_(
+                db.session.query(highlights_topics.c.topic_id).filter(
+                    highlights_topics.c.highlight_id == self.id)))
+        list = []
+        for i in query:
+            list.append(i)
 
-
+        return list
+    
+    
+    
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
