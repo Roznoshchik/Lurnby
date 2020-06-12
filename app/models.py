@@ -7,6 +7,7 @@ from sqlalchemy.sql import column
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     goog_id = db.Column(db.String, unique=True, index=True)
+    firstname = db.Column(db.String, index=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index = True, unique = True)
     password_hash = db.Column(db.String(128))
@@ -40,8 +41,8 @@ class Article(db.Model):
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
 
 highlights_topics = db.Table('highlights_topics',
-    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id')),
-    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'))
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), nullable=False),
+    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), nullable=False )
 )
 
 class Highlight(db.Model):

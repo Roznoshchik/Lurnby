@@ -6,7 +6,11 @@
 
 {% block content %}
 <div class=" pushdown">
+    {% if current_user.firstname%}
+    <h1> Hello {{ current_user.firstname }}</h1>
+    {% else %}
     <h1> Hello {{ current_user.username }}</h1>
+    {% endif %}
     <hr>
     <div class="card" style="width: 18rem; margin-top: 2rem;">
         <div class="card-header">

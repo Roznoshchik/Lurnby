@@ -47,7 +47,7 @@ def login():
         return redirect(url_for('index'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(username=form.username.data).first()
+        user = User.query.filter_by(username=form.username.data.lower()).first()
         if user is not None:
             if user.check_password(form.password.data):
                 login_user(user, remember=form.remember_me.data)
@@ -60,7 +60,7 @@ def login():
             return redirect(url_for('login'))
 
         else:
-            user = User.query.filter_by(email=form.username.data).first()
+            user = User.query.filter_by(email=form.username.data.lower()).first()
             if user is None or not user.check_password(form.password.data):
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('login'))
@@ -142,8 +142,8 @@ def callback():
 
     # Create a user in your db with the information provided
     # by Google
-    newuser = User(goog_id=unique_id, email=users_email, username=users_name)
-    user = User.query.filter_by(goog_id=unique_id).first()    
+    newuser = User(goog_id=unique_id, email=users_email, firstname=users_name)
+    user = User.query.filter_by(email=users_email).first()    
     if user is None:
         db.session.add(newuser)
         db.session.commit()
@@ -151,6 +151,11 @@ def callback():
         login_user(user)
     
     if user is not None:
+        if user.goog_id == None:   
+            user.goog_id = unique_id
+            user.firstname = users_name
+            db.session.commit()
+        
         login_user(user)
     return redirect(url_for("articles"))
 
@@ -162,7 +167,7 @@ def register():
         return redirect(url_for('articles'))
     form = RegisterForm()
     if form.validate_on_submit():
-        user=User(username=form.username.data, email=form.email.data)
+        user=User(username=form.username.data.lower(), firstname=form.firstname.data, email=form.email.data.lower())
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()

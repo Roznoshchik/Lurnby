@@ -8,6 +8,19 @@ body {
     background-color: #f5f5f5;
   }
 
+.text-center {
+    text-align: center;
+}
+
+.body-center{
+    padding-top: 2rem;
+}
+
+.btn-wide{
+    padding-left: 88px;
+    padding-right: 88px;
+}
+
 #card-header-dropdown-menu-button.dropdown-toggle::after {
     border: none;
 }

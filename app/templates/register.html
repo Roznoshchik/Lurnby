@@ -28,6 +28,10 @@
             </div>
         {% endfor %}
         <div class="form-label-group">
+            {{ form.firstname(class="form-control", placeholder="First name", autofocus=true )}}
+            {{ form.firstname.label}}
+        </div>
+        <div class="form-label-group">
             {{ form.email(class="form-control", placeholder="Email", required=true, autofocus=true)}}
             {{ form.email.label}}
         </div>
