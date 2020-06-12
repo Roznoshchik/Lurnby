@@ -7,12 +7,14 @@ from flask_login import LoginManager
 from oauthlib.oauth2 import WebApplicationClient
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
+from flask_mail import Mail
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
+mail = Mail(app)
 
 if __name__ == "__main__":
     app.run(ssl_context=('cert.pem', 'key.pem'))

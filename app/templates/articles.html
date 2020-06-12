@@ -6,7 +6,7 @@
 
 {% block content %}
 <div class=" pushdown">
-    {% if current_user.firstname%}
+    {% if current_user.firstname %}
     <h1> Hello {{ current_user.firstname }}</h1>
     {% else %}
     <h1> Hello {{ current_user.username }}</h1>
