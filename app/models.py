@@ -49,7 +49,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     unread = db.Column(db.Boolean, index=True)
     title = db.Column(db.String(255), index=True)
-    url = db.Column(db.String(500))
+    source = db.Column(db.String(500))
     content = db.Column(db.String)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -68,20 +68,22 @@ class Highlight(db.Model):
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
 
+    # add highlight to topic
     def AddToTopic(self, topic):
         if not self.is_added(topic):
             self.topics.append(topic)
        
-
+    # remove highlight from topic
     def RemoveFromTopic(self, topic):  
         if self.is_added(topic):
             self.topics.remove(topic)
       
-
+    # checks if a highlight is in a topic
     def is_added(self, topic):
         return self.topics.filter(
             topic.id == highlights_topics.c.topic_id).count() > 0
     
+    # returns all topics that a highlight is a part of.  highlight.in_topics.all()
     def in_topics(self):
         return Topic.query.join(
             highlights_topics, (highlights_topics.c.topic_id == Topic.id)
@@ -89,7 +91,7 @@ class Highlight(db.Model):
                highlights_topics.c.highlight_id == self.id
                ) 
    
-
+    # returns all topics that a highlight is not a part of. highlight.not_in_topics()
     def not_in_topics(self):
         query = Topic.query.filter(
             Topic.id.notin_(
@@ -106,7 +108,7 @@ class Highlight(db.Model):
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(512), index=True) #how long should it be?
+    title = db.Column(db.String(512), unique=True, index=True) #how long should it be?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
@@ -116,4 +118,5 @@ class Tag(db.Model):
     name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     archived = db.Column(db.Boolean, index=True)
+    goal = db.Column(db.String(512))
 

@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FormField, FieldList
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length
-from app.models import User
+from app.models import User, Topic
 
 class URLForm(FlaskForm):
     url = URLField('URL', validators=[DataRequired(), URL()])
@@ -44,8 +44,17 @@ class ResetPasswordForm(FlaskForm):
 
 class AddTopicForm(FlaskForm):
     title = StringField('Topic title ...', validators=[DataRequired()])
+    
+    def validate_title(self, title):
+        title = Topic.query.filter_by(title=title.data.lower()).first()
+        if title is not None:
+            raise ValidationError('Topic with this name already exists.')
 
 class AddHighlightForm(FlaskForm):
     text = TextAreaField('Highlight')
-    note = TextAreaField('Note')
-    
+    note = TextAreaField('Add a note or description')
+
+
+
+
+

@@ -66,7 +66,7 @@
                 <a class="addtopicbutton" href="#"><span class="card-header add-topic" data-toggle="collapse" data-target="#addtopic" aria-expanded="true" aria-controls="addtopic"> + add a topic</span></a>
                 <div id="addtopic" class="collapse" aria-labelledby="addtopic" data-parent="#addtopicheader">
                     <div class="card-body">
-                        <form action="" method="post">
+                        <form action="" method="post" novalidate>
                             {{ form.hidden_tag() }}
                             <div class="form-group">
                                 {{ form.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}}

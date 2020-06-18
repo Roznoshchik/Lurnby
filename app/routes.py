@@ -2,14 +2,15 @@ import json
 import requests
 
 from app import app, client, db
-from flask import flash, redirect, url_for, render_template, request
-from app.forms import URLForm, LoginForm, RegisterForm, AddTopicForm, ResetPasswordRequestForm, ResetPasswordForm
+from flask import flash, redirect, url_for, render_template, request, jsonify
+from app.forms import URLForm, LoginForm, RegisterForm, AddTopicForm, ResetPasswordRequestForm, ResetPasswordForm, AddHighlightForm
 from app.pulltext import pull_text
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Article, Topic, Highlight, highlights_topics, Tag
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
+from wtforms import BooleanField
 
 
 @app.route("/", methods=['GET','POST'])
@@ -29,7 +30,7 @@ def index():
             if current_user.is_anonymous:
                  return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
             
-            new_article = Article(unread=True, title=title, url=url, content=content, user_id=current_user.id )
+            new_article = Article(unread=True, title=title, source=url, content=content, user_id=current_user.id )
             db.session.add(new_article)
             db.session.commit()
             flash('Article added!', 'message')
@@ -185,16 +186,62 @@ def articles():
 
     return render_template('articles.html', unread_articles=unread_articles, read_articles=read_articles)
 
-@app.route('/article/<id>')
+@app.route('/article/<id>', methods =['POST', 'GET'])
 def article(id):
     article = Article.query.filter_by(id=id).first()
     article.unread = False
     article.last_reviewed = datetime.utcnow()
     db.session.commit()
-    
+
+    topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
     content = article.content
     title = article.title
-    return render_template('text.html', title =title, content=content)
+
+    addtopicform = AddTopicForm()
+    
+    
+
+    form = AddHighlightForm()
+    
+    if form.validate_on_submit():
+        topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+
+        newHighlight = Highlight(user_id = current_user.id, article_id = id, text = form.text.data, note = form.note.data)
+        db.session.add(newHighlight)
+        for t in topics:
+            if request.form.get(t.title):
+                newHighlight.AddToTopic(t)
+        
+        db.session.commit()
+     
+
+    return render_template('text.html', title =title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+
+
+@app.route('/article/addhighlight', methods =['POST'])
+def addhighlight():
+    form = AddHighlightForm()
+    
+    if form.validate_on_submit():
+        topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+
+        newHighlight = Highlight(user_id = current_user.id, article_id = id, text = form.text.data, note = form.note.data)
+        db.session.add(newHighlight)
+        for t in topics:
+            if request.form.get(t.title):
+                newHighlight.AddToTopic(t)
+
+
+
+
+
+"""
+@app.route('/article/<id>/add')
+def add_highlight(highlightedtext, article_id):
+    article = Article.query.filter_by(id=article_id).first()
+    topics = Topic.query.all()
+ 
+"""
 
 @app.route('/topics', methods=['GET', 'POST'])
 def topics():
@@ -212,6 +259,24 @@ def topics():
         return redirect(url_for('topics'))
 
     return render_template('topics.html', form=form, topics=topics)
+
+
+@app.route('/topics/add', methods=['POST'])
+def add_new_topic():
+
+    newtopic = Topic.query.filter_by(title=request.form['title'].lower()).first()
+    if newtopic is not None:
+        return 403
+    
+    newtopic = Topic(title=request.form['title'].lower(), user_id=current_user.id, archived=False)
+    db.session.add(newtopic)
+    db.session.commit()
+
+    return jsonify({
+        'title': newtopic.title
+    })
+   
+
 
 @app.route('/archivetopic/<id>')
 def archivetopic(id):

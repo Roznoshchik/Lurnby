@@ -74,14 +74,15 @@ function highlightSelection() {
 
 
 function highlightRange(range) {
-    var newNode = document.createElement("button");
+    var newNode = document.createElement("span");
     newNode.setAttribute(
        "style",
        "background-color: yellow; display: inline; border: none;"
     );
 
     newNode.setAttribute('type','button' );
-    newNode.setAttribute('class','button-inline' )
+
+    newNode.setAttribute('class','button-inline TEMP' );
 
     newNode.setAttribute('data-toggle','popover' );
     newNode.setAttribute('data-container','body' );
@@ -127,14 +128,28 @@ $(function () {
     $('[data-toggle="popover"]').popover()
   })
 
+
+  
 content.addEventListener("mouseup", textActions);
 content.addEventListener("keyup", textActions);
 
 
 
-$('#addcomment').click(function(){
-highlightSelection();
+$('#addhighlight').click(function(){
+  highlightSelection();
   document.getElementById('infoDiv').style.visibility = 'hidden';
 
 
 }); 
+
+$('#AddHighlightModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget) // Button that triggered the modal
+    var rawhighlight = selectedText // selected text
+    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+    $('#HighlightField').val(rawhighlight)
+  })
+
+function showaddhighlightmodal(){
+    $('#AddHighlightModal').modal('show')
+  }
