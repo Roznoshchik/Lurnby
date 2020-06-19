@@ -74,24 +74,26 @@ function highlightSelection() {
 
 
 function highlightRange(range) {
-    var newNode = document.createElement("span");
-    newNode.setAttribute(
-       "style",
-       "background-color: yellow; display: inline; border: none;"
-    );
+    var newNode = document.createElement("a");
+    //newNode.setAttribute('type','button' );
 
-    newNode.setAttribute('type','button' );
-
-    newNode.setAttribute('class','button-inline TEMP' );
-
+    newNode.setAttribute('class','d-inline TEMP' );
+    newNode.setAttribute('tabindex', '0')
     newNode.setAttribute('data-toggle','popover' );
     newNode.setAttribute('data-container','body' );
     newNode.setAttribute('data-placement','right' );
     newNode.setAttribute('data-trigger','focus' );
     newNode.setAttribute('title','OPTIONS' );
     newNode.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
-
     range.surroundContents(newNode);
+
+    $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+
+      $('.popover-dismiss').popover({
+        trigger: 'focus'
+      })
 }
 
 

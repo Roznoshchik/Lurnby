@@ -24,7 +24,8 @@
         </div>
         <div class="modal-body">
           <form  id = "SubmitHighlightForm" action="" method="post">
-             {{ form.hidden_tag() }}
+             <!-- {{ form.hidden_tag() }} -->
+            <input type="hidden" name="article_id" value="{{ article_id}}"> 
             <div class="form-group">
               {{ form.text.label }}
               {{ form.text(class="form-control", id="HighlightField") }}
@@ -37,7 +38,7 @@
             <div class="btn-group-toggle" data-toggle="buttons">
               {% for topic in topics %}
               <label class="button-group-pills btn btn-default">
-                <input name = "{{ topic.title }}" type="checkbox"  >
+                <input name = "topics" type="checkbox" value="{{topic.title}}">
                 {{topic.title}}
               </label>
               {% endfor %}
@@ -54,8 +55,8 @@
           
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Add</button>
+          <button type="button" onclick = "RemoveTempHighlights()" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" onclick="SubmitHighlight()" class="btn btn-primary">Add</button>
         </div>
       </form>
       </div>
@@ -168,9 +169,54 @@
 <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
 <script>
   
+  function SubmitHighlight(){
+    $("#SubmitHighlightForm").ajaxSubmit({
+      url: '/article/addhighlight', 
+      type: 'post',
+      success: function(responseText){ AddedHighlight(responseText) },
+      error: function(){ FailedToAddHighlight() }
+    })
+  }
 
-$("#SubmitHighlightForm").ajaxForm({url: '/article/addhighlight', type: 'post'});
+  function AddedHighlight(responseText){
+    var highlightCollection = document.getElementsByClassName('TEMP')
+    var newclass = "highlight" + responseText['highlight_id']  
+    
+    for (let i=0; i < highlightCollection.length; i++){
+        var currentHighlight = highlightCollection[i];
+        currentHighlight.classList.add(newclass);
+        currentHighlight.classList.add("highlighted");
+        currentHighlight.classList.remove("TEMP");
+        //currentHighlight.parentNode.removeChild(currentHighlight);
+    $('#AddHighlightModal').modal('hide');
+    }
+  }
+    
+  function FailedToAddHighlight(){
+    var node = document.createElement('span');
+    node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
+    document.body.appendChild(node);
+    //document.body.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
+  }
 
+
+
+
+    function RemoveTempHighlights(){
+
+      var highlightCollection = document.getElementsByClassName('TEMP')
+      
+      for (let i=0; i < highlightCollection.length; i++){
+        var currentHighlight = highlightCollection[i];
+        //currentHighlight.classList.remove("TEMP");
+        currentHighlight.outerHTML = currentHighlight.innerHTML;
+        currentHighlight.remove();
+        //currentHighlight.parentNode.removeChild(currentHighlight);
+      
+      
+      }
+    }
+    
 
 
   function NewTopic(){
@@ -180,9 +226,9 @@ $("#SubmitHighlightForm").ajaxForm({url: '/article/addhighlight', type: 'post'})
   
   function NewTopicSubmit(){
     $.post('/topics/add', {
-      title: $(addtopicinput).val()
+      title: $('#addtopicinput').val()
     }).done(function(response) {
-        $('#topicplaceholder').append('<label class="button-group-pills btn btn-default"><input name = "' + response['title'] + '" type="checkbox">'+response["title"]+'</label>');
+        $('#topicplaceholder').append('<label class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
         $('#CreateTopic').html('<button onclick ="NewTopic()" class="create-button btn btn-success">Create new topic </button>');
         highlightSelection();
     }).fail(function() {

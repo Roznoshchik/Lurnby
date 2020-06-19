@@ -113,6 +113,10 @@ class Topic(db.Model):
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
 
+    def is_added(self, highlight):
+        return self.highlights.filter(
+            highlight.id == highlights_topics.c.highlight_id).count() > 0
+
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)

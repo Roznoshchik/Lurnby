@@ -206,7 +206,7 @@ def article(id):
     if form.validate_on_submit():
         topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-        newHighlight = Highlight(user_id = current_user.id, article_id = id, text = form.text.data, note = form.note.data)
+        newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data)
         db.session.add(newHighlight)
         for t in topics:
             if request.form.get(t.title):
@@ -220,33 +220,33 @@ def article(id):
 
 @app.route('/article/addhighlight', methods =['POST'])
 def addhighlight():
-    form = AddHighlightForm()
     
-    if form.validate_on_submit():
-        topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+    topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-        newHighlight = Highlight(user_id = current_user.id, article_id = id, text = form.text.data, note = form.note.data)
-        db.session.add(newHighlight)
-        for t in topics:
-            if request.form.get(t.title):
-                newHighlight.AddToTopic(t)
+    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), text = request.form.get('text'), note = request.form.get('note'))
+    db.session.add(newHighlight)
+    
+    list = request.form.getlist('topics')
+    
+    for t in list:
+        print(t)
+        topic = Topic.query.filter_by(title=t).first()
+        print (topic, topic.title)
+        newHighlight.AddToTopic(topic) 
+    
+    db.session.commit() 
+    
+    return jsonify({
+        'highlight_id': newHighlight.id
+    })
 
+   
 
-
-
-
-"""
-@app.route('/article/<id>/add')
-def add_highlight(highlightedtext, article_id):
-    article = Article.query.filter_by(id=article_id).first()
-    topics = Topic.query.all()
- 
-"""
 
 @app.route('/topics', methods=['GET', 'POST'])
 def topics():
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
-    
+    highlights = Highlight.query.filter_by(user_id=current_user.id).all()
     form = AddTopicForm()
     
     if form.validate_on_submit():
@@ -258,7 +258,7 @@ def topics():
         #return render_template('topics.html', form=form, topics=topics)
         return redirect(url_for('topics'))
 
-    return render_template('topics.html', form=form, topics=topics)
+    return render_template('topics.html', form=form, highlights = highlights, topics=topics)
 
 
 @app.route('/topics/add', methods=['POST'])
@@ -273,7 +273,8 @@ def add_new_topic():
     db.session.commit()
 
     return jsonify({
-        'title': newtopic.title
+        'title': newtopic.title,
+        'id': newtopic.id
     })
    
 
@@ -282,6 +283,7 @@ def add_new_topic():
 def archivetopic(id):
     topic = Topic.query.filter_by(id=id).first()
     topic.archived = True
+    topic.title = topic.title + "-id:" + str(topic.id)
     db.session.commit()
     return redirect(url_for('topics'))
 

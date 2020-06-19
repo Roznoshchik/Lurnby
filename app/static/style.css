@@ -8,10 +8,17 @@
     color: #14a4be;
   }
 
+.highlighted {
+    background-color: rgba(255, 255, 0, 0.411); 
+    display: inline; 
+    border: none;
+}
+
+
   #topicplaceholder input{
     display:none;
   }
-  
+
   .button-group-pills.active {
     border-color: #14a4be;
     background-color: #14a4be;
@@ -105,10 +112,16 @@ button.topic-card-header-menu {
     opacity: .5;
 }
 
+
+
+#topicmain {
+width: 100%;
+
+}
+
 .topics-col{
-    width: 18rem; 
-    display: inline-block;
-    float: none;
+margin-bottom: 24px;  
+
 }
 
 .topics-col-inner{
