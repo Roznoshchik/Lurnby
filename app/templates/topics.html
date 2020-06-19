@@ -15,7 +15,7 @@
             {% for topic in topics %}
             <div class="col-sm-6 col-md-3 col-xl-3 topics-col">
                 <div class="card bg-light">
-                    <div class="card-body">
+                    <div class="card-header">
                         <div class="dropdown">
                             <button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu">
                                 <span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -29,7 +29,8 @@
                             </div>
                         </div>
                         <h6 class="card-title text-uppercase py-2">{{topic.title}}</h6>
-
+                    </div>
+                    <div class="card-body topics-col-base">
                         <div class="items border border-light">
                             {% for highlight in highlights %}
                             {% if topic.is_added(highlight) %}
@@ -112,17 +113,15 @@ var tempScrollLeft
 function AddTopicSubmit(){
 
     tempScrollLeft = $('#topicmain').scrollLeft()
-    console.log(tempScrollLeft)
 
-
-
-    /*
+    
     if (!$('#addtopicinput').val())
     {
         $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Topic title can\'t be empty. <button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
         
     }
     else{
+        /*
     $.post('/topics/add', {
       title: $('#addtopicinput').val()
     }).done(function(response) {
@@ -136,13 +135,15 @@ function AddTopicSubmit(){
     });
     
     */
-    $("#NewTopicForm").ajaxSubmit({
-      url: '/topics/add', 
-      type: 'post',
-      success: function(responseText){ AddedTopic(responseText) },
-      error: function(){ FailedToAddTopic() }
 
-    })
+        $("#NewTopicForm").ajaxSubmit({
+        url: '/topics/add', 
+        type: 'post',
+        success: function(responseText){ AddedTopic(responseText) },
+        error: function(){ FailedToAddTopic() }
+
+        })
+    }
 }
 
 function AddedTopic(responseText){
@@ -151,7 +152,7 @@ function AddedTopic(responseText){
 
 
 
-    $('#topicmain').append('<div class="col-sm-6 col-md-3 col-xl-3"><div class="card bg-light"><div class="card-body"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="{{ url_for("archivetopic", id = ' + responseText["id"] + ')}}">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'+ responseText["title"] +'</h6><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-3 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>');
+    $('#topicmain').append('<div class="col-sm-6 col-md-3 col-xl-3"><div class="card bg-light"><div class="card-header"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="{{ url_for("archivetopic", id = ' + responseText["id"] + ')}}">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'+ responseText["title"] +'</h6></div><div class="card-body"><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-3 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>');
     $('#topicmain').scrollLeft(tempScrollLeft)
 
 }

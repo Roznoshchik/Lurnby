@@ -124,6 +124,12 @@ margin-bottom: 24px;
 
 }
 
+.topics-col-base{
+    max-height: 60vh;  
+    overflow: auto;  
+    }
+
+
 .topics-col-inner{
     max-height: 60vh;
     overflow: auto;
