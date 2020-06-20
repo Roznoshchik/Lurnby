@@ -24,7 +24,7 @@
                             </button>
                             <div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button">
                                 <h4 class="dropdown-header">Topic Actions</h4>
-                                <a class="dropdown-item" href="{{ url_for('archivetopic', id = topic.id)}}">Archive topic</a>
+                                <a class="dropdown-item" href="{{ url_for('archivetopic', topic_id = topic.id)}}">Archive topic</a>
                                 
                             </div>
                         </div>
@@ -34,21 +34,22 @@
                         <div class="items border border-light">
                             {% for highlight in highlights %}
                             {% if topic.is_added(highlight) %}
-                            <div class="card draggable shadow-sm" id="cd9" draggable="true" ondragstart="drag(event)">
+                            <div class="card draggable shadow-sm" id="cd9" draggable="False" ondragstart="drag(event)">
                                 <div class="card-body p-2">
                                     <div class="card-title">
                                         <span aria-hidden="true"><svg class=" float-right bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                             <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
                                         </svg></span>
-                                        <a href="" class="lead font-weight-light">Highlight:{{highlight.id}}</a>
+                                        <span onclick="ViewHighlight({{highlight.id}})" class="text-primary highlight-title lead font-weight-light">Highlight:{{highlight.id}}</a>
                                     </div>
                                     <p>
                                         {{highlight.text}}
                                     </p>
-                                    <button class="btn btn-primary btn-sm">View</button>
+                                    <button onclick="ViewHighlight({{highlight.id}})" class="btn btn-primary btn-sm">View</button>
                                 </div>
                             </div>
                             <div class="dropzone rounded" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="clearDrop(event)"> &nbsp; </div>
+                        
                             {% endif %}
                             {% endfor %}
                         </div>
@@ -66,37 +67,41 @@
             </div>
         </div>
         
-
-
-<!--  
-        <div id="addtopic">
-                        <div class="card-body">
-                            <form action="" method="post" novalidate>
-                                {{ form.hidden_tag() }}
-                                <div class="form-group">
-                                    {{ form.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}}
-                                </div>
-                            
-                                <button type="button" onclick = "AddTopicSubmit()" class="btn btn-primary">add</button>
-                                <button type="button" class="close" onclick="AddTopicReset()">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>    
-                            </form>
-                        </div>
-                    </div>   
- -->        
-
-
-
-
     </div>
 </div>
+
+<!-- view Highlight Modal-->
+<div class="modal fade" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
+    
+</div>
+
+<!-- end view Highlight Modal-->
 
 
 {% endblock%}
 
 {% block JS %}
 <script>
+
+function ViewHighlight(id){
+console.log(id)
+console.log('/view_highlight/' + id)
+
+    xhr = $.ajax(
+                        '/view_highlight/' + id).done(
+                            function(data) {
+                                xhr = null
+                                $('#ViewHighlightModal').html(data);
+                            }
+                        );
+               
+    
+    $('#ViewHighlightModal').modal('toggle')
+
+}
+
+
+
 
 function AddTopicReset(){
     $('#add-topic-destination').html('<span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span>')
@@ -117,24 +122,12 @@ function AddTopicSubmit(){
     
     if (!$('#addtopicinput').val())
     {
-        $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Topic title can\'t be empty. <button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+        $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Topic title can\'t be empty. <button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
         
     }
-    else{
-        /*
-    $.post('/topics/add', {
-      title: $('#addtopicinput').val()
-    }).done(function(response) {
-        $('addtopicheader').remove()
-        $('#topicmain').append('<div class="col-sm-6 col-md-3 col-xl-3"><div class="card bg-light"><div class="card-body"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="{{ url_for("archivetopic", id = ' + response["id"] + ')}}">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'+ response["title"] +'</h6><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-3 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>');
-        // $('#add-topic-destination').html('<span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span>')
-        // $('#add-topic-destination').focus()
-    }).fail(function() {
-        $('#addtopicinput').val('')
-        $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-    });
-    
-    */
+    else
+    {
+   
 
         $("#NewTopicForm").ajaxSubmit({
         url: '/topics/add', 
@@ -142,17 +135,34 @@ function AddTopicSubmit(){
         success: function(responseText){ AddedTopic(responseText) },
         error: function(){ FailedToAddTopic() }
 
-        })
+        });
     }
 }
+
+function makeDiv(Topic_id, Topic_title){
+
+    var string1 = '<div class="col-sm-6 col-md-3 col-xl-3"><div class="card bg-light"><div class="card-header"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="/archivetopic/'
+    var string2 = '">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'
+    var string3 = '</h6></div><div class="card-body"><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-3 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>'
+
+return (string1.concat(Topic_id, string2, Topic_title, string3) )
+
+}
+   
 
 function AddedTopic(responseText){
     var element = document.getElementById('addtopicheader');
     element.parentNode.removeChild(element);
+    var NewTopicId = responseText['id'];
+    var NewTopicTitle = responseText['title'];
+    console.log("id:" + NewTopicId);
+    console.log("title:" + NewTopicTitle);
+    
+    var string = makeDiv(NewTopicId, NewTopicTitle);    
 
+    console.log(string)
 
-
-    $('#topicmain').append('<div class="col-sm-6 col-md-3 col-xl-3"><div class="card bg-light"><div class="card-header"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="{{ url_for("archivetopic", id = ' + responseText["id"] + ')}}">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'+ responseText["title"] +'</h6></div><div class="card-body"><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-3 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>');
+    $('#topicmain').append(string);
     $('#topicmain').scrollLeft(tempScrollLeft)
 
 }

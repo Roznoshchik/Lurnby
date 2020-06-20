@@ -1,3 +1,14 @@
+.highlight-title:hover {
+
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+a.custom-card,
+a.custom-card:hover {
+  color: inherit;
+}
+
 /* pill checkbox styles */
 .button-group-pills {
     border-radius: 20px;

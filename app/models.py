@@ -83,7 +83,7 @@ class Highlight(db.Model):
         return self.topics.filter(
             topic.id == highlights_topics.c.topic_id).count() > 0
     
-    # returns all topics that a highlight is a part of.  highlight.in_topics.all()
+    # returns all topics that a highlight is a part of.  highlight.in_topics().all()
     def in_topics(self):
         return Topic.query.join(
             highlights_topics, (highlights_topics.c.topic_id == Topic.id)

@@ -1,0 +1,60 @@
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ViewHighlightModalLabel">View Highlight</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h3>From: {{ article_title}}</h3>
+        <hr>
+        <p>
+            <h4 style = "display:inline;">Original source:</h4> <a href="{{source}}" target="_blank">Open in new window</a>
+        </p>
+        <p>
+            <h4 style = "display:inline;"> View Content in App:</h4> <a href="{{ inappurl }}">Open</a>
+        </p>    
+        <hr>      
+        <form  id = "SubmitHighlightForm" action="" method="post">
+           {{ form.hidden_tag() }} 
+          
+        <h4>Highlight text:</h4>
+        <hr>
+          <div class="form-group">
+            {{ form.text(class="form-control", id="HighlightField") }}
+          </div>
+          <br>
+          <h4>Note or Comment</h4>
+
+          <div class="form-group">
+            {{ form.note(class="form-control", id="message-text") }}              
+          </div>
+          <h4>In the following topics:</h4>
+          <div class="btn-group-toggle" data-toggle="buttons">
+            {% for m in member %}
+            <label class="button-group-pills btn btn-default">
+              <input name = "topics" type="checkbox" value="{{member.title}}">
+              {{member.title}}
+            </label>
+            {% endfor %}        
+          </div>
+          <h4>Not in the following topics:</h4>
+          <hr>
+          <div class="btn-group-toggle" data-toggle="buttons">
+            {% for n in nonmember %}
+            <label class="button-group-pills btn btn-default">
+              <input name = "topics" type="checkbox" value="{{nonmember.title}}">
+              {{nonmember.title}}
+            </label>
+            {% endfor %}        
+          </div>
+          
+      </div>
+      <div class="modal-footer">
+        <button type="button" onclick = "" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" onclick="" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+    </div>
+  </div>

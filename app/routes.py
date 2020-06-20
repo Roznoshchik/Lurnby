@@ -241,12 +241,41 @@ def addhighlight():
     })
 
    
+@app.route('/view_highlight/<id>', methods=['GET', 'POST'])
+def view_highlight(id):
+    highlight = Highlight.query.filter_by(id = id).first_or_404()
+    article = Article.query.filter_by(id = highlight.article_id).first()
+
+    form = AddHighlightForm()
+    
+    member = highlight.in_topics().all()
+    nonmember = highlight.not_in_topics()
+    
+    source = article.source
+    
+    inappurl = url_for('article', id = article.id)
+    
+    article_title = article.title
+
+
+
+    if request.method == 'GET':
+        form.text.data = highlight.text
+        form.note.data = highlight.note
+
+        return render_template('highlight.html', form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, inappurl=inappurl)
+
+
+
 
 
 @app.route('/topics', methods=['GET', 'POST'])
 def topics():
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
     highlights = Highlight.query.filter_by(user_id=current_user.id).all()
+    
+    form2=AddHighlightForm()
+    
     form = AddTopicForm()
     
     if form.validate_on_submit():
@@ -258,7 +287,7 @@ def topics():
         #return render_template('topics.html', form=form, topics=topics)
         return redirect(url_for('topics'))
 
-    return render_template('topics.html', form=form, highlights = highlights, topics=topics)
+    return render_template('topics.html', form=form,form2=form2, highlights = highlights, topics=topics)
 
 
 @app.route('/topics/add', methods=['POST'])
@@ -279,13 +308,23 @@ def add_new_topic():
    
 
 
-@app.route('/archivetopic/<id>')
-def archivetopic(id):
-    topic = Topic.query.filter_by(id=id).first()
-    topic.archived = True
-    topic.title = topic.title + "-id:" + str(topic.id)
-    db.session.commit()
+@app.route('/archivetopic/<topic_id>')
+def archivetopic(topic_id):
+    
+    topic = Topic.query.filter_by(id=topic_id).first()
+    
+    if topic is not None:
+        topic.archived = True
+        topic.title = topic.title + "-id:" + str(topic.id)
+        db.session.commit()
+    else:
+        flash('Something went wrong! Please try again.', 'error')
+
     return redirect(url_for('topics'))
+
+
+
+
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
