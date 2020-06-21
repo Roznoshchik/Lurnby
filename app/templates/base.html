@@ -91,7 +91,7 @@
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
               <ul>
               {% for error in errors %}
-                <li>{{ error }}</li>
+                <li>{{ error|safe }}</li>
               {% endfor %}
               </ul>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">

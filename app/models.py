@@ -1,7 +1,7 @@
 from app import db, login, app
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 from sqlalchemy.sql import column
 from time import time
 import jwt
@@ -54,6 +54,8 @@ class Article(db.Model):
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
+    archived = db.Column(db.Boolean, index=True)
+
 
 highlights_topics = db.Table('highlights_topics',
     db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), nullable=False),
@@ -67,6 +69,7 @@ class Highlight(db.Model):
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
+    archived = db.Column(db.Boolean, index=True)
 
     # add highlight to topic
     def AddToTopic(self, topic):
@@ -88,12 +91,14 @@ class Highlight(db.Model):
         return Topic.query.join(
             highlights_topics, (highlights_topics.c.topic_id == Topic.id)
             ).filter(
-               highlights_topics.c.highlight_id == self.id
+               highlights_topics.c.highlight_id == self.id, Topic.archived==False, Topic.user_id==current_user.id
+
                ) 
    
     # returns all topics that a highlight is not a part of. highlight.not_in_topics()
     def not_in_topics(self):
         query = Topic.query.filter(
+            Topic.archived==False, Topic.user_id==current_user.id,
             Topic.id.notin_(
                 db.session.query(highlights_topics.c.topic_id).filter(
                     highlights_topics.c.highlight_id == self.id)))

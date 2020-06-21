@@ -1,17 +1,18 @@
-<div class="modal-dialog" role="document">
+<div class="modal-lg modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="ViewHighlightModalLabel">View Highlight</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <a href = "" class = "close" type="button" onclick="closeHighlight()">
+          &times;
+        </a>
       </div>
       <div class="modal-body">
         <h3>From: {{ article_title}}</h3>
         <hr>
         <p>
             <h4 style = "display:inline;">Original source:</h4> <a href="{{source}}" target="_blank">Open in new window</a>
-        </p>
+        
+          </p>
         <p>
             <h4 style = "display:inline;"> View Content in App:</h4> <a href="{{ inappurl }}">Open</a>
         </p>    
@@ -35,7 +36,7 @@
             {% for m in member %}
             <label class="button-group-pills btn btn-default">
               <input name = "topics" type="checkbox" value="{{member.title}}">
-              {{member.title}}
+              {{m.title}}
             </label>
             {% endfor %}        
           </div>
@@ -45,16 +46,19 @@
             {% for n in nonmember %}
             <label class="button-group-pills btn btn-default">
               <input name = "topics" type="checkbox" value="{{nonmember.title}}">
-              {{nonmember.title}}
+              {{n.title}}
             </label>
             {% endfor %}        
           </div>
           
       </div>
       <div class="modal-footer">
-        <button type="button" onclick = "" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+        <a href="{{url_for('archivehighlight', id = highlight.id )}} " type="button" class="btn btn-danger mr-auto">{% if member|length > 1 %}Delete from {{member|length}} topics{% else %}Delete{% endif %}</a>
+        <a href = "" type="button" onclick ="closeHighlight()" class="btn btn-outline-secondary">Cancel</a>
         <button type="button" onclick="" class="btn btn-primary">Update</button>
       </div>
     </form>
     </div>
   </div>
+
+  

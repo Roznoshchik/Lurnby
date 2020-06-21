@@ -30,7 +30,7 @@ def index():
             if current_user.is_anonymous:
                  return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
             
-            new_article = Article(unread=True, title=title, source=url, content=content, user_id=current_user.id )
+            new_article = Article(unread=True, title=title, source=url, content=content, user_id=current_user.id, archived=False )
             db.session.add(new_article)
             db.session.commit()
             flash('Article added!', 'message')
@@ -206,7 +206,7 @@ def article(id):
     if form.validate_on_submit():
         topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-        newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data)
+        newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data, archived=False)
         db.session.add(newHighlight)
         for t in topics:
             if request.form.get(t.title):
@@ -223,7 +223,7 @@ def addhighlight():
     
     topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), text = request.form.get('text'), note = request.form.get('note'))
+    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), text = request.form.get('text'), note = request.form.get('note'), archived=False)
     db.session.add(newHighlight)
     
     list = request.form.getlist('topics')
@@ -263,16 +263,32 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
 
-        return render_template('highlight.html', form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, inappurl=inappurl)
+        return render_template('highlight.html', highlight = highlight, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, inappurl=inappurl)
 
+@app.route('/archivehighlight/<id>')
+def archivehighlight(id):
+    
+    highlight = Highlight.query.filter_by(id=id).first()
+    highlight.archived = True
+    db.session.commit()
+    
+    flash('Highlight has been deleted. <a href="'+ url_for('unarchivehighlight', id = id) + '"  class="alert-link">UNDO</a>', 'error')
+    return redirect(url_for('topics'))
 
-
+@app.route('/unarchivehighlight/<id>')
+def unarchivehighlight(id):
+    
+    highlight = Highlight.query.filter_by(id=id).first()
+    highlight.archived = False
+    db.session.commit()
+        
+    return redirect(url_for('topics'))
 
 
 @app.route('/topics', methods=['GET', 'POST'])
 def topics():
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
-    highlights = Highlight.query.filter_by(user_id=current_user.id).all()
+    highlights = Highlight.query.filter_by(user_id=current_user.id, archived=False).all()
     
     form2=AddHighlightForm()
     
