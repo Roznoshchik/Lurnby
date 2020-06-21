@@ -50,6 +50,7 @@ class Article(db.Model):
     unread = db.Column(db.Boolean, index=True)
     title = db.Column(db.String(255), index=True)
     source = db.Column(db.String(500))
+    source_url = db.Column(db.String(500))
     content = db.Column(db.String)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
