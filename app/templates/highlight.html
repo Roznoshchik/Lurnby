@@ -9,10 +9,18 @@
       <div class="modal-body">
         <h3>From: {{ article_title}}</h3>
         <hr>
+        {% if source_url %}
         <p>
-            <h4 style = "display:inline;">Original source:</h4> <a href="{{source}}" target="_blank">Open in new window</a>
+            <h4 style = "display:inline;">Original source:</h4> <a href="{{source_url}}" target="_blank">Open in new window</a>
         
-          </p>
+        </p>
+        {% else %}
+        <p>
+          <h4 style = "display:inline;">Original source:</h4> {{source}}
+      
+      </p>
+
+        {% endif %}
         <p>
             <h4 style = "display:inline;"> View Content in App:</h4> <a href="{{ inappurl }}">Open</a>
         </p>    
@@ -32,22 +40,21 @@
             {{ form.note(class="form-control", id="message-text") }}              
           </div>
           <h4>In the following topics:</h4>
-          <div class="btn-group-toggle" data-toggle="buttons">
+          <div id = "Members" class="btn-group-toggle" data-toggle="buttons">
             {% for m in member %}
-            <label class="button-group-pills btn btn-default">
-              <input name = "topics" type="checkbox" value="{{member.title}}">
-              {{m.title}}
-            </label>
+            <label id = "topic{{ m.id }}"class="topic-member btn btn-default">
+              <span onclick="RemoveFromTopic(topic{{ m.id }})"><input name = "topics" type="checkbox" checked value="{{member.title}}">
+              {{m.title}} <span class="topic-icon">&times;</span>
+            </span></label>
             {% endfor %}        
           </div>
           <h4>Not in the following topics:</h4>
-          <hr>
-          <div class="btn-group-toggle" data-toggle="buttons">
+          <div id ="NonMembers" class="btn-group-toggle" data-toggle="buttons">
             {% for n in nonmember %}
-            <label class="button-group-pills btn btn-default">
-              <input name = "topics" type="checkbox" value="{{nonmember.title}}">
-              {{n.title}}
-            </label>
+            <label id = "topic{{ n.id }}" class="topic-non-member button-group-pills btn btn-default">
+              <span onclick="AddToTopic(topic{{ n.id }})"><input name = "topics" type="checkbox" checked value="{{nonmember.title}}">
+              {{n.title}} <span class="topic-icon">&plus;</span>
+            </span></label>
             {% endfor %}        
           </div>
           

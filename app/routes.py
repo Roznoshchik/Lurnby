@@ -30,7 +30,7 @@ def index():
             if current_user.is_anonymous:
                  return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
             
-            new_article = Article(unread=True, title=title, source=url, content=content, user_id=current_user.id, archived=False )
+            new_article = Article(unread=True, title=title, source_url=url, content=content, user_id=current_user.id, archived=False )
             db.session.add(new_article)
             db.session.commit()
             flash('Article added!', 'message')
@@ -252,6 +252,7 @@ def view_highlight(id):
     nonmember = highlight.not_in_topics()
     
     source = article.source
+    source_url = article.source_url
     
     inappurl = url_for('article', id = article.id)
     
@@ -263,12 +264,15 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
 
-        return render_template('highlight.html', highlight = highlight, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, inappurl=inappurl)
+        return render_template('highlight.html', highlight = highlight, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
 
 @app.route('/archivehighlight/<id>')
 def archivehighlight(id):
     
     highlight = Highlight.query.filter_by(id=id).first()
+    if current_user.id != highlight.user_id:
+        return render_template('404.html'), 404
+
     highlight.archived = True
     db.session.commit()
     
@@ -279,6 +283,9 @@ def archivehighlight(id):
 def unarchivehighlight(id):
     
     highlight = Highlight.query.filter_by(id=id).first()
+    if current_user.id != highlight.user_id:
+        return render_template('404.html'), 404
+
     highlight.archived = False
     db.session.commit()
         
@@ -311,7 +318,7 @@ def add_new_topic():
 
     newtopic = Topic.query.filter_by(title=request.form['title'].lower()).first()
     if newtopic is not None:
-        return 403
+        return  render_template('404.html'), 404
     
     newtopic = Topic(title=request.form['title'].lower(), user_id=current_user.id, archived=False)
     db.session.add(newtopic)
@@ -328,7 +335,9 @@ def add_new_topic():
 def archivetopic(topic_id):
     
     topic = Topic.query.filter_by(id=topic_id).first()
-    
+    if current_user.id != topic.user_id:
+        return render_template('404.html'), 404
+
     if topic is not None:
         topic.archived = True
         topic.title = topic.title + "-id:" + str(topic.id)

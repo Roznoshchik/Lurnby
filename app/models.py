@@ -130,3 +130,4 @@ class Tag(db.Model):
     archived = db.Column(db.Boolean, index=True)
     goal = db.Column(db.String(512))
 
+article = Article(archived=False, content="PEGAZUS KIADÁS", title = "This is a non URL Article", user_id = 1, source="NAGY KÓPÉ")
