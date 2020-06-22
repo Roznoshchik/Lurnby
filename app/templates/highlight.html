@@ -44,16 +44,16 @@
             {% for m in member %}
             <label id = "topic{{ m.id }}"class="topic-member btn btn-default">
               <span onclick="RemoveFromTopic(topic{{ m.id }})"><input name = "topics" type="checkbox" checked value="{{member.title}}">
-              {{m.title}} <span class="topic-icon">&times;</span>
+              {{m.title}} <span class="topic-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
             </span></label>
             {% endfor %}        
           </div>
           <h4>Not in the following topics:</h4>
           <div id ="NonMembers" class="btn-group-toggle" data-toggle="buttons">
             {% for n in nonmember %}
-            <label id = "topic{{ n.id }}" class="topic-non-member button-group-pills btn btn-default">
+            <label id = "topic{{ n.id }}" class="topic-non-member btn btn-default">
               <span onclick="AddToTopic(topic{{ n.id }})"><input name = "topics" type="checkbox" checked value="{{nonmember.title}}">
-              {{n.title}} <span class="topic-icon">&plus;</span>
+              {{n.title}} <span class="topic-icon"><i class="fa fa-plus fa-xs" aria-hidden="true"></i></span>
             </span></label>
             {% endfor %}        
           </div>

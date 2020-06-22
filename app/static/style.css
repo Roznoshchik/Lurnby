@@ -36,9 +36,10 @@
 
 
 .topic-icon {
+    margin-top: 2px;
     opacity: 0;
     float: right;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 400;
     line-height: 1;
     color: #000;
@@ -53,6 +54,12 @@
     
 }
 
+.topic-non-member:hover .topic-icon {
+    
+    color: white;
+    opacity: 100;
+    
+}
 
 
 
