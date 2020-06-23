@@ -103,10 +103,14 @@ function highlightRange(range) {
 var infodiv = document.getElementById('infoDiv');
 var selectedText;
 var content = document.getElementById('content');
+
+
 function textActions() {
  var selectedObj = window.getSelection();
 
- selectedText = selectedObj.getRangeAt(0);
+ if (selectedObj.rangeCount > 0){
+    selectedText = selectedObj.getRangeAt(0);
+ }
 
 if (selectedText != "") {
  
@@ -115,8 +119,6 @@ if (selectedText != "") {
  $('#infoDiv').css('left', event.pageX);
  $('#infoDiv').css('top', event.pageY);
  infodiv.style.visibility = 'visible';
-
-
 
 }
   else{
