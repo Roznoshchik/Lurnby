@@ -133,6 +133,7 @@ $(function () {
 
   
 content.addEventListener("mouseup", textActions);
+content.addEventListener("touchend", textActions);
 content.addEventListener("keyup", textActions);
 
 
