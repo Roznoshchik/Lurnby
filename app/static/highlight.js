@@ -1,3 +1,4 @@
+
 // this is from https://stackoverflow.com/questions/304837/javascript-user-selection-highlighting
 function getSafeRanges(dangerous) {
     var a = dangerous.commonAncestorContainer;
@@ -104,10 +105,13 @@ var infodiv = document.getElementById('infoDiv');
 var selectedText;
 var content = document.getElementById('content');
 
+var activeRange;
+var selectedObj;
 
 function textActions() {
- var selectedObj = window.getSelection();
-
+    //hltr.doHighlight();
+ selectedObj = window.getSelection();
+ 
  if (selectedObj.rangeCount > 0){
     selectedText = selectedObj.getRangeAt(0);
  }
@@ -133,7 +137,7 @@ $(function () {
   })
 
 
-  
+
 content.addEventListener("mouseup", textActions);
 content.addEventListener("touchend", textActions);
 content.addEventListener("keyup", textActions);
@@ -141,9 +145,24 @@ content.addEventListener("keyup", textActions);
 
 
 $('#addhighlight').click(function(){
-  highlightSelection();
-  document.getElementById('infoDiv').style.visibility = 'hidden';
+    //hltr.doHighlight();
+    //highlightSelection();
 
+    //hltr.refineRangeBoundaries(activeRange);
+    //TextHighlighter.prototype.highlightRange(activeRange);
+    //let selection = window.getSelection();
+    //selectedObj.addRange(selectedText);
+   /*
+    hltr.enable();
+    console.log("highlighter enable ...")
+
+    hltr.doHighlight();
+    console.log("dohighlight() ...")
+   
+    hltr.disable();
+    */
+    document.getElementById('infoDiv').style.visibility = 'hidden';
+    
 
 }); 
 

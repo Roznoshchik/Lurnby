@@ -2,8 +2,10 @@
 
 {% block style %}
   <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
+  <link rel="stylesheet" href = "{{url_for('static', filename='/texthighlighter/colorpicker.css')}}">
+
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-{% endblock %}
+  {% endblock %}
 
 {% block content %}
 <main id="standard">
@@ -82,6 +84,16 @@
           </button>
         </div>
         <div class="sidebar-content">
+
+          <h2>TextHighlighter Callbacks</h2>
+            <ul>
+                <li>
+                    Select any text in the sandbox to highlight it. You should see messages before and after
+                    highlighting.
+                </li>
+                <li>Change highlighting color: <div class="color-picker"></div></li>
+                <li>Remove all highlights: <button id="remove">Remove</button>. You should see message before removing.</li>
+            </ul>
           <h6 class="sidebarheading">Set background:</h6> 
           <ul class="list-group list-group-horizontal no-style">
               <li>
@@ -151,7 +163,8 @@
 
 {% block JS %}
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/5.4.0/bootbox.min.js"></script>
+<script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/TextHighlighter.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/ColorPicker.js')}}"></script>
 
 <!-- My Custom JS  -->
 
@@ -165,8 +178,51 @@
 -->
 
 <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
+
+
+<script type="text/javascript">
+     
+      var sandbox = document.getElementById('content');      
+
+      hltr = new TextHighlighter(sandbox, {
+        enabled: false,
+        
+        onAfterHighlight: function (range, highlights) {
+          console.log(highlights);
+          console.log(highlights.length);
+
+          for (var i = 0; i < highlights.length; i++){
+            newNode = highlights[i];
+            console.log(highlights[i]);
+            newNode.setAttribute('class',' highlighted d-inline HIGHLIGHT-ID-NEW' );
+            console.log(newNode);
+            newNode.setAttribute('tabindex', '0');
+            newNode.setAttribute('data-toggle','popover' );
+            newNode.setAttribute('data-container','body' );
+            newNode.setAttribute('data-placement','right' );
+            newNode.setAttribute('data-trigger','focus' );
+            newNode.setAttribute('title','OPTIONS' );
+            newNode.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
+          }
+
+          $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+
+      $('.popover-dismiss').popover({
+        trigger: 'focus'
+      })
+
+
+
+        } 
+        
+      });
+    
+</script>
+
 <script>
-  
+
   function SubmitHighlight(){
     $("#SubmitHighlightForm").ajaxSubmit({
       url: '/article/addhighlight', 
@@ -177,17 +233,26 @@
   }
 
   function AddedHighlight(responseText){
-    var highlightCollection = document.getElementsByClassName('TEMP')
-    var newclass = "highlight" + responseText['highlight_id']  
     
+    $('#AddHighlightModal').modal('hide');
+    selectedObj.removeAllRanges();
+    selectedObj.addRange(selectedText);
+    //var newclass = "highlight" + responseText['highlight_id'] ;
+ 
+    hltr.enable();
+    hltr.doHighlight();
+    hltr.disable();
+
+    //var highlightCollection = document.getElementsByClassName('TEMP')
+    /*
     for (let i=0; i < highlightCollection.length; i++){
         var currentHighlight = highlightCollection[i];
         currentHighlight.classList.add(newclass);
         currentHighlight.classList.add("highlighted");
         currentHighlight.classList.remove("TEMP");
         //currentHighlight.parentNode.removeChild(currentHighlight);
-    $('#AddHighlightModal').modal('hide');
     }
+    */
   }
     
   function FailedToAddHighlight(){
