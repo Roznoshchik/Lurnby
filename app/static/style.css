@@ -305,6 +305,7 @@ margin-bottom: 24px;
     background: none;
     width: auto;
     overflow: hidden;
+    -webkit-touch-callout: none !important;
 }
 
 
