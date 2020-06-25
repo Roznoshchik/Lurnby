@@ -2,8 +2,6 @@
 
 {% block style %}
   <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
-  <link rel="stylesheet" href = "{{url_for('static', filename='/texthighlighter/colorpicker.css')}}">
-
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
   {% endblock %}
 
@@ -27,7 +25,7 @@
         <div class="modal-body">
           <form  id = "SubmitHighlightForm" action="" method="post">
              <!-- {{ form.hidden_tag() }} -->
-            <input type="hidden" name="article_id" value="{{ article_id}}"> 
+            <input id = "article_id" type="hidden" name="article_id" value="{{ article_id}}"> 
             <div class="form-group">
               {{ form.text.label }}
               {{ form.text(class="form-control", id="HighlightField") }}
@@ -84,7 +82,7 @@
           </button>
         </div>
         <div class="sidebar-content">
-          
+
           <h6 class="sidebarheading">Set background:</h6> 
           <ul class="list-group list-group-horizontal no-style">
               <li>
@@ -155,7 +153,6 @@
 {% block JS %}
 
 <script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/TextHighlighter.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/ColorPicker.js')}}"></script>
 
 <!-- My Custom JS  -->
 
@@ -174,14 +171,24 @@
 <script type="text/javascript">
      
       var sandbox = document.getElementById('content');      
+      var article_id = $("#article_id").val()
 
       hltr = new TextHighlighter(sandbox, {
         enabled: false,
-        
         onAfterHighlight: function (range, highlights) {
             var serialized = hltr.serializeHighlights();
             console.log("Serialized highlights:", serialized);
-            window.localStorage.setItem('serializedHighlights', serialized);
+            console.log("\n\n\n\n article id \n\n\n" + article_id+ "\n\n\n")
+
+            $.post('/article/' + article_id + '/highlight-storage', {
+              'SerializedHighlights': serialized
+            }).done(function(response) {
+              $('flashMessages').html('<div class="alert alert-success alert-dismissible fade show" role="alert">success!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+            }).fail(function() {
+              $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+            });
+
+            //window.localStorage.setItem('serializedHighlights', serialized);
 
           for (var i = 0; i < highlights.length; i++){
             newNode = highlights[i];
@@ -213,9 +220,21 @@
       });
     
 
-      var serialized = window.localStorage.getItem('serializedHighlights');
-      console.log("Deserializing highlights:", serialized);
-      hltr.deserializeHighlights(serialized);
+      //var serialized = window.localStorage.getItem('serializedHighlights');
+      var serialized; 
+      $.get('/article/' + article_id + '/highlight-storage', function(data) {
+        serialized = data['SerializedHighlights']
+        hltr.deserializeHighlights(serialized);
+        $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+
+      $('.popover-dismiss').popover({
+        trigger: 'focus'
+      })
+      });
+
+      
 
 </script>
 
@@ -240,7 +259,6 @@
     selectedObj.addRange(selectedText);
     //var newclass = "highlight" + responseText['highlight_id'] ;
     
-    console.log("responseText['highlight_id']\n\n\n" + responseText['highlight_id'])
     returnedhighlightclass = "highlight"+responseText['highlight_id']
     returnedhighlightid = responseText['highlight_id']
     hltr.enable();
@@ -287,7 +305,8 @@
 
 
   function NewTopic(){
-    $('#CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"> {{ addtopicform.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}} </div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>')
+    $('#CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"> {{ addtopicform.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}} </div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>');
+    $('#addtopicinput').trigger('focus');
   }
 
   

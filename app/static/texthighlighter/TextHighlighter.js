@@ -754,9 +754,6 @@
     TextHighlighter.prototype.serializeHighlights = function (highlights) {
         if (!highlights) {
             highlights = this.getHighlights();
-            console.log("\n this is where the highlights start \n \n \n")
-            console.log(highlights)
-            console.log("\n\n\nThis is where the highlights end. \n\n\n")
         }
         sortByDepth(highlights, false);
 
@@ -764,10 +761,6 @@
         for (var i = 0; i < highlights.length; i++) {
             hlDescriptors.push(this.serializeHighlight(highlights[i]));
         }
-
-            console.log("\n this is where the descriptors start \n \n \n")
-            console.log(hlDescriptors)
-            console.log("\n\n\nThis is where the descriptors end. \n\n\n")
 
         return JSON.stringify(hlDescriptors);
     };
@@ -779,10 +772,8 @@
      */
     TextHighlighter.prototype.serializeHighlight = function (highlight) {
         
-        console.log("\n\n\nhighlight???\n\n\n"+ highlight+"\n\n\n END \n\n\n")
         var refEl = this.el;
 
-        console.log("\n\nrefEL:\n\n" + refEl + "\n\n" + Object.values(refEl)+ "\n\nend\n\n")
         
 
         function getElementPath(el, refElement) {
@@ -795,7 +786,6 @@
                 el = el.parentNode;
             } while (el !== refElement || !el);
 
-            console.log("\n\n\nPATH!!!!\n\n\n"+path+ "\n\n\n END!!!\n\n\n")
             return path;
         }
 
@@ -803,7 +793,6 @@
             length = highlight.textContent.length,
             hlPath = getElementPath(highlight, refEl),
             wrapper = highlight.cloneNode(true);
-            console.log("\n\n\n wrapper\n\n\n\n" + wrapper.outerHTML + "\n\n\nend\n\n\n\n")
 
         wrapper.innerHTML = '';
         wrapper = wrapper.outerHTML;

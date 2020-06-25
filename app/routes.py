@@ -218,6 +218,28 @@ def article(id):
     return render_template('text.html', title =title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
+@app.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
+def storeHighlights(id):
+    article = Article.query.filter_by(id=id).first()
+
+
+
+
+    if request.method == "GET":
+        serialized = article.highlightedTextJSON
+        if serialized is not None:
+        
+            return jsonify({
+                'SerializedHighlights': article.highlightedTextJSON
+            })
+
+    if request.method == "POST":
+        article.highlightedTextJSON = request.form['SerializedHighlights']
+        db.session.commit()
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+
+
+
 @app.route('/article/addhighlight', methods =['POST'])
 def addhighlight():
     
