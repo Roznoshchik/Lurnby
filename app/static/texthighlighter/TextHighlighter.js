@@ -462,6 +462,16 @@
             wrapper = TextHighlighter.createWrapper(this.options);
             wrapper.setAttribute(TIMESTAMP_ATTR, timestamp);
             wrapper.setAttribute(DATA_ATTR, "true");
+            wrapper.classList.add(returnedhighlightclass);
+            wrapper.setAttribute('LearnAppid', returnedhighlightid)
+            console.log("\n\n\n adding class \n\n\n\n")
+            wrapper.setAttribute('tabindex', '0');
+            wrapper.setAttribute('data-toggle','popover' );
+            wrapper.setAttribute('data-container','body' );
+            wrapper.setAttribute('data-placement','right' );
+            wrapper.setAttribute('data-trigger','focus' );
+            wrapper.setAttribute('title','OPTIONS' );
+            wrapper.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
 
             createdHighlights = this.highlightRange(range, wrapper);
             normalizedHighlights = this.normalizeHighlights(createdHighlights);
@@ -744,6 +754,9 @@
     TextHighlighter.prototype.serializeHighlights = function (highlights) {
         if (!highlights) {
             highlights = this.getHighlights();
+            console.log("\n this is where the highlights start \n \n \n")
+            console.log(highlights)
+            console.log("\n\n\nThis is where the highlights end. \n\n\n")
         }
         sortByDepth(highlights, false);
 
@@ -751,6 +764,10 @@
         for (var i = 0; i < highlights.length; i++) {
             hlDescriptors.push(this.serializeHighlight(highlights[i]));
         }
+
+            console.log("\n this is where the descriptors start \n \n \n")
+            console.log(hlDescriptors)
+            console.log("\n\n\nThis is where the descriptors end. \n\n\n")
 
         return JSON.stringify(hlDescriptors);
     };
@@ -761,7 +778,12 @@
      * @memberof TextHighlighter
      */
     TextHighlighter.prototype.serializeHighlight = function (highlight) {
+        
+        console.log("\n\n\nhighlight???\n\n\n"+ highlight+"\n\n\n END \n\n\n")
         var refEl = this.el;
+
+        console.log("\n\nrefEL:\n\n" + refEl + "\n\n" + Object.values(refEl)+ "\n\nend\n\n")
+        
 
         function getElementPath(el, refElement) {
             var path = [],
@@ -773,6 +795,7 @@
                 el = el.parentNode;
             } while (el !== refElement || !el);
 
+            console.log("\n\n\nPATH!!!!\n\n\n"+path+ "\n\n\n END!!!\n\n\n")
             return path;
         }
 
@@ -780,6 +803,7 @@
             length = highlight.textContent.length,
             hlPath = getElementPath(highlight, refEl),
             wrapper = highlight.cloneNode(true);
+            console.log("\n\n\n wrapper\n\n\n\n" + wrapper.outerHTML + "\n\n\nend\n\n\n\n")
 
         wrapper.innerHTML = '';
         wrapper = wrapper.outerHTML;
@@ -814,6 +838,7 @@
         }
 
         function deserializationFn(hlDescriptor) {
+            
             var hl = {
                     wrapper: hlDescriptor[0],
                     text: hlDescriptor[1],

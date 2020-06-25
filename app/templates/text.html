@@ -84,16 +84,7 @@
           </button>
         </div>
         <div class="sidebar-content">
-
-          <h2>TextHighlighter Callbacks</h2>
-            <ul>
-                <li>
-                    Select any text in the sandbox to highlight it. You should see messages before and after
-                    highlighting.
-                </li>
-                <li>Change highlighting color: <div class="color-picker"></div></li>
-                <li>Remove all highlights: <button id="remove">Remove</button>. You should see message before removing.</li>
-            </ul>
+          
           <h6 class="sidebarheading">Set background:</h6> 
           <ul class="list-group list-group-horizontal no-style">
               <li>
@@ -188,14 +179,16 @@
         enabled: false,
         
         onAfterHighlight: function (range, highlights) {
-          console.log(highlights);
-          console.log(highlights.length);
+            var serialized = hltr.serializeHighlights();
+            console.log("Serialized highlights:", serialized);
+            window.localStorage.setItem('serializedHighlights', serialized);
 
           for (var i = 0; i < highlights.length; i++){
             newNode = highlights[i];
             console.log(highlights[i]);
-            newNode.setAttribute('class',' highlighted d-inline HIGHLIGHT-ID-NEW' );
-            console.log(newNode);
+            newNode.setAttribute('class', 'highlighted d-inline ' + returnedhighlightclass );
+            newNode.setAttribute('LearnAppid', returnedhighlightid);
+            //newNode.style.cssText="background-color: red !important; color: white;"
             newNode.setAttribute('tabindex', '0');
             newNode.setAttribute('data-toggle','popover' );
             newNode.setAttribute('data-container','body' );
@@ -219,6 +212,11 @@
         
       });
     
+
+      var serialized = window.localStorage.getItem('serializedHighlights');
+      console.log("Deserializing highlights:", serialized);
+      hltr.deserializeHighlights(serialized);
+
 </script>
 
 <script>
@@ -232,13 +230,19 @@
     })
   }
 
+  var returnedhighlightid;
+  var returnedhighlightclass;
+
   function AddedHighlight(responseText){
     
     $('#AddHighlightModal').modal('hide');
     selectedObj.removeAllRanges();
     selectedObj.addRange(selectedText);
     //var newclass = "highlight" + responseText['highlight_id'] ;
- 
+    
+    console.log("responseText['highlight_id']\n\n\n" + responseText['highlight_id'])
+    returnedhighlightclass = "highlight"+responseText['highlight_id']
+    returnedhighlightid = responseText['highlight_id']
     hltr.enable();
     hltr.doHighlight();
     hltr.disable();

@@ -1,3 +1,14 @@
+
+.btn, .close {
+    -moz-appearance: none !important;
+    -webkit-appearance: none !important;
+}
+
+#ViewHighlightModal > textarea { 
+
+    height: auto !important; 
+}
+
 .topic-member{
     border-radius: 20px;
     margin-bottom: 15px !important;
