@@ -56,7 +56,7 @@ class Article(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
-    highlightedTextJSON = db.Column(db.String)
+    highlightedText = db.Column(db.String)
 
 
 highlights_topics = db.Table('highlights_topics',

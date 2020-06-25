@@ -223,16 +223,16 @@ def storeHighlights(id):
     article = Article.query.filter_by(id=id).first()
 
     if request.method == "GET":
-        serialized = article.highlightedTextJSON
+        serialized = article.highlightedText
         if serialized is not None:
             return jsonify({
-                'SerializedHighlights': article.highlightedTextJSON
+                'SerializedHighlights': article.highlightedText
             })
         else: 
             return json.dumps({'success':False}), 403, {'ContentType':'application/json'}  
 
     if request.method == "POST":
-        article.highlightedTextJSON = request.form['SerializedHighlights']
+        article.highlightedText = request.form['SerializedHighlights']
         db.session.commit()
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
 
