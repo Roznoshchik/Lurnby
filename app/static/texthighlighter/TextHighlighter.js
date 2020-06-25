@@ -1,3 +1,6 @@
+// https://github.com/shvelo/texthighlighter/blob/master/src/TextHighlighter.js
+// I made some changes myself to this file in order to make it work with the bootstrap functions i need.
+
 (function (global) {
     'use strict';
 
