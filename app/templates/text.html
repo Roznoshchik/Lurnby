@@ -53,7 +53,7 @@
           
         </div>
         <div class="modal-footer">
-          <button type="button" onclick = "RemoveTempHighlights()" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button"  class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
           <button type="button" onclick="SubmitHighlight()" class="btn btn-primary">Add</button>
         </div>
       </form>
@@ -206,12 +206,17 @@
           }
 
           $(function () {
-        $('[data-toggle="popover"]').popover()
-      })
+            $('[data-toggle="popover"]').popover()
+          });
 
-      $('.popover-dismiss').popover({
-        trigger: 'focus'
-      })
+          $('.popover-dismiss').popover({
+            trigger: 'focus'
+          });
+
+          var $window = $(window);
+          console.log($window.scrollTop()) 
+          localStorage.setItem('scrollPosition', $window.scrollTop());
+          console.log('stored position: ' + localStorage.getItem('scrollPosition'))
 
 
 
@@ -233,6 +238,16 @@
         trigger: 'focus'
       })
       });
+      
+      //window.scroll(0, localStorage.getItem('scrollPosition')|0)
+      $( window ).on( "load", function() { 
+        var $window = $(window)
+        if (localStorage.getItem('scrollPosition')){
+        $window.scrollTop(localStorage.getItem('scrollPosition'))
+      }
+
+      })
+      
 
       
 
@@ -255,26 +270,30 @@
   function AddedHighlight(responseText){
     
     $('#AddHighlightModal').modal('hide');
+    
+    /* THIS RESETS THE SUBMIT HIGHLIGHT FORM */
+    document.getElementById('SubmitHighlightForm').reset()
+    var c = document.querySelectorAll('input[type="checkbox"]');
+    var count = c.length
+    console.log(c)
+    
+    for (var i = 0; i < c.length; i++){
+      if (c[i].parentNode.classList.contains('active')){
+        c[i].click()
+      }  
+    }
+    /* END RESET */
+
+
+
     selectedObj.removeAllRanges();
     selectedObj.addRange(selectedText);
-    //var newclass = "highlight" + responseText['highlight_id'] ;
-    
     returnedhighlightclass = "highlight"+responseText['highlight_id']
     returnedhighlightid = responseText['highlight_id']
     hltr.enable();
     hltr.doHighlight();
     hltr.disable();
-
-    //var highlightCollection = document.getElementsByClassName('TEMP')
-    /*
-    for (let i=0; i < highlightCollection.length; i++){
-        var currentHighlight = highlightCollection[i];
-        currentHighlight.classList.add(newclass);
-        currentHighlight.classList.add("highlighted");
-        currentHighlight.classList.remove("TEMP");
-        //currentHighlight.parentNode.removeChild(currentHighlight);
-    }
-    */
+    
   }
     
   function FailedToAddHighlight(){
@@ -285,22 +304,6 @@
   }
 
 
-
-
-    function RemoveTempHighlights(){
-
-      var highlightCollection = document.getElementsByClassName('TEMP')
-      
-      for (let i=0; i < highlightCollection.length; i++){
-        var currentHighlight = highlightCollection[i];
-        //currentHighlight.classList.remove("TEMP");
-        currentHighlight.outerHTML = currentHighlight.innerHTML;
-        currentHighlight.remove();
-        //currentHighlight.parentNode.removeChild(currentHighlight);
-      
-      
-      }
-    }
     
 
 
@@ -314,7 +317,8 @@
     $.post('/topics/add', {
       title: $('#addtopicinput').val()
     }).done(function(response) {
-        $('#topicplaceholder').append('<label class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
+        $('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
+        document.getElementById("label"+response['id']).click();
         $('#CreateTopic').html('<button onclick ="NewTopic()" class="create-button btn btn-success">Create new topic </button>');
         highlightSelection();
     }).fail(function() {
