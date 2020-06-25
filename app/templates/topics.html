@@ -83,17 +83,55 @@
 {% block JS %}
 <script>
 
-function RemoveFromTopic(id){
-document.getElementById('members')
+function RemoveFromTopic(id, title){
+newId = '"' + id + '"'
+newTitle = '"' + title + '"'
 
-$('#members').append
+var nonmembers = document.getElementById('NonMembers')
+var removeMember = document.getElementById(id)
 
-$('#nonmembers')
 
+
+var newLabel = document.createElement('label')
+newLabel.setAttribute('id', id)
+newLabel.classList.add('topic-non-member', 'btn', 'btn-default')
+
+var newSpan = document.createElement('span')
+newSpan.setAttribute('onclick', 'AddToTopic(' + newId + ',' + newTitle + ')')
+
+newSpan.innerHTML = '<input name = "topics" type="checkbox" checked value="' + title + '">' + title + '<span class="topic-icon"><i class="fa fa-plus fa-xs" aria-hidden="true"></i></span>'
+
+newLabel.append(newSpan)
+nonmembers.append(newLabel)
+
+removeMember.parentNode.removeChild(removeMember);
 
 }
 
-function AddToTopic(id){
+
+
+function AddToTopic(id, title){
+    newId = '"' + id + '"'
+    newTitle = '"' + title + '"'
+
+    var members = document.getElementById('Members')
+    var removeMember = document.getElementById(id)
+
+    
+
+    var newLabel = document.createElement('label')
+    newLabel.setAttribute('id', id)
+    newLabel.classList.add('topic-member', 'btn', 'btn-default')
+        
+    var newSpan = document.createElement('span')
+    newSpan.setAttribute('onclick', 'RemoveFromTopic(' + newId + ',' + newTitle + ')')
+
+    newSpan.innerHTML = '<input name = "topics" type="checkbox" checked value="' + title + '">' + title + '<span class="topic-icon"><i class="fa fa-plus fa-xs" aria-hidden="true"></i></span>'
+
+    newLabel.append(newSpan)
+    members.append(newLabel)
+    
+    removeMember.parentNode.removeChild(removeMember);
 
 }
 
