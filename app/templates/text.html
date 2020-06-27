@@ -12,6 +12,8 @@
     <span id ="addhighlight">Add Highlight</span>
   </button>
 
+
+
   <!-- Add Highlight Modal-->
   <div class="modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -61,6 +63,9 @@
     </div>
   </div>
 
+<!-- View Highlight Modal-->
+<div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
+</div>
 
 
 
@@ -166,6 +171,7 @@
 -->
 
 <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 
 
 <script type="text/javascript">
@@ -177,69 +183,41 @@
         enabled: false,
         onAfterHighlight: function (range, highlights) {
             var serialized = hltr.serializeHighlights();
-            console.log("Serialized highlights:", serialized);
-            console.log("\n\n\n\n article id \n\n\n" + article_id+ "\n\n\n")
-
+         
             $.post('/article/' + article_id + '/highlight-storage', {
               'SerializedHighlights': serialized
-            }).done(function(response) {
-              $('flashMessages').html('<div class="alert alert-success alert-dismissible fade show" role="alert">success!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
             }).fail(function() {
               $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
             });
 
-            //window.localStorage.setItem('serializedHighlights', serialized);
-
-          for (var i = 0; i < highlights.length; i++){
-            newNode = highlights[i];
-            console.log(highlights[i]);
-            newNode.setAttribute('class', 'highlighted d-inline ' + returnedhighlightclass );
-            newNode.setAttribute('LearnAppid', returnedhighlightid);
-            //newNode.style.cssText="background-color: red !important; color: white;"
-            newNode.setAttribute('tabindex', '0');
-            newNode.setAttribute('data-toggle','popover' );
-            newNode.setAttribute('data-container','body' );
-            newNode.setAttribute('data-placement','right' );
-            newNode.setAttribute('data-trigger','focus' );
-            newNode.setAttribute('title','OPTIONS' );
-            newNode.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
-          }
-
-          $(function () {
-            $('[data-toggle="popover"]').popover()
-          });
-
+          $('[data-toggle="popover"]').popover()
+          
+          
           $('.popover-dismiss').popover({
             trigger: 'focus'
           });
+         
 
           var $window = $(window);
-          console.log($window.scrollTop()) 
           localStorage.setItem('scrollPosition', $window.scrollTop());
-          console.log('stored position: ' + localStorage.getItem('scrollPosition'))
-
-
-
+          
         } 
+
+        
         
       });
+        
+      
     
 
-      //var serialized = window.localStorage.getItem('serializedHighlights');
       var serialized; 
       $.get('/article/' + article_id + '/highlight-storage', function(data) {
         serialized = data['SerializedHighlights']
         hltr.deserializeHighlights(serialized);
-        $(function () {
         $('[data-toggle="popover"]').popover()
-      })
-
-      $('.popover-dismiss').popover({
-        trigger: 'focus'
-      })
+      
       });
       
-      //window.scroll(0, localStorage.getItem('scrollPosition')|0)
       $( window ).on( "load", function() { 
         var $window = $(window)
         if (localStorage.getItem('scrollPosition')){
@@ -249,7 +227,6 @@
       })
       
 
-      
 
 </script>
 
@@ -282,6 +259,7 @@
         c[i].click()
       }  
     }
+    
     /* END RESET */
 
 
@@ -320,7 +298,6 @@
         $('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
         document.getElementById("label"+response['id']).click();
         $('#CreateTopic').html('<button onclick ="NewTopic()" class="create-button btn btn-success">Create new topic </button>');
-        highlightSelection();
     }).fail(function() {
         $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
     });
@@ -332,6 +309,16 @@
   }
   
 
+  $(function() {
+    
+    $('[data-toggle="popover"]').popover()
+          
+  
+    $('.popover-dismiss').popover({
+      trigger: 'focus'
+    });
+
+});
 
 </script>
 

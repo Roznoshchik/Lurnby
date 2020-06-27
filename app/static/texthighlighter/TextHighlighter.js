@@ -466,15 +466,17 @@
             wrapper.setAttribute(TIMESTAMP_ATTR, timestamp);
             wrapper.setAttribute(DATA_ATTR, "true");
             wrapper.classList.add(returnedhighlightclass);
-            wrapper.setAttribute('LearnAppid', returnedhighlightid)
             console.log("\n\n\n adding class \n\n\n\n")
             wrapper.setAttribute('tabindex', '0');
+            
             wrapper.setAttribute('data-toggle','popover' );
             wrapper.setAttribute('data-container','body' );
             wrapper.setAttribute('data-placement','right' );
             wrapper.setAttribute('data-trigger','focus' );
-            wrapper.setAttribute('title','OPTIONS' );
-            wrapper.setAttribute('data-content','This will offer some options for what to do with a past highlight.' );
+            wrapper.setAttribute('data-html','true' );
+            wrapper.setAttribute('data-content','<span onclick = "ViewHighlight('+ returnedhighlightid +')" class="btn btn-dark btn-sm">View Highlight</span>' );
+            
+            
 
             createdHighlights = this.highlightRange(range, wrapper);
             normalizedHighlights = this.normalizeHighlights(createdHighlights);

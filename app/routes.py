@@ -265,7 +265,8 @@ def addhighlight():
 def view_highlight(id):
     highlight = Highlight.query.filter_by(id = id).first_or_404()
     article = Article.query.filter_by(id = highlight.article_id).first()
-
+    
+    addtopicform = AddTopicForm()
     form = AddHighlightForm()
     
     member = highlight.in_topics().all()
@@ -285,6 +286,28 @@ def view_highlight(id):
         form.note.data = highlight.note
 
         return render_template('highlight.html', highlight = highlight, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
+
+
+    if request.method == 'POST':
+        highlight.text = request.form['text']
+        highlight.note = request.form['note']
+
+        members = request.form.getlist('members')
+        print(members)
+        for member in members:
+            topic = Topic.query.filter_by(title=member).first()
+            highlight.AddToTopic(topic)
+        
+
+        nonmembers = request.form.getlist('nonmembers')
+        for nonmember in nonmembers:
+            topic = Topic.query.filter_by(title=nonmember).first()
+            highlight.RemoveFromTopic(topic)
+
+
+        db.session.commit()
+        return redirect(url_for('topics'))
+
 
 @app.route('/archivehighlight/<id>')
 def archivehighlight(id):

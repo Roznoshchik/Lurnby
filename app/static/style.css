@@ -309,8 +309,27 @@ margin-bottom: 24px;
 }
 
 
+.bs-popover-right > .arrow::after, .bs-popover-auto[x-placement^="right"] > .arrow::after {
+    left: 1px;
+    border-width: 0.5rem 0.5rem 0.5rem 0;
+    border-right-color: transparent !important;
+  }
 
-#infoDiv {
+
+.popover{
+    color: #fff;
+    background-color:transparent !important;
+    border:none;
+}
+
+.popover .arrow::before {
+    border: none;
+}
+
+.popover .arrow::after {
+    border: none;
+}
+#infoDiv{
     display: none;
     z-index: 101;
   }

@@ -2,7 +2,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="ViewHighlightModalLabel">View Highlight</h5>
-        <a href = "" class = "close" type="button" onclick="closeHighlight()">
+        <button class = "close" type="button" data-dismiss="modal">
           &times;
         </a>
       </div>
@@ -25,7 +25,7 @@
             <h4 style = "display:inline;"> View Content in App:</h4> <a href="{{ inappurl }}">Open</a>
         </p>    
         <hr>      
-        <form  id = "SubmitHighlightForm" action="" method="post">
+        <form  id = "UpdateHighlightForm" action="" method="post">
            {{ form.hidden_tag() }} 
           
         <h4>Highlight text:</h4>
@@ -39,20 +39,28 @@
           <div class="form-group">
             {{ form.note(class="form-control", id="message-text") }}              
           </div>
+
+          <span id="Update-CreateTopic">
+            <button onclick ="UpdateNewTopic()" class="create-button btn btn-success">
+              Create new topic
+            </button>
+          </span>     
+
           <h4>In the following topics:</h4>
           <div id = "Members" class="btn-group-toggle" data-toggle="buttons">
             {% for m in member %}
-            <label id = "topic{{ m.id }}"class="topic-member btn btn-default">
-              <span onclick="RemoveFromTopic('topic{{ m.id }}', '{{ m.title }}')"><input name = "topics" type="checkbox" checked value="{{member.title}}">
+            <label onclick="RemoveFromTopic('topic{{ m.id }}', '{{ m.title }}')" id = "topic{{ m.id }}"class="topic-member btn btn-default">
+              <span ><input name = "members" type="checkbox" checked value="{{m.title}}">
               {{m.title}} <span class="topic-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
             </span></label>
-            {% endfor %}        
+            {% endfor %}
+           
           </div>
           <h4>Not in the following topics:</h4>
           <div id ="NonMembers" class="btn-group-toggle" data-toggle="buttons">
             {% for n in nonmember %}
-            <label id = "topic{{ n.id }}" class="topic-non-member btn btn-default">
-              <span onclick="AddToTopic('topic{{ n.id }}', '{{n.title}}')"><input name = "topics" type="checkbox" checked value="{{n.title}}">
+            <label onclick="AddToTopic('topic{{ n.id }}', '{{n.title}}')" id = "topic{{ n.id }}" class="topic-non-member btn btn-default">
+              <span ><input name = "nonmembers" type="checkbox" checked value="{{n.title}}">
               {{n.title}} <span class="topic-icon"><i class="fa fa-plus fa-xs" aria-hidden="true"></i></span>
             </span></label>
             {% endfor %}        
@@ -61,8 +69,8 @@
       </div>
       <div class="modal-footer">
         <a href="{{url_for('archivehighlight', id = highlight.id )}} " type="button" class="btn btn-danger mr-auto">{% if member|length > 1 %}Delete from {{member|length}} topics{% else %}Delete{% endif %}</a>
-        <a href = "" type="button" onclick ="closeHighlight()" class="btn btn-outline-secondary">Cancel</a>
-        <button type="button" onclick="" class="btn btn-primary">Update</button>
+        <button type="button" data-dismiss ='modal' class="btn btn-outline-secondary">Cancel</button>
+        <button type="button" onclick="UpdateHighlight({{highlight.id}})" class="btn btn-primary">Update</button>
       </div>
     </form>
     </div>
