@@ -286,7 +286,7 @@
 
 
   function NewTopic(){
-    $('#CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"> {{ addtopicform.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}} </div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>');
+    $('#CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"><input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value=""></input></div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>');
     $('#addtopicinput').trigger('focus');
   }
 

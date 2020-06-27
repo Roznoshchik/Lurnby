@@ -285,7 +285,7 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
 
-        return render_template('highlight.html', highlight = highlight, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
+        return render_template('highlight.html', highlight = highlight,addtopicform=addtopicform, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
 
 
     if request.method == 'POST':

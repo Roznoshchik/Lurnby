@@ -88,6 +88,23 @@ function UpdateHighlight(id){
 }
 
 function UpdateNewTopic(){
-    $('#Update-CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"> {{ addtopicform.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}} </div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>');
-    $('#addtopicinput').trigger('focus');
+    $('#Update-CreateTopic').html('<div class = "form-row align-items-center"> <div class="col-sm-6 my-1"> <input autofocus="" class="form-control" id="UpdateAddTopicInput" name="title" placeholder="Topic title..." required="" type="text" value=""></input></div> <div class="col-auto my-1"> <button type="button" onclick="UpdateCancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="UpdateNewTopicSubmit()" type="button" class="btn btn-primary">add</button> </div> </div> ');
+    $('#UpdateAddTopicInput').trigger('focus');
   }
+
+  function UpdateCancelNewTopic(){
+    $('#Update-CreateTopic').html('<button onclick ="UpdateNewTopic()" class="create-button btn btn-success">Create new topic </button>')
+  }
+
+
+  function UpdateNewTopicSubmit(){
+    $.post('/topics/add', {
+      title: $('#UpdateAddTopicInput').val()
+    }).done(function(response) {
+        $('#Update-CreateTopic').html('<button onclick ="UpdateNewTopic()" class="create-button btn btn-success">Create new topic </button>');
+        AddToTopic(response['id'], response['title'])
+    }).fail(function() {
+        $('#Update-CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+    });
+}
+
