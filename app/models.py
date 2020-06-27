@@ -88,6 +88,28 @@ class Highlight(db.Model):
         return self.topics.filter(
             topic.id == highlights_topics.c.topic_id).count() > 0
     
+  
+    def not_added(self):
+        """
+        Highlight.query.join(
+            highlights_topics, (highlights_topics.c.highlight_id == Highlight.id
+            ).filter(
+                Highlight.archived==False, Highlight.user_id==current_user.id,
+                Highlight.id.notin_(
+                    db.session.query(highlights_topics))).all()
+        """
+        query = db.session.query(highlights_topics).filter(highlights_topics.c.highlight_id == self.id).count()
+
+        if query == 0:
+            return True
+        else:
+            return False
+        
+
+    
+    
+
+    
     # returns all topics that a highlight is a part of.  highlight.in_topics().all()
     def in_topics(self):
         return Topic.query.join(
@@ -109,7 +131,11 @@ class Highlight(db.Model):
             list.append(i)
 
         return list
+
+
+  
     
+  
     
     
 

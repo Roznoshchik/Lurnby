@@ -339,7 +339,20 @@ def unarchivehighlight(id):
 def topics():
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
     highlights = Highlight.query.filter_by(user_id=current_user.id, archived=False).all()
+
     
+    notopics = []
+    
+    for highlight in highlights:
+        if highlight.not_added():
+            notopics.append(highlight)
+   
+
+
+
+
+
+
     form2=AddHighlightForm()
     
     form = AddTopicForm()
@@ -353,7 +366,7 @@ def topics():
         #return render_template('topics.html', form=form, topics=topics)
         return redirect(url_for('topics'))
 
-    return render_template('topics.html', form=form,form2=form2, highlights = highlights, topics=topics)
+    return render_template('topics.html', form=form,form2=form2, highlights = highlights, notopics=notopics, topics=topics)
 
 
 @app.route('/topics/add', methods=['POST'])

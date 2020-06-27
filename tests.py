@@ -3,6 +3,9 @@ from app import app, db
 from app.models import User, Highlight, Tag, Topic, highlights_topics
 
 class HighlightModelCase(unittest.TestCase):
+    current_user=User.query.first()
+    
+    
     def setUp(self):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
         db.create_all()

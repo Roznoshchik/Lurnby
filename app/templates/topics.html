@@ -12,6 +12,35 @@
     <div class="small  text-dark">These are all your current topics, not sure what to put here. </div>
     <div class="row flex-row flex-sm-nowrap py-3">
         <div class = "row flex-row flex-sm-nowrap py-3" id="topicmain">
+            <div class="col-sm-6 col-md-3 col-xl-3 topics-col">
+                <div class="card bg-light">
+                    <div class="card-header">
+                        <h6 class="card-title text-uppercase py-2">Not Added</h6>
+                    </div>
+                    <div class="card-body topics-col-base">
+                        <div class="items border border-light">
+                            {% for highlight in notopics %}
+                            <div class="card draggable shadow-sm" id="cd9" draggable="False" ondragstart="drag(event)">
+                                <div class="card-body p-2">
+                                    <div class="card-title">
+                                        <span aria-hidden="true"><svg class=" float-right bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                            <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                                        </svg></span>
+                                        <span onclick="ViewHighlight({{highlight.id}})" class="text-primary highlight-title lead font-weight-light">Highlight:{{highlight.id}}</a>
+                                    </div>
+                                    <p>
+                                        {{highlight.text}}
+                                    </p>
+                                    <button onclick="ViewHighlight({{highlight.id}})" class="btn btn-primary btn-sm">View</button>
+                                </div>
+                            </div>
+                            <div class="dropzone rounded" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="clearDrop(event)"> &nbsp; </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             {% for topic in topics %}
             <div class="col-sm-6 col-md-3 col-xl-3 topics-col">
                 <div class="card bg-light">
