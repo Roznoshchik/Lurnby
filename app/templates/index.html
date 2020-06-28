@@ -7,8 +7,8 @@
 {% block content %}
     <form class="form-signin" action="" method="post" novalidate>
   <div class="text-center mb-4">
-    <span style="cursor: pointer;" onclick="rrtoggle()"><img id = "rrface" class="mb-4 star" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
-    <h1 class="h3 mb-3 font-weight-normal">A Learning Tool</h1>
+    <span style="cursor: pointer;" onclick="rrtoggle()"><img id = "rrface" class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+    <h1 id = "rrtitle" class="h3 mb-3 font-weight-normal">A Learning Tool</h1>
     <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
   </div>
 
@@ -21,7 +21,7 @@
     {{ form.url.label}}
   </div>
   
-  <button class="btn btn-lg btn-primary btn-block" type="submit">Get Clean Content</button>
+  <button class="btn btn-lg btn-primary btn-block" onclick="rrtoggle()" type="submit">Get Clean Content</button>
   <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
 </form>
 {% endblock %}
@@ -30,7 +30,9 @@
   function rrtoggle(){
 
     var rr = document.getElementById('rrface')
-
+    var title = document.getElementById('rrtitle')
+    
+    title.innerHTML="... loading ..."
     rr.classList.toggle('star')
   }
 

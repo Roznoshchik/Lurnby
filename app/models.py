@@ -18,6 +18,7 @@ class User(UserMixin, db.Model):
     highlights = db.relationship('Highlight', backref ='user', lazy ='dynamic')
     topics = db.relationship('Topic', backref = 'user', lazy = 'dynamic')
     tags = db.relationship('Tag', backref = 'user', lazy = 'dynamic')
+    account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -104,9 +105,6 @@ class Highlight(db.Model):
             return True
         else:
             return False
-        
-
-    
     
 
     
@@ -133,12 +131,6 @@ class Highlight(db.Model):
         return list
 
 
-  
-    
-  
-    
-    
-
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(512), unique=True, index=True) #how long should it be?
@@ -157,4 +149,3 @@ class Tag(db.Model):
     archived = db.Column(db.Boolean, index=True)
     goal = db.Column(db.String(512))
 
-article = Article(archived=False, content="PEGAZUS KIADÁS", title = "This is a non URL Article", user_id = 1, source="NAGY KÓPÉ")
