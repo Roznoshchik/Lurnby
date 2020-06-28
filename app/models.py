@@ -46,6 +46,13 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return User.query.get(int(id))
 
+
+tags_articles = db.Table('tags_articles',
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False),
+    db.Column('article_id', db.Integer, db.ForeignKey('article.id'), nullable=False )
+)
+
+
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     unread = db.Column(db.Boolean, index=True)
@@ -58,6 +65,63 @@ class Article(db.Model):
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String)
+    tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
+
+
+
+
+    # add article to tag
+    def AddToTag(self, tag):
+        if not self.is_added(tag):
+            self.tags.append(tag)
+       
+    # remove article from tag
+    def RemoveFromTag(self, tag):  
+        if self.is_added(tag):
+            self.topics.remove(tag)
+      
+    # checks if an article is in a tag
+    def is_added(self, tag):
+        return self.tags.filter(
+            tag.id == tags_articles.c.tag_id).count() > 0
+    
+    #returns true if article is untagged
+    def not_added(self):
+        """
+        Highlight.query.join(
+            highlights_topics, (highlights_topics.c.highlight_id == Highlight.id
+            ).filter(
+                Highlight.archived==False, Highlight.user_id==current_user.id,
+                Highlight.id.notin_(
+                    db.session.query(highlights_topics))).all()
+        """
+        query = db.session.query(tags_articles).filter(tags_articles.c.article_id == self.id).count()
+
+        if query == 0:
+            return True
+        else:
+            return False
+    
+
+    
+    # returns all tagss that an article is a part of.  article.in_tags().all()
+    def in_tags(self):
+        return Tag.query.join(
+            tags_articles, (tags_articles.c.tag_id == Tag.id)
+            ).filter(
+               tags_articles.c.article_id == self.id, Tag.archived==False, Tag.user_id==current_user.id
+               ) 
+   
+    # returns all tags that an article is not a part of. article.not_in_tags().all()
+    def not_in_tags(self):
+        return Tag.query.filter(
+            Tag.archived==False, Tag.user_id==current_user.id,
+            Tag.id.notin_(
+                db.session.query(tags_articles.c.tag_id).filter(
+                    tags_articles.c.article_id == self.id))).all()
+        
+
+
 
 
 highlights_topics = db.Table('highlights_topics',
@@ -73,6 +137,7 @@ class Highlight(db.Model):
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
+
 
     # add highlight to topic
     def AddToTopic(self, topic):
@@ -148,4 +213,5 @@ class Tag(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     archived = db.Column(db.Boolean, index=True)
     goal = db.Column(db.String(512))
+    articles = db.relationship('Article', secondary=tags_articles, backref = 'tag', lazy='dynamic')
 
