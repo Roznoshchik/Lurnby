@@ -57,6 +57,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     unread = db.Column(db.Boolean, index=True)
     title = db.Column(db.String(255), index=True)
+    filetype = db.Column(db.String(32)) 
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
     content = db.Column(db.String)

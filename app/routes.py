@@ -3,7 +3,7 @@ import requests
 
 from app import app, client, db
 from flask import flash, redirect, url_for, render_template, request, jsonify
-from app.forms import URLForm, LoginForm, RegisterForm, AddTopicForm, ResetPasswordRequestForm, ResetPasswordForm, AddHighlightForm
+from app.forms import ContentForm, LoginForm, RegisterForm, AddTopicForm, ResetPasswordRequestForm, ResetPasswordForm, AddHighlightForm
 from app.pulltext import pull_text
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Article, Topic, Highlight, highlights_topics, Tag
@@ -15,28 +15,49 @@ from wtforms import BooleanField
 
 @app.route("/", methods=['GET','POST'])
 @app.route("/index", methods=['GET','POST'])
+@login_required
 def index():
-    form = URLForm()
-    if form.validate_on_submit():
-        
-        if request.method =='POST':
-            url = request.form['url']
-            text = pull_text(url)
+    form = ContentForm()
+
+
+    if request.method =='POST':
+        print("ARE WE HERE?")
+
+        url = request.form['url']
+        print(url)
+        if url != "":
+            urltext = pull_text(url)
             
+            title = urltext["title"]
+            content = urltext["content"]
             
-            title = text["title"]
-            content = text["content"]
-            
+            """
             if current_user.is_anonymous:
-                 return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
-            
-            new_article = Article(unread=True, title=title, source_url=url, content=content, user_id=current_user.id, archived=False )
+                return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
+            """
+
+            new_article = Article(unread=True, title=title, source_url=url, content=content, user_id=current_user.id, archived=False, filetype="url" )
             db.session.add(new_article)
             db.session.commit()
             flash('Article added!', 'message')
 
-            #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
-            
+        text = request.form['text']
+        print(text)
+        if text != "":
+            title = request.form['title']    
+            source = request.form['source']
+            new_article = Article(unread=True, title=title, source=source, content=text, user_id=current_user.id, archived=False, filetype="manual" )
+            db.session.add(new_article)
+            db.session.commit()
+            flash('Article added!', 'message')
+
+
+            epub = form.epub.data
+
+
+
+        #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
+        
         return redirect(url_for('index'))
 
     return render_template('index.html', title="Elegant Reader", form=form)
@@ -55,7 +76,7 @@ def login():
                 login_user(user, remember=form.remember_me.data)
                 next_page = request.args.get('next')
                 if not next_page or url_parse(next_page).netloc != '':
-                    next_page = url_for('articles')
+                    next_page = url_for('index')
                 return redirect(next_page)
 
             flash('Invalid username or password', 'error')
@@ -70,7 +91,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
-                next_page = url_for('articles')
+                next_page = url_for('index')
             return redirect(next_page)
     
     return render_template('login.html', form=form)
@@ -159,14 +180,14 @@ def callback():
             db.session.commit()
         
         login_user(user)
-    return redirect(url_for("articles"))
+    return redirect(url_for("index"))
 
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('articles'))
+        return redirect(url_for('index'))
     form = RegisterForm()
     if form.validate_on_submit():
         user=User(username=form.username.data.lower(), firstname=form.firstname.data, email=form.email.data.lower())
@@ -187,6 +208,7 @@ def articles():
     return render_template('articles.html', unread_articles=unread_articles, read_articles=read_articles)
 
 @app.route('/article/<id>', methods =['POST', 'GET'])
+@login_required
 def article(id):
     article = Article.query.filter_by(id=id).first()
     article.unread = False
@@ -219,6 +241,7 @@ def article(id):
 
 
 @app.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
+@login_required
 def storeHighlights(id):
     article = Article.query.filter_by(id=id).first()
 
@@ -239,6 +262,7 @@ def storeHighlights(id):
 
 
 @app.route('/article/addhighlight', methods =['POST'])
+@login_required
 def addhighlight():
     
     topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
@@ -262,6 +286,7 @@ def addhighlight():
 
    
 @app.route('/view_highlight/<id>', methods=['GET', 'POST'])
+@login_required
 def view_highlight(id):
     highlight = Highlight.query.filter_by(id = id).first_or_404()
     article = Article.query.filter_by(id = highlight.article_id).first()
@@ -310,6 +335,7 @@ def view_highlight(id):
 
 
 @app.route('/archivehighlight/<id>')
+@login_required
 def archivehighlight(id):
     
     highlight = Highlight.query.filter_by(id=id).first()
@@ -323,6 +349,7 @@ def archivehighlight(id):
     return redirect(url_for('topics'))
 
 @app.route('/unarchivehighlight/<id>')
+@login_required
 def unarchivehighlight(id):
     
     highlight = Highlight.query.filter_by(id=id).first()
@@ -336,6 +363,7 @@ def unarchivehighlight(id):
 
 
 @app.route('/topics', methods=['GET', 'POST'])
+@login_required
 def topics():
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
     highlights = Highlight.query.filter_by(user_id=current_user.id, archived=False).all()
@@ -370,6 +398,7 @@ def topics():
 
 
 @app.route('/topics/add', methods=['POST'])
+@login_required
 def add_new_topic():
 
     newtopic = Topic.query.filter_by(title=request.form['title'].lower()).first()
@@ -388,6 +417,8 @@ def add_new_topic():
 
 
 @app.route('/archivetopic/<topic_id>')
+@login_required
+
 def archivetopic(topic_id):
     
     topic = Topic.query.filter_by(id=topic_id).first()
@@ -408,6 +439,8 @@ def archivetopic(topic_id):
 
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
+@login_required
+
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -422,6 +455,8 @@ def reset_password_request():
     return render_template('reset_password_request.html', title='Reset Password', form=form)
 
 @app.route('/reset_password/<token>', methods = ['GET','POST'])
+@login_required
+
 def reset_password(token):
     if current_user.is_authenticated:
         return redirect(url_for('index'))

@@ -1,3 +1,28 @@
+.hidden {
+    display: none;
+}
+.notop{
+    padding-top: 0;
+    margin-top: 0;
+}
+.space-above {
+    margin-top: 2rem;
+}
+
+.custom-file-label{
+    height: 3.125rem;  
+    padding: .75rem .75rem;
+}
+
+.custom-file-label::after {
+    height: 3.0rem;
+    padding: .75rem .75rem;
+}
+
+.custom-file-input{
+margin-top: 1.5rem ;
+}
+
 @keyframes rotate {
     from {
       transform: rotate(0deg);

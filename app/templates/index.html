@@ -5,28 +5,84 @@
 {% endblock %}
 
 {% block content %}
-    <form class="form-signin" action="" method="post" novalidate>
-  <div class="text-center mb-4">
-    <span style="cursor: pointer;" onclick="rrtoggle()"><img id = "rrface" class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
-    <h1 id = "rrtitle" class="h3 mb-3 font-weight-normal">A Learning Tool</h1>
-    <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
-  </div>
 
+
+<div class="row">
+<div class="col-4 text-center mb-4">
+  <span style="cursor: pointer;" onclick="rrtoggle()"><img id = "rrface" class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+  <h1 id = "rrtitle" class="h3 mb-3 font-weight-normal">A Learning Tool</h1>
+  <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
+</div>
+<div class="col-8">
+  <form id = "contentForm" class="form-signin" action="" method="post" enctype="multipart/form-data" name= "contentForm" novalidate>
   <div class="form-label-group">
     {{ form.hidden_tag() }}
   </div>
-  
+  <div class="space-above mb-4">
+    <h4>Article from the web</h4>
+  </div>
   <div class="form-label-group">
-    {{ form.url(class="form-control",id="inputURL", type="URL", placeholder="URL", required=true, autofocus=true)}}
+    {{ form.url(class="form-control",id="inputURL", type="URL", placeholder="URL",  autofocus=true)}}
     {{ form.url.label}}
   </div>
+  <div class="space-above mb-4">
+    <h4>Epub document</h4>
+  </div>
+  <div class="custom-file">
+    {{ form.epub( class="custom-file-input",id="inputEpub", type="file", placeholder="Choose an epub file", autofocus=true)}}
+    {{ form.epub.label(class="custom-file-label", for="inputEpub")}}
+  </div>
+  <div class="space-above mb-4">
+    <h4>Copy & Paste</h4>
+  </div>
+  <div class="form-label-group">
+    {{ form.title(class="form-control",id="inputTitle", type="text", placeholder="Title",  autofocus=true)}}
+    {{ form.title.label}}
+  </div>
+  <div class="form-label-group">
+    {{ form.source(class="form-control",id="inputSource", type="text", placeholder="Source",  autofocus=true)}}
+    {{ form.source.label}}
+  </div>
+  <div class="form-group">
+    {{ form.text(rows="3", class="form-control" ,id="inputText", type="text", placeholder="Paste text here ...", autofocus=true)}}
+  </div>
   
-  <button class="btn btn-lg btn-primary btn-block" onclick="rrtoggle()" type="submit">Get Clean Content</button>
-  <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
+  <button id ="submitButton" class="hidden btn btn-lg btn-primary btn-block" type="submit">Add New Content</button>
 </form>
+<div class="form-signin">
+  <button class="btn btn-lg btn-primary btn-block" onclick="required()">Add New Content</button>
+
+  <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
+
+</div>
+  
+ 
+</div>
+</div>
 {% endblock %}
 {% block JS%}
 <script>
+
+function required()
+{
+  var form = document.forms["contentForm"];
+  var url = form["url"].value;
+  var epub = form["epub"].value;
+  var text = form["text"].value;
+
+  if (url == "" && epub == "" && text == "")
+  {
+    $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">At least one field must be filled. <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
+  }
+
+  else{
+    rrtoggle();
+    document.getElementById('submitButton').click(); 
+  }
+
+}
+
+
   function rrtoggle(){
 
     var rr = document.getElementById('rrface')
@@ -35,6 +91,181 @@
     title.innerHTML="... loading ..."
     rr.classList.toggle('star')
   }
+
+  /*!
+ * bsCustomFileInput v1.3.2 (https://github.com/Johann-S/bs-custom-file-input)
+ * Copyright 2018 - 2019 Johann-S <johann.servoire@gmail.com>
+ * Licensed under MIT (https://github.com/Johann-S/bs-custom-file-input/blob/master/LICENSE)
+ */
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = global || self, global.bsCustomFileInput = factory());
+}(this, function () {
+  'use strict';
+
+  var Selector = {
+    CUSTOMFILE: '.custom-file input[type="file"]',
+    CUSTOMFILELABEL: '.custom-file-label',
+    FORM: 'form',
+    INPUT: 'input'
+  };
+
+  var textNodeType = 3;
+
+  var getDefaultText = function getDefaultText(input) {
+    var defaultText = '';
+    var label = input.parentNode.querySelector(Selector.CUSTOMFILELABEL);
+
+    if (label) {
+      defaultText = label.innerHTML;
+    }
+
+    return defaultText;
+  };
+
+  var findFirstChildNode = function findFirstChildNode(element) {
+    if (element.childNodes.length > 0) {
+      var childNodes = [].slice.call(element.childNodes);
+
+      for (var i = 0; i < childNodes.length; i++) {
+        var node = childNodes[i];
+
+        if (node.nodeType !== textNodeType) {
+          return node;
+        }
+      }
+    }
+
+    return element;
+  };
+
+  var restoreDefaultText = function restoreDefaultText(input) {
+    var defaultText = input.bsCustomFileInput.defaultText;
+    var label = input.parentNode.querySelector(Selector.CUSTOMFILELABEL);
+
+    if (label) {
+      var element = findFirstChildNode(label);
+      element.innerHTML = defaultText;
+    }
+  };
+
+  var fileApi = !!window.File;
+  var FAKE_PATH = 'fakepath';
+  var FAKE_PATH_SEPARATOR = '\\';
+
+  var getSelectedFiles = function getSelectedFiles(input) {
+    if (input.hasAttribute('multiple') && fileApi) {
+      return [].slice.call(input.files).map(function (file) {
+        return file.name;
+      }).join(', ');
+    }
+
+    if (input.value.indexOf(FAKE_PATH) !== -1) {
+      var splittedValue = input.value.split(FAKE_PATH_SEPARATOR);
+      return splittedValue[splittedValue.length - 1];
+    }
+
+    return input.value;
+  };
+
+  function handleInputChange() {
+    var label = this.parentNode.querySelector(Selector.CUSTOMFILELABEL);
+
+    if (label) {
+      var element = findFirstChildNode(label);
+      var inputValue = getSelectedFiles(this);
+
+      if (inputValue.length) {
+        element.innerHTML = inputValue;
+      } else {
+        restoreDefaultText(this);
+      }
+    }
+  }
+
+  function handleFormReset() {
+    var customFileList = [].slice.call(this.querySelectorAll(Selector.INPUT)).filter(function (input) {
+      return !!input.bsCustomFileInput;
+    });
+
+    for (var i = 0, len = customFileList.length; i < len; i++) {
+      restoreDefaultText(customFileList[i]);
+    }
+  }
+
+  var customProperty = 'bsCustomFileInput';
+  var Event = {
+    FORMRESET: 'reset',
+    INPUTCHANGE: 'change'
+  };
+  var bsCustomFileInput = {
+    init: function init(inputSelector, formSelector) {
+      if (inputSelector === void 0) {
+        inputSelector = Selector.CUSTOMFILE;
+      }
+
+      if (formSelector === void 0) {
+        formSelector = Selector.FORM;
+      }
+
+      var customFileInputList = [].slice.call(document.querySelectorAll(inputSelector));
+      var formList = [].slice.call(document.querySelectorAll(formSelector));
+
+      for (var i = 0, len = customFileInputList.length; i < len; i++) {
+        var input = customFileInputList[i];
+        Object.defineProperty(input, customProperty, {
+          value: {
+            defaultText: getDefaultText(input)
+          },
+          writable: true
+        });
+        handleInputChange.call(input);
+        input.addEventListener(Event.INPUTCHANGE, handleInputChange);
+      }
+
+      for (var _i = 0, _len = formList.length; _i < _len; _i++) {
+        formList[_i].addEventListener(Event.FORMRESET, handleFormReset);
+
+        Object.defineProperty(formList[_i], customProperty, {
+          value: true,
+          writable: true
+        });
+      }
+    },
+    destroy: function destroy() {
+      var formList = [].slice.call(document.querySelectorAll(Selector.FORM)).filter(function (form) {
+        return !!form.bsCustomFileInput;
+      });
+      var customFileInputList = [].slice.call(document.querySelectorAll(Selector.INPUT)).filter(function (input) {
+        return !!input.bsCustomFileInput;
+      });
+
+      for (var i = 0, len = customFileInputList.length; i < len; i++) {
+        var input = customFileInputList[i];
+        restoreDefaultText(input);
+        input[customProperty] = undefined;
+        input.removeEventListener(Event.INPUTCHANGE, handleInputChange);
+      }
+
+      for (var _i2 = 0, _len2 = formList.length; _i2 < _len2; _i2++) {
+        formList[_i2].removeEventListener(Event.FORMRESET, handleFormReset);
+
+        formList[_i2][customProperty] = undefined;
+      }
+    }
+  };
+
+  return bsCustomFileInput;
+
+}));
+//# sourceMappingURL=bs-custom-file-input.js.map
+
+document.addEventListener("DOMContentLoaded", function () {
+
+  bsCustomFileInput.init()
+});
+
 
 </script>  
 

@@ -1,11 +1,20 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FormField, FieldList
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length
 from app.models import User, Topic
 
-class URLForm(FlaskForm):
-    url = URLField('URL', validators=[DataRequired(), URL()])
+class ContentForm(FlaskForm):
+    url = URLField('URL', validators=[URL()])
+    epub = FileField('Choose an epub file', validators=[
+        FileRequired(),
+        FileAllowed(['epub'], 'Epub only.')
+    ])
+
+    title = StringField('Title')
+    source = StringField('Source')
+    text = TextAreaField('Copy and paste text')
     submit = SubmitField('Get Content')
 
 class LoginForm(FlaskForm):
