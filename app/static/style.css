@@ -1,10 +1,17 @@
+pre {
+    overflow-x: auto;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    white-space: -pre-wrap;
+    white-space: -o-pre-wrap;
+    word-wrap: break-word;
+ }
+
+
 .hidden {
     display: none;
 }
-.notop{
-    padding-top: 0;
-    margin-top: 0;
-}
+
 .space-above {
     margin-top: 2rem;
 }

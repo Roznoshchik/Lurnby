@@ -2,13 +2,15 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FormField, FieldList
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length
+from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length, Optional
 from app.models import User, Topic
 
 class ContentForm(FlaskForm):
-    url = URLField('URL', validators=[URL()])
+    url = URLField('URL', validators=[
+        URL(),
+        Optional()
+    ])
     epub = FileField('Choose an epub file', validators=[
-        FileRequired(),
         FileAllowed(['epub'], 'Epub only.')
     ])
 

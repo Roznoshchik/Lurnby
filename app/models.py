@@ -60,7 +60,7 @@ class Article(db.Model):
     filetype = db.Column(db.String(32)) 
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
-    content = db.Column(db.String)
+    content = db.Column(db.Text)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')

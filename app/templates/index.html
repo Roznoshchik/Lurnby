@@ -15,38 +15,39 @@
 </div>
 <div class="col-8">
   <form id = "contentForm" class="form-signin" action="" method="post" enctype="multipart/form-data" name= "contentForm" novalidate>
-  <div class="form-label-group">
-    {{ form.hidden_tag() }}
-  </div>
   <div class="space-above mb-4">
     <h4>Article from the web</h4>
   </div>
   <div class="form-label-group">
-    {{ form.url(class="form-control",id="inputURL", type="URL", placeholder="URL",  autofocus=true)}}
+    {{ form.url(class="form-control",id="inputURL", type="URL", placeholder="URL")}}
     {{ form.url.label}}
+    
   </div>
   <div class="space-above mb-4">
     <h4>Epub document</h4>
   </div>
   <div class="custom-file">
-    {{ form.epub( class="custom-file-input",id="inputEpub", type="file", placeholder="Choose an epub file", autofocus=true)}}
+    {{ form.epub( class="custom-file-input",id="inputEpub", type="file", placeholder="Choose an epub file")}}
     {{ form.epub.label(class="custom-file-label", for="inputEpub")}}
+    
   </div>
   <div class="space-above mb-4">
     <h4>Copy & Paste</h4>
   </div>
   <div class="form-label-group">
-    {{ form.title(class="form-control",id="inputTitle", type="text", placeholder="Title",  autofocus=true)}}
+    {{ form.title(class="form-control",id="inputTitle", type="text", placeholder="Title")}}
     {{ form.title.label}}
   </div>
   <div class="form-label-group">
-    {{ form.source(class="form-control",id="inputSource", type="text", placeholder="Source",  autofocus=true)}}
+    {{ form.source(class="form-control",id="inputSource", type="text", placeholder="Source")}}
     {{ form.source.label}}
   </div>
   <div class="form-group">
-    {{ form.text(rows="3", class="form-control" ,id="inputText", type="text", placeholder="Paste text here ...", autofocus=true)}}
+    {{ form.text(rows="3", class="form-control" ,id="inputText", type="text", placeholder="Paste text here ...")}}
   </div>
-  
+  <div class="form-label-group">
+    {{ form.hidden_tag() }}
+  </div>
   <button id ="submitButton" class="hidden btn btn-lg btn-primary btn-block" type="submit">Add New Content</button>
 </form>
 <div class="form-signin">

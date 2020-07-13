@@ -1,15 +1,19 @@
 import json
 import requests
+import tempfile
+import os
 
 from app import app, client, db
 from flask import flash, redirect, url_for, render_template, request, jsonify
 from app.forms import ContentForm, LoginForm, RegisterForm, AddTopicForm, ResetPasswordRequestForm, ResetPasswordForm, AddHighlightForm
 from app.pulltext import pull_text
+from app.ebooks import epub2text, epubTitle
 from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Article, Topic, Highlight, highlights_topics, Tag
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
+from werkzeug.utils import secure_filename
 from wtforms import BooleanField
 
 
@@ -19,13 +23,9 @@ from wtforms import BooleanField
 def index():
     form = ContentForm()
 
-
-    if request.method =='POST':
-        print("ARE WE HERE?")
-
+    if request.method =='POST' and form.validate():
         url = request.form['url']
-        print(url)
-        if url != "":
+        if url:
             urltext = pull_text(url)
             
             title = urltext["title"]
@@ -42,8 +42,7 @@ def index():
             flash('Article added!', 'message')
 
         text = request.form['text']
-        print(text)
-        if text != "":
+        if text:
             title = request.form['title']    
             source = request.form['source']
             new_article = Article(unread=True, title=title, source=source, content=text, user_id=current_user.id, archived=False, filetype="manual" )
@@ -52,12 +51,47 @@ def index():
             flash('Article added!', 'message')
 
 
-            epub = form.epub.data
+        f = form.epub.data
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        filename = secure_filename(f.filename)
+        path = os.path.join(
+            basedir, 'temp', filename
+        )
 
 
+        f.save(path)
+        
+      
+        if f:
+            content = epub2text(path)
+            title = epubTitle(path)
+            
+            title = title[0][0]
+            epubtext = ""
+            for item in content:
+                epubtext = epubtext + "<pre>" + item +"</pre>"
 
+            new_article = Article(unread=True, title=title, content=epubtext, user_id=current_user.id, archived=False, filetype="epub" )
+            db.session.add(new_article)
+            db.session.commit()
+            flash('Article added!', 'message')
+       
+        os.remove(path)
+        print("file removed")       
         #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
         
+        return redirect(url_for('index'))
+
+    elif request.method =='POST' and not form.validate():
+        url = request.form['url']
+        if url:
+            for error in form.url.errors:
+                flash(error, 'error')
+        
+        for error in form.epub.errors:
+            flash(error, 'error')
+
+        flash(form.errors, 'error')
         return redirect(url_for('index'))
 
     return render_template('index.html', title="Elegant Reader", form=form)
