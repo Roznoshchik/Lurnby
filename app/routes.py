@@ -54,6 +54,12 @@ def index():
         f = form.epub.data
         basedir = os.path.abspath(os.path.dirname(__file__))
         filename = secure_filename(f.filename)
+        
+        path = os.path.join(
+            basedir, 'temp'
+        )
+        os.mkdir(path)
+        
         path = os.path.join(
             basedir, 'temp', filename
         )
