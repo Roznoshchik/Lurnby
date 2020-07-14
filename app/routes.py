@@ -43,6 +43,7 @@ def index():
 
         text = request.form['text']
         if text:
+            text = "<pre>" + text + "</pre>"
             title = request.form['title']    
             source = request.form['source']
             new_article = Article(unread=True, title=title, source=source, content=text, user_id=current_user.id, archived=False, filetype="manual" )
@@ -52,23 +53,23 @@ def index():
 
 
         f = form.epub.data
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        filename = secure_filename(f.filename)
-        
-        path = os.path.join(
-            basedir, 'temp'
-        )
-        os.mkdir(path)
-        
-        path = os.path.join(
-            basedir, 'temp', filename
-        )
-
-
-        f.save(path)
-        
-      
         if f:
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            filename = secure_filename(f.filename)
+            
+            path = os.path.join(
+                basedir, 'temp'
+            )
+            if not os.path.isdir(path): 
+                os.mkdir(path)
+            
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+
+
+            f.save(path)
+            
             content = epub2text(path)
             title = epubTitle(path)
             
@@ -80,10 +81,10 @@ def index():
             new_article = Article(unread=True, title=title, content=epubtext, user_id=current_user.id, archived=False, filetype="epub" )
             db.session.add(new_article)
             db.session.commit()
+            os.remove(path)
             flash('Article added!', 'message')
        
-        os.remove(path)
-        print("file removed")       
+       
         #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
         
         return redirect(url_for('index'))

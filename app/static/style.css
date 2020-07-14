@@ -432,9 +432,10 @@ margin-bottom: 24px;
     text-align: center;
 }
 
-.serif-mode{
+.serif-mode, .serif-mode pre{
     font-family: serif !important;
 }
+
 #make-serif{
     background-color: white;
     color:black;
@@ -453,9 +454,12 @@ margin-bottom: 24px;
  
 }
 
-.sans-mode{
+.sans-mode, .sans-mode pre{
     font-family: sans-serif !important;
 }
+
+
+
 #make-sans{
     background-color: white;
     color:black;
@@ -480,11 +484,11 @@ margin-bottom: 24px;
     max-width: 250px;
     margin:8px;
 }
-.sepia-mode{
+.sepia-mode, .sepia-mode pre{
     background-color: #F7EFE1;
     color:#705848;
 }
-.dark-mode{
+.dark-mode, .dark-mode pre{
     background-color:#424242;
     color:white;
 }
