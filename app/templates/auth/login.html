@@ -9,7 +9,7 @@
     <div class="text-center mb-4">
         <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
         <p>
-            <a class="button" href="{{ url_for('google_login' )}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
+            <a class="button" href="{{ url_for('auth.google_login' )}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
         </p>
         <p>or</p>
         {{ form.hidden_tag() }}
@@ -27,7 +27,7 @@
     <div class="form-label-group">
         {{ form.password(class="form-control", placeholder="Password", required=true, autofocus=true)}}
         {{ form.password.label}}
-        <p><a class = "small" href="{{ url_for('reset_password_request') }}">Forgot Your Password?</a></p>
+        <p><a class = "small" href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
     </div>
     {% for error in form.password.errors %}
     <div class="alert alert-danger" role="alert">
@@ -43,7 +43,7 @@
     </div>
     <div class="text-center mb-4">
         <p class="mt-4">
-            <a href="{{ url_for('register') }}">Register</a>
+            <a href="{{ url_for('auth.register') }}">Register</a>
         </p>  
     </div>
 </form>

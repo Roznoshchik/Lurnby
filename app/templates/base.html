@@ -36,7 +36,7 @@
   <body>
     <div class="container-fluid">
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-between">
-        <a class="navbar-brand" href="{{ url_for('index') }}">A Learning Tool</a>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">A Learning Tool</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -45,10 +45,10 @@
           {% if current_user.is_authenticated %}
           <ul class="navbar-nav mr-auto">
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('articles' )}}">Articles</a>
+              <a class="nav-link" href="{{ url_for('main.articles' )}}">Articles</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('topics' )}}">Topics</a>
+              <a class="nav-link" href="{{ url_for('main.topics' )}}">Topics</a>
             </li>
           </ul>
           {% endif %}
@@ -56,14 +56,14 @@
           <ul class="navbar-nav ml-auto">
             {% if current_user.is_anonymous %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+              <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('register') }}">Register</a>
+              <a class="nav-link" href="{{ url_for('auth.register') }}">Register</a>
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+              <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
             </li>
             {% endif %}
           </ul>

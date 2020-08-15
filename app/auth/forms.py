@@ -1,23 +1,8 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, FormField, FieldList
-from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, URL, ValidationError, Email, EqualTo, Length, Optional
-from app.models import User, Topic
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms.validators import DataRequired, ValidationError, Email, EqualTo
+from app.models import User
 
-class ContentForm(FlaskForm):
-    url = URLField('URL', validators=[
-        URL(),
-        Optional()
-    ])
-    epub = FileField('Choose an epub file', validators=[
-        FileAllowed(['epub'], 'Epub only.')
-    ])
-
-    title = StringField('Title')
-    source = StringField('Source')
-    text = TextAreaField('Copy and paste text')
-    submit = SubmitField('Get Content')
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -51,21 +36,3 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     repeat_password = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Your Password')
-
-
-class AddTopicForm(FlaskForm):
-    title = StringField('Topic title ...', validators=[DataRequired()])
-    
-    def validate_title(self, title):
-        title = Topic.query.filter_by(title=title.data.lower()).first()
-        if title is not None:
-            raise ValidationError('Topic with this name already exists.')
-
-class AddHighlightForm(FlaskForm):
-    text = TextAreaField('Highlight')
-    note = TextAreaField('Add a note or description')
-
-
-
-
-
