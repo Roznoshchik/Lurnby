@@ -1,7 +1,8 @@
-#from app import app
-from flask import current_app
+from app import create_app
+from config import Config
 
+app = create_app(config_class=Config)
 
 if __name__ == "__main__":
-    #app.run()
-    current_app._get_current_object().run()
+    app.run()
+    #current_app.run()

@@ -1,1 +1,1 @@
-web: gunicorn app:app npm start
+web: gunicorn learnbetter:app npm start
