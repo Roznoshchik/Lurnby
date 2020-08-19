@@ -1,11 +1,11 @@
 from app import db, login
-from flask import current_app
 from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app, url_for
 from flask_login import UserMixin, current_user
+import jwt
 from sqlalchemy.sql import column
 from time import time
-import jwt
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class User(UserMixin, db.Model):
@@ -43,6 +43,23 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
+    # api return user resource
+    def to_dict(self):
+        tags = self.tags.all()
+        tag_names = []
+        for tag in tags:
+            tag_names.append(tag.name)
+        
+        data = {
+            'id': self.id,
+            'tags': tag_names,    
+            '_links': {
+                'self': url_for('api.get_user_tags', id=self.id),
+                'articles': url_for('api.add_article', id=self.id)
+            }
+        }
+        return data
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
@@ -69,6 +86,16 @@ class Article(db.Model):
     highlightedText = db.Column(db.String)
     tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
 
+    #api return article resource
+    def to_dict(self):
+        data = {
+            'article_id':self.id,
+            '_links': {
+                'self': url_for('api.add_article', id=self.id),
+                'tags': url_for('api.get_user_tags', id=self.id),
+            }
+        }
+        return data
 
 
 
