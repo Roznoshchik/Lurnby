@@ -45,10 +45,11 @@ def add_article(id):
         if Tag.query.filter_by(name=tag_name).first():
             continue
         else: 
-            tag = Tag(name=tag_name, user_id=id)
+            tag = Tag(name=tag_name, user_id=id, archived=False)
             db.session.add(tag)
+        
 
-    article = Article(user_id=id, unread=True, archived=False, source_url=data['url'], filetype='url', title=urltext['title'], content=urltext['content'])
+    article = Article(user_id=id, unread=True, archived=False, source_url=data['url'], filetype='url', title=data['title'], content=urltext['content'])
     db.session.add(article)
     
     for tag_name in data['tags']:

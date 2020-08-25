@@ -49,7 +49,7 @@ class User(UserMixin, db.Model):
 
     # api return user resource
     def to_dict(self):
-        tags = self.tags.all()
+        tags = self.tags.filter_by(archived=False).all()
         tag_names = []
         for tag in tags:
             tag_names.append(tag.name)
@@ -69,7 +69,9 @@ class User(UserMixin, db.Model):
             setattr(self, field, data[field])
         self.set_password(data['password'])
 
-    def get_token(self, expires_in=3600):
+
+     #2592000
+    def get_token(self, expires_in=2592000):
         now = datetime.utcnow()
         if self.token and self.token_expiration > now + timedelta(seconds=60):
             return self.token
