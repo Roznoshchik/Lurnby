@@ -14,8 +14,11 @@ At a very basic level, this process helps you remember more of what you read.
 
 More advanced functionality will exist too. 
 
-## Status
-Code currently runs a bit slow. It’s mostly using python, flask and makes call to a JS script to actually clean the text. Can and obviously should be optimized in the future. 
+## status
+basic workflow currently works. You can add articles and epubs to the document. They get parsed and presented in the articles section where you can then highlight and organize the highlights into different topic categories. 
 
-### 6 May 2020
-Trying to deploy to Heroku - might be having issue with the python + node builds. 
+## next steps
+adding in and making visible a tag functionality which is this apps version of project management and separation. 
+
+current roadmap status lives here :
+https://www.notion.so/Roadmap-93ff8ee2cfa445e2b0b8353440082537
