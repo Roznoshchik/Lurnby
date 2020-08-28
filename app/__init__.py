@@ -28,12 +28,16 @@ talisman = Talisman()
 csp = {
     'default-src': [
         '\'self\'',
-        '*.getbootsrap.com',
-        '*.bootstrapcdn.com',
-        '*.jquery.com',
-        '*.cloudflare.com'
+        '\'unsafe-inline\'',
+        '*.getbootsrap.com/*',
+        '*.bootstrapcdn.com/*',
+        '*.jquery.com/*',
+        '*.cloudflare.com/ajax/libs/*'
     ]
 }
+
+
+
 
 def create_app(config_class=Config):
 
@@ -45,7 +49,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
-    talisman.init_app(app, content_security_policy=csp)
+    talisman.init_app(app, content_security_policy=None)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
