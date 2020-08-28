@@ -25,6 +25,16 @@ mail = Mail()
 cors = CORS()
 talisman = Talisman()
 
+csp = {
+    'default-src': [
+        '\'self\'',
+        '*.getbootsrap.com',
+        '*.bootstrapcdn.com',
+        '*.jquery.com',
+        '*.cloudflare.com'
+    ]
+}
+
 def create_app(config_class=Config):
 
     app = Flask(__name__)
@@ -35,7 +45,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
-    talisman.init_app(app)
+    talisman.init_app(app, content_security_policy=csp)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
