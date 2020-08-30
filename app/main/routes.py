@@ -206,8 +206,8 @@ def view_highlight(id):
     addtopicform = AddTopicForm()
     form = AddHighlightForm()
     
-    member = highlight.in_topics().all()
-    nonmember = highlight.not_in_topics()
+    member = highlight.topics.filter_by(user_id=current_user.id).all()
+    nonmember = highlight.not_in_topics(current_user)
     
     source = article.source
     source_url = article.source_url

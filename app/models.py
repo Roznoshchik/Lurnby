@@ -6,6 +6,7 @@ from flask_login import UserMixin, current_user
 import jwt
 import os
 from sqlalchemy.sql import column
+from sqlalchemy.sql.expression import or_
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -113,7 +114,7 @@ class Article(db.Model):
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
+    highlights = db.relationship('Highlight', backref = 'highlight', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String)
     tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
@@ -133,29 +134,22 @@ class Article(db.Model):
 
     # add article to tag
     def AddToTag(self, tag):
-        if not self.is_added(tag):
+        if not self.is_added_tag(tag):
             self.tags.append(tag)
        
     # remove article from tag
     def RemoveFromTag(self, tag):  
-        if self.is_added(tag):
-            self.topics.remove(tag)
+        if self.is_added_tag(tag):
+            self.tags.remove(tag)
       
     # checks if an article is in a tag
-    def is_added(self, tag):
+    def is_added_tag(self, tag):
         return self.tags.filter(
             tag.id == tags_articles.c.tag_id).count() > 0
     
     #returns true if article is untagged
-    def not_added(self):
-        """
-        Highlight.query.join(
-            highlights_topics, (highlights_topics.c.highlight_id == Highlight.id
-            ).filter(
-                Highlight.archived==False, Highlight.user_id==current_user.id,
-                Highlight.id.notin_(
-                    db.session.query(highlights_topics))).all()
-        """
+    def not_added_tag(self):
+        
         query = db.session.query(tags_articles).filter(tags_articles.c.article_id == self.id).count()
 
         if query == 0:
@@ -163,32 +157,30 @@ class Article(db.Model):
         else:
             return False
     
-
-    
-    # returns all tagss that an article is a part of.  article.in_tags().all()
-    def in_tags(self):
-        return Tag.query.join(
-            tags_articles, (tags_articles.c.tag_id == Tag.id)
-            ).filter(
-               tags_articles.c.article_id == self.id, Tag.archived==False, Tag.user_id==current_user.id
-               ) 
    
     # returns all tags that an article is not a part of. article.not_in_tags().all()
-    def not_in_tags(self):
-        return Tag.query.filter(
-            Tag.archived==False, Tag.user_id==current_user.id,
-            Tag.id.notin_(
-                db.session.query(tags_articles.c.tag_id).filter(
-                    tags_articles.c.article_id == self.id))).all()
+    def not_in_tags(self, user):
         
-
+        sub = db.session.query(Tag.id).outerjoin(
+            tags_articles, tags_articles.c.tag_id == Tag.id).filter(
+                tags_articles.c.article_id==self.id)
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
+            
+        return q
 
 
 
 highlights_topics = db.Table('highlights_topics',
-    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), nullable=False),
-    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), nullable=False )
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), nullable=False, primary_key=True),
+    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), nullable=False, primary_key=True )
 )
+
+
+tags_highlights = db.Table('tags_highlights',
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False),
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), nullable=False )
+)
+
 
 class Highlight(db.Model):
     id = db.Column(db.Integer,primary_key=True)
@@ -198,33 +190,28 @@ class Highlight(db.Model):
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
+    tags = db.relationship('Tag', secondary=tags_highlights, backref = 'highlight', lazy='dynamic')
+
 
 
     # add highlight to topic
     def AddToTopic(self, topic):
-        if not self.is_added(topic):
+        if not self.is_added_topic(topic):
             self.topics.append(topic)
        
     # remove highlight from topic
     def RemoveFromTopic(self, topic):  
-        if self.is_added(topic):
+        if self.is_added_topic(topic):
             self.topics.remove(topic)
       
     # checks if a highlight is in a topic
-    def is_added(self, topic):
+    def is_added_topic(self, topic):
         return self.topics.filter(
             topic.id == highlights_topics.c.topic_id).count() > 0
     
   
-    def not_added(self):
-        """
-        Highlight.query.join(
-            highlights_topics, (highlights_topics.c.highlight_id == Highlight.id
-            ).filter(
-                Highlight.archived==False, Highlight.user_id==current_user.id,
-                Highlight.id.notin_(
-                    db.session.query(highlights_topics))).all()
-        """
+    def not_added_topic(self):
+        
         query = db.session.query(highlights_topics).filter(highlights_topics.c.highlight_id == self.id).count()
 
         if query == 0:
@@ -232,29 +219,60 @@ class Highlight(db.Model):
         else:
             return False
     
-
     
-    # returns all topics that a highlight is a part of.  highlight.in_topics().all()
-    def in_topics(self):
-        return Topic.query.join(
-            highlights_topics, (highlights_topics.c.topic_id == Topic.id)
-            ).filter(
-               highlights_topics.c.highlight_id == self.id, Topic.archived==False, Topic.user_id==current_user.id
+    def not_in_topics(self,user):
+        sub = db.session.query(Topic.id).outerjoin(
+            highlights_topics, highlights_topics.c.topic_id == Topic.id).filter(
+                highlights_topics.c.highlight_id==self.id)
+        q = db.session.query(Topic).filter(~Topic.id.in_(sub)).filter_by(user_id=user.id).all()
+            
+        return q
 
-               ) 
+
+    # add highlight to tag
+    def AddToTag(self, tag):
+        if not self.is_added_tag(tag):
+            self.tags.append(tag)
+       
+    # remove highlight from tag
+    def RemoveFromTag(self, tag):  
+        if self.is_added_tag(tag):
+            self.tags.remove(tag)
+      
+    # checks if an highlight is in a tag
+    def is_added_tag(self, tag):
+        return self.tags.filter(
+            tag.id == tags_highlights.c.tag_id).count() > 0
+    
+    #returns true if highlight is untagged
+    def not_added_tag(self):
+        
+        query = db.session.query(tags_highlights).filter(tags_highlights.c.highlight_id == self.id).count()
+
+        if query == 0:
+            return True
+        else:
+            return False
+    
    
-    # returns all topics that a highlight is not a part of. highlight.not_in_topics()
-    def not_in_topics(self):
-        query = Topic.query.filter(
-            Topic.archived==False, Topic.user_id==current_user.id,
-            Topic.id.notin_(
-                db.session.query(highlights_topics.c.topic_id).filter(
-                    highlights_topics.c.highlight_id == self.id)))
-        list = []
-        for i in query:
-            list.append(i)
+    # returns all tags that a highlight is not a part of
+    def not_in_tags(self, user):
+        
+        sub = db.session.query(Tag.id).outerjoin(
+            tags_highlights, tags_highlights.c.tag_id == Tag.id).filter(
+                tags_highlights.c.highlight_id==self.id)
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
+            
+        return q
 
-        return list
+
+
+
+
+tags_topics = db.Table('tags_topics',
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False),
+    db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'), nullable=False )
+)
 
 
 class Topic(db.Model):
@@ -263,10 +281,51 @@ class Topic(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
+    tags = db.relationship('Tag', secondary=tags_topics, backref = 'topic', lazy='dynamic')
 
-    def is_added(self, highlight):
+    # don't remember what this does ... 
+    def is_added_highlights(self, highlight):
         return self.highlights.filter(
             highlight.id == highlights_topics.c.highlight_id).count() > 0
+
+    
+    # add topic to tag
+    def AddToTag(self, tag):
+        if not self.is_added_tag(tag):
+            self.tags.append(tag)
+       
+    # remove topic from tag
+    def RemoveFromTag(self, tag):  
+        if self.is_added_tag(tag):
+            self.tags.remove(tag)
+      
+    # checks if an topic is in a tag
+    def is_added_tag(self, tag):
+        return self.tags.filter(
+            tag.id == tags_topics.c.tag_id).count() > 0
+    
+    #returns true if topic is untagged
+    def not_added_tag(self):
+        
+        query = db.session.query(tags_topics).filter(tags_topics.c.topic_id == self.id).count()
+
+        if query == 0:
+            return True
+        else:
+            return False
+    
+   
+    # returns all tags that a topic is not a part of
+    def not_in_tags(self, user):
+        
+        sub = db.session.query(Tag.id).outerjoin(
+            tags_topics, tags_topics.c.tag_id == Tag.id).filter(
+                tags_topics.c.topic_id==self.id)
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
+            
+        return q
+
+
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -275,4 +334,17 @@ class Tag(db.Model):
     archived = db.Column(db.Boolean, index=True)
     goal = db.Column(db.String(512))
     articles = db.relationship('Article', secondary=tags_articles, backref = 'tag', lazy='dynamic')
+    highlights = db.relationship('Highlight', secondary=tags_highlights, backref = 'tag', lazy='dynamic')
+    topics = db.relationship('Topic', secondary=tags_topics, backref = 'tag', lazy='dynamic')
 
+    def is_added_highlight(self, highlight):
+        return self.highlights.filter(
+            highlight.id == tags_highlights.c.highlight_id).count() > 0
+
+    def is_added_topic(self, topic):
+        return self.topics.filter(
+            topic.id == tags_topics.c.topic_id).count() > 0
+
+    def is_added_article(self, article):
+        return self.articles.filter(
+            article.id == tags_articles.c.article_id).count() > 0
