@@ -1,7 +1,7 @@
 """reset the migrations
 
 Revision ID: c10add650dd1
-Revises: 
+Revises: a2b1f1fcd256
 Create Date: 2020-06-25 13:14:22.890109
 
 """

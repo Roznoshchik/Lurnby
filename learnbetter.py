@@ -2,7 +2,6 @@ from app import create_app, db
 
 from app.models import User, Article, Highlight, Topic, highlights_topics, Tag, tags_articles
 
-
 app=create_app()
 
 @app.shell_context_processor
