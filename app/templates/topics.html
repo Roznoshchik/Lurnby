@@ -62,7 +62,7 @@
                     <div class="card-body topics-col-base">
                         <div class="items border border-light">
                             {% for highlight in highlights %}
-                            {% if topic.is_added(highlight) %}
+                            {% if topic.is_added_highlight(highlight) %}
                             <div class="card draggable shadow-sm" id="cd9" draggable="False" ondragstart="drag(event)">
                                 <div class="card-body p-2">
                                     <div class="card-title">

@@ -284,7 +284,7 @@ def topics():
     notopics = []
     
     for highlight in highlights:
-        if highlight.not_added():
+        if highlight.not_added_topic():
             notopics.append(highlight)
    
 

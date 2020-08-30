@@ -283,8 +283,8 @@ class Topic(db.Model):
     archived = db.Column(db.Boolean, index=True)
     tags = db.relationship('Tag', secondary=tags_topics, backref = 'topic', lazy='dynamic')
 
-    # don't remember what this does ... 
-    def is_added_highlights(self, highlight):
+    # this checks if a specific highlight is in this topic
+    def is_added_highlight(self, highlight):
         return self.highlights.filter(
             highlight.id == highlights_topics.c.highlight_id).count() > 0
 
@@ -337,6 +337,7 @@ class Tag(db.Model):
     highlights = db.relationship('Highlight', secondary=tags_highlights, backref = 'tag', lazy='dynamic')
     topics = db.relationship('Topic', secondary=tags_topics, backref = 'tag', lazy='dynamic')
 
+    #checks if a specific highlight is tagged
     def is_added_highlight(self, highlight):
         return self.highlights.filter(
             highlight.id == tags_highlights.c.highlight_id).count() > 0
