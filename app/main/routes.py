@@ -232,8 +232,6 @@ def updateArticle(id):
     if request.method == "POST":
 
         data = json.loads(request.form['data'])
-        print(data)
-        
         
         if (data['read_status'] == 'read'):
             article.done = True
@@ -255,8 +253,13 @@ def updateArticle(id):
             
             article.AddToTag(t)
         
-
-        print(request.form)
+        for tag in data['remove_tags']:
+            t = Tag.query.filter_by(name=tag).first()
+            if not t:
+                t = Tag(user_id = current_user.id, name=tag)
+                db.session.add(t)    
+            
+            article.RemoveFromTag(t)
 
         db.session.commit()
 

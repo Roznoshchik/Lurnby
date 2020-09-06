@@ -204,15 +204,23 @@ function article_updated(article_id, data){
 
 function save(article_id){
 
-    var doc_tags, tags, title, read_status, notes, content, data;
+    var doc_tags,doc_remove_tags, tags, title, read_status, notes, content, data;
 
     console.log('saving');
 
-    doc_tags = document.getElementsByClassName('tagged');
+    doc_tags = byClass('tagged');
+    doc_remove_tags = byClass('untagged');
     tags = [];
+    remove_tags = [];
+
     for (var i = 0; i < doc_tags.length; i++){
         tags.push(doc_tags[i].firstElementChild.value); 
-    }
+    };
+
+    for (var i = 0; i < doc_remove_tags.length; i++){
+        remove_tags.push(doc_remove_tags[i].firstElementChild.value); 
+    };
+    
 
     title = byId('title_edit').value;
     read_status = byId('read_edit').value;
@@ -224,7 +232,8 @@ function save(article_id){
         'read_status': read_status,
         'notes': notes,
         'content': content,
-        'tags':tags
+        'tags':tags,
+        'remove_tags': remove_tags
     }
 
 
