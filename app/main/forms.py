@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileRequired, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, TextAreaField, DecimalField
 from wtforms.fields.html5 import URLField
 from wtforms.validators import DataRequired, URL, ValidationError,  Optional
 from app.models import Topic
@@ -32,6 +32,7 @@ class AddTopicForm(FlaskForm):
 class AddHighlightForm(FlaskForm):
     text = TextAreaField('Highlight')
     note = TextAreaField('Add a note or description')
+    position = DecimalField(places=3, rounding=None, use_locale=False)
 
 
 

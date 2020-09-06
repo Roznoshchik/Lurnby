@@ -1,0 +1,40 @@
+<div class="col">
+    <div class = "article_card">
+        
+        <div class="row article_title">
+            <div class="col">
+                {% if article.title|length > 88 %}
+                <h4>{{'%.88s' % article.title}} ...</h4>
+                {% else %}
+                <h4>{{ article.title}}</h4>
+                {% endif %}
+                <div class="underline"></div>
+                {% if article.unread == True %}
+                    <span class = "label"><p>New</p></span>
+                    {% endif %}
+            </div>
+        </div>
+        
+            
+        <div class="row article_data">
+            <div class = "col-3">
+                <h6>Read:</h6>
+                <p class = "data">{{article.progress|round|int }}%</p>
+            </div>
+            <div class = "col-3">
+                <h6>Highlights:</h6>
+                <p class = "data">{{article.highlights.count()}}</p>
+            </div>
+            <div class = "col-3">
+                <h6>Tags:</h6>
+                <p class = "data">{{article.tags.count()}}</p>
+            </div>
+        </div>
+    </div>
+    <div id = "open">
+    
+        <a class = "btn edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">details</a>
+        <a class = "btn" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+
+    </div>
+</div>

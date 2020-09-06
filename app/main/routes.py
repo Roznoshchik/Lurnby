@@ -7,7 +7,7 @@ from app import db
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
 from app.main.ebooks import epub2text, epubTitle
-from app.models import User, Article, Topic, Highlight, highlights_topics, Tag
+from app.models import User, Article, Topic, Highlight, highlights_topics, Tag, tags_articles, tags_highlights
 
 
 from flask import flash, redirect, url_for, render_template, request, jsonify
@@ -110,18 +110,35 @@ def index():
 
 
 
-@bp.route('/articles')
+@bp.route('/articles', methods=['GET'])
 @login_required
 def articles():
-    unread_articles = Article.query.filter_by(unread=True, user_id=current_user.id).all()
-    read_articles = Article.query.filter_by(unread=False, user_id=current_user.id).all()
+
+    articles =  Article.query.filter_by(user_id=current_user.id, archived=False).all()
+    tags = Tag.query.all()
+
+    if (request.method == 'GET'):
+        if(request.json):
+
+            tag_ids = request.json
+
+            articles = Article.query.join(tags_articles, (tags_articles.c.article_id == Article.id))
+            articles = articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
+        
+            return render_template('articles.html', articles)
 
 
-    return render_template('articles.html', unread_articles=unread_articles, read_articles=read_articles)
 
-@bp.route('/article/<id>', methods =['POST', 'GET'])
+    unread_articles = Article.query.filter_by(unread=True,archived=False, user_id=current_user.id).all()
+    read_articles = Article.query.filter_by(unread=False, archived=False, user_id=current_user.id).all()
+
+
+    return render_template('articles.html', articles = articles, unread_articles=unread_articles, read_articles=read_articles)
+
+@bp.route('/article/<id>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
+@bp.route('/article/<id>/<highlight_id>', methods =['POST', 'GET'])
 @login_required
-def article(id):
+def article(id, highlight_id):
     article = Article.query.filter_by(id=id).first()
     article.unread = False
     article.last_reviewed = datetime.utcnow()
@@ -133,6 +150,10 @@ def article(id):
 
     addtopicform = AddTopicForm()
     
+    if highlight_id != "none":
+        highlight = Highlight.query.filter_by(id = highlight_id).first()
+        article.progress = highlight.position
+        db.session.commit()
     
 
     form = AddHighlightForm()
@@ -172,6 +193,98 @@ def storeHighlights(id):
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
 
 
+@bp.route('/article/<id>/progress', methods =['GET', 'POST'])
+@login_required
+def storeProgress(id):
+    article = Article.query.filter_by(id=id).first()
+
+    if request.method == "POST":
+        article.progress = request.form['Progress']
+        
+        if (request.form['Progress'] == 100):
+            article.done = True
+
+        db.session.commit()
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+    
+    if request.method == "GET":
+        progress = article.progress
+        if progress is None:
+            progress = 0
+        
+        return jsonify({ 'Progress': article.progress })
+
+
+@bp.route('/view_article/<id>', methods=['GET'])
+@login_required
+def view_article(id):
+    article = Article.query.filter_by(id = id).first()
+    
+    return render_template('viewarticle.html', article = article)
+
+
+
+@bp.route('/articles/<id>/update', methods =['POST'])
+@login_required
+def updateArticle(id):
+    article = Article.query.filter_by(id=id).first()
+
+    if request.method == "POST":
+
+        data = json.loads(request.form['data'])
+        print(data)
+        
+        
+        if (data['read_status'] == 'read'):
+            article.done = True
+        if (data['read_status'] == 'unread'):
+            article.done = False
+            article.progress= 0.0
+            article.unread = True
+
+        article.title = data['title']
+        article.notes = data['notes']
+        article.content = data['content']
+        
+        
+        for tag in data['tags']:
+            t = Tag.query.filter_by(name=tag).first()
+            if not t:
+                t = Tag(user_id = current_user.id, name=tag)
+                db.session.add(t)    
+            
+            article.AddToTag(t)
+        
+
+        print(request.form)
+
+        db.session.commit()
+
+     
+        #return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+        return render_template('article_card.html', article=article)
+   
+@bp.route('/articles/<id>/archive', methods =[ 'GET','POST'])
+@login_required
+def archiveArticle(id):
+    article = Article.query.filter_by(id=id).first()
+    article.archived=True
+    db.session.commit()
+    
+
+    flash('Article has been archived. <a href="'+ url_for('main.unarchiveArticle', id = id) + '"  class="alert-link">UNDO</a>', 'error')
+    return redirect(url_for('main.articles'))
+    
+@bp.route('/articles/<id>/unarchive', methods =[ 'GET','POST'])
+@login_required
+def unarchiveArticle(id):
+    article = Article.query.filter_by(id=id).first()
+    article.archived=False
+    db.session.commit()
+    
+
+    return redirect(url_for('main.articles'))
+
 
 @bp.route('/article/addhighlight', methods =['POST'])
 @login_required
@@ -179,7 +292,7 @@ def addhighlight():
     
     topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), text = request.form.get('text'), note = request.form.get('note'), archived=False)
+    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), position = request.form.get('position'),  text = request.form.get('text'), note = request.form.get('note'), archived=False)
     db.session.add(newHighlight)
     
     list = request.form.getlist('topics')
@@ -212,7 +325,9 @@ def view_highlight(id):
     source = article.source
     source_url = article.source_url
     
-    inappurl = url_for('main.article', id = article.id)
+    inappurl = url_for('main.article', id = article.id, highlight_id = highlight.id)
+
+
     
     article_title = article.title
 

@@ -37,6 +37,9 @@
               {{ form.note.label }}
               {{ form.note(class="form-control", id="message-text") }}              
             </div>
+            <div class="form-group">
+              {{ form.position(class="form-control",type="hidden", id="highlight_position") }}              
+            </div>
             <div class="btn-group-toggle" data-toggle="buttons">
               {% for topic in topics %}
               <label class="button-group-pills btn btn-default">
@@ -197,13 +200,8 @@
             trigger: 'focus'
           });
          
-
-          var $window = $(window);
-          localStorage.setItem('scrollPosition', $window.scrollTop());
           
         } 
-
-        
         
       });
         
@@ -219,13 +217,56 @@
       });
       
       $( window ).on( "load", function() { 
-        var $window = $(window)
-        if (localStorage.getItem('scrollPosition')){
-        $window.scrollTop(localStorage.getItem('scrollPosition'))
+        var progress; 
+        var $window = $(window);
+
+        var h = document.documentElement, 
+        b = document.body,
+        st = 'scrollTop',
+        sh = 'scrollHeight';
+
+        $.get('/article/' + article_id + '/progress', function(data) {
+          progress = data['Progress'];
+          var position = (progress / 100) * h[sh] || b[sh]          
+          $window.scrollTop(position);
+        });  
+
+        document.addEventListener("scroll", getScrollPercent);
+
+
+      });
+      
+
+      /* store scroll position 
+       hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
+      */
+      
+      var timer;
+
+      function getScrollPercent() {
+        
+        var h = document.documentElement, 
+        b = document.body,
+        st = 'scrollTop',
+        sh = 'scrollHeight';
+        
+        var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+
+
+        clearTimeout(timer)
+        timer = setTimeout(update_progress.bind(null, progress), 3000)
+      } 
+
+      function update_progress(progress){
+        console.log('updating progress');
+        $.post('/article/' + article_id + '/progress', {
+              'Progress': progress
+            });
       }
 
-      })
-      
+    
+
+
 
 
 </script>

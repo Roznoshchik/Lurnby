@@ -106,7 +106,7 @@ tags_articles = db.Table('tags_articles',
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    unread = db.Column(db.Boolean, index=True)
+    unread = db.Column(db.Boolean, index=True, default=True)
     title = db.Column(db.String(255), index=True)
     filetype = db.Column(db.String(32)) 
     source = db.Column(db.String(500))
@@ -114,10 +114,16 @@ class Article(db.Model):
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    highlights = db.relationship('Highlight', backref = 'highlight', lazy='dynamic')
+    highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String)
     tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
+    progress = db.Column(db.Float, index=True, default = 0.0)
+    done = db.Column(db.Boolean, default = False)
+    notes = db.Column(db.Text)
+    article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+
 
     #api return article resource
     def to_dict(self):
@@ -191,7 +197,7 @@ class Highlight(db.Model):
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
     tags = db.relationship('Tag', secondary=tags_highlights, backref = 'highlight', lazy='dynamic')
-
+    position = db.Column(db.Float)
 
 
     # add highlight to topic
@@ -254,6 +260,9 @@ class Highlight(db.Model):
         else:
             return False
     
+
+    
+
    
     # returns all tags that a highlight is not a part of
     def not_in_tags(self, user):
@@ -331,7 +340,7 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    archived = db.Column(db.Boolean, index=True)
+    archived = db.Column(db.Boolean, index=True, default = False)
     goal = db.Column(db.String(512))
     articles = db.relationship('Article', secondary=tags_articles, backref = 'tag', lazy='dynamic')
     highlights = db.relationship('Highlight', secondary=tags_highlights, backref = 'tag', lazy='dynamic')

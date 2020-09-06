@@ -5,39 +5,109 @@
 {% endblock %}
 
 {% block content %}
-<div class=" pushdown">
-    {% if current_user.firstname %}
-    <h1> Hello {{ current_user.firstname }}</h1>
-    {% else %}
-    <h1> Hello {{ current_user.username }}</h1>
-    {% endif %}
-    <hr>
-    <div class="card" style="width: 18rem; margin-top: 2rem;">
-        <div class="card-header">
-            Unread
+
+
+
+<div id = "articles">
+{% for article in unread_articles %}
+
+<div id = "article{{article.id}}" class = "article_container row">
+    <div class="col">
+        <div class = "article_card">
+            
+            <div class="row article_title">
+                <div class="col">
+                    
+                    {% if article.title|length > 88 %}
+                    <h4>{{'%.88s' % article.title}} ...</h4>
+                    {% else %}
+                    <h4>{{ article.title}}</h4>
+                    {% endif %}
+                    
+                    <div class="underline"></div>
+                    {% if article.unread == True %}
+                    <span class = "label"><p>New</p></span>
+                    {% endif %}
+                </div>
+            </div>
+            
+                
+            <div class="row article_data">
+                <div class = "col-3">
+                    <h6>Read:</h6>
+                    <p class = "data">{{article.progress|round|int }}%</p>
+                </div>
+                <div class = "col-3">
+                    <h6>Highlights:</h6>
+                    <p class = "data">{{article.highlights.count()}}</p>
+                </div>
+                <div class = "col-3">
+                    <h6>Tags:</h6>
+                    <p class = "data">{{article.tags.count()}}</p>
+                </div>
+            </div>
         </div>
-        <ul class="list-group list-group-flush">
-            {% for article in unread_articles %}
-            <a href="{{url_for('main.article', id=article.id)}}" class="list-group-item list-group-item-action">{{article.title}}</a>
-            {% endfor %}
-        </ul>
+        <div id = "open">
+        
+            <a class = "btn edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">details</a>
+            <a class = "btn" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+
+        </div>
     </div>
+</div>
+
+{% endfor %}
+{% for article in read_articles %}
+<div id = "article{{article.id}}" class = "article_container row">
+    <div class="col">
+        <div class = "article_card">
+          
+            <div class="row article_title">
+                <div class="col">
+                    {% if article.title|length > 88 %}
+                    <h4>{{'%.88s' % article.title}} ...</h4>
+                    {% else %}
+                    <h4>{{ article.title}}</h4>
+                    {% endif %}
+                    <div class="underline"></div>
+                </div>
+            </div>
+            
+                
+            <div class="row article_data">
+                <div class = "col-3">
+                    <h6>Read:</h6>
+                    <p class = "data">{{article.progress|round|int }}%</p>
+                </div>
+                <div class = "col-3">
+                    <h6>Highlights:</h6>
+                    <p class = "data">{{article.highlights.count()}}</p>
+                </div>
+                <div class = "col-3">
+                    <h6>Tags:</h6>
+                    <p class = "data">{{article.tags.count()}}</p>
+                </div>
+            </div>
+        </div>
+        <div id = "open">
+        
+            <a class = "btn edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">details</a>
+            <a class = "btn" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+</div>
+<div class="modal" id = "edit_article" tabindex="-1">
     
-    <div class="card" style="width: 18rem; margin-top: 2rem;">
-        <div class="card-header">
-            Read
-        </div>
-        <ul class="list-group list-group-flush">
-            {% for article in read_articles %}
-            <a href="{{url_for('main.article', id=article.id)}}" class="list-group-item list-group-item-action">{{article.title}}</a>
-            {% endfor %}
-        </ul>
-    </div>
+</div>
 
 
 {% endblock%}
 
+
 {% block JS %}
-
-
+<script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
 {% endblock %}

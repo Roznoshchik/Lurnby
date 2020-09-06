@@ -1,0 +1,71 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <form id="article_data_form">
+            <div class="modal-header">
+                <h5 class="modal-title not-editing">{{article.title}}</h5>
+                <textarea id = "title_edit" class="editing title" >{{article.title}}</textarea>
+                <a class = "btn cancel not-editing" onclick="edit_article()">Edit</a>
+           
+            <button type="button" class="close editing" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body">
+                <div class = "article_data_group form-group">
+                    <h6>Read: </h6>
+                    <p class = "not-editing" id="article_progress">{{ article.progress|round|int}}%</p>
+                
+                    <select class="reg-select editing " id="read_edit">
+                        <option value="keep">{{ article.progress|round|int}}%</option>
+                        <option value="read">Mark read</option>
+                        <option value="unread">Mark unread</option>
+                    </select>
+                    
+                </div>
+                <div id = "article_source" class = "article_data_group">
+                    <h6>Source:</h6><a class = "regular" target = "_blank" href="{{article.source_url}}">{{article.source_url}}</a>
+                </div>
+            
+                <div class = "article_data_group">
+
+                    <h6 class="inline-block">Tags:</h6><span id ="add_new_tag"><button  onclick = "add_tag_start()" class = "btn add_new editing">Add New</button></span><br>
+
+                    <span id="tags">
+                        <span id="new_tags"></span>
+                        {% for tag in article.tags %}
+                        <label class = "tagged">{{tag.name}}<input type="checkbox" name = "tags" checked value="{{tag.name}}"></input></label>
+                        {% endfor %}
+                        {% for tag in article.not_in_tags(current_user) %}
+                        <label class = "untagged editing" >{{tag.name}}<input type="checkbox" name = "tags" value="{{tag.name}}"></input></label>
+                        {% endfor %}
+                    </span>
+                </div>
+                
+                <div class = "article_data_group">
+                    <h6>Notes: </h6>
+                    <p class = "not-editing" id="article_notes">{{ article.notes}}</p>
+                    <textarea id="notes_edit" class = "large editing">{{ article.notes}}</textarea>
+                </div>
+
+                <div class = "article_data_group">
+                    <h6>Content: </h6>
+                    <p class = "not-editing" id="article_content">{{ '%.200s' % article.content}}... </p>
+                    <textarea id="content_edit" class = "large article_content editing" >{{ article.content}}</textarea>
+                </div>
+        
+        </form>
+
+      
+    </div>
+    <div class="modal-footer">
+        <a type="button" href ="{{url_for('main.archiveArticle', id=article.id)}}" class="btn cancel archive editing">Archive</a>
+
+      <button type="button" class="btn cancel editing"  data-dismiss="modal">Close</button>
+      <button type="button" class="btn save editing"  data-dismiss="modal" onclick="save({{article.id}})">Save changes</button>
+      <button type="button" class="btn not-editing" data-dismiss="modal">Close</button>
+
+    </div>
+  </div>
+</div>
+
+<script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
