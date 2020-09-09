@@ -1,34 +1,51 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-lg">
     <div class="modal-content">
         <form id="article_data_form">
-            <div class="modal-header">
-                <h5 class="modal-title not-editing">{{article.title}}</h5>
-                <textarea id = "title_edit" class="editing title" >{{article.title}}</textarea>
-                <a class = "btn cancel not-editing" onclick="edit_article()">Edit</a>
-           
-            <button type="button" class="close editing" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+            <div class= "article_data_group">
+                <div class="modal-header">
+                    <h5 class="modal-title not-editing">{{article.title}}</h5>
+                    <textarea id = "title_edit" class="editing title" >{{article.title}}</textarea>
+                    <button type = "button" class = "main-button cancel not-editing" onclick="edit_article()">Edit</button>
+               
+                <button type="button"  class="close editing" data-dismiss="modal" onclick="clear_modals()" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
             </div>
+           
             <div class="modal-body">
                 <div class = "article_data_group form-group">
                     <h6>Read: </h6>
                     <p class = "not-editing" id="article_progress">{{ article.progress|round|int}}%</p>
                 
                     <select class="reg-select editing " id="read_edit">
+                        {%if article.done == true %}
                         <option value="keep">{{ article.progress|round|int}}%</option>
-                        <option value="read">Mark read</option>
+                        <option value="read" selected >Mark read</option>
                         <option value="unread">Mark unread</option>
+                        {% elif article.unread == true %}
+                        <option value="keep">{{ article.progress|round|int}}%</option>
+                        <option value="read"  >Mark read</option>
+                        <option value="unread" selected>Mark unread</option>
+                        {% else %}
+                        <option value="keep" selected>{{ article.progress|round|int}}%</option>
+                        <option value="read"  >Mark read</option>
+                        <option value="unread">Mark unread</option>
+                        {% endif %}
                     </select>
                     
                 </div>
                 <div id = "article_source" class = "article_data_group">
+                    {% if article.source_url %}
                     <h6>Source:</h6><a class = "regular" target = "_blank" href="{{article.source_url}}">{{article.source_url}}</a>
+                    {% else %}
+                    <h6>Source:</h6><p>{{article.source}}</p>
+                    {% endif %}
                 </div>
             
                 <div class = "article_data_group">
 
-                    <h6 class="inline-block">Tags:</h6><span id ="add_new_tag"><button  onclick = "add_tag_start()" class = "btn add_new editing">Add New</button></span><br>
+                    <h6 class="inline-block">Tags:</h6><span id ="add_new_tag"><button  onclick = "add_tag_start('view-article-tag')" class = "main-button add_new editing">Add New</button></span><br>
 
                     <span id="tags">
                         <span id="new_tags"></span>
@@ -58,11 +75,11 @@
       
     </div>
     <div class="modal-footer">
-        <a type="button" href ="{{url_for('main.archiveArticle', id=article.id)}}" class="btn cancel archive editing">Archive</a>
+        <a type="button" href ="{{url_for('main.archiveArticle', id=article.id)}}" class="main-button cancel archive editing">Archive</a>
 
-      <button type="button" class="btn cancel editing"  data-dismiss="modal">Close</button>
-      <button type="button" class="btn save editing"  data-dismiss="modal" onclick="save({{article.id}})">Save changes</button>
-      <button type="button" class="btn not-editing" data-dismiss="modal">Close</button>
+      <button type="button" class="main-button cancel editing"  onclick="clear_modals()" data-dismiss="modal">Close</button>
+      <button type="button" class="main-button save editing"  data-dismiss="modal" onclick="save({{article.id}})">Save changes</button>
+      <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
 
     </div>
   </div>

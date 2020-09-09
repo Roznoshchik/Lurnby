@@ -34,9 +34,9 @@
     {% block style %}{% endblock%}
 </head>
   <body>
-    <div class="container-fluid">
+    <div id = "base-main" class="container-fluid">
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-between">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">A Learning Tool</a>
+        <a class="navbar-brand" href="{{ url_for('main.articles') }}">A Learning Tool</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -44,9 +44,6 @@
         <div class="collapse navbar-collapse" id="navbarsExampleDefault">
           {% if current_user.is_authenticated %}
           <ul class="navbar-nav mr-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.articles' )}}">Articles</a>
-            </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('main.topics' )}}">Topics</a>
             </li>
@@ -119,6 +116,19 @@
 
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>      
+      
+      <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
+    
+        $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                }
+            }
+        });
+    </script>
+      
       {% block JS %}{% endblock %}
     </div>
  </body>

@@ -2,6 +2,7 @@ import json
 import requests
 import tempfile
 import os
+import validators
 
 from app import db
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
@@ -12,8 +13,9 @@ from app.models import User, Article, Topic, Highlight, highlights_topics, Tag, 
 
 from flask import flash, redirect, url_for, render_template, request, jsonify
 from flask_login import current_user, login_required
+from flask_wtf.csrf import CSRFError
 
-from datetime import datetime
+from datetime import datetime, date
 
 # from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
@@ -21,6 +23,7 @@ from werkzeug.utils import secure_filename
 
 from app.main import bp
 
+"""
 @bp.route("/", methods=['GET','POST'])
 @bp.route("/index", methods=['GET','POST'])
 @login_required
@@ -34,11 +37,7 @@ def index():
             
             title = urltext["title"]
             content = urltext["content"]
-            
-            """
-            if current_user.is_anonymous:
-                return render_template('text.html', title =text["title"], author = text["byline"], content=text["content"])
-            """
+         
 
             new_article = Article(unread=True, title=title, source_url=url, content=content, user_id=current_user.id, archived=False, filetype="url" )
             db.session.add(new_article)
@@ -50,6 +49,10 @@ def index():
             text = "<pre>" + text + "</pre>"
             title = request.form['title']    
             source = request.form['source']
+            if source == '':
+                today = date.today()
+                today = today.strftime("%B %d, %Y")
+                source = 'manually added ' + today
             new_article = Article(unread=True, title=title, source=source, content=text, user_id=current_user.id, archived=False, filetype="manual" )
             db.session.add(new_article)
             db.session.commit()
@@ -91,7 +94,7 @@ def index():
        
         #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
         
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.articles'))
 
     elif request.method =='POST' and not form.validate():
         url = request.form['url']
@@ -103,16 +106,21 @@ def index():
             flash(error, 'error')
 
         flash(form.errors, 'error')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.articles'))
 
     return render_template('index.html', title="Elegant Reader", form=form)
- 
+    """
 
 
 
+
+@bp.route("/", methods=['GET','POST'])
+@bp.route("/index", methods=['GET','POST'])
 @bp.route('/articles', methods=['GET'])
 @login_required
 def articles():
+    form = ContentForm()
+    
 
     articles =  Article.query.filter_by(user_id=current_user.id, archived=False).all()
     tags = Tag.query.all()
@@ -128,12 +136,206 @@ def articles():
             return render_template('articles.html', articles)
 
 
+    done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
+    unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
+    read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
 
-    unread_articles = Article.query.filter_by(unread=True,archived=False, user_id=current_user.id).all()
-    read_articles = Article.query.filter_by(unread=False, archived=False, user_id=current_user.id).all()
+
+    return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles,user=current_user, read_articles=read_articles)
+
+@bp.route('/articles/new', methods = ['GET', 'POST'])
+@login_required
+@bp.errorhandler(CSRFError)
+def add_article():
+
+    form = ContentForm()
+
+    if request.method=='POST':
+        
+        notes = request.form['notes']
+        tags = json.loads(request.form['tags'])
+        epub = request.form['epub']
+        title = request.form['title']
+        source = request.form['source']
+        content = request.form['content']
+        url = request.form['url']
+
+        for i in request.form:
+            print (i + ': '+ request.form[i])
 
 
-    return render_template('articles.html', articles = articles, unread_articles=unread_articles, read_articles=read_articles)
+        if (title == 'none' and url == 'none' and epub == 'none'):
+            return json.dumps({'no_article':True}), 400, {'ContentType':'application/json'}
+
+
+
+        if (title != 'none'):
+
+            if content == '':
+                return json.dumps({'manual_fail':True}), 400, {'ContentType':'application/json'}
+
+
+            content = "<pre>" + content + "</pre>"
+            if source == '':
+                today = date.today()
+                today = today.strftime("%B %d, %Y")
+                source = 'manually added ' + today
+           
+            new_article = Article(unread=True, notes = notes, progress=0.0, title=title, source=source, content=content, user_id=current_user.id, archived=False, filetype="manual" )
+            db.session.add(new_article)
+            for tag in tags:
+                t = Tag.query.filter_by(name=tag).first()
+                
+                if not t:
+                    t = Tag(name=tag, user_id=current_user.id)
+                    db.session.add(t)
+                    new_article.AddToTag(t)
+                else:
+                    new_article.AddToTag(t)        
+            
+           
+            db.session.commit()
+        
+        if (url != 'none'):
+            
+            if not validators.url(url):
+                return json.dumps({'bad_url':True}), 400, {'ContentType':'application/json'}
+
+
+            urltext = pull_text(url)
+            
+            title = urltext["title"]
+            content = urltext["content"]
+
+            if not title or not content:
+                return json.dumps({'bad_url':True}), 400, {'ContentType':'application/json'}
+
+            
+
+            new_article = Article(unread=True, notes = notes, progress=0.0, title=title, source_url=url, content=content, user_id=current_user.id, archived=False, filetype="url" )
+            db.session.add(new_article)
+
+            for tag in tags:
+                t = Tag.query.filter_by(name=tag).first()
+                
+                if not t:
+                    t = Tag(name=tag, user_id=current_user.id)
+                    db.session.add(t)
+                    new_article.AddToTag(t)
+                else:
+                    new_article.AddToTag(t)        
+            
+            db.session.commit()
+        
+        if epub == "true":
+            f = request.files['epub_file']
+
+            filename = f.filename
+            if filename != '':
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext != '.epub':
+                    return json.dumps({'not_epub':True}), 400, {'ContentType':'application/json'}
+           
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            filename = secure_filename(f.filename)
+            
+            path = os.path.join(
+                basedir, 'temp'
+            )
+            if not os.path.isdir(path): 
+                os.mkdir(path)
+            
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+
+            f.save(path)
+            
+            content = epub2text(path)
+            title = epubTitle(path)
+            
+            title = title[0][0]
+            epubtext = ""
+            for item in content:
+                epubtext = epubtext + "<pre>" + item +"</pre>"
+
+            new_article = Article(unread=True, title=title, content=epubtext, user_id=current_user.id, archived=False, progress = 0.0, filetype="epub" )
+            db.session.add(new_article)
+
+            for tag in tags:
+                t = Tag.query.filter_by(name=tag).first()
+                
+                if not t:
+                    t = Tag(name=tag, user_id=current_user.id)
+                    db.session.add(t)
+                    new_article.AddToTag(t)
+                else:
+                    new_article.AddToTag(t)        
+            
+            db.session.commit()
+            os.remove(path)
+             
+        done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
+        unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
+        read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
+    
+    return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
+
+def handle_csrf_error(e):
+    return json.dumps({'success':False}), 500, {'ContentType':'application/json'}
+
+@bp.route('/articles/filter', methods=['GET', 'POST'])
+@login_required
+def filter_articles():
+
+    form = ContentForm()
+    data = json.loads(request.form['data'])
+    tag_ids = data['tags']
+    
+    if tag_ids == []:
+        done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
+        unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
+        read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
+        
+        print('no tags passed')
+        print('done articles')
+        for a in done_articles:
+            print(a.id, a.title, a.tags.all(),'\n\n')
+        for a in unread_articles:
+            print(a.id, a.title, a.tags.all(),'\n\n')
+        for a in read_articles:
+            print(a.id, a.title, a.tags.all(),'\n\n')
+
+        return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
+
+
+    active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+
+    done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
+    done_articles = done_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
+    
+    print('tags passed')
+    print('done articles')
+    for a in done_articles:
+        print(a.id, a.title, a.tags.all(),'\n\n')
+
+    unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
+    unread_articles = unread_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
+    print('unread articles')
+    for a in unread_articles:
+        print(a.id, a.title, a.tags.all(),'\n\n')
+
+
+    read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
+    read_articles = read_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
+    print('read articles')
+    for a in read_articles:
+        print(a.id, a.title, a.tags.all(),'\n\n')
+
+    return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user, active_tags = active_tags)
+
+
+    
 
 @bp.route('/article/<id>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
 @bp.route('/article/<id>/<highlight_id>', methods =['POST', 'GET'])
@@ -170,7 +372,7 @@ def article(id, highlight_id):
         db.session.commit()
      
 
-    return render_template('text.html', title =title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+    return render_template('text.html', title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
@@ -222,11 +424,20 @@ def view_article(id):
     
     return render_template('viewarticle.html', article = article)
 
+@bp.route('/view_add_article/', methods=['GET'])
+@login_required
+def view_add_article():
+    form=ContentForm()
+    
+    return render_template('add_article_modal.html', form=form, user=current_user)
+
 
 
 @bp.route('/articles/<id>/update', methods =['POST'])
 @login_required
 def updateArticle(id):
+
+    form = ContentForm()
     article = Article.query.filter_by(id=id).first()
 
     if request.method == "POST":
@@ -239,7 +450,7 @@ def updateArticle(id):
             article.done = False
             article.progress= 0.0
             article.unread = True
-
+    
         article.title = data['title']
         article.notes = data['notes']
         article.content = data['content']
@@ -263,9 +474,18 @@ def updateArticle(id):
 
         db.session.commit()
 
+
+        done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
+        unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
+        read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
+
+
+        return render_template('articles_all.html', form=form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
+
+
      
         #return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
-        return render_template('article_card.html', article=article)
+        #return render_template('articles_all.html', article=article)
    
 @bp.route('/articles/<id>/archive', methods =[ 'GET','POST'])
 @login_required

@@ -1,103 +1,10 @@
-{% extends "base.html" %}
-
-{% block style%}
-{% endblock %}
-
-{% block content %}
-
-
-<div class="row">
-  <div class="col-4 text-center mb-4">
-    <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
-        src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
-    <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">A Learning Tool</h1>
-    <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
-  </div>
-  <div class="col-8">
-    <form id="contentForm" class="form-signin" action="" method="post" enctype="multipart/form-data" name="contentForm"
-      novalidate>
-      <div class="space-above mb-4">
-        <h4>Article from the web</h4>
-      </div>
-      <div class="form-label-group">
-        {{ form.url(class="form-control",id="inputURL", type="URL", placeholder="URL")}}
-        {{ form.url.label}}
-
-      </div>
-      <div class="space-above mb-4">
-        <h4>Epub document</h4>
-      </div>
-      <div class="custom-file">
-        {{ form.epub( class="custom-file-input",id="inputEpub", type="file", placeholder="Choose an epub file")}}
-        {{ form.epub.label(class="custom-file-label", for="inputEpub")}}
-
-      </div>
-      <div class="space-above mb-4">
-        <h4>Copy & Paste</h4>
-      </div>
-      <div class="form-label-group">
-        {{ form.title(class="form-control",id="inputTitle", type="text", placeholder="Title")}}
-        {{ form.title.label}}
-      </div>
-      <div class="form-label-group">
-        {{ form.source(class="form-control",id="inputSource", type="text", placeholder="Source")}}
-        {{ form.source.label}}
-      </div>
-      <div class="form-group">
-        {{ form.text(rows="3", class="form-control" ,id="inputText", type="text", placeholder="Paste text here ...")}}
-      </div>
-      <div class="form-label-group">
-        {{ form.hidden_tag() }}
-      </div>
-      <button id="submitButton" class="hidden btn btn-lg btn-primary btn-block" type="submit">Add New Content</button>
-    </form>
-    <div class="form-signin">
-      <button class="btn btn-lg btn-primary btn-block" onclick="required()">Add New Content</button>
-
-      <p class="mt-5 mb-3 text-muted text-center">&copy; 2020</p>
-
-    </div>
-
-
-  </div>
-</div>
-{% endblock %}
-{% block JS%}
-<script>
-
-  function required() {
-    var form = document.forms["contentForm"];
-    var url = form["url"].value;
-    var epub = form["epub"].value;
-    var text = form["text"].value;
-
-    if (url == "" && epub == "" && text == "") {
-      $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">At least one field must be filled. <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-    }
-
-    else {
-      rrtoggle();
-      document.getElementById('submitButton').click();
-    }
-
-  }
-
-
-  function rrtoggle() {
-
-    var rr = document.getElementById('rrface')
-    var title = document.getElementById('rrtitle')
-
-    title.innerHTML = "... loading ..."
-    rr.classList.toggle('star')
-  }
 
   /*!
  * bsCustomFileInput v1.3.2 (https://github.com/Johann-S/bs-custom-file-input)
  * Copyright 2018 - 2019 Johann-S <johann.servoire@gmail.com>
  * Licensed under MIT (https://github.com/Johann-S/bs-custom-file-input/blob/master/LICENSE)
  */
-  (function (global, factory) {
+(function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
       typeof define === 'function' && define.amd ? define(factory) :
         (global = global || self, global.bsCustomFileInput = factory());
@@ -107,7 +14,7 @@
     var Selector = {
       CUSTOMFILE: '.custom-file input[type="file"]',
       CUSTOMFILELABEL: '.custom-file-label',
-      FORM: 'form',
+      FORM: '#contentForm',
       INPUT: 'input'
     };
 
@@ -265,9 +172,3 @@
 
     bsCustomFileInput.init()
   });
-
-
-</script>
-
-
-{% endblock %}

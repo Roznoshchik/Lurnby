@@ -142,11 +142,16 @@ class Article(db.Model):
     def AddToTag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
+            for h in self.highlights:
+                h.AddToTag(tag)
+
        
     # remove article from tag
     def RemoveFromTag(self, tag):  
         if self.is_added_tag(tag):
             self.tags.remove(tag)
+            for h in self.highlights:
+                h.RemoveFromTag(tag)
       
     # checks if an article is in a tag
     def is_added_tag(self, tag):

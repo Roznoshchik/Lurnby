@@ -13,6 +13,7 @@ from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
+from flask_wtf.csrf import CSRFProtect
 
 
 
@@ -23,6 +24,7 @@ login.login_view='auth.login'
 login.login_message = 'Please log in to access this page'
 mail = Mail()
 cors = CORS()
+csrf = CSRFProtect()
 talisman = Talisman()
 
 csp = {
@@ -50,6 +52,7 @@ def create_app(config_class=Config):
     login.init_app(app)
     mail.init_app(app)
     talisman.init_app(app, content_security_policy=None)
+    csrf.init_app(app)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)
@@ -62,7 +65,7 @@ def create_app(config_class=Config):
 
     from app.api import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api')
-
+    csrf.exempt(api_bp)
 
     if __name__ == "__main__":
         app.run(ssl_context=('cert.pem', 'key.pem'))

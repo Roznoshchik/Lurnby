@@ -10,18 +10,262 @@ return document.getElementsByClassName(classname);
 document.addEventListener("DOMContentLoaded", initialize());
 
 
+$('#edit_article').on('hidden.bs.modal', function (e) {
+    console.log("made it here")
+    
+    byId('edit_article').innerHTML = '';
+})
+
+$('#add_article').on('hidden.bs.modal', function (e) {
+    byId('add_article').innerHTML = '';
+})
+
+function clear_modals(){
+
+    $('#add_article').modal('hide')    
+    $('#edit_article').modal('hide') 
+    byId('edit_article').innerHTML='';
+    byId('add_article').innerHTML='';
+}
+
+
+
+/* add article form functions */
+
+
+
+
+function add_web(){
+    byId('add_from').innerHTML = `
+    <div class = "article_data_group">
+        <p class = "small">Add articles easily with our <a href="https://chrome.google.com/webstore/detail/lurnby/dpobgbljepcemmnbfflkcplalobfllgn" target="_blank">Chrome</a> or <a href = "https://addons.mozilla.org/en-US/firefox/addon/lurnby/" target="_blank">Firefox</a> extensions.</p>     
+        <h6>Article URL</h6>
+        <input style = "width:100%;" type = "text" id = "url_add" placeholder="http://..." required></input>
+    </div>
+    `
+    byId('url_add').focus()
+}
+
+
+function add_epub(){
+    byId('add_from').innerHTML = `
+    <div class = "article_data_group">
+        <h6>Add epub</h6>
+        <input class = "epub-input" id="epub_add" type="file"></input>
+        <label class="main-button add_new epub-label" for="epub_add">choose a file</label>
+        </div>
+    `
+
+    var input = byId('epub_add');
+    console.log('got input')
+    console.log(input)
+    var label = input.nextElementSibling, labelVal=label.innerHTML;
+
+    input.addEventListener('change', function(e){
+        console.log('added event listener?');
+        console.log(input.value)
+        var fileName = '';
+        if (this.files){
+            fileName = e.target.value.split( '\\' ).pop();            
+        };
+
+        if (fileName){
+            label.innerHTML=fileName;
+        }
+        else {
+            label.innerHTML = labelVal;
+        }
+    });
+
+}
+
+function add_manual(){
+    byId('add_from').innerHTML = `
+    <div class = "article_data_group manual_add">
+        <h6>Title</h6>
+        <input style = "width:100%;" type = "text" id = "title_add" required placeholder="Article title ..."></input>
+        <h6>Source</h6>
+        <input style = "width:100%;" type = "text" id = "source_add" placeholder="Where the article is from ..."></input>
+        <h6>Text</h6>
+        <textarea id = "content_add" placeholder="Paste article text here ..."></textarea>
+    </div>
+    `
+
+    byId('title_add').focus()
+}
+
+function add_new_article(){
+
+    var title='none', source='none', tags=[], notes='none',content='none', url='none', epub='none', doc_tags; 
+    doc_tags=byClass('article-tag');
+    Array.prototype.forEach.call(doc_tags, function(tag){
+        if (tag.classList.contains('tagged')){
+            tags.push(tag.firstElementChild.value);
+        };
+    });
+    
+
+
+    formdata = new FormData();
+
+    notes = byId('notes_add').value;
+
+ 
+    if (byId('title_add')){
+        title = byId('title_add').value;
+    };
+    if (byId('source_add')){
+        source = byId('source_add').value ; 
+
+    };
+    
+    if (byId('url_add')){
+        url = byId('url_add').value;
+
+    };
+
+
+    if (byId('epub_add')){
+        epub = 'true'
+        epub_file = byId('epub_add').files[0];
+        formdata.append('epub_file', epub_file);
+    }
+    formdata.append('epub', epub);
+
+
+
+    if (byId('content_add')){
+        content = byId('content_add').value;
+    };
+    
+
+
+    formdata.append('notes', notes);
+    formdata.append('tags', JSON.stringify(tags));
+    formdata.append('title', title);
+    formdata.append('source', source);
+    formdata.append('url', url);
+    formdata.append('content', content);
+
+    
+    $.ajax({
+        url:'/articles/new',
+        data:formdata,
+        type:'POST',
+        contentType: false,
+        processData: false,
+    }).done(function(response){
+        byId('articles_page').innerHTML = response;
+        
+        var alert = document.createElement('div')
+        alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
+        alert.setAttribute('role', 'alert')
+        alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+     `
+        
+       
+
+        var flash = byId('flashMessages')
+        flash.appendChild(alert);
+
+
+        
+    }).fail(function(xhr) {
+      
+        response = JSON.parse(xhr.responseText)
+        if (response['not_epub']){
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>`
+
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);        
+        }
+        if (response['bad_url']){
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Please check the url and try again.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>`
+
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);
+        }
+        if (response['manual_fail']){
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Something went wrong, please try again. <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>`
+
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);
+        }
+        if (response['no_article']){
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert', 'alert','alert-dismissable', 'alert-danger')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>`
+
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);
+        }
+
+        
+    });
+
+
+/*
+    $.post('/articles/new', {
+        'epub': epub,
+        'url':url,
+        'notes':notes,
+        'tags': JSON.stringify(tags),
+        'title': title,
+        'source':source,
+        'content':content
+        }).done(function( data ) {
+        console.log(data)
+    }); 
+*/
+}
+
+
+
+/*  end add article form  */
+
+
+
 
 function ViewArticle(id){
 
     $.get('/view_article/' + id, function(data) {
         var modal = byId('edit_article');
-        console.log(modal);
         modal.innerHTML = data;
         initialize();
         $('#edit_article').modal('toggle');
     });
 }
 
+function ViewAddArticle(){
+
+    $.get('/view_add_article/', function(data) {
+        var modal = byId('add_article');
+        modal.innerHTML = data;
+        initialize();
+
+        $('#add_article').modal('toggle');
+    });
+}
 
 
     
@@ -107,21 +351,29 @@ function initialize(){
 
 
 
-
-function add_tag_start(){
+function add_tag_start(string){
+    var target
+    if (string == 'article-tag'){
+        target = 'article-tag'
+    }
+    else {
+        target = 'view-article-tag'
+    }
+    
+    
     add.innerHTML = `
     <form>
         <button type="submit" disabled style="display: none" aria-hidden="true"></button>
         <div class="form-row align-items-center">
             <div class="col-auto">
                 <label class="sr-only" for="inlineFormInput">Name</label>
-                <input id = "add_tag_input" type="text" class="form-control mb-2" id="inlineFormInput" placeholder="Tag">
+                <input id = "add_tag_input" type="text" class="form-control mb-2" id="inlineFormInput" placeholder="Tag" required>
                 <input disabled style="display: none" aria-hidden="true"></input>
 
             </div>
             <div class="col-auto">
-                <button id = "submit_new_tag" type="button" onclick = "add_tag_finish()" class="btn mb-2">Add</button>
-                <button type="button" class="btn cancel mb-2" onclick="add_tag_cancel()">Cancel</button>
+                <button id = "submit_new_tag" type="button" onclick = "add_tag_finish('${target}')" class="main-button add-new">Add</button>
+                <button type="button" class="btn cancel mb-2" onclick="add_tag_cancel('${target}')">Cancel</button>
             </div>
         </div>
     </form>
@@ -142,24 +394,31 @@ function add_tag_start(){
 
 }
 
-function add_tag_cancel(){
+function add_tag_cancel(string){
+    
+
     add.innerHTML = `
-    <button id="add_new_button" onclick = "add_tag_start()" class = "btn add_new">Add New</button>
+    <button id="add_new_button" onclick = "add_tag_start('${string}')" class = "main-button add_new">Add New</button>
     `;
 }
 
 
 
-function add_tag_finish(){
+function add_tag_finish(string){
     var new_tag = document.getElementById('add_tag_input').value;
 
+    if (new_tag == ''){
+        byId('add_tag_input').classList.add('is-invalid')
+        return;
+    }
+
     add.innerHTML = `
-    <button id="add_new_button" onclick = "add_tag_start()" class = "btn add_new">Add New</button>
+    <button id="add_new_button" onclick = "add_tag_start('${string}')" class = "main-button add_new">Add New</button>
     `;
 
     var new_label = document.createElement('label');
     new_label.innerHTML = new_tag;
-    new_label.classList.add('tagged');
+    new_label.classList.add('tagged', string);
 
 
     var new_input = document.createElement('input');
@@ -196,9 +455,39 @@ function add_tag_finish(){
 
     
 }
+/*
 function article_updated(article_id, data){
     var a = byId(`article${article_id}`);
     a.innerHTML = data;
+}
+*/
+
+function article_updated(data){
+    var a = byId('articles_page');
+    a.innerHTML = data;
+    initialize();
+}
+
+function filter(){
+    console.log('filter()')
+    var doc_tags = byClass('tagged');
+    console.log(doc_tags)
+    var tags = []
+    
+    for (var i = 0; i <doc_tags.length; i++){
+        tags.push(doc_tags[i].firstElementChild.value);
+    }
+    
+    data = {
+        'tags':tags,
+    }
+
+
+    $.post('/articles/filter', {
+            'data':JSON.stringify(data)
+        }).done(function( data ) {
+            article_updated(data)
+        }); 
 }
 
 
@@ -212,14 +501,25 @@ function save(article_id){
     doc_remove_tags = byClass('untagged');
     tags = [];
     remove_tags = [];
-
-    for (var i = 0; i < doc_tags.length; i++){
-        tags.push(doc_tags[i].firstElementChild.value); 
-    };
-
-    for (var i = 0; i < doc_remove_tags.length; i++){
-        remove_tags.push(doc_remove_tags[i].firstElementChild.value); 
-    };
+    if (doc_tags){
+        for (var i = 0; i < doc_tags.length; i++){
+            if (doc_tags[i].classList.contains('filter-tag') || doc_tags[i].classList.contains('new-article-tag')){
+                continue;
+            }
+    
+            tags.push(doc_tags[i].firstElementChild.value); 
+        };
+    }
+  
+    if (doc_remove_tags){
+        for (var i = 0; i < doc_remove_tags.length; i++){
+            if (doc_remove_tags[i].classList.contains('filter-tag') || doc_remove_tags[i].classList.contains('new-article-tag')){
+                continue;
+            }
+            remove_tags.push(doc_remove_tags[i].firstElementChild.value); 
+        };
+    }
+    
     
 
     title = byId('title_edit').value;
@@ -240,7 +540,7 @@ function save(article_id){
     $.post('/articles/' + article_id + '/update', {
             'data':JSON.stringify(data)
         }).done(function( data ) {
-            article_updated(article_id, data)
+            article_updated(data)
         }); 
 
 }

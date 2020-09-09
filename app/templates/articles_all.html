@@ -1,0 +1,262 @@
+<div id="overview" class = "main-section row">
+    
+    <div id = "statistics" class ="main-col col-sm-12 col-lg-4">
+        <div class = "heading">
+            <h6 class = "label">Your work in progress</h6>
+        </div>
+
+        <div class = "col data">
+            {% if user.articles.count == 1%}
+            <div class = "data-item">
+                <p>{{user.articles.count()}} article added</p>
+            </div>
+            {% else %}
+            <div class = "data-item">
+                <p>{{user.articles.count()}} articles added</p>
+            </div>
+            {% endif %}
+
+            {% if done_articles|count == 1 %}
+            <div class = "data-item">
+                <p>{{done_articles|count}} article read </p>
+            </div>
+            {% else %}
+            <div class = "data-item">
+                <p>{{done_articles|count}} articles read </p>
+            </div>
+            {% endif %}
+            
+            {% if user.tags.count() == 1 %}
+            <div class = "data-item">
+                <p>{{user.tags.count()}} tag </p>
+            </div>
+            {% else %}
+            <div class = "data-item">
+                <p>{{user.tags.count()}} tags </p>
+            </div>
+            {% endif %}
+
+            {% if user.highlights.count() == 1 %}
+            <div class = "data-item">
+                <p>{{user.highlights.count()}} highlight</p>
+            </div>
+            {% else %}
+            <div class = "data-item">
+                <p>{{user.highlights.count()}} highlights</p>
+            </div>
+            {% endif %}
+
+            {% if user.topics.count() == 1 %}
+            <div class = "data-item">
+                <p>{{user.topics.count()}} topic</p>
+            </div>
+            {% else %}
+            <div class = "data-item">
+                <p>{{user.topics.count()}} topics</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div id = "articles_all" class = "main-section">
+    <div class = "heading row">
+        <div class = "">
+            <h6>Articles</h6>
+            <button class="main-button cancel" onclick="ViewAddArticle()">Add new</button>
+
+        </div>
+        <div class = "filter-col">
+            <div id = "filter" class = "main-col filter">
+                <div class = "dropdown">
+                    <button class="filter-dropdown main-button " type="button" id="dropdownMenuButton" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                        Filter <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                          </svg>
+                    </button>
+                    <div class="dropdown-menu">
+                        <form >
+                            <div class = "tags">
+                                {% for tag in user.tags.all() %}
+                                <label for= "tag{{tag.id}}" class = "filter-tag untagged">{{tag.name}}<input type="checkbox" id = "tag{{tag.id}}" name = "tags" checked value="{{tag.id}}"></input></label>
+                                {% endfor %}
+                            </div>
+                            
+                            <br>
+                            <button type="button" class="main-button save"  data-dismiss="modal" onclick="filter()">apply filter</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div id = "active_filters">
+                {% for tag in active_tags %}
+                    <span class = "active-tags">{{tag.name}}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <hr>
+    
+    
+    {% if unread_articles or read_articles %}
+    <h6 class = "subheading">Reading</h6>
+    <div class = "articles_section">
+    
+        <div id = "articles">
+            {% for article in unread_articles %}
+        
+            <div id = "article{{article.id}}" class = "article_container row">
+                <div class="col">
+                    <div class = "article_card">
+                        
+                        <div class="row article_title">
+                            <div class="col">
+                                
+                                {% if article.title|length > 88 %}
+                                <h4>{{'%.88s' % article.title}} ...</h4>
+                                {% else %}
+                                <h4>{{ article.title}}</h4>
+                                {% endif %}
+                                
+                                <div class="underline"></div>
+                                {% if article.unread == True %}
+                                <span class = "label"><p>New</p></span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                            
+                        <div class="row article_data">
+                            <div class = "col-3">
+                                <h6>Read:</h6>
+                                <p class = "data">{{article.progress|round|int }}%</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Highlights:</h6>
+                                <p class = "data">{{article.highlights.count()}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Tags:</h6>
+                                <p class = "data">{{article.tags.count()}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id = "open">
+                    
+                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
+                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+        
+                    </div>
+                </div>
+            </div>
+        
+            {% endfor %}
+            {% for article in read_articles %}
+            <div id = "article{{article.id}}" class = "article_container row">
+                <div class="col">
+                    <div class = "article_card">
+                    
+                        <div class="row article_title">
+                            <div class="col">
+                                {% if article.title|length > 88 %}
+                                <h4>{{'%.88s' % article.title}} ...</h4>
+                                {% else %}
+                                <h4>{{ article.title}}</h4>
+                                {% endif %}
+                                <div class="underline"></div>
+                            </div>
+                        </div>
+                        
+                            
+                        <div class="row article_data">
+                            <div class = "col-3">
+                                <h6>Read:</h6>
+                                <p class = "data">{{article.progress|round|int }}%</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Highlights:</h6>
+                                <p class = "data">{{article.highlights.count()}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Tags:</h6>
+                                <p class = "data">{{article.tags.count()}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id = "open">
+                    
+                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
+                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+                    </div>
+                </div>
+            </div>
+        
+            {% endfor %}  
+        </div>
+    </div>
+    {% endif %}
+
+    {% if done_articles %}
+    <hr>
+    <h6 class = "subheading">Read</h6>
+    <div class = "articles_section">
+        <div class = "heading">
+        </div>
+
+        <div id = "done_articles">
+            {% for article in done_articles %}
+            <div id = "article{{article.id}}" class = "article_container row">
+                <div class="col">
+                    <div class = "article_card">
+                    
+                        <div class="row article_title">
+                            <div class="col">
+                                {% if article.title|length > 88 %}
+                                <h4>{{'%.88s' % article.title}} ...</h4>
+                                {% else %}
+                                <h4>{{ article.title}}</h4>
+                                {% endif %}
+                                <div class="underline"></div>
+                            </div>
+                        </div>
+                        
+                            
+                        <div class="row article_data">
+                            <div class = "col-3">
+                                <h6>Read:</h6>
+                                <p class = "data">{{article.progress|round|int }}%</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Highlights:</h6>
+                                <p class = "data">{{article.highlights.count()}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Tags:</h6>
+                                <p class = "data">{{article.tags.count()}}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id = "open">
+                    
+                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
+                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+                    </div>
+                </div>
+            </div>
+                
+        {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="modal" id = "edit_article" tabindex="-1">
+    
+</div>
+
+<div class="modal" id = "add_article" tabindex="-1">
+    
+</div>
+
+
+</div>

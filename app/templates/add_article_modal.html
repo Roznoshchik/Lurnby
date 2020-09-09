@@ -1,0 +1,58 @@
+<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">Add a new article</h5>
+            <button type="button" class="close"  data-dismiss="modal" onclick = "clear_modals()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form class = "main-form" id="contentForm">
+                
+                    <div id = "add_from">
+                        <div class = "article_data_group">
+                            <h6>Article type: </h6>
+                            <button  type = "button" onclick = "add_web()" class = "main-button add_new add-article">Web</button>
+                            <button  type = "button" onclick = "add_epub()" class = "main-button add_new add-article">Epub</button>
+                            <button  type = "button" onclick = "add_manual()" class = "main-button add_new add-article">Manual</button>
+                    
+
+                        </div>
+                    </div>
+                    
+                    
+               
+
+
+                <div class = "article_data_group">
+    
+                    <h6 class="inline-block">Tags:</h6><span id ="add_new_tag"><button  type = "button" onclick = "add_tag_start('article-tag')" class = "main-button add_new ">Add New</button></span><br>
+    
+                    <span id="tags">
+                        <span id="new_tags"></span>
+                        {% for tag in user.tags.all() %}
+                        <label class = "article-tag untagged">{{tag.name}}<input type="checkbox" name = "tags" checked value="{{tag.name}}"></input></label>
+                        {% endfor %}
+                    </span>
+                </div>
+                <div class = "article_data_group">
+    
+                    <h6>Notes:</h6>
+                    <textarea id="notes_add" class = "large"placeholder= "Add any personal notes or comments about the article here ..."></textarea>
+    
+                </div>
+    
+    
+                <div class="article_data_group">
+                <input type="hidden" id="csrf_token" name="csrf_token" value="{{ csrf_token() }}"/>                </div>
+                <button id="submitButton" class="hidden  btn btn-lg btn-primary btn-block" disabled type="submit">Add New Content</button>
+                <button class="main-button save" data-dismiss="modal" onclick="add_new_article()">Add Article</button>        
+
+            </form>
+        </div>    
+    
+        
+       
+    </div>
+    
+    </div>
