@@ -1,7 +1,7 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
         <form id="article_data_form">
-            <div class= "article_data_group">
+            <div class= "lurnby_data_group article_data_group">
                 <div class="modal-header">
                     <h5 class="modal-title not-editing">{{article.title}}</h5>
                     <textarea id = "title_edit" class="editing title" >{{article.title}}</textarea>
@@ -14,7 +14,7 @@
             </div>
            
             <div class="modal-body">
-                <div class = "article_data_group form-group">
+                <div class = "lurnby_data_group article_data_group form-group">
                     <h6>Read: </h6>
                     <p class = "not-editing" id="article_progress">{{ article.progress|round|int}}%</p>
                 
@@ -35,7 +35,7 @@
                     </select>
                     
                 </div>
-                <div id = "article_source" class = "article_data_group">
+                <div id = "article_source" class = "lurnby_data_group article_data_group">
                     {% if article.source_url %}
                     <h6>Source:</h6><a class = "regular" target = "_blank" href="{{article.source_url}}">{{article.source_url}}</a>
                     {% else %}
@@ -43,9 +43,9 @@
                     {% endif %}
                 </div>
             
-                <div class = "article_data_group">
+                <div class = "lurnby_data_group article_data_group">
 
-                    <h6 class="inline-block">Tags:</h6><span id ="add_new_tag"><button  onclick = "add_tag_start('view-article-tag')" class = "main-button add_new editing">Add New</button></span><br>
+                    <h6 class="inline-block">Tags:</h6><span class = "inline-button" id ="add_new_tag"><button  onclick = "add_tag_start('view-article-tag')" class = "main-button add_new editing">Add New</button></span><br>
 
                     <span id="tags">
                         <span id="new_tags"></span>
@@ -58,13 +58,13 @@
                     </span>
                 </div>
                 
-                <div class = "article_data_group">
+                <div class = "lurnby_data_group article_data_group">
                     <h6>Notes: </h6>
                     <p class = "not-editing" id="article_notes">{{ article.notes}}</p>
                     <textarea id="notes_edit" class = "large editing">{{ article.notes}}</textarea>
                 </div>
 
-                <div class = "article_data_group">
+                <div class = "lurnby_data_group article_data_group">
                     <h6>Content: </h6>
                     <p class = "not-editing" id="article_content">{{ '%.200s' % article.content}}... </p>
                     <textarea id="content_edit" class = "large article_content editing" >{{ article.content}}</textarea>

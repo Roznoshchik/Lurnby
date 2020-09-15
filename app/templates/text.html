@@ -3,7 +3,7 @@
 {% block style %}
   <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-  {% endblock %}
+{% endblock %}
 
 {% block content %}
 <main id="standard">
@@ -15,51 +15,51 @@
 
 
   <!-- Add Highlight Modal-->
-  <div class="modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
+  <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="AddHighlightModalLabel">Add highlight to topics</h5>
+          <h5 class="modal-title" id="AddHighlightModalLabel">New Highlight</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <form  id = "SubmitHighlightForm" action="" method="post">
+          <form  class = "main-form" id = "SubmitHighlightForm" action="" method="post">
              <!-- {{ form.hidden_tag() }} -->
+             {{ form.position(class="form-control",type="hidden", id="highlight_position") }}   
             <input id = "article_id" type="hidden" name="article_id" value="{{ article_id}}"> 
-            <div class="form-group">
-              {{ form.text.label }}
+            <div class=" lurnby_data_group form-group">
+              <h6>Highlight</h6>
               {{ form.text(class="form-control", id="HighlightField") }}
             </div>
             <br>
-            <div class="form-group">
-              {{ form.note.label }}
+            <div class="lurnby_data_group form-group">
+              <h6>Add a note</h6>
               {{ form.note(class="form-control", id="message-text") }}              
             </div>
-            <div class="form-group">
-              {{ form.position(class="form-control",type="hidden", id="highlight_position") }}              
-            </div>
-            <div class="btn-group-toggle" data-toggle="buttons">
-              {% for topic in topics %}
-              <label class="button-group-pills btn btn-default">
-                <input name = "topics" type="checkbox" value="{{topic.title}}">
-                {{topic.title}}
-              </label>
-              {% endfor %}
-              <span id = "topicplaceholder"></span>
-          
-              <span id="CreateTopic">
-                <button onclick ="NewTopic()" class="create-button btn btn-success">
+                        
+            <div class="lurnby_data_group topics-group" data-toggle="buttons">
+              <h6 class="inline-block">Topics:</h6><span  id="CreateTopic">
+                <button onclick ="NewTopic()" class="main-button save">
                   Create new topic
                 </button>
-              </span>
+              </span><br>
+              <div class = "topics-all">
+                {% for topic in topics %}
+                <label class="topic-label btn">
+                  <input name = "topics" type="checkbox" value="{{topic.title}}">
+                  {{topic.title}}
+                </label>
+                {% endfor %}
+                <span id = "topicplaceholder"></span>
+              </div>
             </div>
           
         </div>
         <div class="modal-footer">
-          <button type="button"  class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
-          <button type="button" onclick="SubmitHighlight()" class="btn btn-primary">Add</button>
+          <button type="button"  class="main-button cancel" data-dismiss="modal">Cancel</button>
+          <button type="button" onclick="SubmitHighlight()" class="main-button save">Add</button>
         </div>
       </form>
       </div>
@@ -69,8 +69,6 @@
 <!-- View Highlight Modal-->
 <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
 </div>
-
-
 
 
   <div class= "row">
@@ -180,7 +178,8 @@
 <script type="text/javascript">
      
       var sandbox = document.getElementById('content');      
-      var article_id = $("#article_id").val()
+      //var article_id = $("#article_id").val()
+      var article_id = {{article_id}}
 
       hltr = new TextHighlighter(sandbox, {
         enabled: false,
@@ -227,7 +226,12 @@
 
         $.get('/article/' + article_id + '/progress', function(data) {
           progress = data['Progress'];
-          var position = (progress / 100) * h[sh] || b[sh]          
+          console.log('progress')
+          console.log(progress)
+
+          var position = (progress / 100) * (h[sh] || b[sh])    
+          console.log('position')
+          console.log(position)      
           $window.scrollTop(position);
         });  
 
@@ -264,9 +268,7 @@
             });
       }
 
-    
-
-
+  
 
 
 </script>
@@ -327,7 +329,22 @@
 
 
   function NewTopic(){
-    $('#CreateTopic').html('<br> <div class = "form-row align-items-center"> <div class="col-sm-6 my-1"><input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value=""></input></div> <div class="col-auto my-1"> <button type="button" onclick="CancelNewTopic()" class="btn btn-outline-secondary">cancel</button> </div>  <div class="col-auto my-1"> <button onclick="NewTopicSubmit()" type="submit" class="btn btn-primary">add</button> </div> </div> </form>');
+    $('#CreateTopic').html(`
+      <br>
+      <form> 
+        <div class = "form-row align-items-center"> 
+          <div class="col-sm-6 my-1">
+            <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
+            </input>
+          </div> 
+          <div class="col-auto my-1"> 
+            <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
+          </div>  
+          <div class="col-auto my-1"> 
+            <button onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
+          </div> 
+        </div> 
+    </form>`);
     $('#addtopicinput').trigger('focus');
   }
 
@@ -336,17 +353,24 @@
     $.post('/topics/add', {
       title: $('#addtopicinput').val()
     }).done(function(response) {
-        $('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
+        //$('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
+        $('#topicplaceholder').append(`
+          <label id="label${response['id']}" class="topic-label btn">
+            <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
+        `);
+
         document.getElementById("label"+response['id']).click();
-        $('#CreateTopic').html('<button onclick ="NewTopic()" class="create-button btn btn-success">Create new topic </button>');
-    }).fail(function() {
+
+        $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
+
+      }).fail(function() {
         $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
     });
 }
 
 
   function CancelNewTopic(){
-    $('#CreateTopic').html('<button onclick ="NewTopic()" class="create-button btn btn-success">Create new topic </button>')
+    $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>')
   }
   
 

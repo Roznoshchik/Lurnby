@@ -1,79 +1,112 @@
-<div class="modal-lg modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="ViewHighlightModalLabel">View Highlight</h5>
-        <button class = "close" type="button" data-dismiss="modal">
-          &times;
-        </a>
+<div class=" lurnby_modal modal-lg modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="ViewHighlightModalLabel">View Highlight</h5>
+      <button class="close" type="button" data-dismiss="modal">
+        &times;
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="lurnby_data_group">
+        <h6>From: {{ article_title}}</h6>
       </div>
-      <div class="modal-body">
-        <h3>From: {{ article_title}}</h3>
-        <hr>
+
+      <div class="lurnby_data_group">
         {% if source_url %}
+
+        <h6 class="inline-block">Source:</h6> <a class="main-button save" href="{{ inappurl }}">Go to highlight</a>
+
         <p>
-            <h4 style = "display:inline;">Original source:</h4> <a href="{{source_url}}" target="_blank">Open in new window</a>
-        
+          <a href="{{source_url}}" target="_blank">{{source_url}}</a>
         </p>
         {% else %}
+
+        <h6 class="inline-block">Source:</h6><a class="main-button save" href="{{ inappurl }}">Go to highlight</a>
+
         <p>
-          <h4 style = "display:inline;">Original source:</h4> {{source}}
-      
-      </p>
+          {{source}}
+        </p>
 
         {% endif %}
-        <p>
-            <h4 style = "display:inline;"> View Content in App:</h4> <a href="{{ inappurl }}">Open</a>
-        </p>    
-        <hr>      
-        <form  id = "UpdateHighlightForm" action="" method="post">
-           {{ form.hidden_tag() }} 
-          
-        <h4>Highlight text:</h4>
-        <hr>
+      </div>
+
+      <form class="main-form" id="UpdateHighlightForm" action="" method="post">
+        {{ form.hidden_tag() }}
+
+        <div class="lurnby_data_group">
+          <h6>Highlight</h6>
           <div class="form-group">
             {{ form.text(class="form-control", id="HighlightField") }}
           </div>
-          <br>
-          <h4>Note or Comment</h4>
+        </div>
 
+        <div class="lurnby_data_group">
+          <h6>Notes</h6>
           <div class="form-group">
-            {{ form.note(class="form-control", id="message-text") }}              
+            {{ form.note(class="form-control", id="message-text") }}
           </div>
 
-          <span id="Update-CreateTopic">
-            <button onclick ="UpdateNewTopic()" class="create-button btn btn-success">
+        </div>
+      
+        <div class="lurnby_data_group">
+          <h6 class="inline-block"> Topics:</h6> 
+          <span class="inline-button" id="new-topic">
+            <button type = "button" onclick="UpdateNewTopic()" class="main-button save">
               Create new topic
             </button>
-          </span>      
-
-          <h4>In the following topics:</h4>
-          <div id = "Members" class="btn-group-toggle" data-toggle="buttons">
+          </span>
+          <br>
+          <span id="Members" class="topics-group" data-toggle="buttons">
             {% for m in member %}
-            <label onclick="RemoveFromTopic('topic{{ m.id }}', '{{ m.title }}')" id = "topic{{ m.id }}"class="topic-member btn btn-default">
-              <span ><input name = "members" type="checkbox" checked value="{{m.title}}">
-              {{m.title}} <span class="topic-icon"><i class="fa fa-times" aria-hidden="true"></i></span>
-            </span></label>
+            <label class="btn active topic-label" onclick="RemoveFromTopic('topic{{ m.id }}', '{{ m.title }}')"
+              id="topic{{ m.id }}">
+              <span><input name="members" type="checkbox" checked value="{{m.title}}">
+                {{m.title}}
+              </span></label>
             {% endfor %}
-           
-          </div>
-          <h4>Not in the following topics:</h4>
-          <div id ="NonMembers" class="btn-group-toggle" data-toggle="buttons">
+          </span>
+          <span id="NonMembers" class="topics-group" data-toggle="buttons">
             {% for n in nonmember %}
-            <label onclick="AddToTopic('topic{{ n.id }}', '{{n.title}}')" id = "topic{{ n.id }}" class="topic-non-member btn btn-default">
-              <span ><input name = "nonmembers" type="checkbox" checked value="{{n.title}}">
-              {{n.title}} <span class="topic-icon"><i class="fa fa-plus fa-xs" aria-hidden="true"></i></span>
-            </span></label>
-            {% endfor %}        
-          </div>
-          
-      </div>
-      <div class="modal-footer">
-        <a href="{{url_for('main.archivehighlight', id = highlight.id )}} " type="button" class="btn btn-danger mr-auto">{% if member|length > 1 %}Delete from {{member|length}} topics{% else %}Delete{% endif %}</a>
-        <button type="button" data-dismiss ='modal' class="btn btn-outline-secondary">Cancel</button>
-        <button type="button" onclick="UpdateHighlight({{highlight.id}})" class="btn btn-primary">Update</button>
-      </div>
-    </form>
+            <label class="btn topic-label" onclick="AddToTopic('topic{{ n.id }}', '{{n.title}}')" id="topic{{ n.id }}">
+              <span><input name="nonmembers" type="checkbox" checked value="{{n.title}}">
+                {{n.title}}
+              </span></label>
+            {% endfor %}
+          </span>
+        </div>
+
+        <div class="lurnby_data_group article_data_group">
+
+          <h6 class="inline-block">Tags:</h6>
+          <span class="inline-button" id="add_new_tag">
+            <button type = "button" onclick="add_tag_start()" class="main-button add_new">Add New</button>
+          </span><br>
+
+          <span id="tags">
+            <span id="new_tags"></span>
+            {% for tag in highlight.tags %}
+            <label class="tagged">{{tag.name}}<input type="checkbox" name="tag" checked
+                value="{{tag.name}}"></input></label>
+            {% endfor %}
+            {% for tag in highlight.not_in_tags(current_user) %}
+            <label class="untagged">{{tag.name}}<input type="checkbox" name="untag" checked value="{{tag.name}}"></input></label>
+            {% endfor %}
+          </span>
+        </div>
+
+       
+
+
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <a href="{{url_for('main.archivehighlight', id = highlight.id )}} " type="button"
+        class="main-button cancel mr-auto">{% if member|length > 1 %}Delete from {{member|length}}
+        topics{% else %}Delete{% endif %}</a>
+      <button type="button" data-dismiss='modal' class="main-button save cancel">Cancel</button>
+      <button type="button" onclick="UpdateHighlight({{highlight.id}})" class="main-button save">Update</button>
     </div>
   </div>
 
-  
+</div>

@@ -259,7 +259,13 @@ def add_article():
             for item in content:
                 epubtext = epubtext + "<pre>" + item +"</pre>"
 
-            new_article = Article(unread=True, title=title, content=epubtext, user_id=current_user.id, archived=False, progress = 0.0, filetype="epub" )
+        
+            today = date.today()
+            today = today.strftime("%B %d, %Y")
+            source = 'Epub File: added ' + today
+
+
+            new_article = Article(unread=True, title=title, content=epubtext, source=source, user_id=current_user.id, archived=False, progress = 0.0, filetype="epub" )
             db.session.add(new_article)
 
             for tag in tags:
@@ -519,6 +525,10 @@ def addhighlight():
     db.session.add(newHighlight)
     
     list = request.form.getlist('topics')
+    article = Article.query.filter_by(id = request.form.get('article_id')).first()
+
+    for tag in articles.tags.all():
+        newHighlight.AddToTag(tag)
     
     for t in list:
         print(t)
@@ -578,6 +588,18 @@ def view_highlight(id):
         for nonmember in nonmembers:
             topic = Topic.query.filter_by(title=nonmember).first()
             highlight.RemoveFromTopic(topic)
+
+        tags = request.form.getlist('tag')
+        for tag in tags:
+            t = Tag.query.filter_by(name=tag).first()
+            highlight.AddToTag(t)
+
+        untags = request.form.getlist('untag')
+        for tag in untags:
+            t = Tag.query.filter_by(name=tag).first()
+            highlight.RemoveFromTag(t)
+
+
 
 
         db.session.commit()
