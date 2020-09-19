@@ -355,6 +355,7 @@ def article(id, highlight_id):
     topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
     content = article.content
     title = article.title
+    progress=article.progress
 
     addtopicform = AddTopicForm()
     
@@ -378,7 +379,7 @@ def article(id, highlight_id):
         db.session.commit()
      
 
-    return render_template('text.html', title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+    return render_template('text.html',progress=progress, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
@@ -524,13 +525,13 @@ def addhighlight():
     newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), position = request.form.get('position'),  text = request.form.get('text'), note = request.form.get('note'), archived=False)
     db.session.add(newHighlight)
     
-    list = request.form.getlist('topics')
+    topics = request.form.getlist('topics')
     article = Article.query.filter_by(id = request.form.get('article_id')).first()
 
-    for tag in articles.tags.all():
+    for tag in article.tags.all():
         newHighlight.AddToTag(tag)
     
-    for t in list:
+    for t in topics:
         print(t)
         topic = Topic.query.filter_by(title=t).first()
         print (topic, topic.title)

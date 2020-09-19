@@ -6,15 +6,125 @@
 {% endblock %}
 
 {% block content %}
-<main id="standard">
+<main class = "light-mode" id="standard">
+      <div  id = "sidebar">
+        <button type="button" onclick ="show_controls()" class="main-button action-button">Aa</button>
+      </div>  
+
+      <div class = "sans-serif line-height-mid light-mode" id="content">
+        <h1>{{ title|safe}}</h1>
+
+        <h3>{{ author|safe}}</h3>
+        <hr>
+        {{ content|safe }}
+      </div>
+
+      <!-- bottom-bar -->  
+      <div class = "col-12" id ="bottom-bar">
+        <div class = "article-overview">
+          <p class = "small">{{title}}</p>
+          <p class = "ml-auto small"><span id="overview-progress">{{progress|round|int}}</span>%</p>
+        </div>
+      
+        <button class="main-button action-button">Aa</button>
+      </div>
+</main>
+
+
+
+
   <!-- tooltip-->
   <button id="infoDiv" type ="button" onclick = "showaddhighlightmodal()" class="tooltipDiv btn btn-dark btn-sm" >
     <span id ="addhighlight">Add Highlight</span>
   </button>
 
+  <!--  type controls  -->
+  <form class = "light-control-mode" id = "type-controls">
+    <!-- font selection -->
+    <div class="form-group">
+      <input type = "radio" checked name="font-choice" id = "sans-serif">
+      <label class = "type-control-button font-selector sans-serif" for="sans-serif"><p>Sans-serif</p>Aa</label>
+      
+      <input type = "radio" name="font-choice" id = "serif">
+      <label class = "type-control-button font-selector serif" for="serif"><p>Serif</p>Aa</label>
+    </div>
+
+    <div class="underline"></div>
+    
+    <!-- font size  -->
+    <div class = "form-group">
+      <div class = "font-size" id = "decrease-size"> - </div>
+      <input type="range" id="font-size-input" min = "1" max = "15" value="6" step="1"></input>
+      <label id = "font-size-value" class = "num-input" for="font-size-value">6</label>
+      <div class = "font-size" id="increase-size"> + </div>
+    </div>
+    <div class = "underline"></div>
+
+    <!-- line height  -->
+    <div class = "form-group">
+      
+        <input type="radio" name = "line-height-options" id="line-height-min">
+        <label for="line-height-min">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            width="38"
+            height="24"
+            viewBox="0 0 38 24"
+            fill="context-fill">
+            <rect x="0" y="0" width="28" height="2"/>
+            <rect x="0" y="5" width="38" height="2"/>
+            <rect x="0" y="10" width="18" height="2"/>
+          </svg>
+        </label>
+     
+        <input type="radio" name = "line-height-options"checked id="line-height-mid">
+        <label  for="line-height-mid">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            width="38"
+            height="24"
+            viewBox="0 0 38 24"
+            fill="context-fill">
+  
+            <rect x="0" y="0" width="28" height="2"/>
+            <rect x="0" y="8" width="38" height="2"/>
+            <rect x="0" y="16" width="18" height="2"/>
+          </svg>
+        </label>
+     
+        <input type="radio" name = "line-height-options" id="line-height-max">
+        <label for="line-height-max">
+          <svg xmlns="http://www.w3.org/2000/svg"
+            width="38"
+            height="24"
+            viewBox="0 0 38 24"
+            fill="context-fill">
+  
+            <rect x="0" y="0" width="28" height="2"/>
+            <rect x="0" y="11" width="38" height="2"/>
+            <rect x="0" y="22" width="18" height="2"/>
+          </svg>
+        </label>
+      
+    </div>
+    <div class="underline"></div>
+    
+    <!--  Color mode -->
+    <div class="form-group">
+      
+      <input type = "radio" name="color-mode" checked id = "light-mode">
+      <label for = "light-mode" class = "type-controls-button color-selector  light-mode">Light</label>
+   
+      <input type = "radio" name="color-mode" id = "dark-mode">
+      <label for = "dark-mode" class = "type-controls-button color-selector dark-mode">Dark</label>
+   
+      <input type = "radio" name="color-mode" id = "sepia-mode">
+      <label for = "sepia-mode" class = "type-controls-button color-selector sepia-mode">Sepia</label>
+   
+  </div>  
 
 
-  <!-- Add Highlight Modal-->
+  </form>
+
+<!-- Add Highlight Modal-->
   <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -69,91 +179,6 @@
 <!-- View Highlight Modal-->
 <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
 </div>
-
-
-  <div class= "row">
-
-    <div class="col-lg-3">
-      <!-- Sidebar -->
-      <nav id="sidebar">
-        <!--
-        <div class="sidebar-header">
-              <h3><a href="{{ url_for('main.articles' )}}">Home</a></h3>
-          </div>
-        -->   
-        <div id ="sidebar-collapse" class = "justify-content-end ">
-          <button type="button" class="btn settings-button ">
-          <i id="collapse-icon" class= "fa fa-angle-double-left"></i>
-          <span data-toggle="collapse" aria-expanded="false" id="inviz">Hide Controls</span>
-          </button>
-        </div>
-        <div class="sidebar-content">
-
-          <h6 class="sidebarheading">Set background:</h6> 
-          <ul class="list-group list-group-horizontal no-style">
-              <li>
-                <button id = "make-light" class="list-group-item-action"> Light Mode</button>
-              </li>
-              <li>
-                <button id = "make-dark" class="list-group-item-action"> Dark Mode</button>
-              </li>
-              <li>
-                <button id = "make-sepia" class="list-group-item-action"> Sepia mode </button>
-              </li>            
-          </ul>
-          <br>
-          <h6 class="sidebarheading">Set font:</h6> 
-          <ul class="list-group no-style d-flex justify-content-around">
-              <li>
-                <button id = "make-serif"><span class="font-preview">Aa </span>Serif</button>
-              </li>
-              <li>
-                <button id = "make-sans"><span class="font-preview">Aa </span>Sans Serif</button>
-              </li>    
-          </ul>
-          <br>
-          <h6 class="sidebarheading">Set sizing:</h6> 
-
-            <div class="d-flex align-middle sidebar-row">
-              <button id="p-less"class="p-2 flex-fill make-size font-preview">-</button>
-              <button class="p-2 flex-fill make-size-middle disabled">Size</button>
-              <button id="p-more"class="p-2 flex-fill make-size font-preview">+</button>
-            </div>
-            <div class="d-flex align-middle sidebar-row">
-              <button id="lheight-less"class="p-2 flex-fill make-size font-preview">-</button>
-              <button class="p-2 flex-fill make-size-middle disabled">Line Height</button>
-              <button id="lheight-more"class="p-2 flex-fill make-size font-preview">+</button>
-            </div>
-            <div class="d-flex align-middle sidebar-row">
-              <button id="margin-less" class="p-2 flex-fill make-size font-preview">-</button>
-              <button class="p-2 flex-fill make-size-middle disabled">Margins</button>
-              <button id="margin-more" class="p-2 flex-fill make-size font-preview">+</button>
-            </div>
-        </div>
-      </nav>
-    </div>
-    <div class="col-auto">
-      <!-- Page Content -->
-      <nav class="navbar">
-      <!--
-        <button type="button" id="sidebar-collapse" class="btn settings-button">
-          <i id="collapse-icon" class= "fa fa-angle-double-left"></i>
-          <span data-toggle="collapse" aria-expanded="false" id="inviz">Hide Controls</span>
-        </button>
-      -->
-      </nav>
-      <div id="content">
-        <h1>{{ title|safe}}</h1>
-
-        <h3>{{ author|safe}}</h3>
-        <hr>
-        {{ content|safe }}
-      </div>
-
-    </div>
-  </div>   
-</main>
-
 {% endblock %}
 
 {% block JS %}
@@ -176,206 +201,357 @@
 
 
 <script type="text/javascript">
-     
-      var sandbox = document.getElementById('content');      
-      //var article_id = $("#article_id").val()
-      var article_id = {{article_id}}
-
-      hltr = new TextHighlighter(sandbox, {
-        enabled: false,
-        onAfterHighlight: function (range, highlights) {
-            var serialized = hltr.serializeHighlights();
-         
-            $.post('/article/' + article_id + '/highlight-storage', {
-              'SerializedHighlights': serialized
-            }).fail(function() {
-              $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-            });
-
-          $('[data-toggle="popover"]').popover()
-          
-          
-          $('.popover-dismiss').popover({
-            trigger: 'focus'
-          });
-         
-          
-        } 
-        
-      });
-        
-      
-    
-
-      var serialized; 
-      $.get('/article/' + article_id + '/highlight-storage', function(data) {
-        serialized = data['SerializedHighlights']
-        hltr.deserializeHighlights(serialized);
-        $('[data-toggle="popover"]').popover()
-      
-      });
-      
-      $( window ).on( "load", function() { 
-        var progress; 
-        var $window = $(window);
-
-        var h = document.documentElement, 
-        b = document.body,
-        st = 'scrollTop',
-        sh = 'scrollHeight';
-
-        $.get('/article/' + article_id + '/progress', function(data) {
-          progress = data['Progress'];
-          console.log('progress')
-          console.log(progress)
-
-          var position = (progress / 100) * (h[sh] || b[sh])    
-          console.log('position')
-          console.log(position)      
-          $window.scrollTop(position);
-        });  
-
-        document.addEventListener("scroll", getScrollPercent);
-
-
-      });
-      
-
-      /* store scroll position 
-       hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
-      */
-      
-      var timer;
-
-      function getScrollPercent() {
-        
-        var h = document.documentElement, 
-        b = document.body,
-        st = 'scrollTop',
-        sh = 'scrollHeight';
-        
-        var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
-
-
-        clearTimeout(timer)
-        timer = setTimeout(update_progress.bind(null, progress), 3000)
-      } 
-
-      function update_progress(progress){
-        console.log('updating progress');
-        $.post('/article/' + article_id + '/progress', {
-              'Progress': progress
-            });
-      }
+  /* type controls functions */
 
   
+  var size, size_input, increase, decrease, val, content, standard;
+  standard = byId('standard')
+  content = byId('content');
+  size = byId('font-size-input');
+  size_input = byId('font-size-value')
+  increase = byId('increase-size')
+  decrease = byId('decrease-size')
 
+  // font-size
+  increase.addEventListener('click', function(){
+ 
+    size.value++;
+    size_input.innerHTML=size.value
+    val = size.value
 
-</script>
+    content.classList.add(`size-${val}`)
+    val--
+    content.classList.remove(`size-${val}`)
+    disable_buttons();
+  
+  });
 
-<script>
+  decrease.addEventListener('click', function(){
 
-  function SubmitHighlight(){
-    $("#SubmitHighlightForm").ajaxSubmit({
-      url: '/article/addhighlight', 
-      type: 'post',
-      success: function(responseText){ AddedHighlight(responseText) },
-      error: function(){ FailedToAddHighlight() }
-    })
-  }
+    size.value--;
+    size_input.innerHTML=size.value
+    val = size.value
 
-  var returnedhighlightid;
-  var returnedhighlightclass;
+    content.classList.add(`size-${val}`)
+    val++
+    content.classList.remove(`size-${val}`)
 
-  function AddedHighlight(responseText){
+    disable_buttons();
     
-    $('#AddHighlightModal').modal('hide');
+  });
+
+  function disable_buttons(){
+    val = size.value
     
-    /* THIS RESETS THE SUBMIT HIGHLIGHT FORM */
-    document.getElementById('SubmitHighlightForm').reset()
-    var c = document.querySelectorAll('input[type="checkbox"]');
-    var count = c.length
-    console.log(c)
-    
-    for (var i = 0; i < c.length; i++){
-      if (c[i].parentNode.classList.contains('active')){
-        c[i].click()
-      }  
+    if (val == 1){
+      decrease.classList.add('disabled')
+    }
+    if (val > 1){
+      decrease.classList.remove('disabled')
+    }
+    if (val < 15){
+      increase.classList.remove('disabled')
+    }
+    if (val == 15){
+      increase.classList.add('disabled')
     }
     
-    /* END RESET */
-
-
-
-    selectedObj.removeAllRanges();
-    selectedObj.addRange(selectedText);
-    returnedhighlightclass = "highlight"+responseText['highlight_id']
-    returnedhighlightid = responseText['highlight_id']
-    hltr.enable();
-    hltr.doHighlight();
-    hltr.disable();
     
   }
+
+
+    // font choice
+
+    var font = document.forms['type-controls'].elements['font-choice'];
+
+  for (var i = 0; i < font.length; i++){
+      font[i].onclick = function(){
+        
+        var content = byId('content');
+        
+        if (this.id == 'serif'){
+          content.classList.remove('sans-serif');
+          content.classList.add('serif')
+          
+        }
+        else if (this.id == 'sans-serif'){
+          content.classList.remove('serif');
+          content.classList.add('sans-serif')    
+          
+        }
+        
+        
+      };
+    }
+
+
+    // color mode
+    var color = document.forms['type-controls'].elements['color-mode'];
+
+  for (var i = 0; i < color.length; i++){
+      color[i].onclick = function(){
+        
+        var content = byId('content');
+        var controls = byId('type-controls');
+        
+        if (this.id == 'light-mode'){
+          content.classList.remove('dark-mode', 'sepia-mode');
+          content.classList.add('light-mode')
+
+          standard.classList.remove('dark-mode', 'sepia-mode');
+          standard.classList.add('light-mode')
+          
+          controls.classList.remove('dark-control-mode', 'sepia-control-mode');
+          controls.classList.add('light-control-mode')
+          
+        }
+        else if (this.id == 'dark-mode'){
+          content.classList.remove('light-mode', 'sepia-mode');
+          content.classList.add('dark-mode')
+
+          standard.classList.remove('light-mode', 'sepia-mode');
+          standard.classList.add('dark-mode')
+          
+          controls.classList.remove('light-control-mode', 'sepia-control-mode');
+          controls.classList.add('dark-control-mode')	
+          
+        }
+        else if (this.id == 'sepia-mode'){
+          content.classList.remove('dark-mode', 'light-mode');
+          content.classList.add('sepia-mode')
+
+          standard.classList.remove('dark-mode', 'light-mode');
+          standard.classList.add('sepia-mode')
+          
+          controls.classList.remove('dark-control-mode', 'light-control-mode');
+          controls.classList.add('sepia-control-mode')
+        }
+        
+      };
+    }
+
     
-  function FailedToAddHighlight(){
-    var node = document.createElement('span');
-    node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
-    document.body.appendChild(node);
-    //document.body.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
-  }
+    var lineheight = document.forms['type-controls'].elements['line-height-options'];
 
+    for (var i = 0; i < lineheight.length; i++){
+      lineheight[i].onclick = function(){
+        
+        if (this.id == 'line-height-min'){
+          content.style.lineHeight = '1.2em';
+        }
+        else if (this.id == 'line-height-mid'){
+        content.style.lineHeight = '1.5em';
+        }
+        else if (this.id == 'line-height-max'){
+        content.style.lineHeight = '2em';
+        }
+        
+      };
+    }
+
+    // end type controls
+
+
+      
+        var sandbox = document.getElementById('content');      
+        //var article_id = $("#article_id").val()
+        var article_id = {{article_id}}
+
+        hltr = new TextHighlighter(sandbox, {
+          enabled: false,
+          onAfterHighlight: function (range, highlights) {
+              var serialized = hltr.serializeHighlights();
+          
+              $.post('/article/' + article_id + '/highlight-storage', {
+                'SerializedHighlights': serialized
+              }).fail(function() {
+                $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+              });
+
+            $('[data-toggle="popover"]').popover()
+            
+            
+            $('.popover-dismiss').popover({
+              trigger: 'focus'
+            });
+          
+            
+          } 
+          
+        });
+          
+        
+      
+
+        var serialized; 
+        $.get('/article/' + article_id + '/highlight-storage', function(data) {
+          serialized = data['SerializedHighlights']
+          hltr.deserializeHighlights(serialized);
+          $('[data-toggle="popover"]').popover()
+        
+        });
+        
+        $( window ).on( "load", function() { 
+          var progress; 
+          var $window = $(window);
+
+          var h = document.documentElement, 
+          b = document.body,
+          st = 'scrollTop',
+          sh = 'scrollHeight';
+
+          $.get('/article/' + article_id + '/progress', function(data) {
+            progress = data['Progress'];
+            console.log('progress')
+            console.log(progress)
+
+            var position = (progress / 100) * (h[sh] || b[sh])    
+            console.log('position')
+            console.log(position)      
+            $window.scrollTop(position);
+          });  
+
+          document.addEventListener("scroll", getScrollPercent);
+
+
+        });
+        
+
+        /* store scroll position 
+        hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
+        */
+        
+        var timer;
+
+        function getScrollPercent() {
+          
+          var h = document.documentElement, 
+          b = document.body,
+          st = 'scrollTop',
+          sh = 'scrollHeight';
+          
+          var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+
+
+          clearTimeout(timer)
+          timer = setTimeout(update_progress.bind(null, progress), 3000)
+        } 
+
+        function update_progress(progress){
+          console.log('updating progress');
+          $.post('/article/' + article_id + '/progress', {
+                'Progress': progress
+              });
+        }
 
     
 
 
-  function NewTopic(){
-    $('#CreateTopic').html(`
-      <br>
-      <form> 
-        <div class = "form-row align-items-center"> 
-          <div class="col-sm-6 my-1">
-            <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
-            </input>
+  </script>
+
+  <script>
+
+    function SubmitHighlight(){
+      $("#SubmitHighlightForm").ajaxSubmit({
+        url: '/article/addhighlight', 
+        type: 'post',
+        success: function(responseText){ AddedHighlight(responseText) },
+        error: function(){ FailedToAddHighlight() }
+      })
+    }
+
+    var returnedhighlightid;
+    var returnedhighlightclass;
+
+    function AddedHighlight(responseText){
+      
+      $('#AddHighlightModal').modal('hide');
+      
+      /* THIS RESETS THE SUBMIT HIGHLIGHT FORM */
+      document.getElementById('SubmitHighlightForm').reset()
+      var c = document.querySelectorAll('input[type="checkbox"]');
+      var count = c.length
+      console.log(c)
+      
+      for (var i = 0; i < c.length; i++){
+        if (c[i].parentNode.classList.contains('active')){
+          c[i].click()
+        }  
+      }
+      
+      /* END RESET */
+
+
+
+      selectedObj.removeAllRanges();
+      selectedObj.addRange(selectedText);
+      returnedhighlightclass = "highlight"+responseText['highlight_id']
+      returnedhighlightid = responseText['highlight_id']
+      hltr.enable();
+      hltr.doHighlight();
+      hltr.disable();
+      
+    }
+      
+    function FailedToAddHighlight(){
+      var node = document.createElement('span');
+      node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
+      document.body.appendChild(node);
+      //document.body.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
+    }
+
+
+      
+
+
+    function NewTopic(){
+      $('#CreateTopic').html(`
+        <br>
+        <form> 
+          <div class = "form-row align-items-center"> 
+            <div class="col-sm-6 my-1">
+              <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
+              </input>
+            </div> 
+            <div class="col-auto my-1"> 
+              <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
+            </div>  
+            <div class="col-auto my-1"> 
+              <button onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
+            </div> 
           </div> 
-          <div class="col-auto my-1"> 
-            <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
-          </div>  
-          <div class="col-auto my-1"> 
-            <button onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
-          </div> 
-        </div> 
-    </form>`);
-    $('#addtopicinput').trigger('focus');
+      </form>`);
+      $('#addtopicinput').trigger('focus');
+    }
+
+    
+    function NewTopicSubmit(){
+      $.post('/topics/add', {
+        title: $('#addtopicinput').val()
+      }).done(function(response) {
+          //$('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
+          $('#topicplaceholder').append(`
+            <label id="label${response['id']}" class="topic-label btn">
+              <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
+          `);
+
+          document.getElementById("label"+response['id']).click();
+
+          $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
+
+        }).fail(function() {
+          $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+      });
   }
-
-  
-  function NewTopicSubmit(){
-    $.post('/topics/add', {
-      title: $('#addtopicinput').val()
-    }).done(function(response) {
-        //$('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
-        $('#topicplaceholder').append(`
-          <label id="label${response['id']}" class="topic-label btn">
-            <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
-        `);
-
-        document.getElementById("label"+response['id']).click();
-
-        $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
-
-      }).fail(function() {
-        $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-    });
-}
 
 
   function CancelNewTopic(){
     $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>')
   }
-  
+    
 
   $(function() {
-    
+      
     $('[data-toggle="popover"]').popover()
           
   
@@ -383,7 +559,7 @@
       trigger: 'focus'
     });
 
-});
+  });
 
 </script>
 
