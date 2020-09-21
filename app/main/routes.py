@@ -341,6 +341,19 @@ def filter_articles():
     return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user, active_tags = active_tags)
 
 
+@bp.route('/article/preferences', methods=['POST','GET'])
+@login_required
+def reader_preferences():
+    if request.method == "POST":
+        current_user.preferences = request.form['Preferences']
+        db.session.commit()
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+    
+    if request.method == "GET":
+        preferences = json.loads(current_user.preferences)
+        
+        return jsonify({ 'Preferences': preferences })
+
     
 
 @bp.route('/article/<id>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
@@ -356,6 +369,11 @@ def article(id, highlight_id):
     content = article.content
     title = article.title
     progress=article.progress
+    serialized = json.dumps({'highlights': article.highlightedText})
+    print (serialized)
+
+
+
 
     addtopicform = AddTopicForm()
     
@@ -366,6 +384,13 @@ def article(id, highlight_id):
     
 
     form = AddHighlightForm()
+
+    preferences = json.loads(current_user.preferences)
+    size = preferences['size']
+    spacing= preferences['spacing']
+    color = preferences['color']
+    font = preferences['font']
+    
     
     if form.validate_on_submit():
         topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
@@ -378,8 +403,10 @@ def article(id, highlight_id):
         
         db.session.commit()
      
+    
 
-    return render_template('text.html',progress=progress, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+
+    return render_template('text.html', serialized = serialized, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])

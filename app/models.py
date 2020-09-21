@@ -11,6 +11,8 @@ from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+preferences = '{"font":"sans-serif","color":"light-mode","size":"4","spacing":"line-height-min"}'
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     goog_id = db.Column(db.String, unique=True, index=True)
@@ -20,12 +22,13 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     articles = db.relationship('Article', backref='user', lazy='dynamic')
     highlights = db.relationship('Highlight', backref ='user', lazy ='dynamic')
-    topics = db.relationship('Topic', backref = 'user', lazy = 'dynamic')
+    topics = db.relationship('Topic', backref =
+     'user', lazy = 'dynamic')
     tags = db.relationship('Tag', backref = 'user', lazy = 'dynamic')
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
-    preferences = db.Column(db.String, index=True)
+    preferences = db.Column(db.String, index=True, default = preferences)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -117,7 +120,7 @@ class Article(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
-    highlightedText = db.Column(db.String)
+    highlightedText = db.Column(db.String, default = '')
     tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
     progress = db.Column(db.Float, index=True, default = 0.0)
     done = db.Column(db.Boolean, default = False)

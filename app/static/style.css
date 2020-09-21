@@ -178,20 +178,36 @@ padding: 0 88px;
   position: fixed;
 }
 
+.action-button{
+  background: none;
+  border: none;
+  padding: 8px 16px;
+  margin-left: 16px;
+}
+
+.action-button:hover {
+  background: rgba(0,0,0, .5);
+  color: white;
+}
+
+
 /* type controls */
 
 #type-controls {
-  position: absolute;
-  top: 300px;
-  left: 300px;
-  width: 250px;
+  position: fixed;
   height: auto;
   padding: 16px 24px;
+  display:none;
+  top: 75px;
+  left: 80px;
+}
+
+#type-controls::after {
+  top: 4%;
 }
 
 .dark-control-mode::after {
 	right: 100%;
-	top: 6%;
 	border: solid transparent;
 	content: " ";
 	height: 0;
@@ -206,7 +222,6 @@ padding: 0 88px;
 
 .sepia-control-mode::after {
 	right: 100%;
-	top: 6%;
 	border: solid transparent;
 	content: " ";
 	height: 0;
@@ -220,7 +235,6 @@ padding: 0 88px;
 }
 .light-control-mode::after {
 	right: 100%;
-	top: 6%;
 	border: solid transparent;
 	content: " ";
 	height: 0;
@@ -255,6 +269,8 @@ padding: 0 88px;
 
 .type-controls-button{
   padding: 4px 12px;
+  margin-right: 8px;
+
 }
 
 label svg {
@@ -293,8 +309,6 @@ border: #FAB1A0 2px solid;
     color: white;
   fill: white;
 }
-
-
 
 .sepia-control-mode, .sepia-control-mode label svg{
    background-color: white;
@@ -419,6 +433,19 @@ border: #FAB1A0 2px solid;
 .size-15, .size-15 pre {
   font-size: 128px;
 }
+
+.line-height-min {
+  line-height: 1.5em;
+}
+
+.line-height-mid {
+  line-height: 2em;
+}
+
+.line-height-max {
+  line-height:2.5em;
+}
+
 
 /* end type controls*/
 
