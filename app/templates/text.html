@@ -6,8 +6,8 @@
 {% endblock %}
 
 {% block content %}
-<main class = "{{color}} " id="standard">
-      <div  id = "sidebar">
+<main class = "{{color}}" id="standard">
+      <div  class = "{{color}}" id = "sidebar">
         <button type="button" onclick ="show_controls()" id= "sidebar-action-button" class=" {{color}} action-button">Aa</button>
       </div>  
 
@@ -15,18 +15,20 @@
         <h1>{{ title|safe}}</h1>
 
         <h3>{{ author|safe}}</h3>
-        <hr>
-        {{ content|safe }}
+        <hr><div id="article_content">
+          {{ content|safe }}
+        </div>
+        
       </div>
 
       <!-- bottom-bar -->  
-      <div class = "col-12" id ="bottom-bar">
+      <div class = "{{color}}" id ="bottom-bar">
         <div class = "article-overview">
-          <p class = "small">{{title}}</p>
+          <p id = "overview-title" class = "small">{{title}}</p>
+          <p><button onclick ="show_controls()" id = "bottombar-action" class=" {{color}} action-button">Aa</button></p>
           <p class = "ml-auto small"><span id="overview-progress">{{progress|round|int}}</span>%</p>
         </div>
       
-        <button class="main-button action-button">Aa</button>
       </div>
 </main>
 
@@ -34,7 +36,9 @@
 
 
   <!-- tooltip-->
-  <button id="infoDiv" type ="button" data-toggle="popover" data-trigger="focus" onclick = "showaddhighlightmodal()" class="tooltipDiv btn btn-dark btn-sm" >
+
+
+  <button id="infoDiv" type ="button" data-toggle="popover" data-trigger="focus" onclick = "showaddhighlightmodal()" class="highlight-button main-button light-mode" >
     <span id ="addhighlight">Add Highlight</span>
   </button>
 <!--  type controls  -->
@@ -280,6 +284,8 @@ set_position();
 
   function update_progress(progress, article_id){
     console.log('updating progress');
+    byId('overview-progress').innerText = Math.round(progress);
+
     $.post('/article/' + {{article_id}} + '/progress', {
           'Progress': progress
         });
@@ -301,10 +307,11 @@ set_position();
   hltr = new TextHighlighter(sandbox, {
     enabled: false,
     onAfterHighlight: function (range, highlights) {
-        var serialized = hltr.serializeHighlights();
-
+        //var serialized = hltr.serializeHighlights();
+        var updated_content = byId('article_content').innerHTML
         $.post('/article/' + article_id + '/highlight-storage', {
-          'SerializedHighlights': serialized
+          //'SerializedHighlights': serialized
+          'updated_content': updated_content
         }).fail(function() {
           $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
         });
@@ -333,11 +340,12 @@ set_position();
     $('[data-toggle="popover"]').popover()
 
   });
-  */
+  
   
 
   serialized = {{serialized|safe}}  
   hltr.deserializeHighlights(serialized['highlights']);
+  */
   $('[data-toggle="popover"]').popover()
   
 
@@ -464,10 +472,13 @@ set_position();
   
   var size, size_input, increase, decrease, val, content, standard, controls, sidebar_button;
   
+  highlight_button = byId('infoDiv')
   sidebar_button = byId('sidebar-action-button')
   controls = byId('type-controls')
   standard = byId('standard')
   content = byId('content');
+  bottom = byId('bottom-bar')
+  bottom_button = byId('bottombar-action')
   size = byId('font-size-input');
   size_input = byId('font-size-value')
   increase = byId('increase-size')
@@ -476,6 +487,7 @@ set_position();
 
   content.addEventListener('click', function(){
     hide_controls();
+
   });
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -552,13 +564,11 @@ window.onscroll = function() {
   getScrollPercent()
   if (prevScrollpos > currentScrollPos) {
     sidebar_button.style.border='1px solid';
-    nav.style.display="flex"
     	
   } else {
     
 
     sidebar_button.style.border="none";
-    nav.style.display="none";
   }
   prevScrollpos = currentScrollPos;
 } 
@@ -571,7 +581,19 @@ window.onscroll = function() {
   function hide_controls(){
     console.log('hiding')
     controls.style.display="none"
+    //byId('infoDiv').style.display="none"
+
   }
+
+  /*
+  document.addEventListener('selectionchange', ()=> {
+    if (document.getSelection().empty || window.getSelection().empty) {
+      byId('infoDiv').style.display="none"
+    }
+
+  })
+*/
+
 
 
   function initialize_controls(){
@@ -657,10 +679,20 @@ window.onscroll = function() {
         
         var content = byId('content');
         var controls = byId('type-controls');
+        var sidebar = byId('sidebar')
         
         if (this.id == 'light-mode'){
           content.classList.remove('dark-mode', 'sepia-mode');
           content.classList.add('light-mode')
+
+
+          
+
+          sidebar.classList.remove('dark-mode', 'sepia-mode');
+          sidebar.classList.add('light-mode')
+
+          bottom.classList.remove('dark-mode', 'sepia-mode');
+          bottom.classList.add('light-mode')
 
           standard.classList.remove('dark-mode', 'sepia-mode');
           standard.classList.add('light-mode')
@@ -671,13 +703,27 @@ window.onscroll = function() {
           sidebar_button.classList.remove('dark-mode', 'sepia-mode');
           sidebar_button.classList.add('light-mode')
 
+          bottom_button.classList.remove('dark-mode', 'sepia-mode');
+          bottom_button.classList.add('light-mode')
+
         }
         else if (this.id == 'dark-mode'){
           content.classList.remove('light-mode', 'sepia-mode');
           content.classList.add('dark-mode')
 
+          
+          sidebar.classList.remove('light-mode', 'sepia-mode');
+          sidebar.classList.add('dark-mode')
+
+          bottom.classList.remove('light-mode', 'sepia-mode');
+          bottom.classList.add('dark-mode')
+
+
           sidebar_button.classList.remove('light-mode', 'sepia-mode');
           sidebar_button.classList.add('dark-mode')
+
+          bottom_button.classList.remove('light-mode', 'sepia-mode');
+          bottom_button.classList.add('dark-mode')
 
           standard.classList.remove('light-mode', 'sepia-mode');
           standard.classList.add('dark-mode')
@@ -690,8 +736,19 @@ window.onscroll = function() {
           content.classList.remove('dark-mode', 'light-mode');
           content.classList.add('sepia-mode')
 
+          
+
+          sidebar.classList.remove('dark-mode', 'light-mode');
+          sidebar.classList.add('sepia-mode')
+
+          bottom.classList.remove('dark-mode', 'light-mode');
+          bottom.classList.add('sepia-mode')
+
           sidebar_button.classList.remove('dark-mode', 'light-mode');
           sidebar_button.classList.add('sepia-mode')
+
+          bottom_button.classList.remove('dark-mode', 'light-mode');
+          bottom_button.classList.add('sepia-mode')
           
           standard.classList.remove('dark-mode', 'light-mode');
           standard.classList.add('sepia-mode')

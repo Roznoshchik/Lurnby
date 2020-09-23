@@ -369,11 +369,7 @@ def article(id, highlight_id):
     content = article.content
     title = article.title
     progress=article.progress
-    serialized = json.dumps({'highlights': article.highlightedText})
-    print (serialized)
-
-
-
+    #serialized = json.dumps({'highlights': article.highlightedText})
 
     addtopicform = AddTopicForm()
     
@@ -406,7 +402,7 @@ def article(id, highlight_id):
     
 
 
-    return render_template('text.html', serialized = serialized, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+    return render_template('text.html', progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
@@ -424,7 +420,8 @@ def storeHighlights(id):
             return json.dumps({'success':False}), 403, {'ContentType':'application/json'}  
 
     if request.method == "POST":
-        article.highlightedText = request.form['SerializedHighlights']
+        #article.highlightedText = request.form['SerializedHighlights']
+        article.content = request.form['updated_content']
         db.session.commit()
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
 
