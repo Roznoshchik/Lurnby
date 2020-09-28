@@ -7,7 +7,172 @@
 {% block content %}
 
 
-<div class="container-fluid pt-3 <!--pushdown-->">
+{% if user.highlights.count() == 0 %}
+<div id = "topics_page">
+    <div class="main-section lurnby-empty-row">
+        <div class=" lurnby-empty-col col text-center">
+        
+            <!--  Todo   -->
+
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+{% if user.highlights.count() >= 1 %}
+<div id = "topics_page">
+    <div id="overview" class = "main-section row">
+    
+        <div id = "statistics" class ="main-col col-sm-12 col-lg-4">
+            <div class = "heading">
+                <h6 class = "label">Your work in progress</h6>
+            </div>
+    
+            <div class = "col data">
+                {% if user.articles.count() == 1%}
+                    <div class = "data-item">
+                        <p>{{user.articles.count()}} article added</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{user.articles.count()}} articles added</p>
+                    </div>
+                {% endif %}
+    
+                {% if user.tags.count() == 1 %}
+                    <div class = "data-item">
+                        <p>{{user.tags.count()}} tag </p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{user.tags.count()}} tags </p>
+                    </div>
+                {% endif %}
+    
+                {% if user.highlights.count() == 1 %}
+                    <div class = "data-item">
+                        <p>{{user.highlights.count()}} highlight</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{user.highlights.count()}} highlights</p>
+                    </div>
+                {% endif %}
+    
+                {% if user.topics.count() == 1 %}
+                    <div class = "data-item">
+                        <p>{{user.topics.count()}} topic</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{user.topics.count()}} topics</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div id = "topics_all" class = "main-section">
+        <div class = "heading row">
+            <div class = "">
+                <h6>Topics</h6>
+                <button class="main-button cancel" onclick="AddTopicStart()">Add new</button>
+    
+            </div>
+
+            {% if user.tags.count() > 0 %}
+                <!-- Filters   -->
+                <div class = "filter-col">
+                    <div id = "filter" class = "main-col filter">
+                        <div class = "dropdown">
+                            <button class="filter-dropdown main-button " type="button" id="dropdownMenuButton" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                                Filter <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-caret-down-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-menu">
+                                <form >
+                                    <div class = "tags">
+                                        {% for tag in user.tags.all() %}
+                                        <label for= "tag{{tag.id}}" class = "filter-tag untagged">{{tag.name}}<input type="checkbox" id = "tag{{tag.id}}" name = "tags" checked value="{{tag.id}}"></input></label>
+                                        {% endfor %}
+                                    </div>
+                                    
+                                    <br>
+                                    <button type="button" class="main-button save"  data-dismiss="modal" onclick="filter()">apply filter</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id = "active_filters">
+                        {% for tag in active_tags %}
+                            <span class = "active-tags">{{tag.name}}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <!-- End Filters   -->
+            {% endif %} 
+           
+        </div>
+        <hr>
+        <div class = "scroll-x"> 
+            <div class = "topic-column">
+                <div class="heading">
+                    <h4>Title</h4>
+                    <p>{{notopics|length}} highlights</p>
+                    <a class = "main-button edit" type="button" onclick = "EditTopic()"href="#">Details</a>
+                </div>
+                <div class="underline"></div>
+
+                <div class = "scroll-y">
+                    {% for highlight in notopics %}
+                        <div class = "highlight-card">
+                            {% if highlight.text|length > 200 %}
+                            <p>{{'%.200s' % highlight.text}} ...</p>
+                            {% else %}
+                            <p>{{ highlight.text}}</p>
+                            {% endif %}
+                        
+                            <div class = "open">        
+                                <a class = "main-button" type="button" onclick = "ViewHighlight({{highlight.id}})"href="#">Details</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="spacer"></div>
+                </div>
+            </div>
+            
+            {% for topic in topics %}
+            <div class = "topic-column">
+                <div class="heading">
+                    <h4>{{topic.title}}</h4>
+                    <p>{{topic.highlights.count()}} highlights</p>
+                    <a class = "main-button edit" type="button" onclick = "EditTopic()"href="#">Details</a>
+                </div>
+                <div class="underline"></div>
+
+                <div class = "scroll-y">
+                    {% for highlight in highlights %}
+                    {% if topic.is_added_highlight(highlight) %}
+                    {% endif %}
+                    {% endfor %}
+                    <div class="spacer"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true"> 
+        </div>
+
+
+
+<!--   old topics page -->
+
+<!--    
+<div class="container-fluid pt-3">
     <h3 class="font-weight-light text-dark">Topics</h3>
     <div class="small  text-dark">These are all your current topics, not sure what to put here. </div>
     <div class="row flex-row flex-sm-nowrap py-3">
@@ -86,7 +251,9 @@
                 </div>
             </div>
             {% endfor %}
-            <!--  Add Topic Button   -->
+
+
+            ---> <!--  Add Topic Button   --> <!--  
             <div class="col-sm-6 col-md-6 col-xl-3 topics-col align-top" id="addtopicheader">
                 <div class="card bg-light">
                     <span id ="add-topic-destination">
@@ -99,17 +266,16 @@
     </div>
 </div>
 
-<!-- view Highlight Modal-->
+--> <!-- view Highlight Modal--><!-- 
 
 
 
-<div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true"> 
-</div>
 
 
-<!-- end view Highlight Modal-->
 
+--> <!-- end view Highlight Modal--> 
 
+{% endif %}
 {% endblock%}
 
 {% block JS %}

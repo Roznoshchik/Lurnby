@@ -691,7 +691,7 @@ def topics():
         #return render_template('topics.html', form=form, topics=topics)
         return redirect(url_for('main.topics'))
 
-    return render_template('topics.html', form=form,form2=form2, highlights = highlights, notopics=notopics, topics=topics)
+    return render_template('topics.html',user=current_user, form=form,form2=form2, highlights = highlights, notopics=notopics, topics=topics)
 
 
 @bp.route('/topics/add', methods=['POST'])

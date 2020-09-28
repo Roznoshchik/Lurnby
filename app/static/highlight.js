@@ -35,6 +35,17 @@ else{
 //test code
 
 function textActions(event) {
+
+  
+  var h = document.documentElement, 
+  b = document.body,
+  st = 'scrollTop',
+  sh = 'scrollHeight';
+  
+  position =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+
+
+
   selectedObj = window.getSelection();
  
   var x = selectedObj.toString().length

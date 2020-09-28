@@ -7,11 +7,13 @@ body, #base-main {
 
 
 
-.articles-empty-row {
+.articles-empty-row,
+.lurnby-empty-row {
   display: flex;
   justify-content: center;
 }
 
+.lurnby-empty-col,
 .articles-empty-col {
   margin-top: 32px; 
   background: white;
@@ -20,6 +22,7 @@ body, #base-main {
 }
 
 @media(min-width:768px){
+  .lurnby-empty-col,
   .articles-empty-col{
     max-width: 450px;
     padding: 48px;
@@ -629,6 +632,8 @@ background: #fab1a0;
 
 
 
+
+
 @media(min-width:375px){
 
 
@@ -864,7 +869,7 @@ background: #fab1a0;
       border: none;
       border-bottom: #424242 1px solid;
       border-radius: 0;
-      font-size:0.8rem;
+      font-size:16px;
     }
   
     .lurnby_modal textarea,
@@ -942,12 +947,77 @@ background: #fab1a0;
     .article_card, #open{
       width: 300px;
     }
+
+    .lurnby_modal input,
+   #edit_article input,
+   #add_article input,
+   .main-form input{
+      border: none;
+      border-bottom: #424242 1px solid;
+      border-radius: 0;
+      font-size:0.8rem;
+    }
+
   }
     
   
 
 /* articles page styles end */
 
+
+/* topics page styles  */
+
+
+.scroll-x {
+  width: auto;
+  display: flex;  
+  overflow-y: hidden;
+  overflow-x: auto;
+  justify-content: space-between;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scroll-x::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-y{
+  overflow-y: auto;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  height: 100%;
+  margin-bottom: 32px;
+}
+
+.scroll-y::-webkit-scrollbar {
+  display: none;
+}
+.spacer{
+  height: 60px;
+}
+
+
+
+.topic-column {
+  background: white;
+  min-width: 300px;
+  max-height:600px;
+  padding: 16px 8px;
+  margin-right: 32px;
+}
+
+ 
+
+
+.highlight-card{
+  height: auto;
+  padding: 8px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* topics page styles end*/
 
 
 
