@@ -239,7 +239,7 @@ class Highlight(db.Model):
         sub = db.session.query(Topic.id).outerjoin(
             highlights_topics, highlights_topics.c.topic_id == Topic.id).filter(
                 highlights_topics.c.highlight_id==self.id)
-        q = db.session.query(Topic).filter(~Topic.id.in_(sub)).filter_by(user_id=user.id).all()
+        q = db.session.query(Topic).filter(~Topic.id.in_(sub)).filter_by(user_id=user.id, archived=False).all()
             
         return q
 

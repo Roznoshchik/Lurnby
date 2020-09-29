@@ -1,12 +1,4 @@
 
-const byId = function(id){
-    return document.getElementById(id);
-};
-
-const byClass = function(classname){
-return document.getElementsByClassName(classname);
-};
-
 document.addEventListener("DOMContentLoaded", initialize());
 
 
@@ -287,11 +279,10 @@ function edit_article(){
 
 }
 
+
 var add;
 
 function initialize(){
-
-    
 
     var tagged =  byClass('tagged');
     var untagged = byClass('untagged');

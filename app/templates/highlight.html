@@ -58,7 +58,7 @@
           <br>
           <span id="Members" class="topics-group" data-toggle="buttons">
             {% for m in member %}
-            <label class="btn active topic-label" onclick="RemoveFromTopic('topic{{ m.id }}', '{{ m.title }}')"
+            <label class="btn active topic-label" onclick='RemoveFromTopic("topic{{ m.id }}", "{{m.title}}")'
               id="topic{{ m.id }}">
               <span><input name="members" type="checkbox" checked value="{{m.title}}">
                 {{m.title}}
@@ -67,7 +67,7 @@
           </span>
           <span id="NonMembers" class="topics-group" data-toggle="buttons">
             {% for n in nonmember %}
-            <label class="btn topic-label" onclick="AddToTopic('topic{{ n.id }}', '{{n.title}}')" id="topic{{ n.id }}">
+            <label class="btn topic-label" onclick='AddToTopic("topic{{ n.id }}", "{{n.title}}")' id="topic{{ n.id }}">
               <span><input name="nonmembers" type="checkbox" checked value="{{n.title}}">
                 {{n.title}}
               </span></label>
@@ -79,17 +79,17 @@
 
           <h6 class="inline-block">Tags:</h6>
           <span class="inline-button" id="add_new_tag">
-            <button type = "button" onclick="add_tag_start()" class="main-button add_new">Add New</button>
+            <button type = "button" onclick="add_tag_start('update-highlight')" class="main-button add_new">Add New</button>
           </span><br>
 
           <span id="tags">
             <span id="new_tags"></span>
             {% for tag in highlight.tags %}
-            <label class="tagged">{{tag.name}}<input type="checkbox" name="tag" checked
-                value="{{tag.name}}"></input></label>
+            <label class="tagged update-highlight"><input type="checkbox" name="tags" checked
+                value="{{tag.name}}"></input>{{tag.name}}</label>
             {% endfor %}
             {% for tag in highlight.not_in_tags(current_user) %}
-            <label class="untagged">{{tag.name}}<input type="checkbox" name="untag" checked value="{{tag.name}}"></input></label>
+            <label class="untagged update-highlight"><input type="checkbox" name="untags" checked value="{{tag.name}}"></input>{{tag.name}}</label>
             {% endfor %}
           </span>
         </div>

@@ -375,7 +375,7 @@ def article(id, highlight_id):
     
     if highlight_id != "none":
         highlight = Highlight.query.filter_by(id = highlight_id).first()
-        article.progress = highlight.position
+        progress = highlight.position
         db.session.commit()
     
 
@@ -577,7 +577,7 @@ def view_highlight(id):
     addtopicform = AddTopicForm()
     form = AddHighlightForm()
     
-    member = highlight.topics.filter_by(user_id=current_user.id).all()
+    member = highlight.topics.filter_by(user_id=current_user.id, archived=False).all()
     nonmember = highlight.not_in_topics(current_user)
     
     source = article.source
@@ -599,37 +599,44 @@ def view_highlight(id):
 
 
     if request.method == 'POST':
-        highlight.text = request.form['text']
-        highlight.note = request.form['note']
 
-        members = request.form.getlist('members')
-        print(members)
+        data = json.loads(request.form['data'])
+
+
+        highlight.text = data['highlight']
+        highlight.note = data['notes']
+
+        members = data['topics']
         for member in members:
             topic = Topic.query.filter_by(title=member).first()
             highlight.AddToTopic(topic)
         
 
-        nonmembers = request.form.getlist('nonmembers')
+        nonmembers = data['untopics']
         for nonmember in nonmembers:
             topic = Topic.query.filter_by(title=nonmember).first()
             highlight.RemoveFromTopic(topic)
 
-        tags = request.form.getlist('tag')
+        tags = data['tags']
+       
+      
         for tag in tags:
             t = Tag.query.filter_by(name=tag).first()
+            if not t:
+                t = Tag(name=tag, archived=False, user_id=current_user.id)
+                db.session.add(t)
+
             highlight.AddToTag(t)
 
-        untags = request.form.getlist('untag')
+
+        untags = data['untags']
         for tag in untags:
             t = Tag.query.filter_by(name=tag).first()
             highlight.RemoveFromTag(t)
 
-
-
-
         db.session.commit()
-        return redirect(url_for('main.topics'))
-
+        #return redirect(url_for('main.topics'))
+        return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
 
 @bp.route('/archivehighlight/<id>')
 @login_required

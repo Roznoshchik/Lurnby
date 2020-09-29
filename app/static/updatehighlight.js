@@ -1,8 +1,4 @@
 
-const byId = function(id){
-    return document.getElementById(id);
-};
-
 var add_span;
 var add;
 
@@ -40,6 +36,9 @@ function UpdateNewTopic(){
 
   function UpdateNewTopicSubmit(){
     $.post('/topics/add', {
+        
+
+
       title: $('#UpdateAddTopicInput').val()
     }).done(function(response) {
         add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
@@ -53,123 +52,24 @@ function UpdateNewTopic(){
 
 
 
-function add_tag_start(){
-   
-
-    add.innerHTML = `
-        <button type="submit" disabled style="display: none" aria-hidden="true"></button>
-        <div class="form-row align-items-center">
-            <div class="col-auto">
-                <label class="sr-only" for="inlineFormInput">Name</label>
-                <input id = "add_tag_input" type="text" class="form-control mb-2" id="inlineFormInput" placeholder="Tag" required>
-                <input disabled style="display: none" aria-hidden="true"></input>
-
-            </div>
-            <div class="col-auto">
-                <button id = "submit_new_tag" type="button" onclick = "add_tag_finish()" class="main-button add-new">Add</button>
-                <button type="button" class="btn cancel mb-2" onclick="add_tag_cancel()">Cancel</button>
-            </div>
-        </div>
-    `;
-    var input = document.getElementById('add_tag_input');
-    input.focus();
-    // Execute a function when the user releases a key on the keyboard
-    input.addEventListener("keyup", function(event) {
-        // Number 13 is the "Enter" key on the keyboard
-        if (event.keyCode === 13) {
-            // Cancel the default action, if needed
-            event.preventDefault();
-            // Trigger the button element with a click
-            document.getElementById("submit_new_tag").click();
-        }
-    }); 
-
-
-}
-
-function add_tag_cancel(){
-    
-
-    add.innerHTML = `
-    <button id="add_new_button" onclick = "add_tag_start()" class = "main-button add_new">Add New</button>
-    `;
-}
-
-
-
-function add_tag_finish(){
-    var new_tag = document.getElementById('add_tag_input').value;
-
-    if (new_tag == ''){
-        byId('add_tag_input').classList.add('is-invalid')
-        return;
-    }
-
-    add.innerHTML = `
-    <button id="add_new_button" onclick = "add_tag_start()" class = "main-button add_new">Add New</button>
-    `;
-
-    var new_label = document.createElement('label');
-    new_label.innerHTML = new_tag;
-    new_label.classList.add('tagged');
-
-
-    var new_input = document.createElement('input');
-    new_input.name = "tags";
-    new_input.value = new_tag;
-    new_input.type = "checkbox";
-    new_input.checked = true;
-
-    new_label.appendChild(new_input);
-
-    new_label.addEventListener("click", function(e) {
-        e=e || window.event;
-        var target = e.target || e.srcElement;
-
-        
-            if (target.tagName === 'LABEL'){
-                console.log("target = label")
-
-                if (target.classList.contains('tagged')){
-                    target.classList.remove('tagged');
-                    target.classList.add('untagged')
-                }
-                else{
-                    target.classList.remove('untagged');
-                    target.classList.add('tagged')
-                }
-            }
-            
-    });
-
-    
-
-    document.getElementById('new_tags').appendChild(new_label);
-
-    
-}
-
-
 
 
 function RemoveFromTopic(id, title){
-    newId = '"' + id + '"'
-    newTitle = '"' + title + '"'
+    //newId = '"' + id + '"'
+    //newTitle = '"' + title + '"'
     
+    newId = `"${id}"`
+    newTitle = `"${title}"`   
     var nonmembers = document.getElementById('NonMembers')
     var removeMember = document.getElementById(id)
-    
     var newLabel = document.createElement('label')
     newLabel.setAttribute('id', id)
     newLabel.classList.add('topic-label', 'btn')
-    newLabel.setAttribute('onclick', 'AddToTopic(' + newId + ',' + newTitle + ')')
-    
+    newLabel.setAttribute('onclick', `AddToTopic(${newId}, ${newTitle})`)
     var newSpan = document.createElement('span')
     newSpan.innerHTML = '<input name = "nonmembers" type="checkbox" checked value="' + title + '">' + title
-    
     newLabel.append(newSpan)
     nonmembers.append(newLabel)
-    
     removeMember.parentNode.removeChild(removeMember);
 }
     
@@ -204,22 +104,22 @@ function ViewHighlight(id){
 
 
     xhr = $.ajax(
-                        '/view_highlight/' + id).done(
-                            function(data) {
-                                xhr = null
-                                $('#ViewHighlightModal').html(data);
-                                add_span = byId('new-topic');
-                                add = byId('add_new_tag');
-
-                            }
-                        );
-                
+                '/view_highlight/' + id).done(
+                    function(data) {
+                        xhr = null
+                        $('#ViewHighlightModal').html(data);
+                        add_span = byId('new-topic');
+                        add = byId('add_new_tag');
+                        initialize();
+                        $('#ViewHighlightModal').modal('toggle')
+                    }
+    );
+        
+   
+            
+   
     
-    $('#ViewHighlightModal').modal('toggle')
-    
-    const byId = function(id){
-        return document.getElementById(id);
-    };
+  
     
     
 
@@ -230,7 +130,63 @@ function ViewHighlight(id){
 function UpdateHighlight(id){
 
     $('#ViewHighlightModal').modal('hide')
+    var doc_tags,tags,untags, doc_topics, topics, doc_untopics, untopics, notes, highlight
+    
+    notes = byId('message-text').value
+    highlight = byId('HighlightField').value
+    
+    doc_tags= byClass('update-highlight')
+    tags=[]
+    untags=[]
+    for (var i = 0; i <doc_tags.length; i++){
+        if(doc_tags[i].classList.contains('tagged')){
+            tags.push(doc_tags[i].firstElementChild.value);
+        }
+        else {
+            untags.push(doc_tags[i].firstElementChild.value);
+        }
+    }
 
+
+    doc_topics = document.getElementsByName('members')
+    doc_untopics = document.getElementsByName('nonmembers')
+    topics=[]
+    untopics=[]
+
+    for (var i = 0; i <doc_topics.length; i++){
+        topics.push(doc_topics[i].value);
+    }
+
+    for (var i = 0; i <doc_untopics.length; i++){
+        untopics.push(doc_untopics[i].value);
+    }
+
+    data = {
+        'notes': notes,
+        'highlight':highlight,
+        'topics':topics,
+        'untopics':untopics,
+        'tags':tags,
+        'untags':untags
+    }
+
+    data = JSON.stringify(data)
+    url = '/view_highlight/' + id
+
+    $.post(url, {
+        'data':data
+    }).done(function( data ) {
+        console.log(data)
+    }); 
+
+
+
+
+    console.log(data)
+
+
+
+    /*
     $("#UpdateHighlightForm").ajaxSubmit({
         url: '/view_highlight/' + id, 
         type: 'post',
@@ -245,7 +201,7 @@ function UpdateHighlight(id){
         },
         //error: function(){ FailedToAddHighlight() }
     });
-    
+    */    
 
 }
 
