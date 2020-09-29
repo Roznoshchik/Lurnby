@@ -633,10 +633,31 @@ def view_highlight(id):
         for tag in untags:
             t = Tag.query.filter_by(name=tag).first()
             highlight.RemoveFromTag(t)
-
+        
         db.session.commit()
+
+        if (data['topics-page'] == 'true'):
+            topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+            highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+            notopics = []
+                
+            for highlight in highlights:
+                if highlight.not_added_topic():
+                    notopics.append(highlight)
+
+            active_topics = []
+            active_tags = []
+
+            filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+
+            
+            return render_template('topics_all.html', active_tags=active_tags, active_topics=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
+        
+
         #return redirect(url_for('main.topics'))
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+
+
 
 @bp.route('/archivehighlight/<id>')
 @login_required
@@ -669,6 +690,8 @@ def unarchivehighlight(id):
 @bp.route('/topics', methods=['GET', 'POST'])
 @login_required
 def topics():
+    
+    filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id).all()
     highlights = Highlight.query.filter_by(user_id=current_user.id, archived=False).all()
 
@@ -698,7 +721,7 @@ def topics():
         #return render_template('topics.html', form=form, topics=topics)
         return redirect(url_for('main.topics'))
 
-    return render_template('topics.html',user=current_user, form=form,form2=form2, highlights = highlights, notopics=notopics, topics=topics)
+    return render_template('topics.html',user=current_user, form=form,form2=form2, highlights = highlights, notopics=notopics,filter_topics=filter_topics, topics=topics)
 
 
 @bp.route('/topics/add', methods=['POST'])
@@ -707,16 +730,89 @@ def add_new_topic():
 
     newtopic = Topic.query.filter_by(title=request.form['title'].lower()).first()
     if newtopic is not None:
-        return  render_template('errors/404.html'), 404
+        filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+        topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+        highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+        notopics = []
+            
+        for highlight in highlights:
+            if highlight.not_added_topic():
+                notopics.append(highlight)
+        return  render_template('topics_all.html', user = current_user, topics=topics, filter_topics=filter_topics, highlights=highlights,notopics=notopics), 404
     
     newtopic = Topic(title=request.form['title'].lower(), user_id=current_user.id, archived=False)
     db.session.add(newtopic)
     db.session.commit()
 
+    """
     return jsonify({
         'title': newtopic.title,
         'id': newtopic.id
     })
+    """
+    filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+    topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+    highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+    notopics = []
+        
+    for highlight in highlights:
+        if highlight.not_added_topic():
+            notopics.append(highlight)
+
+    return render_template('topics_all.html', user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
+
+@bp.route('/topics/filter', methods=['POST'])
+@login_required
+def filter_topics():
+    data = json.loads(request.form['data'])
+    tag_ids = data['tags']
+    topic_ids = data['topics']
+    active_tags = []
+    active_topics = []
+    highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+    
+    if tag_ids == [] and topic_ids == []:
+        filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+        topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+        highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+        notopics = []
+            
+        for highlight in highlights:
+            if highlight.not_added_topic():
+                notopics.append(highlight)
+
+
+        return render_template('topics_all.html', active_tags=active_tags, active_topcs=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
+
+    if tag_ids != []:
+        active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+
+        highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).join(tags_highlights, (tags_highlights.c.highlight_id == Highlight.id))
+        highlights = highlights.filter(tags_highlights.c.tag_id.in_(tag_ids)).all()
+    else:
+        highlights = Highlight.query.filter_by(user_id = current_user.id, archived=False).all()
+
+
+    if topic_ids != []:
+        active_topics = Topic.query.filter(Topic.id.in_(topic_ids)).all()
+
+        topics = Topic.query.filter_by(archived=False, user_id = current_user.id)
+        topics = topics.filter(Topic.id.in_(topic_ids)).all()
+    else:
+        topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+
+    notopics = []
+        
+    for highlight in highlights:
+        if highlight.not_added_topic():
+            notopics.append(highlight)
+
+    filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
+
+
+    return render_template('topics_all.html', active_tags=active_tags, active_topcs=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
+
+   
    
 
 

@@ -1,5 +1,21 @@
 /* regular styles */
 
+.loading {
+  display: flex;
+  flex-wrap: wrap;
+  height: 100%;
+  text-align: center;
+  justify-content: center;
+  align-content: center;
+  padding-top: 80px;
+}
+
+.loading p {
+  color: #424242;
+  width: 100%;
+}
+
+
 body, #base-main {
   padding: 0;
 
@@ -92,12 +108,36 @@ body, #base-main {
 
 /* filter styles */
 
+.filter-dropdown svg {
+  pointer-events: none;
+}
+
 .filter-col {
   margin-top:8px;
   width: 100%;
 }
 
+.apply-filter {
+  width: 100%;
+  text-align: right;
+}
 
+.filter-topic.tagged {
+  background: #FAB1A0;
+}
+
+.filter-topic.untagged:hover {
+    background: #FAB1A0;
+
+}
+
+.tags .heading {
+  margin-bottom: 0;
+}
+
+.tags {
+  margin-bottom: 16px;
+}
 
 .filter input[type=checkbox]{
     width: 0.1px;
@@ -495,6 +535,10 @@ border: #FAB1A0 2px solid;
   background: #F9F7F4;
 }
 
+.topic-label *{
+  pointer-events: none;
+}
+
 .topic-label.active {
 background: #fab1a0;
 }
@@ -600,6 +644,10 @@ background: #fab1a0;
   margin-bottom: 16px;
   align-items: flex-start;
   
+}
+
+.heading *{
+  word-break: break-all
 }
 
 .subheading{
@@ -897,6 +945,18 @@ background: #fab1a0;
   margin-bottom: 16px;
 }
 
+.lurnby-text-input {
+  background: none;
+  border: none;
+  border-bottom: #424242 2px solid;
+  margin-left: 16px;
+}
+
+.lurnby-text-input.is-invalid {
+  background: #FFBEC3;
+}
+
+
 
   #add_from {
     width: 100%;
@@ -978,7 +1038,7 @@ background: #fab1a0;
   display: flex;  
   overflow-y: hidden;
   overflow-x: auto;
-  justify-content: space-between;
+  justify-content: flex-start;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
@@ -1007,6 +1067,7 @@ background: #fab1a0;
 .topic-column {
   background: white;
   min-width: 300px;
+  max-width: 300px;
   max-height:600px;
   padding: 16px 8px;
   margin-right: 32px;

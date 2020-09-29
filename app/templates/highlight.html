@@ -36,14 +36,14 @@
         <div class="lurnby_data_group">
           <h6>Highlight</h6>
           <div class="form-group">
-            {{ form.text(class="form-control", id="HighlightField") }}
+            {{ form.text(class="form-control", id="view_highlight_text") }}
           </div>
         </div>
 
         <div class="lurnby_data_group">
           <h6>Notes</h6>
           <div class="form-group">
-            {{ form.note(class="form-control", id="message-text") }}
+            {{ form.note(class="form-control", id="view_highlight_notes") }}
           </div>
 
         </div>
@@ -56,23 +56,21 @@
             </button>
           </span>
           <br>
-          <span id="Members" class="topics-group" data-toggle="buttons">
+          <span id="Members" class="topics-group">
             {% for m in member %}
-            <label class="btn active topic-label" onclick='RemoveFromTopic("topic{{ m.id }}", "{{m.title}}")'
-              id="topic{{ m.id }}">
-              <span><input name="members" type="checkbox" checked value="{{m.title}}">
+            <label class="btn active topic-label" id="topic{{ m.id }}">
+              <input name="members" type="checkbox" checked value="{{m.title}}">
                 {{m.title}}
-              </span></label>
+              </label>
             {% endfor %}
-          </span>
-          <span id="NonMembers" class="topics-group" data-toggle="buttons">
             {% for n in nonmember %}
-            <label class="btn topic-label" onclick='AddToTopic("topic{{ n.id }}", "{{n.title}}")' id="topic{{ n.id }}">
-              <span><input name="nonmembers" type="checkbox" checked value="{{n.title}}">
+            <label class="btn topic-label" id="topic{{ n.id }}">
+              <input name="nonmembers" type="checkbox" checked value="{{n.title}}">
                 {{n.title}}
-              </span></label>
+              </label>
             {% endfor %}
           </span>
+         
         </div>
 
         <div class="lurnby_data_group article_data_group">

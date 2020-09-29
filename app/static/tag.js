@@ -1,7 +1,7 @@
 var add;
 
 function initialize(){
-
+    console.log('initializing')
     var tagged =  byClass('tagged');
     var untagged = byClass('untagged');
     add = byId('add_new_tag');
@@ -13,7 +13,7 @@ function initialize(){
 
             
             if (target.tagName === 'LABEL'){
-                console.log("target = label")
+                //console.log("target = label")
 
                 if (target.classList.contains('tagged')){
                     target.classList.remove('tagged');

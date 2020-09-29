@@ -11,9 +11,11 @@
 <div id = "topics_page">
     <div class="main-section lurnby-empty-row">
         <div class=" lurnby-empty-col col text-center">
-        
-            <!--  Todo   -->
-
+            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+            <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">You don't have any highlights yet!</h1>
+            <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
+                <a href = "{{url_for('main.articles')}}" class="main-button articles-empty-cta add-new">Start by reading an article.</a>
         </div>
     </div>
 </div>
@@ -60,13 +62,13 @@
                     </div>
                 {% endif %}
     
-                {% if user.topics.count() == 1 %}
+                {% if topics|length == 1 %}
                     <div class = "data-item">
-                        <p>{{user.topics.count()}} topic</p>
+                        <p>{{topics|length}} topic</p>
                     </div>
                 {% else %}
                     <div class = "data-item">
-                        <p>{{user.topics.count()}} topics</p>
+                        <p>{{topics|length}} topics</p>
                     </div>
                 {% endif %}
             </div>
@@ -76,12 +78,16 @@
     <div id = "topics_all" class = "main-section">
         <div class = "heading row">
             <div class = "">
-                <h6>Topics</h6>
-                <button class="main-button cancel" onclick="AddTopicStart()">Add new</button>
+                {% if topics | length == 1 %}
+                <h6>1 Topic</h6>
+                {% else %}
+                <h6>{{topics | length }} Topics</h6>
+                {% endif %}
+                <span id="add-topic-destination"><button type = "button" class="main-button cancel" onclick="AddTopicStart()">Add new</button></span>
     
             </div>
 
-            {% if user.tags.count() > 0 %}
+            {% if filter_topics|length > 0 or user.tags.count() > 0 %}
                 <!-- Filters   -->
                 <div class = "filter-col">
                     <div id = "filter" class = "main-col filter">
@@ -93,14 +99,32 @@
                             </button>
                             <div class="dropdown-menu">
                                 <form >
-                                    <div class = "tags">
+                                    {% if user.tags.count() > 0 %}
+                                    <div class = "tags filter-col">
+                                        <div class="heading">
+                                            <h4>Filter highlights by tag:</h4>
+                                        </div>
                                         {% for tag in user.tags.all() %}
                                         <label for= "tag{{tag.id}}" class = "filter-tag untagged">{{tag.name}}<input type="checkbox" id = "tag{{tag.id}}" name = "tags" checked value="{{tag.id}}"></input></label>
                                         {% endfor %}
                                     </div>
+                                    {% endif %}
+
+                                    {% if filter_topics|length > 0 %}
+                                    <div class = "tags filter-col">
+                                        <div class="heading">
+                                            <h4>Filter topics</h4>
+                                        </div>
+                                        {% for topic in filter_topics %}
+                                        <label for= "topic{{topic.id}}" class = "filter-topic untagged">{{topic.title}}<input type="checkbox" id = "topic{{topic.id}}" name = "topics" checked value="{{topic.id}}"></input></label>
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
                                     
                                     <br>
-                                    <button type="button" class="main-button save"  data-dismiss="modal" onclick="filter()">apply filter</button>
+                                    <div class="apply-filter">
+                                        <button type="button" class="main-button save"  data-dismiss="modal" onclick="filter()">apply filter</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -117,6 +141,7 @@
         </div>
         <hr>
         <div class = "scroll-x"> 
+            {% if notopics|length >= 1 %}
             <div class = "topic-column">
                 <div class="heading">
                     <h4>Highlights without topics</h4>
@@ -146,6 +171,7 @@
                     <div class="spacer"></div>
                 </div>
             </div>
+            {% endif %}
             
             {% for topic in topics %}
             <div class = "topic-column">
@@ -201,114 +227,9 @@
 
         <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true"> 
         </div>
-
-
-
-<!--   old topics page -->
-
-<!--    
-<div class="container-fluid pt-3">
-    <h3 class="font-weight-light text-dark">Topics</h3>
-    <div class="small  text-dark">These are all your current topics, not sure what to put here. </div>
-    <div class="row flex-row flex-sm-nowrap py-3">
-        <div class = "row flex-row flex-sm-nowrap py-3" id="topicmain">
-            <div class="col-sm-6 col-md-6 col-xl-3 topics-col">
-                <div class="card bg-light">
-                    <div class="card-header">
-                        <h6 class="card-title text-uppercase py-2">Not Added</h6>
-                    </div>
-                    <div class="card-body topics-col-base">
-                        <div class="items border border-light">
-                            {% for highlight in notopics %}
-                            <div class="card draggable shadow-sm" id="cd9" draggable="False" ondragstart="drag(event)">
-                                <div class="card-body p-2">
-                                    <div class="card-title">
-                                        <span aria-hidden="true"><svg class=" float-right bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                        </svg></span>
-                                        <span onclick="ViewHighlight({{highlight.id}})" class="text-primary highlight-title lead font-weight-light">Highlight:{{highlight.id}}</a>
-                                    </div>
-                                    <p>
-                                        {{highlight.text}}
-                                    </p>
-                                    <button onclick="ViewHighlight({{highlight.id}})" class="btn btn-primary btn-sm">View</button>
-                                </div>
-                            </div>
-                            <div class="dropzone rounded" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="clearDrop(event)"> &nbsp; </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            {% for topic in topics %}
-            <div class="col-sm-6 col-md-6 col-xl-3 topics-col">
-                <div class="card bg-light">
-                    <div class="card-header">
-                        <div class="dropdown">
-                            <button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu">
-                                <span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                </svg></span>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button">
-                                <h4 class="dropdown-header">Topic Actions</h4>
-                                <a class="dropdown-item" href="{{ url_for('main.archivetopic', topic_id = topic.id)}}">Archive topic</a>
-                                
-                            </div>
-                        </div>
-                        <h6 class="card-title text-uppercase py-2">{{topic.title}}</h6>
-                    </div>
-                    <div class="card-body topics-col-base">
-                        <div class="items border border-light">
-                            {% for highlight in highlights %}
-                            {% if topic.is_added_highlight(highlight) %}
-                            <div class="card draggable shadow-sm" id="cd9" draggable="False" ondragstart="drag(event)">
-                                <div class="card-body p-2">
-                                    <div class="card-title">
-                                        <span aria-hidden="true"><svg class=" float-right bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                                            <path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
-                                        </svg></span>
-                                        <span onclick="ViewHighlight({{highlight.id}})" class="text-primary highlight-title lead font-weight-light">Highlight:{{highlight.id}}</a>
-                                    </div>
-                                    <p>
-                                        {{highlight.text}}
-                                    </p>
-                                    <button onclick="ViewHighlight({{highlight.id}})" class="btn btn-primary btn-sm">View</button>
-                                </div>
-                            </div>
-                            <div class="dropzone rounded" ondrop="drop(event)" ondragover="allowDrop(event)" ondragleave="clearDrop(event)"> &nbsp; </div>
-                        
-                            {% endif %}
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-
-
-            ---> <!--  Add Topic Button   --> <!--  
-            <div class="col-sm-6 col-md-6 col-xl-3 topics-col align-top" id="addtopicheader">
-                <div class="card bg-light">
-                    <span id ="add-topic-destination">
-                        <span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span>
-                    </span>
-                </div>
-            </div>
-        </div>
-        
     </div>
 </div>
 
---> <!-- view Highlight Modal--><!-- 
-
-
-
-
-
-
---> <!-- end view Highlight Modal--> 
 
 {% endif %}
 {% endblock%}
@@ -316,81 +237,7 @@
 {% block JS %}
 <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
-
-
-
-<script>
-
-
-function AddTopicReset(){
-    $('#add-topic-destination').html('<span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span>')
-}
-
-function AddTopicStart(){
-    $('#add-topic-destination').html('<div id="addtopic"><div class="card-body"><form id = "NewTopicForm" action="" method="post" novalidate>{{ form.hidden_tag() }}<div class="form-group">{{ form.title(class="form-control", id ="addtopicinput", placeholder="Topic title...", required=true, autofocus=true)}}</div><button type="button" onclick = "AddTopicSubmit()" class="btn btn-primary">add</button><button type="button" class="close" onclick="AddTopicReset()"><span aria-hidden="true">&times;</span></button></form></div></div>')
-    $('#addtopicinput').focus()
-}
-
-
-var tempScrollLeft
-
-function AddTopicSubmit(){
-
-    tempScrollLeft = $('#topicmain').scrollLeft()
-
-    
-    if (!$('#addtopicinput').val())
-    {
-        $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Topic title can\'t be empty. <button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>');
-        
-    }
-    else
-    {
-   
-
-        $("#NewTopicForm").ajaxSubmit({
-        url: '/topics/add', 
-        type: 'post',
-        success: function(responseText){ AddedTopic(responseText) },
-        error: function(){ FailedToAddTopic() }
-
-        });
-    }
-}
-
-function makeDiv(Topic_id, Topic_title){
-
-    var string1 = '<div class="col-sm-6 col-md-6 col-xl-3"><div class="card bg-light"><div class="card-header"><div class="dropdown"><button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu"><span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg></span></button><div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button"><h4 class="dropdown-header">Topic Actions</h4><a class="dropdown-item" href="/archivetopic/'
-    var string2 = '">Archive topic</a></div></div><h6 class="card-title text-uppercase  py-2">'
-    var string3 = '</h6></div><div class="card-body"><div class="items border border-light"></div></div></div></div><div class="col-sm-6 col-md-6 col-xl-3 topics-col align-top" id="addtopicheader"><div class="card bg-light"><span id ="add-topic-destination"><span class="addtopicbutton" onclick = "AddTopicStart()"><span class="card-header add-topic"> + add a topic</span></span></span></div></div>'
-
-return (string1.concat(Topic_id, string2, Topic_title, string3) )
-
-}
-   
-
-function AddedTopic(responseText){
-    var element = document.getElementById('addtopicheader');
-    element.parentNode.removeChild(element);
-    var NewTopicId = responseText['id'];
-    var NewTopicTitle = responseText['title'];
-   
-    
-    var string = makeDiv(NewTopicId, NewTopicTitle);    
-
-    
-
-    $('#topicmain').append(string);
-    $('#topicmain').scrollLeft(tempScrollLeft)
-
-}
-
-function FailedToAddTopic(){
-    $('#addtopicinput').val('')
-        $('#flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "AddTopicStart()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-}
-
-</script>
+<script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
 
 
 {% endblock %}

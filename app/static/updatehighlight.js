@@ -36,8 +36,6 @@ function UpdateNewTopic(){
 
   function UpdateNewTopicSubmit(){
     $.post('/topics/add', {
-        
-
 
       title: $('#UpdateAddTopicInput').val()
     }).done(function(response) {
@@ -50,33 +48,33 @@ function UpdateNewTopic(){
 
 
 
-
-
-
-
+/*
 function RemoveFromTopic(id, title){
     //newId = '"' + id + '"'
     //newTitle = '"' + title + '"'
     
-    newId = `"${id}"`
-    newTitle = `"${title}"`   
-    var nonmembers = document.getElementById('NonMembers')
-    var removeMember = document.getElementById(id)
+    //newId = `"${id}"`
+    //newTitle = `"${title}"`   
+    var nonmembers = byId('NonMembers')
+    var removeMember = byId(id)
+
     var newLabel = document.createElement('label')
     newLabel.setAttribute('id', id)
     newLabel.classList.add('topic-label', 'btn')
-    newLabel.setAttribute('onclick', `AddToTopic(${newId}, ${newTitle})`)
+    newLabel.setAttribute('onclick', `AddToTopic("${id}", "${title}")`)
+    
     var newSpan = document.createElement('span')
     newSpan.innerHTML = '<input name = "nonmembers" type="checkbox" checked value="' + title + '">' + title
     newLabel.append(newSpan)
+    
     nonmembers.append(newLabel)
     removeMember.parentNode.removeChild(removeMember);
 }
     
     
 function AddToTopic(id, title){
-    newId = '"' + id + '"'
-    newTitle = '"' + title + '"'
+    //newId = `"${id}"`
+    //newTitle = `"${title}"` 
 
     var members = byId('Members')
     var removeMember = byId(id)
@@ -84,20 +82,40 @@ function AddToTopic(id, title){
     var newLabel = document.createElement('label')
     newLabel.setAttribute('id', id)
     newLabel.classList.add('topic-label', 'btn', 'active')
-    newLabel.setAttribute('onclick', 'RemoveFromTopic(' + newId + ',' + newTitle + ')')
+    newLabel.setAttribute('onclick', `RemoveFromTopic("${id}", "${title}")`)
     
     var newSpan = document.createElement('span')
-
     newSpan.innerHTML = '<input name = "members" type="checkbox" checked value="' + title + '">' + title 
-
     newLabel.append(newSpan)
-    members.append(newLabel)
     
+    members.append(newLabel)
     removeMember.parentNode.removeChild(removeMember);
-
 }
     
-    
+*/
+
+function initialize_topics(){
+    var all_topics = byClass('topic-label')
+    for (var i=0; i< all_topics.length; i++){
+        all_topics[i].addEventListener("click", function(e){
+            e=e || window.event;
+            var target = e.target || e.srcElement;
+           
+            if (target.tagName === "LABEL"){
+                var target = e.target
+                if (target.classList.contains('active')){
+                    target.classList.remove('active')
+                }
+                else {
+                    target.classList.add('active')
+                }
+            }
+        });
+    }
+}
+
+
+
     
     
 function ViewHighlight(id){
@@ -111,6 +129,7 @@ function ViewHighlight(id){
                         add_span = byId('new-topic');
                         add = byId('add_new_tag');
                         initialize();
+                        initialize_topics();
                         $('#ViewHighlightModal').modal('toggle')
                     }
     );
@@ -128,12 +147,14 @@ function ViewHighlight(id){
     
     
 function UpdateHighlight(id){
-
     $('#ViewHighlightModal').modal('hide')
-    var doc_tags,tags,untags, doc_topics, topics, doc_untopics, untopics, notes, highlight
+
     
-    notes = byId('message-text').value
-    highlight = byId('HighlightField').value
+    var doc_tags,tags,untags, doc_topics, topics, doc_untopics, untopics, notes, highlight, topicspace
+    
+
+    notes = byId('view_highlight_notes').value
+    highlight = byId('view_highlight_text').value
     
     doc_tags= byClass('update-highlight')
     tags=[]
@@ -148,35 +169,67 @@ function UpdateHighlight(id){
     }
 
 
-    doc_topics = document.getElementsByName('members')
-    doc_untopics = document.getElementsByName('nonmembers')
+    doc_topics = byClass('topic-label')
     topics=[]
     untopics=[]
 
     for (var i = 0; i <doc_topics.length; i++){
-        topics.push(doc_topics[i].value);
+        if (doc_topics[i].classList.contains('active')){
+            topics.push(doc_topics[i].firstElementChild.value);
+        }
+        else {
+            untopics.push(doc_topics[i].firstElementChild.value);
+        }
     }
 
-    for (var i = 0; i <doc_untopics.length; i++){
-        untopics.push(doc_untopics[i].value);
-    }
+   
 
-    data = {
-        'notes': notes,
-        'highlight':highlight,
-        'topics':topics,
-        'untopics':untopics,
-        'tags':tags,
-        'untags':untags
+    topicspace = byId('topics_all')
+    if (topicspace){
+        data = {
+            'notes': notes,
+            'highlight':highlight,
+            'topics':topics,
+            'untopics':untopics,
+            'tags':tags,
+            'untags':untags,
+            'topics-page':'true'
+        }
     }
-
+    else {
+        data = {
+            'notes': notes,
+            'highlight':highlight,
+            'topics':topics,
+            'untopics':untopics,
+            'tags':tags,
+            'untags':untags,
+            'topics-page':'false'
+        }
+    }
+    
     data = JSON.stringify(data)
     url = '/view_highlight/' + id
 
+    topicspace = byId('topics_all')
+        if (topicspace){
+            topicspace.innerHTML=`
+                <div class = "loading">
+                    <p>Loading...</p>
+                    <svg xmlns="http://www.w3.org/2000/svg" style="margin:auto;background:0 0" width="64" height="64" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" display="block"><circle cx="50" cy="50" fill="none" stroke="#e3e3e3" stroke-width="5" r="32" stroke-dasharray="150.79644737231007 52.26548245743669" transform="rotate(144.01 50 50)"><animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"/></circle></svg>
+                </div>
+            `
+        }
+
+        
     $.post(url, {
         'data':data
     }).done(function( data ) {
-        console.log(data)
+        if (topicspace){
+            topicspace.innerHTML = data;
+            initialize();
+        }
+        
     }); 
 
 
