@@ -76,6 +76,8 @@
     </div>
     
     <div id = "topics_all" class = "main-section">
+
+        <!--start topics_all  -->
         <div class = "heading row">
             <div class = "">
                 {% if topics | length == 1 %}
@@ -130,9 +132,24 @@
                         </div>
                     </div>
                     <div id = "active_filters">
-                        {% for tag in active_tags %}
-                            <span class = "active-tags">{{tag.name}}</span>
+                        {% if active_tags|length >=1 %}
+                        <div class = "heading">
+                            <h4>Filtering by tags: </h4>
+                            {% for tag in active_tags %}
+                            <span class = "active-tags"><input type="checkbox" value = "{{tag.id}}"></input>{{tag.name}}</span>
                         {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if active_topics|length >=1 %}
+                        <div class = "heading">
+                            <h4>Filtering by topics: </h4>
+                            {% for topic in active_topics %}
+                            <span class = "active-topics"><input type="checkbox" value = "{{topic.id}}"></input>{{topic.title}}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                       
                     </div>
                 </div>
                 <!-- End Filters   -->
@@ -176,7 +193,7 @@
             {% for topic in topics %}
             <div class = "topic-column">
                 <div class="heading">
-                    <h4>{{topic.title}}</h4>
+                    <span class = "topic-title" id = "rename{{topic.id}}"><h4>{{topic.title}}</h4></span>
                     <div class="options dropdown">
                         <button id="card-header-dropdown-menu-button" type="button" class="topic-card-header-menu float-right dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Topics Column Menu">
                             <span aria-hidden="true"><svg class="bi bi-three-dots" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -184,8 +201,8 @@
                             </svg></span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button">
-                            <h4 class="dropdown-header">Topic Actions</h4>
-                            <a class="dropdown-item" href="{{ url_for('main.archivetopic', topic_id = topic.id)}}">Archive topic</a>
+                            <button class="dropdown-button dropdown-item" onclick="rename({{topic.id}})">Rename topic</button>
+                            <button class="dropdown-button dropdown-item" onclick = "archive({{topic.id}})">Archive topic</button>
                             
                         </div>
                     </div>                </div>
@@ -227,6 +244,7 @@
 
         <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true"> 
         </div>
+        <!--  end topics_all  -->
     </div>
 </div>
 
@@ -239,5 +257,11 @@
 <script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
 
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    // not working! why the fuck not!!
+    //initialize();
+});
+</script>
 
 {% endblock %}

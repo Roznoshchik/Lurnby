@@ -35,64 +35,71 @@ function UpdateNewTopic(){
 
 
   function UpdateNewTopicSubmit(){
-    $.post('/topics/add', {
-
-      title: $('#UpdateAddTopicInput').val()
-    }).done(function(response) {
-        add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
-        AddToTopic(response['id'], response['title'])
-    }).fail(function() {
-        add_span.innerHTML ='<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
-    });
+    input = byId('UpdateAddTopicInput')
+    
+    if (input.value === '' || input.value === ' ' || input.value === '  ')
+    {
+        input.classList.add('is-invalid')
+        input.focus();
+    }
+    else 
+    {   
+            
+        $.post('/topics/add/from_highlight', {
+            title: input.value
+        }).done(function(response) {
+            add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
+            AddToTopic(response['id'], response['title'])
+        }).fail(function() {
+            add_span.innerHTML ='<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+        });
+        
+    }
+  
 };
 
 
-
-/*
-function RemoveFromTopic(id, title){
-    //newId = '"' + id + '"'
-    //newTitle = '"' + title + '"'
-    
-    //newId = `"${id}"`
-    //newTitle = `"${title}"`   
-    var nonmembers = byId('NonMembers')
-    var removeMember = byId(id)
-
-    var newLabel = document.createElement('label')
-    newLabel.setAttribute('id', id)
-    newLabel.classList.add('topic-label', 'btn')
-    newLabel.setAttribute('onclick', `AddToTopic("${id}", "${title}")`)
-    
-    var newSpan = document.createElement('span')
-    newSpan.innerHTML = '<input name = "nonmembers" type="checkbox" checked value="' + title + '">' + title
-    newLabel.append(newSpan)
-    
-    nonmembers.append(newLabel)
-    removeMember.parentNode.removeChild(removeMember);
-}
     
     
 function AddToTopic(id, title){
-    //newId = `"${id}"`
-    //newTitle = `"${title}"` 
+    
+    var members, newLabel, newInput, newSpan
 
-    var members = byId('Members')
-    var removeMember = byId(id)
+    members = byId('Members')
+    newLabel = document.createElement('label')
+    newInput = document.createElement('input')
+    newSpan = document.createElement('span')
 
-    var newLabel = document.createElement('label')
-    newLabel.setAttribute('id', id)
+    newLabel.setAttribute('id', 'topic'+id)
     newLabel.classList.add('topic-label', 'btn', 'active')
-    newLabel.setAttribute('onclick', `RemoveFromTopic("${id}", "${title}")`)
     
-    var newSpan = document.createElement('span')
-    newSpan.innerHTML = '<input name = "members" type="checkbox" checked value="' + title + '">' + title 
-    newLabel.append(newSpan)
-    
+    newInput.setAttribute('name', 'members')
+    newInput.setAttribute('type', 'checkbox')
+    newInput.checked = true
+    newInput.setAttribute('value', title)
+    newLabel.append(newInput)    
     members.append(newLabel)
-    removeMember.parentNode.removeChild(removeMember);
+    newSpan.innerText= title
+    newLabel.appendChild(newSpan)
+
+
+    newLabel.addEventListener('click', function(e){
+        e=e || window.event;
+        var target = e.target || e.srcElement;
+        
+        if (target.tagName === "LABEL"){
+            var target = e.target
+            if (target.classList.contains('active')){
+                target.classList.remove('active')
+            }
+            else {
+                target.classList.add('active')
+            }
+        }
+    });
 }
     
-*/
+
 
 function initialize_topics(){
     var all_topics = byClass('topic-label')
@@ -150,7 +157,7 @@ function UpdateHighlight(id){
     $('#ViewHighlightModal').modal('hide')
 
     
-    var doc_tags,tags,untags, doc_topics, topics, doc_untopics, untopics, notes, highlight, topicspace
+    var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
     
 
     notes = byId('view_highlight_notes').value
@@ -182,7 +189,28 @@ function UpdateHighlight(id){
         }
     }
 
+    var a_tags = byClass('active-tags')
+    var a_topics = byClass('active-topics')
+    
+    atags = []
+    atopics = []
+    
+    
+    
+    
+    for (var i=0;i<a_tags.length;i++){
+      atags.push(a_tags[i].firstElementChild.value)
+    }
+    
+    for (var i=0;i<a_topics.length;i++){
+      atopics.push(a_topics[i].firstElementChild.value)
+    }
+    
    
+
+
+
+
 
     topicspace = byId('topics_all')
     if (topicspace){
@@ -193,6 +221,8 @@ function UpdateHighlight(id){
             'untopics':untopics,
             'tags':tags,
             'untags':untags,
+            'atags':atags,
+            'atopics':atopics,
             'topics-page':'true'
         }
     }
@@ -204,11 +234,16 @@ function UpdateHighlight(id){
             'untopics':untopics,
             'tags':tags,
             'untags':untags,
+            'atags':false,
+            'atopics':false,
             'topics-page':'false'
         }
     }
     
     data = JSON.stringify(data)
+   
+
+    
     url = '/view_highlight/' + id
 
     topicspace = byId('topics_all')
@@ -228,6 +263,7 @@ function UpdateHighlight(id){
         if (topicspace){
             topicspace.innerHTML = data;
             initialize();
+            console.log(data)
         }
         
     }); 
@@ -235,26 +271,11 @@ function UpdateHighlight(id){
 
 
 
-    console.log(data)
+   
 
 
 
-    /*
-    $("#UpdateHighlightForm").ajaxSubmit({
-        url: '/view_highlight/' + id, 
-        type: 'post',
-        success: function(){
-            //check if url contains topics and only then reloads
-            //this is because i use this same script on the text.html page and no reload is necessary. 
-            if (window.location.href.indexOf("topics") > -1) {
-                location.reload();
-                return false;
-              }
-             
-        },
-        //error: function(){ FailedToAddHighlight() }
-    });
-    */    
+    
 
 }
 

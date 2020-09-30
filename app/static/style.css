@@ -135,6 +135,15 @@ body, #base-main {
   margin-bottom: 0;
 }
 
+#active_filters .heading {
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+#active_filters .heading h4 {
+  margin-right: 8px;
+}
+
 .tags {
   margin-bottom: 16px;
 }
@@ -776,7 +785,7 @@ background: #fab1a0;
       pointer-events: none;
     }
   
-    .tagged, .active-tags {
+    .tagged, .active-tags, .active-topics {
       font-weight: 100;
       font-size: 0.8rem;
       padding: 4px 8px;
@@ -784,6 +793,10 @@ background: #fab1a0;
       display: inline-flex;
       margin-bottom: 4px;
       margin-right:4px;
+    }
+
+    .active-topics input, .active-tags input {
+      display: none;
     }
 
     .untagged  {
@@ -1039,13 +1052,9 @@ background: #fab1a0;
   overflow-y: hidden;
   overflow-x: auto;
   justify-content: flex-start;
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
 }
 
-.scroll-x::-webkit-scrollbar {
-  display: none;
-}
+
 
 .scroll-y{
   overflow-y: auto;
@@ -1095,6 +1104,23 @@ background: #fab1a0;
   }
 
   
+  .lurnby-button-group {
+    display: flex;
+    margin-top: 8px;
+    justify-content: flex-end
+  }
+  
+  .inline-button {
+    margin: 0 0 0 4px;
+  }
+  
+  .topic-title .lurnby-text-input {
+    padding-right: 8px;
+  }
+
+
+
+
 
 /* topics page styles end*/
 
