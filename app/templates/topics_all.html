@@ -111,6 +111,7 @@
     </div>
     {% endif %}
     
+    <!-- topics start -->
     {% for topic in topics %}
     <div class = "topic-column">
         <div class="heading">
@@ -123,10 +124,11 @@
                 </button>
                 <div class="dropdown-menu" aria-labelledby="card-header-dropdown-menu-button">
                     <button class="dropdown-button dropdown-item" onclick="rename({{topic.id}})">Rename topic</button>
-                    <button class="dropdown-button dropdown-item" onclick = "archive({{topic.id}})">Archive topic</button>
+                    <button class="dropdown-button dropdown-item" onclick = "archive({{topic.id}},'{{topic.title}}')">Archive topic</button>
                     
                 </div>
-            </div>                </div>
+            </div>                
+        </div>
 
         {% if topic.highlights.count() == 0%}
         <p class="small">no highlights</p>

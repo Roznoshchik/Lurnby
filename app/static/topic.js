@@ -170,9 +170,10 @@ function rename_reset(id){
 
 
 
-function archive(id){
+function archive(id,title){
     
     afilters = active_filter_data()
+    current_title = title
        
     data = {
         'atags':afilters['atags'],
@@ -188,7 +189,7 @@ function archive(id){
     </div>
     `
 
-    $.post('/topics/archive/'+ id, {
+    $.post('archivetopic/'+ id, {
         data: JSON.stringify(data)
     }).done(function(response) {
         //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
@@ -206,7 +207,8 @@ function unarchive(id){
     data = {
         'atags':afilters['atags'],
         'atopics':afilters['atopics'],
-        'id':id
+        'id':id,
+        'title':current_title
     }
 
     topicspace = byId('topics_all')
@@ -217,7 +219,7 @@ function unarchive(id){
     </div>
     `
 
-    $.post('/topics/unarchive/'+ id, {
+    $.post('unarchivetopic/'+ id, {
         data: JSON.stringify(data)
     }).done(function(response) {
         //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
