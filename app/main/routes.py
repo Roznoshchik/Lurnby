@@ -544,21 +544,25 @@ def unarchiveArticle(id):
 @login_required
 def addhighlight():
     
-    topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+    data = json.loads(request.form['data'])
 
-    newHighlight = Highlight(user_id = current_user.id, article_id = request.form.get('article_id'), position = request.form.get('position'),  text = request.form.get('text'), note = request.form.get('note'), archived=False)
+
+
+    #topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+
+    newHighlight = Highlight(user_id = current_user.id, article_id = data['article_id'], position = data['position'],  text = data['text'], note = data['notes'], archived=False)
     db.session.add(newHighlight)
     
-    topics = request.form.getlist('topics')
-    article = Article.query.filter_by(id = request.form.get('article_id')).first()
+    topics = data['topics']
+    article = Article.query.filter_by(id = data['article_id']).first()
 
     for tag in article.tags.all():
         newHighlight.AddToTag(tag)
     
     for t in topics:
-        print(t)
+        #print(t)
         topic = Topic.query.filter_by(title=t).first()
-        print (topic, topic.title)
+        #print (topic, topic.title)
         newHighlight.AddToTopic(topic) 
     
     db.session.commit() 
@@ -572,12 +576,26 @@ def addhighlight():
 @login_required
 def view_highlight(id):
     highlight = Highlight.query.filter_by(id = id).first_or_404()
+
+    print('\n\n')
+    print('checking highlight')
+    print (highlight)
+    print(highlight.topics.all())
+    print('\n\n')
+
+
+
     article = Article.query.filter_by(id = highlight.article_id).first()
     
     addtopicform = AddTopicForm()
     form = AddHighlightForm()
     
     member = highlight.topics.filter_by(user_id=current_user.id, archived=False).all()
+    print('\n\n')
+    print('members')
+    print(member)
+    print('\n\n')
+
     nonmember = highlight.not_in_topics(current_user)
     
     source = article.source
@@ -595,7 +613,7 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
 
-        return render_template('highlight.html', highlight = highlight,addtopicform=addtopicform, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
+        return render_template('highlight.html', highlight = highlight, addtopicform=addtopicform, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
 
 
     if request.method == 'POST':
@@ -607,10 +625,20 @@ def view_highlight(id):
         highlight.note = data['notes']
 
         members = data['topics']
+        
+        print('\n\n\n')
         for member in members:
             topic = Topic.query.filter_by(title=member).first()
+            print(topic.title)
+            print('\n')
+            print(highlight.topics.all())
             highlight.AddToTopic(topic)
-        
+            db.session.commit()
+            print('after add')
+            print(highlight.topics.all())
+            print('\n\n')
+
+        print('\n\n\n')
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:
@@ -767,6 +795,9 @@ def topics():
 def add_new_topic():
 
     data = json.loads(request.form['data'])
+
+
+
 
     #checks to see if the view was filtered
     if (data['atags'] and data['atags']!= []) or (data['atopics'] and data['atopics']!= []):

@@ -71,7 +71,7 @@ function AddToTopic(id, title){
     newSpan = document.createElement('span')
 
     newLabel.setAttribute('id', 'topic'+id)
-    newLabel.classList.add('topic-label', 'btn', 'active')
+    newLabel.classList.add('topic-label', 'btn', 'active', 'initialized')
     
     newInput.setAttribute('name', 'members')
     newInput.setAttribute('type', 'checkbox')
@@ -88,6 +88,13 @@ function AddToTopic(id, title){
         var target = e.target || e.srcElement;
         
         if (target.tagName === "LABEL"){
+
+            console.log(target.firstElementChild.value)
+            console.log(target.classList)
+            target.classList.toggle('active')
+            console.log(target.classList)
+
+            /*
             var target = e.target
             if (target.classList.contains('active')){
                 target.classList.remove('active')
@@ -95,30 +102,107 @@ function AddToTopic(id, title){
             else {
                 target.classList.add('active')
             }
+            */
         }
     });
 }
-    
+  
+
 
 
 function initialize_topics(){
+
     var all_topics = byClass('topic-label')
+    
     for (var i=0; i< all_topics.length; i++){
-        all_topics[i].addEventListener("click", function(e){
-            e=e || window.event;
-            var target = e.target || e.srcElement;
-           
-            if (target.tagName === "LABEL"){
-                var target = e.target
-                if (target.classList.contains('active')){
-                    target.classList.remove('active')
+        
+        if (all_topics[i].classList.contains('initialized')){
+            continue
+        }
+        else{
+            all_topics[i].classList.add('initialized');
+            all_topics[i].addEventListener("click", function(e){
+                //console.log('click registered')
+                e=e || window.event;
+                var target = e.target || e.srcElement;
+               
+                //console.log(target.tagName)        
+
+                
+                if (target.tagName === "LABEL"){
+                    /*
+                    if (target.classList.contains('active')){
+                        console.log('removing')
+                        target.classList.remove('active')
+                    }
+
+                    else {
+                        console.log('adding')
+                        console.log(target.classList)
+                        target.classList.add("active");
+                        console.log(target.classList)
+                    }
+                    */
+                    console.log(target.firstElementChild.value)
+                    console.log(target.classList)
+                    target.classList.toggle('active')
+                    console.log(target.classList)
+
                 }
-                else {
-                    target.classList.add('active')
-                }
-            }
-        });
+            });
+
+        }
+        
     }
+
+}
+
+
+function initialize_view_topics(){
+
+    var all_topics = byClass('upd-topic-label')
+    
+    for (var i=0; i< all_topics.length; i++){
+        
+        if (all_topics[i].classList.contains('initialized')){
+            continue
+        }
+        else{
+            all_topics[i].classList.add('initialized');
+            all_topics[i].addEventListener("click", function(e){
+                //console.log('click registered')
+                e=e || window.event;
+                var target = e.target || e.srcElement;
+               
+                //console.log(target.tagName)        
+
+                
+                if (target.tagName === "LABEL"){
+                    /*
+                    if (target.classList.contains('active')){
+                        console.log('removing')
+                        target.classList.remove('active')
+                    }
+
+                    else {
+                        console.log('adding')
+                        console.log(target.classList)
+                        target.classList.add("active");
+                        console.log(target.classList)
+                    }
+                    */
+                    console.log(target.firstElementChild.value)
+                    console.log(target.classList)
+                    target.classList.toggle('active')
+                    console.log(target.classList)
+
+                }
+            });
+
+        }
+        
+    }
+
 }
 
 
@@ -135,8 +219,11 @@ function ViewHighlight(id){
                         $('#ViewHighlightModal').html(data);
                         add_span = byId('new-topic');
                         add = byId('add_new_tag');
+
+                        
+
                         initialize();
-                        initialize_topics();
+                        initialize_view_topics();
                         $('#ViewHighlightModal').modal('toggle')
                     }
     );
@@ -154,8 +241,8 @@ function ViewHighlight(id){
     
     
 function UpdateHighlight(id){
-    $('#ViewHighlightModal').modal('hide')
 
+    $('#ViewHighlightModal').modal('hide')
     
     var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
     
@@ -176,11 +263,16 @@ function UpdateHighlight(id){
     }
 
 
-    doc_topics = byClass('topic-label')
+    doc_topics = byClass('upd-topic-label')
     topics=[]
     untopics=[]
 
-    for (var i = 0; i <doc_topics.length; i++){
+    for (var i = 0; i < doc_topics.length; i++){
+
+        console.log(i)
+        console.log(doc_topics[i].firstElementChild.value)
+        console.log('\n')
+        
         if (doc_topics[i].classList.contains('active')){
             topics.push(doc_topics[i].firstElementChild.value);
         }
@@ -241,6 +333,7 @@ function UpdateHighlight(id){
     }
     
     data = JSON.stringify(data)
+    console.log(data)
    
 
     
@@ -270,12 +363,8 @@ function UpdateHighlight(id){
 
 
 
-
-   
-
-
-
     
+      
 
 }
 

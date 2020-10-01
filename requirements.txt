@@ -18,12 +18,14 @@ email-validator==1.1.1
 Flask==1.1.2
 Flask-Cors==3.0.8
 Flask-HTTPAuth==4.1.0
+Flask-JWT==0.3.2
 Flask-Login==0.5.0
 Flask-Mail==0.9.1
 Flask-Migrate==2.5.3
 Flask-SQLAlchemy==2.4.1
 flask-talisman==0.7.0
 Flask-WTF==0.14.3
+future==0.18.2
 gunicorn==20.0.4
 html5lib==1.0.1
 httpie==2.2.0
@@ -52,6 +54,7 @@ pyflakes==2.2.0
 Pygments==2.6.1
 PyJWT==1.7.1
 pylint==2.5.2
+pyngrok==4.1.12
 pyOpenSSL==19.1.0
 pyparsing==2.4.7
 pytest==5.4.2

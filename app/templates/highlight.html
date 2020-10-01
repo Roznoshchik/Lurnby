@@ -58,13 +58,13 @@
           <br>
           <span id="Members" class="topics-group">
             {% for m in member %}
-            <label class="btn active topic-label" id="topic{{ m.id }}">
+            <label class="btn active topic-label upd-topic-label" id="topic{{ m.id }}">
               <input name="members" type="checkbox" checked value="{{m.title}}">
                 {{m.title}}
               </label>
             {% endfor %}
             {% for n in nonmember %}
-            <label class="btn topic-label" id="topic{{ n.id }}">
+            <label class="btn topic-label upd-topic-label" id="topic{{ n.id }}">
               <input name="nonmembers" type="checkbox" checked value="{{n.title}}">
                 {{n.title}}
               </label>

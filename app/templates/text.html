@@ -12,6 +12,8 @@
       </div>  
 
       <div class = "{{font}} size-{{size}} {{spacing}} {{color}}" id="content">
+        
+
         <h1>{{ title|safe}}</h1>
 
         <h3>{{ author|safe}}</h3>
@@ -202,13 +204,14 @@
                 </button>
               </span><br>
               <div class = "topics-all">
+                <span id = "topicplaceholder">
                 {% for topic in topics %}
-                <label class="topic-label btn">
+                <label id= "add_highlight_topic{{topic.id}}" class="topic-label btn">
                   <input name = "topics" type="checkbox" value="{{topic.title}}">
                   {{topic.title}}
                 </label>
                 {% endfor %}
-                <span id = "topicplaceholder"></span>
+                </span>
               </div>
             </div>
           
@@ -352,22 +355,66 @@ set_position();
   
 
     function SubmitHighlight(){
+
+      var text, notes, topics, doctopics, article_id, position
+
+      text = byId('HighlightField').value
+      notes = byId('message-text').value
+      topics = []
+      doctopics = byClass('topic-label')
+      article_id = byId('article_id').value
+      position = byId('highlight_position').value
+
+      for (var i = 0; i < doctopics.length; i++){
+        if (doctopics[i].classList.contains('active')){
+          topics.push(doctopics[i].firstElementChild.value)
+        }
+      }
+
+      var data = {
+        text:text,
+        notes:notes,
+        topics:topics,
+        article_id:article_id,
+        position:position
+      }
+
+      data = JSON.stringify(data)
+      //console.log(data)
+
+      $.post('/article/addhighlight', {
+        'data':data
+      }).done(function( data ) {
+        AddedHighlight(data)
+      }).fail( function(){
+        FailedToAddHighlight()
+      });
+
+
+      /*
       $("#SubmitHighlightForm").ajaxSubmit({
         url: '/article/addhighlight', 
         type: 'post',
         success: function(responseText){ AddedHighlight(responseText) },
         error: function(){ FailedToAddHighlight() }
       })
+      */
     }
-
+      
     var returnedhighlightid;
     var returnedhighlightclass;
 
     function AddedHighlight(responseText){
       
       $('#AddHighlightModal').modal('hide');
+
+      var active = byClass('active')
+      for (var i = active.length - 1; i>=0; i--){
+        active[i].classList.remove('active')
+      }
+
       
-      /* THIS RESETS THE SUBMIT HIGHLIGHT FORM */
+      /* THIS RESETS THE SUBMIT HIGHLIGHT FORM 
       document.getElementById('SubmitHighlightForm').reset()
       var c = document.querySelectorAll('input[type="checkbox"]');
       var count = c.length
@@ -426,6 +473,38 @@ set_position();
 
     
     function NewTopicSubmit(){
+
+      input = byId('addtopicinput')
+    
+    if (input.value === '' || input.value === ' ' || input.value === '  ')
+    {
+        input.classList.add('is-invalid')
+        input.focus();
+    }
+    else 
+    {   
+            
+        $.post('/topics/add/from_highlight', {
+            title: input.value
+        }).done(function(response) {
+          $('#topicplaceholder').append(`
+            <label id="label${response['id']}" class="topic-label btn">
+              <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
+          `);
+
+          document.getElementById("label"+response['id']).click();
+
+          $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
+
+        }).fail(function() {
+            byId('CreateTopic').innerHTML ='<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+        });
+        
+    }
+
+
+
+/*
       $.post('/topics/add', {
         title: $('#addtopicinput').val()
       }).done(function(response) {
@@ -442,6 +521,7 @@ set_position();
         }).fail(function() {
           $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
       });
+      */
   }
 
 

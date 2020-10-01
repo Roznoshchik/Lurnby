@@ -103,7 +103,7 @@ content.addEventListener("keyup", textActions);
 $('#addhighlight').click(function(){
     
     document.getElementById('infoDiv').style.display = 'none';
-    
+    //initialize_topics();
 
 }); 
 
@@ -116,9 +116,9 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
     $('#HighlightField').val(rawhighlight);
     $('#highlight_position').val(highlight_position);
 
-
   })
 
 function showaddhighlightmodal(){
-    $('#AddHighlightModal').modal('show')
+    //initialize_topics();
+    $('#AddHighlightModal').modal('show');
   }

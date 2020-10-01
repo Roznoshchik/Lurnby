@@ -1,5 +1,6 @@
 var add;
 
+
 function initialize(){
     console.log('initializing')
     var tagged =  byClass('tagged');
@@ -7,66 +8,93 @@ function initialize(){
     add = byId('add_new_tag');
 
     for (var i = 0; i<tagged.length; i++){
-        tagged[i].addEventListener("click", function(e) {
-            e=e || window.event;
-            var target = e.target || e.srcElement;
-
-            
-            if (target.tagName === 'LABEL'){
-                //console.log("target = label")
-
-                if (target.classList.contains('tagged')){
-                    target.classList.remove('tagged');
-                    target.classList.add('untagged')
-                    target.firstChild.name = 'untags';
-                    target.firstChild.checked=true;
-
-
-
-                }
-                else{
-                    target.classList.remove('untagged');
-                    target.classList.add('tagged')
-                    target.firstChild.name = 'tags';
-                    target.firstChild.checked=true;
-
-                }
-            }
+        if (tagged[i].classList.contains('initialized')){
+            continue;
+        }
+        else {
+            tagged[i].classList.add('initialized');
+            tagged[i].addEventListener("click", function(e) {
+                e=e || window.event;
+                var target = e.target || e.srcElement;
+    
                 
+                if (target.tagName === 'LABEL'){
+                    target.classList.toggle('tagged')
+                    target.classList.toggle('untagged')
+
+                    //console.log("target = label")
+                    /*
+                    if (target.classList.contains('tagged')){
+                        target.classList.remove('tagged');
+                        target.classList.add('untagged')
+                        target.firstChild.name = 'untags';
+                        target.firstChild.checked=true;
+    
+    
+    
+                    }
+                    else{
+                        target.classList.remove('untagged');
+                        target.classList.add('tagged')
+                        target.firstChild.name = 'tags';
+                        target.firstChild.checked=true;
+    
+                    }
+                    */
+                }  
+            
+            });
+            
+        }
+
         
-        });
     }
 
     for (var i = 0; i<untagged.length; i++){
+        if (untagged[i].classList.contains('initialized')){
+            continue;
+        }
+        else {
+            untagged[i].classList.add('initialized');
+            untagged[i].addEventListener("click", function(e) {
+                e=e || window.event;
+                var target = e.target || e.srcElement;
+    
+                
+                if (target.tagName === 'LABEL'){
+                    target.classList.toggle('tagged')
+                    target.classList.toggle('untagged')
 
-        untagged[i].addEventListener("click", function(e) {
-            e=e || window.event;
-            var target = e.target || e.srcElement;
+                    /*
+                    if (target.classList.contains('tagged')){
+                        target.classList.remove('tagged');
+                        target.classList.add('untagged')
+                        target.firstChild.name = 'untags';
+                        target.firstChild.checked=true;
+    
+    
+    
+                    }
+                    else{
+                        target.classList.remove('untagged');
+                        target.classList.add('tagged')
+    
+                        target.firstChild.name = 'tags';
+                        target.firstChild.checked=true;
+    
+                    }
 
+                    */
+                }
             
-            if (target.tagName === 'LABEL'){
+            });
 
-                if (target.classList.contains('tagged')){
-                    target.classList.remove('tagged');
-                    target.classList.add('untagged')
-                    target.firstChild.name = 'untags';
-                    target.firstChild.checked=true;
+        }
 
-
-
-                }
-                else{
-                    target.classList.remove('untagged');
-                    target.classList.add('tagged')
-
-                    target.firstChild.name = 'tags';
-                    target.firstChild.checked=true;
-
-                }
-            }
         
-        
-        });
+
+
+
     }
     
     
@@ -146,7 +174,7 @@ function add_tag_finish(string){
 
     var new_label = document.createElement('label');
     //new_label.innerHTML = new_tag;
-    new_label.classList.add('tagged', string);
+    new_label.classList.add('tagged', string, 'initialized');
 
 
     var new_input = document.createElement('input');

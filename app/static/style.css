@@ -557,7 +557,7 @@ background: #fab1a0;
 }
 
 .topic-label.active:hover{
-   background: #F9F7F4;
+   /*background: #F9F7F4;*/
 }
 
 .highlighted {
@@ -810,12 +810,13 @@ background: #fab1a0;
     }
   
     .tagged:hover {
-      background:#F9F7F4;
+      /*background:#F9F7F4;*/
       cursor: pointer;
     }
 
     .untagged:hover {
-      background:#FFF79F;
+
+     background:#FFF79F;
       cursor: pointer;
     }
   
