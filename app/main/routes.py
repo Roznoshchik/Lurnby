@@ -23,95 +23,6 @@ from werkzeug.utils import secure_filename
 
 from app.main import bp
 
-"""
-@bp.route("/", methods=['GET','POST'])
-@bp.route("/index", methods=['GET','POST'])
-@login_required
-def index():
-    form = ContentForm()
-
-    if request.method =='POST' and form.validate():
-        url = request.form['url']
-        if url:
-            urltext = pull_text(url)
-            
-            title = urltext["title"]
-            content = urltext["content"]
-         
-
-            new_article = Article(unread=True, title=title, source_url=url, content=content, user_id=current_user.id, archived=False, filetype="url" )
-            db.session.add(new_article)
-            db.session.commit()
-            flash('Article added!', 'message')
-
-        text = request.form['text']
-        if text:
-            text = "<pre>" + text + "</pre>"
-            title = request.form['title']    
-            source = request.form['source']
-            if source == '':
-                today = date.today()
-                today = today.strftime("%B %d, %Y")
-                source = 'manually added ' + today
-            new_article = Article(unread=True, title=title, source=source, content=text, user_id=current_user.id, archived=False, filetype="manual" )
-            db.session.add(new_article)
-            db.session.commit()
-            flash('Article added!', 'message')
-
-
-        f = form.epub.data
-        if f:
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            filename = secure_filename(f.filename)
-            
-            path = os.path.join(
-                basedir, 'temp'
-            )
-            if not os.path.isdir(path): 
-                os.mkdir(path)
-            
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-
-
-            f.save(path)
-            
-            content = epub2text(path)
-            title = epubTitle(path)
-            
-            title = title[0][0]
-            epubtext = ""
-            for item in content:
-                epubtext = epubtext + "<pre>" + item +"</pre>"
-
-            new_article = Article(unread=True, title=title, content=epubtext, user_id=current_user.id, archived=False, filetype="epub" )
-            db.session.add(new_article)
-            db.session.commit()
-            os.remove(path)
-            flash('Article added!', 'message')
-       
-       
-        #return render_template('text.html', title =text["title"], author = text["byline"], content=text["plain_content"])
-        
-        return redirect(url_for('main.articles'))
-
-    elif request.method =='POST' and not form.validate():
-        url = request.form['url']
-        if url:
-            for error in form.url.errors:
-                flash(error, 'error')
-        
-        for error in form.epub.errors:
-            flash(error, 'error')
-
-        flash(form.errors, 'error')
-        return redirect(url_for('main.articles'))
-
-    return render_template('index.html', title="Elegant Reader", form=form)
-    """
-
-
 
 
 @bp.route("/", methods=['GET','POST'])
@@ -141,7 +52,7 @@ def articles():
     read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
 
 
-    return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles,user=current_user, read_articles=read_articles)
+    return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles, user=current_user, read_articles=read_articles)
 
 @bp.route('/articles/new', methods = ['GET', 'POST'])
 @login_required
@@ -402,7 +313,7 @@ def article(id, highlight_id):
     
 
 
-    return render_template('text.html', progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+    return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
 
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
@@ -613,7 +524,7 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
 
-        return render_template('highlight.html', highlight = highlight, addtopicform=addtopicform, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
+        return render_template('highlight.html',user=current_user, highlight = highlight, addtopicform=addtopicform, form = form, member = member, nonmember = nonmember, article_title=article_title, source = source, source_url=source_url, inappurl=inappurl)
 
 
     if request.method == 'POST':
