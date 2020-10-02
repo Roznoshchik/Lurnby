@@ -120,7 +120,7 @@ class Article(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
-    highlightedText = db.Column(db.String, default = '')
+    highlightedText = db.Column(db.String, index=True,  default = '')
     tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
     progress = db.Column(db.Float, index=True, default = 0.0)
     done = db.Column(db.Boolean, default = False)
@@ -205,7 +205,7 @@ class Highlight(db.Model):
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship('Tag', secondary=tags_highlights, backref = 'highlight', lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_highlights,index=True, backref = 'highlight', lazy='dynamic')
     position = db.Column(db.Float)
 
 

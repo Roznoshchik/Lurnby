@@ -1030,8 +1030,11 @@ def filter_topics():
 
     filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
 
+    taglist = []
+    for tag in active_tags:
+        taglist.append(tag.name)
 
-    return render_template('topics_all.html', active_tags=active_tags, active_topics=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
+    return render_template('topics_all.html',taglist=taglist, active_tags=active_tags, active_topics=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
 
    
    
