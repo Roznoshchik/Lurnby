@@ -296,6 +296,21 @@ set_position();
 
   document.addEventListener("scroll", getScrollPercent());
 
+
+  var tables = document.getElementsByTagName('table');
+
+for(let i=0; i<tables.length; i++){
+  
+  var div = document.createElement('div');
+  
+  div.classList.add('twrap')
+  
+  tables[i].parentNode.insertBefore(div, tables[i]);
+  
+  div.appendChild(tables[i]);
+}
+
+
 </script>
 
 
@@ -871,12 +886,19 @@ window.onscroll = function() {
 
   </script>
    <script>
-    
-    FS.identify('{{user.id}}', {
+     FS.setUserVars({
       displayName: '{{user.id}}',
       email: '{{user.email}}',
-      // TODO: Add your own custom user variables here, details at
-    });
+      uid: "{{user.id}}"
+      });
 
+    /*
+
+      FS.identify('{{user.id}}', {
+        displayName: '{{user.id}}',
+        email: '{{user.email}}',
+        // TODO: Add your own custom user variables here, details at
+      });
+    */
   </script>
 {% endblock %}
