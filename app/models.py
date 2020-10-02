@@ -205,7 +205,7 @@ class Highlight(db.Model):
     topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship('Tag', secondary=tags_highlights,index=True, backref = 'highlight', lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_highlights, backref = 'highlight', lazy='dynamic')
     position = db.Column(db.Float)
 
 
