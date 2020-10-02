@@ -302,9 +302,12 @@
     <script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
     <script text="javascript" src = "{{url_for('static', filename='fileinput.js') }}"> </script>
     <script>
-        FS.setUserVars({
-          "uid" : "{{user.id}}",
-          "email" : "{{user.email}}",
+           
+        FS.identify('{{user.id}}', {
+        displayName: '{{user.id}}',
+        email: '{{user.email}}',
+        // TODO: Add your own custom user variables here, details at
         });
-      </script>
+
+    </script>
 {% endblock %}

@@ -269,10 +269,13 @@
 
 </script>
 <script>
-  FS.setUserVars({
-    "uid" : "{{user.id}}",
-    "email" : "{{user.email}}",
-  });
+    
+    FS.identify('{{user.id}}', {
+      displayName: '{{user.id}}',
+      email: '{{user.email}}',
+      // TODO: Add your own custom user variables here, details at
+    });
+
 </script>
 
 {% endblock %}

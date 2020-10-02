@@ -268,10 +268,13 @@
 <script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function(){
-    // not working! why the fuck not!!
-    //initialize();
-});
+    
+    FS.identify('{{user.id}}', {
+      displayName: '{{user.id}}',
+      email: '{{user.email}}',
+      // TODO: Add your own custom user variables here, details at
+    });
+
 </script>
 
 {% endblock %}
