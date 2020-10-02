@@ -870,5 +870,10 @@ window.onscroll = function() {
 
 
   </script>
-
+   <script>
+    FS.setUserVars({
+      "uid" : "{{user.id}}",
+      "email" : "{{user.email}}",
+    });
+  </script>
 {% endblock %}
