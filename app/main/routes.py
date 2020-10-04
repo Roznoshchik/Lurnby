@@ -261,7 +261,7 @@ def reader_preferences():
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
     
     if request.method == "GET":
-        preferences = json.loads(current_user.preferences)
+        preferences = current_user.preferences
         
         return jsonify({ 'Preferences': preferences })
 
