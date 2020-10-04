@@ -256,12 +256,12 @@ def filter_articles():
 @login_required
 def reader_preferences():
     if request.method == "POST":
-        current_user.preferences = json.loads(request.form['Preferences'])
+        current_user.preferences = json.dumps(request.form['Preferences'])
         db.session.commit()
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
     
     if request.method == "GET":
-        preferences = current_user.preferences
+        preferences = json.loads(current_user.preferences)
         
         return jsonify({ 'Preferences': preferences })
 
