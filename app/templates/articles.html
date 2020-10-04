@@ -303,10 +303,10 @@
     <script text="javascript" src = "{{url_for('static', filename='fileinput.js') }}"> </script>
     <script>
            
-        FS.identify('{{user.id}}', {
-        displayName: '{{user.id}}',
-        email: '{{user.email}}',
-        // TODO: Add your own custom user variables here, details at
+        FS.setUserVars({
+            displayName: '{{user.id}}',
+            email: '{{user.email}}',
+            uid: "{{user.id}}"
         });
 
     </script>
