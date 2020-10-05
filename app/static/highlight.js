@@ -119,6 +119,12 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
     //$('#highlight_position').val(highlight_position);
     byId('message-text').value='';
 
+    var active = byClass('active')
+      for (var i = active.length - 1; i>=0; i--){
+        active[i].classList.remove('active')
+        console.log('removed')
+      }
+
   })
 
 function showaddhighlightmodal(){
