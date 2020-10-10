@@ -51,9 +51,12 @@
           {% endif %}
           
           <ul class="navbar-nav ml-auto">
+            {% if current_user.is_authenticated %}
             <li class="nav-item">
               <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class="feedback nav-link">Give feedback</button>
             </li>
+            {% endif %}
+            
             <li class="nav-item">
               <a class="nav-link" target = "_blank" href="https://www.patreon.com/lurnby">Thank you for your support</a>
             </li>
@@ -106,8 +109,9 @@
         {% endwith %}
       </div>
       {% block content %}{% endblock %}
-      <!--  Feedback Modal Code  -->
 
+      {% if current_user.is_authenticated %}
+      <!--  Feedback Modal Code  -->
       <div class="lurnby_modal modal fade" id="FeedbackModal" tabindex="-1" role="dialog" aria-labelledby="FeedbackModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -117,16 +121,14 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div id = "FeedbackContent" class="modal-body">
+            <div class="modal-body">
               <form  class = "main-form" id = "FeedbackForm" action="" method="post">
-
                 <input type="text" id = "user-email" class="hidden" value="{{ user.email }}"/>
+
                 <div class=" lurnby_data_group form-group">
                   <h6>Feedback, Requests, or 🐞 Bugs 🐞</h6>
                   <textarea id="feedback-text"></textarea>
                 </div>
-                
-
               
                           
             </div>
@@ -139,7 +141,7 @@
         </div>
       </div>
 
-
+      {% endif %}
       <!-- End Feedback Modal   -->
 
 
@@ -165,8 +167,6 @@
           var feedbacktext = byId('feedback-text')
           var email = byId('user-email')
           var url = window.location.pathname
-
-          var feedback = byId('FeedbackContent')
           
           var data = {
           'feedback':feedbacktext.value,
@@ -177,7 +177,8 @@
           $.post('/feedback', {
             'data':JSON.stringify(data)
           }).done(function( data ) {
-            feedback.innerHTML = data;
+            feedbacktext.value = '';
+
 
           });
 
