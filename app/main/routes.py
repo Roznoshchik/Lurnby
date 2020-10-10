@@ -5,6 +5,7 @@ import os
 import validators
 
 from app import db
+from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
 from app.main.ebooks import epub2text, epubTitle
@@ -53,6 +54,28 @@ def articles():
 
 
     return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles, user=current_user, read_articles=read_articles)
+
+
+@bp.route('/feedback', methods = ['POST'])
+@login_required
+@bp.errorhandler(CSRFError)
+def feedback():
+
+    data = json.loads(request.form['data'])
+    recipients = 'research@lurnby.com'
+    sender = data['email']
+    subject = 'App Feedback' 
+    text_body = sender + '\n\n' + data['url'] + '\n\n' + data['feedback']
+    html_body = text_body
+
+    send_email(subject, sender, recipients, text_body, html_body)
+
+    return 'Thank you for the feedback!'
+
+
+
+
+
 
 @bp.route('/articles/new', methods = ['GET', 'POST'])
 @login_required

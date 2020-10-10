@@ -1,5 +1,13 @@
 /* regular styles */
 
+/* feedback button */
+.feedback {
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+/* end feedback button  */
+
 .loading {
   display: flex;
   flex-wrap: wrap;
@@ -777,6 +785,7 @@ background: #fab1a0;
     
     }
   
+    
   
       
 

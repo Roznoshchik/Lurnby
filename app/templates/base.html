@@ -51,6 +51,12 @@
           {% endif %}
           
           <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+              <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class="feedback nav-link">Give feedback</button>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" target = "_blank" href="https://www.patreon.com/lurnby">Thank you for your support</a>
+            </li>
             {% if current_user.is_anonymous %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
@@ -100,11 +106,44 @@
         {% endwith %}
       </div>
       {% block content %}{% endblock %}
-      <!---
-        jquery slim
-            <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+      <!--  Feedback Modal Code  -->
 
-      -->   
+      <div class="lurnby_modal modal fade" id="FeedbackModal" tabindex="-1" role="dialog" aria-labelledby="FeedbackModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="FeedbackModalLabel"> Give Feedback</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div id = "FeedbackContent" class="modal-body">
+              <form  class = "main-form" id = "FeedbackForm" action="" method="post">
+
+                <input type="text" id = "user-email" class="hidden" value="{{ user.email }}"/>
+                <div class=" lurnby_data_group form-group">
+                  <h6>Feedback, Requests, or 🐞 Bugs 🐞</h6>
+                  <textarea id="feedback-text"></textarea>
+                </div>
+                
+
+              
+                          
+            </div>
+            <div class="modal-footer">
+              <button type="button"  class="main-button cancel" data-dismiss="modal">Cancel</button>
+              <button id = "FeedbackSubmit" type="button" class="main-button save">Add</button>
+            </div>
+          </form>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- End Feedback Modal   -->
+
+
+
       <script>
         const byId = function(id){
             return document.getElementById(id);
@@ -113,6 +152,41 @@
         const byClass = function(classname){
             return document.getElementsByClassName(classname);
         };
+
+
+        /* feedback form */
+        var feedbacksubmit = byId('FeedbackSubmit');
+
+        feedbacksubmit.addEventListener('click', send_feedback);
+
+
+        function send_feedback(){
+          
+          var feedbacktext = byId('feedback-text')
+          var email = byId('user-email')
+          var url = window.location.pathname
+
+          var feedback = byId('FeedbackContent')
+          
+          var data = {
+          'feedback':feedbacktext.value,
+          'email': email.value,
+          'url':url
+          }
+
+          $.post('/feedback', {
+            'data':JSON.stringify(data)
+          }).done(function( data ) {
+            feedback.innerHTML = data;
+
+          });
+
+        }
+
+        /* feedback end */
+
+
+
 
       </script>
       
@@ -151,7 +225,10 @@
       <script type="text/javascript"> window.$crisp=[];window.CRISP_WEBSITE_ID="af51d0d3-fbb0-4772-add7-ac98709f6bdd";(function(){ d=document;s=d.createElement("script"); s.src="https://client.crisp.chat/l.js"; s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})(); </script>
 
       -->
+      <script>
+        
 
+      </script>
       {% block JS %}
       
       {% endblock %}
