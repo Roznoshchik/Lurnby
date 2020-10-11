@@ -62,11 +62,11 @@ def articles():
 def feedback():
 
     data = json.loads(request.form['data'])
-    recipients = 'research@lurnby.com'
-    sender = data['email']
-    subject = 'App Feedback' 
-    text_body = sender + '\n\n' + data['url'] + '\n\n' + data['feedback']
-    html_body = text_body
+    recipients = ['research@lurnby.com']
+    sender = 'team@lurnby.com'
+    subject = 'App Feedback from ' + data['email']
+    text_body = data['email'] + '\n\n' + data['url'] + '\n\n' + data['feedback']
+    html_body = '<p>'+data['email']+'</p><p>'+ data['url'] + '</p><p>' + data['feedback']+ '</p>'
 
     send_email(subject, sender, recipients, text_body, html_body)
 
