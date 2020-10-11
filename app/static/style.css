@@ -785,7 +785,7 @@ background: #fab1a0;
     
     }
   
-    
+
   
       
 
@@ -984,6 +984,7 @@ background: #fab1a0;
     #add_article textarea,
     .main-form textarea{
       width: 100%;
+      min-height: 150px;
       border: #efefef 1px solid;
     }
   
@@ -1046,7 +1047,7 @@ background: #fab1a0;
   }
 
   #add_article textarea {
-    min-height: 40px;
+    min-height: 150px;
   }
 
   }
@@ -1279,10 +1280,6 @@ img.star {
     -webkit-appearance: none !important;
 }
 
-#ViewHighlightModal > textarea { 
-
-    height: auto !important; 
-}
 
 .topic-member{
     border-radius: 20px;
