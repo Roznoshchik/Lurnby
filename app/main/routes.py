@@ -118,10 +118,10 @@ def add_article():
             new_article = Article(unread=True, notes = notes, progress=0.0, title=title, source=source, content=content, user_id=current_user.id, archived=False, filetype="manual" )
             db.session.add(new_article)
             for tag in tags:
-                t = Tag.query.filter_by(name=tag).first()
+                t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
                 
                 if not t:
-                    t = Tag(name=tag, user_id=current_user.id)
+                    t = Tag(name=tag, archived=False, user_id=current_user.id)
                     db.session.add(t)
                     new_article.AddToTag(t)
                 else:
@@ -150,10 +150,10 @@ def add_article():
             db.session.add(new_article)
 
             for tag in tags:
-                t = Tag.query.filter_by(name=tag).first()
+                t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
                 
                 if not t:
-                    t = Tag(name=tag, user_id=current_user.id)
+                    t = Tag(name=tag, archived=False, user_id=current_user.id)
                     db.session.add(t)
                     new_article.AddToTag(t)
                 else:
@@ -203,10 +203,10 @@ def add_article():
             db.session.add(new_article)
 
             for tag in tags:
-                t = Tag.query.filter_by(name=tag).first()
+                t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
                 
                 if not t:
-                    t = Tag(name=tag, user_id=current_user.id)
+                    t = Tag(name=tag, archived=False, user_id=current_user.id)
                     db.session.add(t)
                     new_article.AddToTag(t)
                 else:
@@ -422,15 +422,15 @@ def updateArticle(id):
         
         
         for tag in data['tags']:
-            t = Tag.query.filter_by(name=tag).first()
+            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
             if not t:
-                t = Tag(user_id = current_user.id, name=tag)
+                t = Tag(user_id = current_user.id, archived=False, name=tag)
                 db.session.add(t)    
             
             article.AddToTag(t)
         
         for tag in data['remove_tags']:
-            t = Tag.query.filter_by(name=tag).first()
+            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
             if not t:
                 t = Tag(user_id = current_user.id, name=tag)
                 db.session.add(t)    
@@ -583,7 +583,7 @@ def view_highlight(id):
        
       
         for tag in tags:
-            t = Tag.query.filter_by(name=tag).first()
+            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
             if not t:
                 t = Tag(name=tag, archived=False, user_id=current_user.id)
                 db.session.add(t)
@@ -593,7 +593,7 @@ def view_highlight(id):
 
         untags = data['untags']
         for tag in untags:
-            t = Tag.query.filter_by(name=tag).first()
+            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
             highlight.RemoveFromTag(t)
         
         db.session.commit()
