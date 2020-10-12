@@ -495,7 +495,7 @@ def addhighlight():
     
     for t in topics:
         #print(t)
-        topic = Topic.query.filter_by(title=t).first()
+        topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
         #print (topic, topic.title)
         newHighlight.AddToTopic(topic) 
     
@@ -562,7 +562,7 @@ def view_highlight(id):
         
         print('\n\n\n')
         for member in members:
-            topic = Topic.query.filter_by(title=member).first()
+            topic = Topic.query.filter_by(title=member, user_id=current_user.id).first()
             print(topic.title)
             print('\n')
             print(highlight.topics.all())
@@ -576,7 +576,7 @@ def view_highlight(id):
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:
-            topic = Topic.query.filter_by(title=nonmember).first()
+            topic = Topic.query.filter_by(title=nonmember, user_id=current_user.id).first()
             highlight.RemoveFromTopic(topic)
 
         tags = data['tags']
@@ -741,7 +741,7 @@ def add_new_topic():
         active_tags = []
         active_topics = []
 
-        newtopic = Topic.query.filter_by(title=data['title'].lower()).first()
+        newtopic = Topic.query.filter_by(title=data['title'].lower(),user_id=current_user.id).first()
         
         exists = False
         if newtopic is not None:
@@ -782,7 +782,7 @@ def add_new_topic():
         return render_template('topics_all.html', active_tags=active_tags, active_topics=active_topics, user = current_user, filter_topics=filter_topics, topics=topics, highlights=highlights,notopics=notopics)
 
 
-    newtopic = Topic.query.filter_by(title=data['title'].lower()).first()
+    newtopic = Topic.query.filter_by(title=data['title'].lower(), user_id=current_user.id).first()
     if newtopic is not None:
         filter_topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
         topics = Topic.query.filter_by(archived=False, user_id = current_user.id).all()
@@ -814,7 +814,7 @@ def add_new_topic():
 @login_required
 def add_new_topic_from_highlight():
 
-    newtopic = Topic.query.filter_by(title=request.form['title'].lower()).first()
+    newtopic = Topic.query.filter_by(title=request.form['title'].lower(), user_id=current_user.id).first()
     if newtopic is not None:
     
         return  403
