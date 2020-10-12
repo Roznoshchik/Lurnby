@@ -295,7 +295,7 @@ tags_topics = db.Table('tags_topics',
 
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(512), unique=True, index=True) #how long should it be?
+    title = db.Column(db.String(512), index=True) #how long should it be?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
