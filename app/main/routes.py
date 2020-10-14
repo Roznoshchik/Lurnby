@@ -10,7 +10,7 @@ from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
 from app.main.ebooks import epub2text, epubTitle
 from app.models import User, Article, Topic, Highlight, highlights_topics, Tag, tags_articles, tags_highlights
-
+from data import data_dashboard
 
 from flask import flash, redirect, url_for, render_template, request, jsonify
 from flask_login import current_user, login_required
@@ -54,6 +54,16 @@ def articles():
 
 
     return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles, user=current_user, read_articles=read_articles)
+
+
+@bp.route('/app_dashboard', methods=['GET'])
+@login_required
+@bp.errorhandler(CSRFError)
+def app_dashboard():
+    
+    users = data_dashboard()
+
+    return render_template('app_dashboard.html', user = current_user, users = users)
 
 
 @bp.route('/feedback', methods = ['POST'])

@@ -1,10 +1,11 @@
-from app import create_app, db
+import json
 
+from app import create_app, db
 from app.models import User, Article, Highlight, Topic, highlights_topics, Tag, tags_articles, tags_highlights
 
 app=create_app()
 
-def data(): 
+def print_data(): 
     count = User.query.count()
     users = User.query.all()
     print("Total Users: "+str(count))
@@ -17,3 +18,22 @@ def data():
         print("topics "+ str(u.topics.count()))
         print("tags "+str(u.tags.count()))
         print('\n')
+
+def data_dashboard():
+    users = User.query.all()
+    user_list=[]
+    for u in users:
+        user = {
+            'email':u.email,
+            'articles':u.articles.count(),
+            'topics': u.topics.count(),
+            'tags': u.tags.count()
+        }
+
+        user_list.append(user)
+
+    return user_list
+
+
+
+

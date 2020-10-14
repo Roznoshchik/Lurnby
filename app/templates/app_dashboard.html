@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+
+{% for user in users %}
+<div id = "articles_page">
+    <div id = "articles_all" class = "main-section">
+        <div class = "articles_section">      
+            <div class = "article_container row">
+                <div class="col">
+                    <div class = "article_card">
+                        
+                        <div class="row article_title">
+                            <div class="col">
+                                <h4>{{ user['email']}}</h4>
+                                <div class="underline"></div>
+                            </div>
+                        </div>
+                        
+                            
+                        <div class="row article_data">
+                            <div class = "col-3">
+                                <h6>Articles:</h6>
+                                <p class = "data">{{user['articles']}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Highlights:</h6>
+                                <p class = "data">{{user['highlights']}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Tags:</h6>
+                                <p class = "data">{{user['tags']}}</p>
+                            </div>
+                            <div class = "col-3">
+                                <h6>Topics:</h6>
+                                <p class = "data">{{user['topics']}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+
+{% endblock %}
+
+{% block JS %}
+
+{% endblock %}
