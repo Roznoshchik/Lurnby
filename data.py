@@ -24,10 +24,12 @@ def data_dashboard():
     user_list=[]
     for u in users:
         user = {
+            'id':u.id,
             'email':u.email,
             'articles':u.articles.count(),
             'topics': u.topics.count(),
-            'tags': u.tags.count()
+            'tags': u.tags.count(),
+            'test_account': u.test_account
         }
 
         user_list.append(user)

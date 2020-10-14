@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     token_expiration = db.Column(db.DateTime)
     preferences = db.Column(db.String, index=True, default = preferences)
     admin = db.Column(db.Boolean)
+    test_account = db.Column(db.Boolean)
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

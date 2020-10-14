@@ -56,11 +56,18 @@ def articles():
     return render_template('articles.html', form = form, done_articles = done_articles, unread_articles=unread_articles, user=current_user, read_articles=read_articles)
 
 
-@bp.route('/app_dashboard', methods=['GET'])
+@bp.route('/app_dashboard', methods=['GET', 'POST'])
 @login_required
 @bp.errorhandler(CSRFError)
 def app_dashboard():
-    
+
+    if request.method == 'POST':
+        uid = json.loads(request.form['user'])
+        print(uid)
+        u = User.query.filter_by(id=uid).first()
+        u.test_account=True
+        db.session.commit()
+        
     users = data_dashboard()
 
     return render_template('app_dashboard.html', user = current_user, users = users)
