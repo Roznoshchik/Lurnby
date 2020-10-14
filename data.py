@@ -27,6 +27,7 @@ def data_dashboard():
             'id':u.id,
             'email':u.email,
             'articles':u.articles.count(),
+            'highlights':u.highlights.count(),
             'topics': u.topics.count(),
             'tags': u.tags.count(),
             'test_account': u.test_account
