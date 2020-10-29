@@ -101,16 +101,7 @@
                             </button>
                             <div class="dropdown-menu">
                                 <form >
-                                    {% if user.tags.count() > 0 %}
-                                    <div class = "tags filter-col">
-                                        <div class="heading">
-                                            <h4>Filter highlights by tag:</h4>
-                                        </div>
-                                        {% for tag in user.tags.all() %}
-                                        <label for= "tag{{tag.id}}" class = "filter-tag untagged">{{tag.name}}<input type="checkbox" id = "tag{{tag.id}}" name = "tags" checked value="{{tag.id}}"></input></label>
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
+                                    
 
                                     {% if filter_topics|length > 0 %}
                                     <div class = "tags filter-col">
@@ -132,14 +123,6 @@
                         </div>
                     </div>
                     <div id = "active_filters">
-                        {% if active_tags|length >=1 %}
-                        <div class = "heading">
-                            <h4>Filtering by tags: </h4>
-                            {% for tag in active_tags %}
-                            <span class = "active-tags"><input type="checkbox" value = "{{tag.id}}"></input>{{tag.name}}</span>
-                        {% endfor %}
-                        </div>
-                        {% endif %}
 
                         {% if active_topics|length >=1 %}
                         <div class = "heading">
@@ -220,8 +203,7 @@
                 <div class="underline"></div>
 
                 <div class = "scroll-y">
-                    {% for highlight in highlights %}
-                    {% if topic.is_added_highlight(highlight) %}
+                    {% for highlight in topic.highlights.all() %}
                     <div class = "highlight-card">
                         {% if highlight.text|length > 200 %}
                         <p>{{'%.200s' % highlight.text}} ...</p>
@@ -233,9 +215,6 @@
                             <a class = "main-button" type="button" onclick = "ViewHighlight({{highlight.id}})"href="#">View</a>
                         </div>
                     </div>
-
-
-                    {% endif %}
                     {% endfor %}
                     <div class="spacer"></div>
                 </div>
