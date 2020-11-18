@@ -1,6 +1,6 @@
 /* regular styles */
 
-p { word-break: break-all }
+p { word-break: break-word }
 
 
 /* admin dashboard*/
