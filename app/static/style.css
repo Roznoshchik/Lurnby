@@ -1,6 +1,10 @@
 /* regular styles */
 
-p { word-break: break-word }
+p { 
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+}
 
 
 /* admin dashboard*/
