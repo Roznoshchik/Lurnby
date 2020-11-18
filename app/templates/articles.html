@@ -301,13 +301,16 @@
 {% block JS %}
     <script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
     <script text="javascript" src = "{{url_for('static', filename='fileinput.js') }}"> </script>
-    <script>
-           
-        FS.setUserVars({
-            displayName: '{{user.id}}',
-            email: '{{user.email}}',
-            uid: "{{user.id}}"
-        });
+    
+    {% if not config['DEBUG'] %}
+   <script>
+     FS.setUserVars({
+      displayName: '{{user.id}}',
+      email: '{{user.email}}',
+      uid: "{{user.id}}"
+      });
+  
+  </script>
 
-    </script>
+  {% endif %}
 {% endblock %}

@@ -1,6 +1,33 @@
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
+from bs4.element import Tag, NavigableString, ProcessingInstruction, Doctype
+
+
+
+
+def epubConverted(filepath):
+    book = epub.read_epub(filepath)
+    chapters=[]
+
+    for item in book.get_items():
+        if item.get_type() == ebooklib.ITEM_DOCUMENT:
+            chapters.append(item.get_content())
+    string = ''
+
+    for item in chapters:
+        soup = BeautifulSoup(item, 'lxml')
+            
+        blacklist = ['[document]', 'noscript', 'header', 'html', 'meta', 'head', 'input', 'script',]
+        for i in soup.contents:
+            if isinstance(i, Tag):
+                for child in i.children:
+                    if child.name == 'body':
+                        for tag in child:
+                            string += str(tag)
+                    
+
+    return string
 
 
 def epub2html(filepath):
@@ -32,7 +59,10 @@ def chap2text(chapters):
     for t in text:
         if t.parent.name not in blacklist:
             output += '{} '.format(t)
+
     return output
+
+    
 
 def html2text(html):
     content = []
@@ -40,7 +70,7 @@ def html2text(html):
     for item in html:
         text = chap2text(item)
         content.append(text)
-
+    
     return content
 
 def epub2text(epub):

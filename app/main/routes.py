@@ -8,7 +8,7 @@ from app import db
 from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
-from app.main.ebooks import epub2text, epubTitle
+from app.main.ebooks import epub2text, epubTitle, epubConverted
 from app.models import User, Article, Topic, Highlight, highlights_topics, Tag, tags_articles, tags_highlights
 from data import data_dashboard
 
@@ -202,15 +202,19 @@ def add_article():
 
             f.save(path)
             
-            content = epub2text(path)
+            #content = epub2text(path)
+            content = epubConverted(path)
             title = epubTitle(path)
             
             title = title[0][0]
+            epubtext = content
+
+            """
             epubtext = ""
             for item in content:
                 epubtext = epubtext + "<pre>" + item +"</pre>"
 
-        
+            """
             today = date.today()
             today = today.strftime("%B %d, %Y")
             source = 'Epub File: added ' + today

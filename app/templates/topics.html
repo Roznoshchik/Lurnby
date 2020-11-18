@@ -234,18 +234,14 @@
 {% endblock%}
 
 {% block JS %}
-<script>
-    FS.setUserVars({
-      "uid" : "{{user.id}}",
-      "email" : "{{user.email}}",
-    });
-  </script>
+
 
 
 <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
 
+{% if not config['DEBUG'] %}
 <script>
     
     FS.setUserVars({
@@ -255,5 +251,7 @@
       });
 
 </script>
+
+{% endif %}
 
 {% endblock %}

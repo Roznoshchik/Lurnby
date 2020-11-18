@@ -268,14 +268,16 @@
 
 
 </script>
-<script>
-    
-    FS.identify('{{user.id}}', {
+{% if not config['DEBUG'] %}
+   <script>
+     FS.setUserVars({
       displayName: '{{user.id}}',
       email: '{{user.email}}',
-      // TODO: Add your own custom user variables here, details at
-    });
+      uid: "{{user.id}}"
+      });
+  
+  </script>
 
-</script>
+  {% endif %}
 
 {% endblock %}

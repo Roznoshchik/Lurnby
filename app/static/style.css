@@ -1,5 +1,8 @@
 /* regular styles */
 
+p { word-break: break-all }
+
+
 /* admin dashboard*/
 
 .dashboard_container{

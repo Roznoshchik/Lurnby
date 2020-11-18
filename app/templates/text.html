@@ -887,20 +887,16 @@ window.onscroll = function() {
 
 
   </script>
+
+  {% if not config['DEBUG'] %}
    <script>
      FS.setUserVars({
       displayName: '{{user.id}}',
       email: '{{user.email}}',
       uid: "{{user.id}}"
       });
-
-    /*
-
-      FS.identify('{{user.id}}', {
-        displayName: '{{user.id}}',
-        email: '{{user.email}}',
-        // TODO: Add your own custom user variables here, details at
-      });
-    */
+  
   </script>
+
+  {% endif %}
 {% endblock %}
