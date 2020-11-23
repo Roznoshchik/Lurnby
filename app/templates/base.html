@@ -30,7 +30,11 @@
       
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type" />
+
     <!-- Custom styles for this template -->
+
+
     {% block style %}{% endblock%}
 </head>
   <body>
@@ -130,7 +134,7 @@
             </div>
             <div class="modal-body">
               <form  class = "main-form" id = "FeedbackForm" action="" method="post">
-                <input type="text" id = "user-email" class="hidden" value="{{ user.email }}"/>
+                <input type="text" id = "user-email" class="hidden" value="{{ current_user.email }}"/>
 
                 <div class=" lurnby_data_group form-group">
                   <h6>Feedback, Requests, or 🐞 Bugs 🐞</h6>

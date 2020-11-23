@@ -316,49 +316,49 @@ def reader_preferences():
 @login_required
 def article(id, highlight_id):
     article = Article.query.filter_by(id=id).first()
-    article.unread = False
-    article.last_reviewed = datetime.utcnow()
-    db.session.commit()
-
-    topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
-    content = article.content
-    title = article.title
-    progress=article.progress
-    #serialized = json.dumps({'highlights': article.highlightedText})
-
-    addtopicform = AddTopicForm()
-    
-    if highlight_id != "none":
-        highlight = Highlight.query.filter_by(id = highlight_id).first()
-        progress = highlight.position
+    if article.user_id == current_user.id:
+        article.unread = False
+        article.last_reviewed = datetime.utcnow()
         db.session.commit()
-    
 
-    form = AddHighlightForm()
-
-    preferences = json.loads(current_user.preferences)
-    size = preferences['size']
-    spacing= preferences['spacing']
-    color = preferences['color']
-    font = preferences['font']
-    
-    
-    if form.validate_on_submit():
         topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+        content = article.content
+        title = article.title
+        progress=article.progress
+        #serialized = json.dumps({'highlights': article.highlightedText})
 
-        newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data, archived=False)
-        db.session.add(newHighlight)
-        for t in topics:
-            if request.form.get(t.title):
-                newHighlight.AddToTopic(t)
+        addtopicform = AddTopicForm()
         
-        db.session.commit()
-     
+        if highlight_id != "none":
+            highlight = Highlight.query.filter_by(id = highlight_id).first()
+            progress = highlight.position
+            db.session.commit()
+        
+
+        form = AddHighlightForm()
+
+        preferences = json.loads(current_user.preferences)
+        size = preferences['size']
+        spacing= preferences['spacing']
+        color = preferences['color']
+        font = preferences['font']
+        
+        
+        if form.validate_on_submit():
+            topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+
+            newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data, archived=False)
+            db.session.add(newHighlight)
+            for t in topics:
+                if request.form.get(t.title):
+                    newHighlight.AddToTopic(t)
+            
+            db.session.commit()
+        
     
-
-
-    return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
-
+        return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+    else:
+        return render_template('errors/404.html'), 404
 
 @bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
 @login_required
@@ -407,8 +407,13 @@ def storeProgress(id):
 @login_required
 def view_article(id):
     article = Article.query.filter_by(id = id).first()
+    if article.user_id == current_user.id:
+        return render_template('viewarticle.html', article = article)
     
-    return render_template('viewarticle.html', article = article)
+    else:
+        return render_template('errors/404.html'), 404
+
+    
 
 @bp.route('/view_add_article/', methods=['GET'])
 @login_required
@@ -425,48 +430,50 @@ def updateArticle(id):
 
     form = ContentForm()
     article = Article.query.filter_by(id=id).first()
+    if article.user_id == current_user.id:
+        if request.method == "POST":
 
-    if request.method == "POST":
-
-        data = json.loads(request.form['data'])
-        
-        if (data['read_status'] == 'read'):
-            article.done = True
-        if (data['read_status'] == 'unread'):
-            article.done = False
-            article.progress= 0.0
-            article.unread = True
-    
-        article.title = data['title']
-        article.notes = data['notes']
-        article.content = data['content']
-        
-        
-        for tag in data['tags']:
-            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-            if not t:
-                t = Tag(user_id = current_user.id, archived=False, name=tag)
-                db.session.add(t)    
+            data = json.loads(request.form['data'])
             
-            article.AddToTag(t)
+            if (data['read_status'] == 'read'):
+                article.done = True
+            if (data['read_status'] == 'unread'):
+                article.done = False
+                article.progress= 0.0
+                article.unread = True
         
-        for tag in data['remove_tags']:
-            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-            if not t:
-                t = Tag(user_id = current_user.id, name=tag)
-                db.session.add(t)    
+            article.title = data['title']
+            article.notes = data['notes']
+            article.content = data['content']
             
-            article.RemoveFromTag(t)
+            
+            for tag in data['tags']:
+                t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
+                if not t:
+                    t = Tag(user_id = current_user.id, archived=False, name=tag)
+                    db.session.add(t)    
+                
+                article.AddToTag(t)
+            
+            for tag in data['remove_tags']:
+                t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
+                if not t:
+                    t = Tag(user_id = current_user.id, name=tag)
+                    db.session.add(t)    
+                
+                article.RemoveFromTag(t)
 
-        db.session.commit()
+            db.session.commit()
 
 
-        done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
-        unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
-        read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
+            done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).all()
+            unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
+            read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
 
 
-        return render_template('articles_all.html', form=form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
+            return render_template('articles_all.html', form=form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
+    else:
+         render_template('errors/404.html'), 404
 
 
      
@@ -477,12 +484,17 @@ def updateArticle(id):
 @login_required
 def archiveArticle(id):
     article = Article.query.filter_by(id=id).first()
-    article.archived=True
-    db.session.commit()
     
+    if article.user_id == current_user.id:
+        article.archived=True
+        db.session.commit()
+        flash('Article has been archived. <a href="'+ url_for('main.unarchiveArticle', id = id) + '"  class="alert-link">UNDO</a>', 'error')
+        return redirect(url_for('main.articles'))
+    else:
+        return render_template('errors/404.html'), 404
 
-    flash('Article has been archived. <a href="'+ url_for('main.unarchiveArticle', id = id) + '"  class="alert-link">UNDO</a>', 'error')
-    return redirect(url_for('main.articles'))
+
+   
     
 @bp.route('/articles/<id>/unarchive', methods =[ 'GET','POST'])
 @login_required
