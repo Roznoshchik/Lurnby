@@ -4,9 +4,11 @@ from datetime import datetime, timedelta
 from flask import current_app, url_for
 from flask_login import UserMixin, current_user
 import jwt
+import uuid
 import os
 from sqlalchemy.sql import column
 from sqlalchemy.sql.expression import or_
+from sqlalchemy_utils import UUIDType
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -112,6 +114,7 @@ tags_articles = db.Table('tags_articles',
 
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True)
     unread = db.Column(db.Boolean, index=True, default=True)
     title = db.Column(db.String(255), index=True)
     filetype = db.Column(db.String(32)) 

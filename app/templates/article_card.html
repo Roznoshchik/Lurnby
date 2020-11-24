@@ -33,8 +33,8 @@
     </div>
     <div id = "open">
     
-        <a class = "btn edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">details</a>
-        <a class = "btn" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+        <a class = "btn edit" type="button" onclick = "ViewArticle('{{article.uuid}}')"href="#">details</a>
+        <a class = "btn" type="button" href="{{url_for('main.article', uuid=article.uuid)}}">Start reading</a>
 
     </div>
 </div>

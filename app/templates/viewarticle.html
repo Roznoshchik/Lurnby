@@ -75,10 +75,10 @@
       
     </div>
     <div class="modal-footer">
-        <a type="button" href ="{{url_for('main.archiveArticle', id=article.id)}}" class="main-button cancel archive editing">Archive</a>
+        <a type="button" href ="{{url_for('main.archiveArticle', uuid=article.uuid)}}" class="main-button cancel archive editing">Archive</a>
 
       <button type="button" class="main-button cancel editing"  onclick="clear_modals()" data-dismiss="modal">Close</button>
-      <button type="button" class="main-button save editing"  data-dismiss="modal" onclick="save({{article.id}})">Save changes</button>
+      <button type="button" class="main-button save editing"  data-dismiss="modal" onclick="save('{{article.uuid}}')">Save changes</button>
       <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
 
     </div>

@@ -2,6 +2,7 @@ import json
 import requests
 import tempfile
 import os
+from uuid import UUID
 import validators
 
 from app import db
@@ -311,11 +312,14 @@ def reader_preferences():
 
     
 
-@bp.route('/article/<id>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
-@bp.route('/article/<id>/<highlight_id>', methods =['POST', 'GET'])
+@bp.route('/article/<uuid>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
+@bp.route('/article/<uuid>/<highlight_id>', methods =['POST', 'GET'])
 @login_required
-def article(id, highlight_id):
-    article = Article.query.filter_by(id=id).first()
+def article(uuid, highlight_id):
+    print(uuid)
+    uuid_hash = UUID(uuid)
+
+    article = Article.query.filter_by(uuid=uuid_hash).first()
     if article.user_id == current_user.id:
         article.unread = False
         article.last_reviewed = datetime.utcnow()
@@ -356,14 +360,16 @@ def article(id, highlight_id):
             db.session.commit()
         
     
-        return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_id = id, content=content, form=form, addtopicform=addtopicform, topics=topics)
+        return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_uuid = uuid, content=content, form=form, addtopicform=addtopicform, topics=topics)
     else:
         return render_template('errors/404.html'), 404
 
-@bp.route('/article/<id>/highlight-storage', methods =['POST', 'GET'])
+@bp.route('/article/<uuid>/highlight-storage', methods =['POST', 'GET'])
 @login_required
-def storeHighlights(id):
-    article = Article.query.filter_by(id=id).first()
+def storeHighlights(uuid):
+    uuid_hash = UUID(uuid)
+
+    article = Article.query.filter_by(uuid=uuid_hash).first()
 
     if request.method == "GET":
         serialized = article.highlightedText
@@ -381,10 +387,12 @@ def storeHighlights(id):
         return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
 
 
-@bp.route('/article/<id>/progress', methods =['GET', 'POST'])
+@bp.route('/article/<uuid>/progress', methods =['GET', 'POST'])
 @login_required
-def storeProgress(id):
-    article = Article.query.filter_by(id=id).first()
+def storeProgress(uuid):
+    print(uuid)
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid=uuid_hash).first()
 
     if request.method == "POST":
         article.progress = request.form['Progress']
@@ -403,10 +411,11 @@ def storeProgress(id):
         return jsonify({ 'Progress': article.progress })
 
 
-@bp.route('/view_article/<id>', methods=['GET'])
+@bp.route('/view_article/<uuid>', methods=['GET'])
 @login_required
-def view_article(id):
-    article = Article.query.filter_by(id = id).first()
+def view_article(uuid):
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid = uuid_hash).first()
     if article.user_id == current_user.id:
         return render_template('viewarticle.html', article = article)
     
@@ -424,12 +433,14 @@ def view_add_article():
 
 
 
-@bp.route('/articles/<id>/update', methods =['POST'])
+@bp.route('/articles/<uuid>/update', methods =['POST'])
 @login_required
-def updateArticle(id):
+def updateArticle(uuid):
 
     form = ContentForm()
-    article = Article.query.filter_by(id=id).first()
+    uuid_hash = UUID(uuid)
+
+    article = Article.query.filter_by(uuid=uuid_hash).first()
     if article.user_id == current_user.id:
         if request.method == "POST":
 
@@ -480,15 +491,16 @@ def updateArticle(id):
         #return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
         #return render_template('articles_all.html', article=article)
    
-@bp.route('/articles/<id>/archive', methods =[ 'GET','POST'])
+@bp.route('/articles/<uuid>/archive', methods =[ 'GET','POST'])
 @login_required
-def archiveArticle(id):
-    article = Article.query.filter_by(id=id).first()
+def archiveArticle(uuid):
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid=uuid_hash).first()
     
     if article.user_id == current_user.id:
         article.archived=True
         db.session.commit()
-        flash('Article has been archived. <a href="'+ url_for('main.unarchiveArticle', id = id) + '"  class="alert-link">UNDO</a>', 'error')
+        flash('Article has been archived. <a href="'+ url_for('main.unarchiveArticle', uuid = uuid) + '"  class="alert-link">UNDO</a>', 'error')
         return redirect(url_for('main.articles'))
     else:
         return render_template('errors/404.html'), 404
@@ -496,10 +508,11 @@ def archiveArticle(id):
 
    
     
-@bp.route('/articles/<id>/unarchive', methods =[ 'GET','POST'])
+@bp.route('/articles/<uuid>/unarchive', methods =[ 'GET','POST'])
 @login_required
-def unarchiveArticle(id):
-    article = Article.query.filter_by(id=id).first()
+def unarchiveArticle(uuid):
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid=uuid_hash).first()
     article.archived=False
     db.session.commit()
     
@@ -516,12 +529,14 @@ def addhighlight():
 
 
     #topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+    article = Article.query.filter_by(uuid=data['article_uuid']).first()
 
-    newHighlight = Highlight(user_id = current_user.id, article_id = data['article_id'], position = data['position'],  text = data['text'], note = data['notes'], archived=False)
+
+    newHighlight = Highlight(user_id = current_user.id, article_id = article.id, position = data['position'],  text = data['text'], note = data['notes'], archived=False)
     db.session.add(newHighlight)
     
     topics = data['topics']
-    article = Article.query.filter_by(id = data['article_id']).first()
+    article = Article.query.filter_by(uuid = data['article_uuid']).first()
 
     for tag in article.tags.all():
         newHighlight.AddToTag(tag)
@@ -542,7 +557,11 @@ def addhighlight():
 @bp.route('/view_highlight/<id>', methods=['GET', 'POST'])
 @login_required
 def view_highlight(id):
+    
     highlight = Highlight.query.filter_by(id = id).first_or_404()
+
+    if highlight.user_id != current_user.id:
+        return render_template('errors/404.html'), 404
 
     print('\n\n')
     print('checking highlight')
@@ -568,7 +587,7 @@ def view_highlight(id):
     source = article.source
     source_url = article.source_url
     
-    inappurl = url_for('main.article', id = article.id, highlight_id = highlight.id)
+    inappurl = url_for('main.article', uuid = article.uuid, highlight_id = highlight.id)
 
 
     

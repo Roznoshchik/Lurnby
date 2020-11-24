@@ -17,7 +17,8 @@
         <h1>{{ title|safe}}</h1>
 
         <h3>{{ author|safe}}</h3>
-        <hr><div id="article_content">
+        <hr>
+        <div id="article_content">
           {{ content|safe }}
         </div>
         
@@ -186,7 +187,7 @@
           <form  class = "main-form" id = "SubmitHighlightForm" action="" method="post">
              <!-- {{ form.hidden_tag() }} -->
              {{ form.position(class="form-control",type="hidden", id="highlight_position") }}   
-            <input id = "article_id" type="hidden" name="article_id" value="{{ article_id}}"> 
+            <input id = "article_uuid" type="hidden" name="article_uuid" value="{{ article_uuid}}"> 
             <div class=" lurnby_data_group form-group">
               <h6>Highlight</h6>
               {{ form.text(class="form-control", id="HighlightField") }}
@@ -285,11 +286,11 @@ set_position();
     timer = setTimeout(update_progress.bind(null, progress), 3000)
   } 
 
-  function update_progress(progress, article_id){
+  function update_progress(progress, article_uuid){
     console.log('updating progress');
     byId('overview-progress').innerText = Math.round(progress);
 
-    $.post('/article/' + {{article_id}} + '/progress', {
+    $.post('/article/' + '{{article_uuid}}' + '/progress', {
           'Progress': progress
         });
   }
@@ -322,14 +323,14 @@ for(let i=0; i<tables.length; i++){
   // enable highlighting      
   var sandbox = document.getElementById('content');      
   //var article_id = $("#article_id").val()
-  var article_id = {{article_id}}
+  var article_uuid = '{{article_uuid}}'
 
   hltr = new TextHighlighter(sandbox, {
     enabled: false,
     onAfterHighlight: function (range, highlights) {
         //var serialized = hltr.serializeHighlights();
         var updated_content = byId('article_content').innerHTML
-        $.post('/article/' + article_id + '/highlight-storage', {
+        $.post('/article/' + article_uuid + '/highlight-storage', {
           //'SerializedHighlights': serialized
           'updated_content': updated_content
         }).fail(function() {
@@ -371,13 +372,13 @@ for(let i=0; i<tables.length; i++){
 
     function SubmitHighlight(){
 
-      var text, notes, topics, doctopics, article_id, position
+      var text, notes, topics, doctopics, article_uuid, position
 
       text = byId('HighlightField').value
       notes = byId('message-text').value
       topics = []
       doctopics = byClass('topic-label')
-      article_id = byId('article_id').value
+      article_uuid = byId('article_uuid').value
       position = byId('highlight_position').value
 
       for (var i = 0; i < doctopics.length; i++){
@@ -390,7 +391,7 @@ for(let i=0; i<tables.length; i++){
         text:text,
         notes:notes,
         topics:topics,
-        article_id:article_id,
+        article_uuid:article_uuid,
         position:position
       }
 

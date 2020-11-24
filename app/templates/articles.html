@@ -137,7 +137,7 @@
                         <div id = "articles">
                             {% for article in unread_articles %}
                         
-                            <div id = "article{{article.id}}" class = "article_container row">
+                            <div id = "article{{article.uuid}}" class = "article_container row">
                                 <div class="col">
                                     <div class = "article_card">
                                         
@@ -175,8 +175,8 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
-                                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{article.uuid}}')"href="#">Details</a>
+                                        <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article.uuid)}}">Start reading</a>
                         
                                     </div>
                                 </div>
@@ -184,7 +184,7 @@
                         
                             {% endfor %}
                             {% for article in read_articles %}
-                            <div id = "article{{article.id}}" class = "article_container row">
+                            <div id = "article{{article.uuid}}" class = "article_container row">
                                 <div class="col">
                                     <div class = "article_card">
                                     
@@ -217,8 +217,8 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
-                                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{article.uuid}}')"href="#">Details</a>
+                                        <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article.uuid)}}">Start reading</a>
                                     </div>
                                 </div>
                             </div>
@@ -237,7 +237,7 @@
                 
                         <div id = "done_articles">
                             {% for article in done_articles %}
-                            <div id = "article{{article.id}}" class = "article_container row">
+                            <div id = "article{{article.uuid}}" class = "article_container row">
                                 <div class="col">
                                     <div class = "article_card">
                                     
@@ -270,8 +270,8 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle({{article.id}})"href="#">Details</a>
-                                        <a class = "main-button" type="button" href="{{url_for('main.article', id=article.id)}}">Start reading</a>
+                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{article.uuid}}')"href="#">Details</a>
+                                        <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article.uuid)}}">Start reading</a>
                                     </div>
                                 </div>
                             </div>
