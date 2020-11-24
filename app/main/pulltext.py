@@ -15,9 +15,7 @@ def pull_text(url):
     response = requests.get(url, headers=headers)
 
     article = simple_json_from_html_string(response.text, content_digests=False, node_indexes=False, use_readability=True)
-    with open("../../file.txt", "w") as file:
-        file.write(article["title"] + article["content"])
-    return article
+   
     
     #doc = DocDoc(response.text)
 
