@@ -16,6 +16,7 @@ def pull_text(url):
 
     article = simple_json_from_html_string(response.text, content_digests=False, node_indexes=False, use_readability=True)
    
+    return article
     
     #doc = DocDoc(response.text)
 
