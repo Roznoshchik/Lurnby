@@ -310,10 +310,10 @@ function edit_article_tiny_init(){
           selector: '#notes_edit',
           menubar: 'insert format',
           resize: 'vertical',
-          toolbar: 'styleselect | bold italic underline ',
+          toolbar: 'styleselect | bold italic underline | hr',
           skin: "oxide",
           content_css: "light",  
-          plugins: 'link', 
+          plugins: 'link hr', 
           mobile: {
               height:300
           }
@@ -325,10 +325,10 @@ function edit_article_tiny_init(){
           selector: '#content_edit',
           menubar: 'insert format',
           resize: 'vertical',
-          toolbar: 'styleselect | bold italic underline ',
+          toolbar: 'styleselect | bold italic underline | hr',
           skin: "oxide",
           content_css: "light",  
-          plugins: 'link', 
+          plugins: 'link hr', 
           mobile: {
               height: 300
           }

@@ -577,7 +577,7 @@ for(let i=0; i<tables.length; i++){
     selector: '#notes-editor',
     menubar: 'insert format',
     resize: 'both',
-    toolbar: 'styleselect | bold italic underline ',
+    toolbar: 'styleselect | bold italic underline| hr ',
     
     {% if color == 'dark-mode' %}
     skin: "oxide-dark",
@@ -589,7 +589,7 @@ for(let i=0; i<tables.length; i++){
   
     width:600,
     height:400,
-    plugins: 'link',
+    plugins: 'link hr',
     mobile:{
             width: '100%',
             height:400
@@ -777,10 +777,10 @@ window.onscroll = function() {
           selector: '#notes-editor',
           menubar: 'insert format',
           resize: 'both',
-          toolbar: 'styleselect | bold italic underline ',
+          toolbar: 'styleselect | bold italic underline | hr',
           skin: "oxide-dark",
           content_css: "dark",  
-          plugins: 'link',
+          plugins: 'link hr',
 
           mobile:{
             width: '100%',
@@ -799,10 +799,10 @@ window.onscroll = function() {
           selector: '#notes-editor',
           menubar: 'insert format',
           resize: 'both',
-          toolbar: 'styleselect | bold italic underline ',
+          toolbar: 'styleselect | bold italic underline | hr',
           skin: "oxide",
           content_css: "light",  
-          plugins: 'link', 
+          plugins: 'link hr', 
           mobile:{
             width: '100%',
             height: 400
