@@ -465,6 +465,7 @@
             wrapper = TextHighlighter.createWrapper(this.options);
             wrapper.setAttribute(TIMESTAMP_ATTR, timestamp);
             wrapper.setAttribute(DATA_ATTR, "true");
+            wrapper.setAttribute('id', returnedhighlightclass);
             wrapper.classList.add(returnedhighlightclass);
             console.log("\n\n\n adding class \n\n\n\n")
             wrapper.setAttribute('tabindex', '0');
@@ -474,9 +475,12 @@
             wrapper.setAttribute('data-placement','right' );
             wrapper.setAttribute('data-trigger','focus' );
             wrapper.setAttribute('data-html','true' );
-            wrapper.setAttribute('data-content','<span onclick = "ViewHighlight('+ returnedhighlightid +')" class="btn btn-dark btn-sm">View Highlight</span>' );
+            wrapper.setAttribute('data-content', `<span onclick = 'ViewHighlight(${returnedhighlightid})' class='btn btn-dark btn-sm'>View Highlight</span>`
+            );
             
             
+
+
 
             createdHighlights = this.highlightRange(range, wrapper);
             normalizedHighlights = this.normalizeHighlights(createdHighlights);

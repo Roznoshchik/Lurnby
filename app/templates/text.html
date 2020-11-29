@@ -3,12 +3,16 @@
 {% block style %}
   <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-{% endblock %}
+
+  {% endblock %}
 
 {% block content %}
 <main class = "{{color}}" id="standard">
       <div  class = "{{color}}" id = "sidebar">
         <button type="button" onclick ="show_controls()" id= "sidebar-action-button" class=" {{color}} action-button">Aa</button>
+        <button type="button" id = "sidebar-notes" class = "{{color}} action-button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+        </svg></button>
       </div>  
 
       <div class = "{{font}} size-{{size}} {{spacing}} {{color}}" id="content">
@@ -29,6 +33,9 @@
         <div class = "article-overview">
           <p id = "overview-title" class = "small">{{title}}</p>
           <p><button onclick ="show_controls()" id = "bottombar-action" class=" {{color}} action-button">Aa</button></p>
+          <p><button id = "bottombar-notes" class=" {{color}} action-button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+          </svg></button></p>
           <p class = "ml-auto small"><span id="overview-progress">{{progress|round|int}}</span>%</p>
         </div>
       
@@ -172,6 +179,28 @@
 
 <!--  end type controls  -->
  
+<!--  notes editor  -->
+
+{% if color == 'light-mode' %}
+<form class = "light-control-mode" id = "notes-form" >
+{% elif color == 'dark-mode' %}
+<form class = "dark-control-mode" id = "notes-form">
+{% else %}
+<form class = "sepia-control-mode" id = "notes-form">
+{% endif %}
+<textarea id="notes-editor">
+
+</textarea>
+
+</form>
+
+
+
+
+<!--   end notes editor  -->
+
+
+
 
 <!-- Add Highlight Modal-->
   <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
@@ -263,7 +292,16 @@ function set_position() {
   
     $window.scrollTop(position);
 };
+
+{% if highlight_id == 'none' %}
 set_position();
+{% else %}
+  console.log('I should scroll now ')
+  console.log('{{highlight_id }}')
+  var highlight_position = byId('{{highlight_id}}')
+
+  highlight_position.scrollIntoView()
+{% endif %}
 
 /* store scroll position 
   hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
@@ -294,6 +332,18 @@ set_position();
           'Progress': progress
         });
   }
+
+  function update_notes(){
+    var updated_notes = tinymce.get('notes-editor').getContent();
+    
+    $.post('/article/{{article_uuid}}/notes', {
+        'updated_notes': updated_notes
+      });
+
+  }
+
+  
+
 
   document.addEventListener("scroll", getScrollPercent());
 
@@ -328,10 +378,11 @@ for(let i=0; i<tables.length; i++){
   hltr = new TextHighlighter(sandbox, {
     enabled: false,
     onAfterHighlight: function (range, highlights) {
+
+        update_notes();
         //var serialized = hltr.serializeHighlights();
         var updated_content = byId('article_content').innerHTML
         $.post('/article/' + article_uuid + '/highlight-storage', {
-          //'SerializedHighlights': serialized
           'updated_content': updated_content
         }).fail(function() {
           $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
@@ -352,21 +403,7 @@ for(let i=0; i<tables.length; i++){
   //load highlights
   var serialized; 
 
-  /*
-  $.get('/article/' + article_id + '/highlight-storage', function(data) {
-    serialized = data['SerializedHighlights']
-    console.log(serialized)
-
-    hltr.deserializeHighlights(serialized);
-    $('[data-toggle="popover"]').popover()
-
-  });
-  
-  
-
-  serialized = {{serialized|safe}}  
-  hltr.deserializeHighlights(serialized['highlights']);
-  */
+ 
   $('[data-toggle="popover"]').popover()
   
 
@@ -406,21 +443,12 @@ for(let i=0; i<tables.length; i++){
         FailedToAddHighlight()
       });
 
-
-      /*
-      $("#SubmitHighlightForm").ajaxSubmit({
-        url: '/article/addhighlight', 
-        type: 'post',
-        success: function(responseText){ AddedHighlight(responseText) },
-        error: function(){ FailedToAddHighlight() }
-      })
-      */
     }
       
     var returnedhighlightid;
     var returnedhighlightclass;
 
-    function AddedHighlight(responseText){
+    function AddedHighlight(data){
       
       $('#AddHighlightModal').modal('hide');
 
@@ -429,29 +457,23 @@ for(let i=0; i<tables.length; i++){
         active[i].classList.remove('active')
       }
 
-      //byId('message-text').value = ''
-
-      
-      /* THIS RESETS THE SUBMIT HIGHLIGHT FORM 
-      document.getElementById('SubmitHighlightForm').reset()
-      var c = document.querySelectorAll('input[type="checkbox"]');
-      var count = c.length
-      console.log(c)
-      
-      for (var i = 0; i < c.length; i++){
-        if (c[i].parentNode.classList.contains('active')){
-          c[i].click()
-        }  
-      }
-      
-      /* END RESET */
 
 
 
       selectedObj.removeAllRanges();
       selectedObj.addRange(selectedText);
-      returnedhighlightclass = "highlight"+responseText['highlight_id']
-      returnedhighlightid = responseText['highlight_id']
+      returnedhighlightclass = "highlight"+data['highlight_id'];
+      returnedhighlightid = data['highlight_id'];
+
+      if (data['highlight_notes'] != ''){
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><h4>Highlight note:</h4>` + data['highlight_notes']+ '<hr>')
+      }
+      else {
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr>`)
+
+      }
+
+
       hltr.enable();
       hltr.doHighlight();
       hltr.disable();
@@ -462,7 +484,6 @@ for(let i=0; i<tables.length; i++){
       var node = document.createElement('span');
       node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
       document.body.appendChild(node);
-      //document.body.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
     }
 
 
@@ -522,24 +543,7 @@ for(let i=0; i<tables.length; i++){
 
 
 
-/*
-      $.post('/topics/add', {
-        title: $('#addtopicinput').val()
-      }).done(function(response) {
-          //$('#topicplaceholder').append('<label id="label' + response['id']+ '" class="button-group-pills btn btn-default"><input name = "topics" value = "'+response["title"]+'"type="checkbox">'+response["title"]+'</label>');
-          $('#topicplaceholder').append(`
-            <label id="label${response['id']}" class="topic-label btn">
-              <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
-          `);
 
-          document.getElementById("label"+response['id']).click();
-
-          $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
-
-        }).fail(function() {
-          $('#CreateTopic').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "NewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-      });
-      */
   }
 
 
@@ -563,18 +567,62 @@ for(let i=0; i<tables.length; i++){
 
 </script>
 
+  <!--
+  WYSIWYG Editor
+ --> 
+
+
+<script>
+  tinymce.init({
+    selector: '#notes-editor',
+    menubar: 'insert format',
+    resize: 'both',
+    toolbar: 'styleselect | bold italic underline ',
+    
+    {% if color == 'dark-mode' %}
+    skin: "oxide-dark",
+    content_css: "dark",
+    {% else %}
+    skin: "oxide",
+    content_css: "light",
+    {% endif %}
+  
+    width:600,
+    height:400,
+    plugins: 'link',
+    mobile:{
+            width: '100%',
+            height:400
+    },
+    
+    setup: function (editor) {
+    editor.on('init', function (e) {
+      editor.setContent(`{{article.notes | safe}}`);
+      });
+    }
+
+  });
+</script>
+
+  <!--
+   End WYSIWYG Editor
+ --> 
+
+
 <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 
 
 <script type="text/javascript">
+
  /* type controls functions */
   
-  var size, size_input, increase, decrease, val, content, standard, controls, sidebar_button;
+  var size, size_input, increase, decrease, val, content, standard, controls,editor, sidebar_button;
   
   highlight_button = byId('infoDiv')
   sidebar_button = byId('sidebar-action-button')
   controls = byId('type-controls')
+  editor = byId('notes-form')
   standard = byId('standard')
   content = byId('content');
   bottom = byId('bottom-bar')
@@ -587,11 +635,21 @@ for(let i=0; i<tables.length; i++){
 
   content.addEventListener('click', function(){
     hide_controls();
+    hide_editor();
 
   });
 
 document.addEventListener('DOMContentLoaded', function(){
   initialize_controls();
+  var sidebar_notes = byId('sidebar-notes');
+  var bottombar_notes = byId('bottombar-notes');
+  sidebar_notes.addEventListener("click", function(){
+    show_editor();
+  })
+  bottombar_notes.addEventListener("click", function(){
+    show_editor();
+  })
+
 }) 
 
 /* Save preferences and Send them  */
@@ -675,24 +733,85 @@ window.onscroll = function() {
 
 
   function show_controls(event){
-    controls.style.display="block";
+
+    if (controls.style.display=== "none"){
+      controls.style.display = "block";
+      editor.style.display = "none"
+    }
+    else {
+      controls.style.display = "none"
+    }
   }
+
+  function show_editor(){
+      if (editor.style.display=== "none"){
+      editor.style.display = "block";
+      controls.style.display = "none"
+    }
+    else {
+      editor.style.display = "none"
+    }
+  }
+
 
   function hide_controls(){
     console.log('hiding')
     controls.style.display="none"
     //byId('infoDiv').style.display="none"
-
   }
 
-  /*
-  document.addEventListener('selectionchange', ()=> {
-    if (document.getSelection().empty || window.getSelection().empty) {
-      byId('infoDiv').style.display="none"
-    }
+  function hide_editor(){
+    editor.style.display="none";
 
-  })
-*/
+    clearTimeout(timer)
+    timer = setTimeout(update_notes.bind(), 3000)
+
+    //update_notes();
+  }
+
+  function update_editor(mode){
+    if (mode == 'dark'){
+      tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'notes-editor');
+
+      tinymce.EditorManager.init({
+          selector: '#notes-editor',
+          menubar: 'insert format',
+          resize: 'both',
+          toolbar: 'styleselect | bold italic underline ',
+          skin: "oxide-dark",
+          content_css: "dark",  
+          plugins: 'link',
+
+          mobile:{
+            width: '100%',
+            height: 400
+          }
+
+        });
+
+      tinymce.EditorManager.execCommand('mceAddEditor',true, 'notes-editor');
+    }
+    
+    else {
+      tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'notes-editor');
+
+      tinymce.EditorManager.init({
+          selector: '#notes-editor',
+          menubar: 'insert format',
+          resize: 'both',
+          toolbar: 'styleselect | bold italic underline ',
+          skin: "oxide",
+          content_css: "light",  
+          plugins: 'link', 
+          mobile:{
+            width: '100%',
+            height: 400
+          }
+        });
+
+      tinymce.EditorManager.execCommand('mceAddEditor',true, 'notes-editor');
+    }
+  }
 
 
 
@@ -779,17 +898,32 @@ window.onscroll = function() {
         
         var content = byId('content');
         var controls = byId('type-controls');
+        var sidebar_notes = byId('notes-form')
+        var sidebar_notes_button = byId('sidebar-notes')
+        var bottombar_notes_button = byId('bottombar-notes')
+
+        var editor = byId('notes-form')
         var sidebar = byId('sidebar')
         
+        
         if (this.id == 'light-mode'){
+
+          update_editor('light')
           content.classList.remove('dark-mode', 'sepia-mode');
           content.classList.add('light-mode')
 
-
-          
-
           sidebar.classList.remove('dark-mode', 'sepia-mode');
           sidebar.classList.add('light-mode')
+
+          sidebar_notes.classList.remove('dark-control-mode', 'sepia-control-mode');
+          sidebar_notes.classList.add('light-control-mode')
+
+          sidebar_notes_button.classList.remove('dark-mode', 'sepia-mode');
+          sidebar_notes_button.classList.add('light-mode')
+
+          bottombar_notes_button.classList.remove('dark-mode', 'sepia-mode');
+          bottombar_notes_button.classList.add('light-mode')
+
 
           bottom.classList.remove('dark-mode', 'sepia-mode');
           bottom.classList.add('light-mode')
@@ -808,12 +942,24 @@ window.onscroll = function() {
 
         }
         else if (this.id == 'dark-mode'){
+
+          update_editor('dark')
+
           content.classList.remove('light-mode', 'sepia-mode');
           content.classList.add('dark-mode')
 
           
           sidebar.classList.remove('light-mode', 'sepia-mode');
           sidebar.classList.add('dark-mode')
+
+          sidebar_notes.classList.remove('light-control-mode', 'sepia-control-mode');
+          sidebar_notes.classList.add('dark-control-mode')
+
+          sidebar_notes_button.classList.remove('light-mode', 'sepia-mode');
+          sidebar_notes_button.classList.add('dark-mode')
+
+          bottombar_notes_button.classList.remove('light-mode', 'sepia-mode');
+          bottombar_notes_button.classList.add('dark-mode')
 
           bottom.classList.remove('light-mode', 'sepia-mode');
           bottom.classList.add('dark-mode')
@@ -833,13 +979,23 @@ window.onscroll = function() {
           
         }
         else if (this.id == 'sepia-mode'){
+
+          update_editor('sepia')
+
           content.classList.remove('dark-mode', 'light-mode');
           content.classList.add('sepia-mode')
 
-          
-
           sidebar.classList.remove('dark-mode', 'light-mode');
           sidebar.classList.add('sepia-mode')
+
+          sidebar_notes.classList.remove('dark-control-mode', 'light-control-mode');
+          sidebar_notes.classList.add('sepia-control-mode')
+
+          sidebar_notes_button.classList.remove('dark-mode', 'light-mode');
+          sidebar_notes_button.classList.add('sepia-mode')
+
+          bottombar_notes_button.classList.remove('dark-mode', 'light-mode');
+          bottombar_notes_button.classList.add('sepia-mode')
 
           bottom.classList.remove('dark-mode', 'light-mode');
           bottom.classList.add('sepia-mode')
@@ -900,4 +1056,7 @@ window.onscroll = function() {
   </script>
 
   {% endif %}
-{% endblock %}
+
+   
+
+  {% endblock %}

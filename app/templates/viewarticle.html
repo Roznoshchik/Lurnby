@@ -60,19 +60,20 @@
                 
                 <div class = "lurnby_data_group article_data_group">
                     <h6>Notes: </h6>
-                    <p class = "not-editing" id="article_notes">{{ article.notes}}</p>
-                    <textarea id="notes_edit" class = "large editing">{{ article.notes}}</textarea>
+                    <p class = "not-editing" id="article_notes"></p>
+                    <textarea id="notes_edit" class = "large editing">{{ article.notes|safe}}</textarea>
                 </div>
 
                 <div class = "lurnby_data_group article_data_group">
                     <h6>Content: </h6>
-                    <p class = "not-editing" id="article_content">{{ '%.200s' % article.content}}... </p>
-                    <textarea id="content_edit" class = "large article_content editing" >{{ article.content}}</textarea>
+                    <p class = "not-editing" id="article_content"> </p>
+                    <textarea id="content_edit" class = "large article_content editing" >{{ article.content|safe}}</textarea>
                 </div>
         
         </form>
 
       
+    
     </div>
     <div class="modal-footer">
         <a type="button" href ="{{url_for('main.archiveArticle', uuid=article.uuid)}}" class="main-button cancel archive editing">Archive</a>

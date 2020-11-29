@@ -293,7 +293,11 @@ td, th {
 
 #sidebar {
   position: fixed;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: 50px;
 }
+
 
 .action-button{
   background: none;
@@ -318,6 +322,25 @@ td, th {
   top: 75px;
   left: 80px;
 }
+
+#notes-form {
+
+  position: fixed;
+  height: auto;
+  padding: 16px 24px;
+  display:none;
+  top: 115px;
+  left: 80px;
+
+}
+
+#notes-form::after{
+  top: 0;
+  margin-top: 10px;
+
+}
+
+
 
 #type-controls::after {
   top: 4%;
@@ -566,6 +589,10 @@ border: #FAB1A0 2px solid;
 
 /* end type controls*/
 
+/* article notes*/
+
+/* end article notes*/
+
 
 .highlight-button{
   border: none;
@@ -654,7 +681,7 @@ background: #fab1a0;
 /* mobile adjustments */
 
 @media(min-width:576px){
-  #bottombar-action {
+  #bottombar-action, #bottombar-notes {
     display: none;
   }
 }
@@ -691,6 +718,13 @@ background: #fab1a0;
   }
   
   #type-controls{
+    width: 100%;
+    left: 0;
+    bottom: 0;
+    top: auto;
+  }
+
+  #notes-form{
     width: 100%;
     left: 0;
     bottom: 0;

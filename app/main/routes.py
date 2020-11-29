@@ -64,7 +64,7 @@ def app_dashboard():
 
     if request.method == 'POST':
         uid = json.loads(request.form['user'])
-        print(uid)
+        #print(uid)
         u = User.query.filter_by(id=uid).first()
         u.test_account=True
         db.session.commit()
@@ -112,8 +112,8 @@ def add_article():
         content = request.form['content']
         url = request.form['url']
 
-        for i in request.form:
-            print (i + ': '+ request.form[i])
+        #for i in request.form:
+            #print (i + ': '+ request.form[i])
 
 
         if (title == 'none' and url == 'none' and epub == 'none'):
@@ -259,14 +259,14 @@ def filter_articles():
         unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).all()
         read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).all()
         
-        print('no tags passed')
-        print('done articles')
-        for a in done_articles:
-            print(a.id, a.title, a.tags.all(),'\n\n')
-        for a in unread_articles:
-            print(a.id, a.title, a.tags.all(),'\n\n')
-        for a in read_articles:
-            print(a.id, a.title, a.tags.all(),'\n\n')
+        #print('no tags passed')
+        #print('done articles')
+        #for a in done_articles:
+            #print(a.id, a.title, a.tags.all(),'\n\n')
+        #for a in unread_articles:
+            #print(a.id, a.title, a.tags.all(),'\n\n')
+        #for a in read_articles:
+            #print(a.id, a.title, a.tags.all(),'\n\n')
 
         return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user)
 
@@ -276,23 +276,23 @@ def filter_articles():
     done_articles = Article.query.filter_by(archived=False, done = True, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
     done_articles = done_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
     
-    print('tags passed')
-    print('done articles')
-    for a in done_articles:
-        print(a.id, a.title, a.tags.all(),'\n\n')
+    #print('tags passed')
+    #print('done articles')
+    #for a in done_articles:
+        #print(a.id, a.title, a.tags.all(),'\n\n')
 
     unread_articles = Article.query.filter_by(unread=True,done = False, archived=False, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
     unread_articles = unread_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
-    print('unread articles')
-    for a in unread_articles:
-        print(a.id, a.title, a.tags.all(),'\n\n')
+    #print('unread articles')
+    #for a in unread_articles:
+        ##print(a.id, a.title, a.tags.all(),'\n\n')
 
 
     read_articles = Article.query.filter_by(unread=False, done=False,archived=False, user_id=current_user.id).join(tags_articles, (tags_articles.c.article_id == Article.id))
     read_articles = read_articles.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
-    print('read articles')
-    for a in read_articles:
-        print(a.id, a.title, a.tags.all(),'\n\n')
+    ##print('read articles')
+    #for a in read_articles:
+        #print(a.id, a.title, a.tags.all(),'\n\n')
 
     return render_template('articles_all.html', form = form, done_articles = done_articles, unread_articles=unread_articles, read_articles=read_articles, user=current_user, active_tags = active_tags)
 
@@ -312,12 +312,24 @@ def reader_preferences():
 
     
 
-@bp.route('/article/<uuid>', defaults={"highlight_id": "none" }, methods =['POST', 'GET'])
-@bp.route('/article/<uuid>/<highlight_id>', methods =['POST', 'GET'])
+@bp.route('/article/<uuid>', methods =['POST', 'GET'])
+#@bp.route('/article/<uuid>/<highlight_id>', methods =['POST', 'GET'])
 @login_required
-def article(uuid, highlight_id):
-    print(uuid)
+def article(uuid):
+    #print(uuid)
     uuid_hash = UUID(uuid)
+
+
+    highlight_id = request.args.get('highlight_id', None)
+    highlight=request.args.get('highlight', None)    
+  
+
+    
+    if highlight == 'burrito':
+        highlight_id = request.args.get('highlight_id')
+    else:
+        highlight_id="none"
+    
 
     article = Article.query.filter_by(uuid=uuid_hash).first()
     if article.user_id == current_user.id:
@@ -333,11 +345,12 @@ def article(uuid, highlight_id):
 
         addtopicform = AddTopicForm()
         
+        """
         if highlight_id != "none":
             highlight = Highlight.query.filter_by(id = highlight_id).first()
-            progress = highlight.position
+            #progress = highlight.position
             db.session.commit()
-        
+        """
 
         form = AddHighlightForm()
 
@@ -360,9 +373,26 @@ def article(uuid, highlight_id):
             db.session.commit()
         
     
-        return render_template('text.html', user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_uuid = uuid, content=content, form=form, addtopicform=addtopicform, topics=topics)
+        return render_template('text.html',highlight_id=highlight_id,article=article, user=current_user, progress=progress,size=size, color=color, font=font, spacing=spacing, title = title, article_uuid = uuid, content=content, form=form, addtopicform=addtopicform, topics=topics)
     else:
         return render_template('errors/404.html'), 404
+
+
+@bp.route('/article/<uuid>/notes', methods = ['POST'])
+@login_required
+def updatearticlenotes(uuid):
+    uuid_hash = UUID(uuid)
+
+    article = Article.query.filter_by(uuid=uuid_hash).first()
+    
+    if current_user.id != article.user_id:
+        return render_template('errors/404.html'), 404
+
+    article.notes = request.form['updated_notes']
+    db.session.commit()
+    
+    return json.dumps({'success':True}), 200, {'ContentType':'application/json'}  
+
 
 @bp.route('/article/<uuid>/highlight-storage', methods =['POST', 'GET'])
 @login_required
@@ -390,7 +420,7 @@ def storeHighlights(uuid):
 @bp.route('/article/<uuid>/progress', methods =['GET', 'POST'])
 @login_required
 def storeProgress(uuid):
-    print(uuid)
+    #print(uuid)
     uuid_hash = UUID(uuid)
     article = Article.query.filter_by(uuid=uuid_hash).first()
 
@@ -542,15 +572,22 @@ def addhighlight():
         newHighlight.AddToTag(tag)
     
     for t in topics:
-        #print(t)
+        ##print(t)
         topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
-        #print (topic, topic.title)
+        ##print (topic, topic.title)
         newHighlight.AddToTopic(topic) 
     
     db.session.commit() 
+    newHighlight.position = "#" + str(newHighlight.id)
+    db.session.commit()
+
+    article_url = url_for('main.article', uuid=article.uuid)
     
     return jsonify({
-        'highlight_id': newHighlight.id
+        'highlight_id': newHighlight.id,
+        'highlight_text': newHighlight.text,
+        'highlight_notes': newHighlight.note,
+        'article_url': article_url
     })
 
    
@@ -563,11 +600,11 @@ def view_highlight(id):
     if highlight.user_id != current_user.id:
         return render_template('errors/404.html'), 404
 
-    print('\n\n')
-    print('checking highlight')
-    print (highlight)
-    print(highlight.topics.all())
-    print('\n\n')
+    #print('\n\n')
+    #print('checking highlight')
+    #print (highlight)
+    #print(highlight.topics.all())
+    #print('\n\n')
 
 
 
@@ -577,20 +614,18 @@ def view_highlight(id):
     form = AddHighlightForm()
     
     member = highlight.topics.filter_by(user_id=current_user.id, archived=False).all()
-    print('\n\n')
-    print('members')
-    print(member)
-    print('\n\n')
+    #print('\n\n')
+    #print('members')
+    #print(member)
+    #print('\n\n')
 
     nonmember = highlight.not_in_topics(current_user)
     
     source = article.source
     source_url = article.source_url
     
-    inappurl = url_for('main.article', uuid = article.uuid, highlight_id = highlight.id)
+    inappurl = url_for('main.article', uuid = article.uuid) + '?highlight_id=highlight' + str(highlight.id)+'&highlight=burrito'
 
-
-    
     article_title = article.title
 
 
@@ -612,19 +647,19 @@ def view_highlight(id):
 
         members = data['topics']
         
-        print('\n\n\n')
+        #print('\n\n\n')
         for member in members:
             topic = Topic.query.filter_by(title=member, user_id=current_user.id).first()
-            print(topic.title)
-            print('\n')
-            print(highlight.topics.all())
+            #print(topic.title)
+            #print('\n')
+            #print(highlight.topics.all())
             highlight.AddToTopic(topic)
             db.session.commit()
-            print('after add')
-            print(highlight.topics.all())
-            print('\n\n')
+            #print('after add')
+            #print(highlight.topics.all())
+            #print('\n\n')
 
-        print('\n\n\n')
+        #print('\n\n\n')
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:

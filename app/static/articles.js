@@ -3,7 +3,6 @@ document.addEventListener("DOMContentLoaded", initialize());
 
 
 $('#edit_article').on('hidden.bs.modal', function (e) {
-    console.log("made it here")
     
     byId('edit_article').innerHTML = '';
 })
@@ -235,7 +234,109 @@ function add_new_article(){
 
 /*  end add article form  */
 
+function view_article_tiny_init(){
+    console.log('pulling up an article')
+    var existing_notes = byId('notes_edit').value
+    var existing_content = byId('content_edit').value
 
+    // cancels any existing editing tiny editors?
+    tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'content_edit');
+    tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'notes_edit');
+    tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_content');
+    tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_notes');
+
+
+
+  //notes preview
+  tinymce.init({
+    selector: '#article_notes',
+    menubar: false,
+    resize: 'vertical',
+    toolbar: false,
+    skin: "oxide",
+    content_css: "light",
+    mobile: {
+        height: 300
+    },
+  	readonly: 1,
+    
+    setup: function (editor) {
+    editor.on('init', function (e) {
+      editor.setContent(`${existing_notes}`);
+      });
+    }
+
+  });
+  
+  console.log('notes_initialized')
+	//content preview
+  tinymce.init({
+      selector: '#article_content',
+      menubar: false,
+      resize: 'vertical',
+      toolbar: false,
+      skin: "oxide",
+      content_css: "light",
+      mobile: {
+          height: 300
+      },
+      readonly: 1,
+
+      setup: function (editor) {
+      editor.on('init', function (e) {
+        editor.setContent(`${existing_content}`);
+        });
+      }
+
+    });
+    console.log('content initialized')
+}
+
+function edit_article_tiny_init(){
+  
+  //preview remove
+  tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_content');
+  
+  byId('article_content').style.display = "none"
+   
+  tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_notes');
+   byId('article_notes').style.display = "none"
+
+
+ 
+  
+  //notes edit
+  tinymce.EditorManager.init({
+          selector: '#notes_edit',
+          menubar: 'insert format',
+          resize: 'vertical',
+          toolbar: 'styleselect | bold italic underline ',
+          skin: "oxide",
+          content_css: "light",  
+          plugins: 'link', 
+          mobile: {
+              height:300
+          }
+
+    });
+    console.log('notes edit initialized')        
+  //content edit
+  tinymce.EditorManager.init({
+          selector: '#content_edit',
+          menubar: 'insert format',
+          resize: 'vertical',
+          toolbar: 'styleselect | bold italic underline ',
+          skin: "oxide",
+          content_css: "light",  
+          plugins: 'link', 
+          mobile: {
+              height: 300
+          }
+          
+    });
+    console.log('content edit initialized')
+  
+}
 
 
 function ViewArticle(id){
@@ -244,6 +345,8 @@ function ViewArticle(id){
         var modal = byId('edit_article');
         modal.innerHTML = data;
         initialize();
+        //intialize tiny mce here?
+        view_article_tiny_init()
         $('#edit_article').modal('toggle');
     });
 }
@@ -254,6 +357,7 @@ function ViewAddArticle(){
         var modal = byId('add_article');
         modal.innerHTML = data;
         initialize();
+        // initialize tinymce here?
 
         $('#add_article').modal('toggle');
     });
@@ -262,6 +366,8 @@ function ViewAddArticle(){
 
     
 function edit_article(){
+
+    edit_article_tiny_init()
 
     var not_editing = byClass('not-editing');
     var editing = byClass('editing');
@@ -515,8 +621,12 @@ function save(article_id){
 
     title = byId('title_edit').value;
     read_status = byId('read_edit').value;
-    notes = byId('notes_edit').value;
-    content = byId('content_edit').value;
+    
+    notes = tinymce.get('notes_edit').getContent()
+    content = tinymce.get('content_edit').getContent()
+    
+    //notes = byId('notes_edit').value;
+    //content = byId('content_edit').value;
 
     data = {
         'title': title,
