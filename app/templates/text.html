@@ -466,10 +466,10 @@ for(let i=0; i<tables.length; i++){
       returnedhighlightid = data['highlight_id'];
 
       if (data['highlight_notes'] != ''){
-        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><h4>Highlight note:</h4>` + data['highlight_notes']+ '<hr>')
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><h4>Highlight note:</h4>` + data['highlight_notes']+ '<hr><br>')
       }
       else {
-        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr>`)
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><br>`)
 
       }
 
