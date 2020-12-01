@@ -1067,13 +1067,17 @@ def filter_topics():
 def archivetopic(topic_id):
     
 
-
     topic = Topic.query.filter_by(id=topic_id).first()
     if current_user.id != topic.user_id:
         return render_template('errors/404.html'), 404
 
     if topic is not None:
         topic.archived = True
+
+        for h in topic.highlights.all():
+            h.RemoveFromTopic(topic)
+
+
         topic.title = topic.title + "-id:" + str(topic.id)
         db.session.commit()
 
