@@ -92,6 +92,8 @@ hr {
 }
 
 .app-previews {
+    display: flex;
+    flex-wrap: wrap;
     margin-top: 44px;
 }
 
@@ -228,6 +230,11 @@ ol {
         max-width: 500px;
         
         margin: 8px 16px;
+    }
+
+    
+    .mobile-screen {
+        width: 250px;
     }
 
 
