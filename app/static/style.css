@@ -257,6 +257,10 @@ body, #base-main {
   padding: 0 88px;
 }
 
+#content {
+  cursor: url('/static/highlighter.png'), auto;
+}
+
 .twrap{
   overflow: auto;
 }
@@ -699,10 +703,8 @@ background: #fab1a0;
   #content {
     padding: 16px;
   }
-  
-  #content {
-    cursor: url('/static/highlighter.png'), auto;
-  }
+
+ 
   
   .article-overview{
     padding: 8px 16px 0 0;
