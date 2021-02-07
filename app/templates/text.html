@@ -213,9 +213,7 @@
           </button>
         </div>
         <div class="modal-body">
-          <form  class = "main-form" id = "SubmitHighlightForm" action="" method="post">
-             <!-- {{ form.hidden_tag() }} -->
-             {{ form.position(class="form-control",type="hidden", id="highlight_position") }}   
+          <form  class = "main-form" id = "SubmitHighlightForm" action="" method="">            {{ form.position(class="form-control",type="hidden", id="highlight_position") }}   
             <input id = "article_uuid" type="hidden" name="article_uuid" value="{{ article_uuid}}"> 
             <div class=" lurnby_data_group form-group">
               <h6>Highlight</h6>
@@ -244,13 +242,14 @@
                 </span>
               </div>
             </div>
-          
+            <input  style = "display:none;" type="submit" value="Submit" disabled>
+          </form>
         </div>
         <div class="modal-footer">
           <button type="button"  class="main-button cancel" data-dismiss="modal">Cancel</button>
           <button type="button" onclick="SubmitHighlight()" class="main-button save">Add</button>
         </div>
-      </form>
+      
       </div>
     </div>
   </div>
@@ -493,8 +492,8 @@ for(let i=0; i<tables.length; i++){
     function NewTopic(){
       $('#CreateTopic').html(`
         <br>
-        <form> 
-          <div class = "form-row align-items-center"> 
+        <form method="" action="" novalidate> 
+          <div class = "form-row align-items-center">
             <div class="col-sm-6 my-1">
               <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
               </input>
@@ -503,11 +502,23 @@ for(let i=0; i<tables.length; i++){
               <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
             </div>  
             <div class="col-auto my-1"> 
-              <button onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
+              <button id = "submit_new_topic" onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
             </div> 
           </div> 
       </form>`);
+
+      input = document.getElementById('addtopicinput')
+      input.addEventListener("keyup", function(event) {
+        // Number 13 is the "Enter" key on the keyboard
+        if (event.keyCode === 13) {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            document.getElementById("submit_new_topic").click();
+        }
+    }); 
       $('#addtopicinput').trigger('focus');
+
     }
 
     

@@ -1,6 +1,4 @@
 import json
-import requests
-import tempfile
 import os
 from uuid import UUID
 import validators
@@ -9,8 +7,9 @@ from app import db
 from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
-from app.main.ebooks import epub2text, epubTitle, epubConverted
-from app.models import User, Article, Topic, Highlight, highlights_topics, Tag, tags_articles, tags_highlights
+from app.main.ebooks import epubTitle, epubConverted
+from app.models import (User, Article, Topic, Highlight, Tag,
+                        tags_articles, tags_highlights)
 from data import data_dashboard
 
 from flask import flash, redirect, url_for, render_template, request, jsonify
@@ -361,10 +360,14 @@ def article(uuid):
         font = preferences['font']
         
         
-        if form.validate_on_submit():
+        #if form.validate_on_submit():
+        if request.method == 'POST':
+            form = request.form
             topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
 
-            newHighlight = Highlight(user_id = current_user.id, article_id = form.article_id.data, text = form.text.data, note = form.note.data, archived=False)
+            article = Article.query.filter_by(uuid = form['article_uuid']).first()
+
+            newHighlight = Highlight(user_id = current_user.id, article_id = article.id, text = form['text'], note = form['note'], archived=False)
             db.session.add(newHighlight)
             for t in topics:
                 if request.form.get(t.title):

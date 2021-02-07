@@ -130,4 +130,5 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
 function showaddhighlightmodal(){
     //initialize_topics();
     $('#AddHighlightModal').modal('show');
+    
   }

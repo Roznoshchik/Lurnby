@@ -123,10 +123,10 @@ class Article(db.Model):
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    highlights = db.relationship('Highlight', backref = 'article', lazy='dynamic')
+    highlights = db.relationship('Highlight', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String,  default = '')
-    tags = db.relationship('Tag', secondary=tags_articles, backref = 'article', lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_articles, lazy='dynamic')
     progress = db.Column(db.Float, index=True, default = 0.0)
     done = db.Column(db.Boolean, default = False)
     notes = db.Column(db.Text)
@@ -207,10 +207,10 @@ class Highlight(db.Model):
     text = db.Column(db.String, index=True) #should I set a max length?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
-    topics = db.relationship('Topic', secondary=highlights_topics, backref = 'highlight', lazy='dynamic')
+    topics = db.relationship('Topic', secondary=highlights_topics, lazy='dynamic')
     note = db.Column(db.String, index=True) 
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship('Tag', secondary=tags_highlights, backref = 'highlight', lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_highlights, lazy='dynamic')
     position = db.Column(db.String)
 
 
@@ -302,9 +302,9 @@ class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(512), index=True) #how long should it be?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    highlights = db.relationship('Highlight', secondary=highlights_topics, backref = 'topic', lazy='dynamic')
+    highlights = db.relationship('Highlight', secondary=highlights_topics, lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship('Tag', secondary=tags_topics, backref = 'topic', lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_topics, lazy='dynamic')
 
     # this checks if a specific highlight is in this topic
     def is_added_highlight(self, highlight):
@@ -356,9 +356,9 @@ class Tag(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     archived = db.Column(db.Boolean, index=True, default = False)
     goal = db.Column(db.String(512))
-    articles = db.relationship('Article', secondary=tags_articles, backref = 'tag', lazy='dynamic')
-    highlights = db.relationship('Highlight', secondary=tags_highlights, backref = 'tag', lazy='dynamic')
-    topics = db.relationship('Topic', secondary=tags_topics, backref = 'tag', lazy='dynamic')
+    articles = db.relationship('Article', secondary=tags_articles,  lazy='dynamic')
+    highlights = db.relationship('Highlight', secondary=tags_highlights,  lazy='dynamic')
+    topics = db.relationship('Topic', secondary=tags_topics,  lazy='dynamic')
 
     #checks if a specific highlight is tagged
     def is_added_highlight(self, highlight):
