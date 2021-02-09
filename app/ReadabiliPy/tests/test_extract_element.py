@@ -17,8 +17,10 @@ def test_extract_element():
     """
 
     expected_output_1 = defaultdict(dict)
-    expected_output_1['Title 1'] = {'score': 4, 'xpaths': ['//h1[@class="entry-title"]//text()']}
-    expected_output_1['Title 2'] = {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
+    expected_output_1['Title 1'] = \
+        {'score': 4, 'xpaths': ['//h1[@class="entry-title"]//text()']}
+    expected_output_1['Title 2'] = \
+        {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
 
     assert extract_element(html, xpaths) == expected_output_1
 
@@ -43,6 +45,8 @@ def test_extract_element_with_passed_func():
 
     expected_output_3 = defaultdict(dict)
     expected_output_3['Title 1'] = 7
-    expected_output_3['Title 2'] = {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
+    expected_output_3['Title 2'] = \
+        {'score': 3, 'xpaths': ['//h1[@itemprop="headline"]//text()']}
 
-    assert extract_element(html, xpaths, process_dict_fn=process_dict) == expected_output_3
+    assert extract_element(html, xpaths, process_dict_fn=process_dict) \
+        == expected_output_3

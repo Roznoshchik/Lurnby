@@ -1,5 +1,6 @@
 """Test readability.py on sample articles"""
-from .checks import check_extract_article, check_extract_paragraphs_as_plain_text
+from .checks import (check_extract_article,
+                     check_extract_paragraphs_as_plain_text)
 
 
 # Test end-to-end article extraction
@@ -64,7 +65,7 @@ def test_extract_article_list_items_node_indexes():
 def test_extract_article_full_page_content_digest():
     check_extract_article(
         "addictinginfo.com-1_full_page.html",
-        "addictinginfo.com-1_simple_article_from_full_page_content_digest.json",
+        "addictinginfo.com-1_simple_article_from_full_page_content_digest.json",  # noqa : E501
         content_digests=True
     )
 
@@ -72,7 +73,7 @@ def test_extract_article_full_page_content_digest():
 def test_extract_article_full_page_node_indexes():
     check_extract_article(
         "addictinginfo.com-1_full_page.html",
-        "addictinginfo.com-1_simple_article_from_full_page_node_indexes.json",
+        "addictinginfo.com-1_simple_article_from_full_page_node_indexes.json",  # noqa : E501
         node_indexes=True
     )
 
@@ -80,7 +81,7 @@ def test_extract_article_full_page_node_indexes():
 def test_extract_article_full_page_content_digest_node_indexes():
     check_extract_article(
         "addictinginfo.com-1_full_page.html",
-        "addictinginfo.com-1_simple_article_from_full_page_content_digest_node_indexes.json",
+        "addictinginfo.com-1_simple_article_from_full_page_content_digest_node_indexes.json",  # noqa : E501
         content_digests=True,
         node_indexes=True
     )

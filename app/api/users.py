@@ -17,22 +17,28 @@ def get_user_tags(id):
 @bp.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json() or {}
-    if 'username' not in data or  'email' not in data or 'password' not in data:
-        return bad_request('must include username. email, and password fields')
+    if (
+            'username' not in data or
+            'email' not in data or
+            'password' not in data
+            ):
+        return bad_request('must include username. \
+                           email, and password fields')
+
     if User.query.filter_by(username=data['username']).first():
         return bad_request('please use a different username')
+
     if User.query.filter_by(email=data['email']).first():
         return bad_request('please use a different email address')
-    
+
     user = User()
     user.from_dict(data)
     token = user.get_token()
     db.session.commit()
-    response = jsonify({'token':token, 'id':user.id})
+    response = jsonify({'token': token, 'id': user.id})
     response.status_code = 201
     response.headers['location'] = url_for('api.get_user_tags', id=user.id)
     return response
-
 
 
 @bp.route('users/<int:id>/articles', methods=['POST'])
@@ -44,21 +50,21 @@ def add_article(id):
     for tag_name in data['tags']:
         if Tag.query.filter_by(name=tag_name).first():
             continue
-        else: 
+        else:
             tag = Tag(name=tag_name, user_id=id, archived=False)
             db.session.add(tag)
-        
 
-    article = Article(user_id=id, unread=True, archived=False, source_url=data['url'], filetype='url', title=data['title'], content=urltext['content'])
+    article = Article(user_id=id, unread=True, archived=False,
+                      source_url=data['url'], filetype='url',
+                      title=data['title'], content=urltext['content'])
     db.session.add(article)
-    
+
     for tag_name in data['tags']:
         tag = Tag.query.filter_by(name=tag_name).first()
         article.AddToTag(tag)
-    
+
     db.session.commit()
     response = jsonify(article.to_dict())
     response.status_code = 201
-    response.headers['Location'] = url_for('main.article', id=article.id) 
+    response.headers['Location'] = url_for('main.article', id=article.id)
     return response
-

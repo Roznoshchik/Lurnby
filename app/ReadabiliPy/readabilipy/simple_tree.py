@@ -1,11 +1,18 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup
-from .simplifiers.html import consolidate_text, insert_paragraph_breaks, normalise_strings, process_special_elements, process_unknown_elements, recursively_prune_elements, remove_blacklist, remove_empty_strings_and_elements, remove_metadata, strip_attributes, structural_elements, unnest_paragraphs, unwrap_elements, wrap_bare_text
+from .simplifiers.html import (
+    consolidate_text, insert_paragraph_breaks,
+    normalise_strings, process_special_elements,
+    process_unknown_elements, recursively_prune_elements,
+    remove_blacklist, remove_empty_strings_and_elements,
+    remove_metadata, strip_attributes, structural_elements,
+    unnest_paragraphs, unwrap_elements, wrap_bare_text)
 
 
 def simple_tree_from_html_string(html):
     """Turn input HTML into a cleaned parsed tree."""
-    # Insert space into non-spaced comments so that html5lib can interpret them correctly
+    # Insert space into non-spaced comments so that html5lib
+    # can interpret them correctly
     html = html.replace("<!---->", "<!-- -->")
 
     # Convert the HTML into a Soup parse tree
@@ -20,7 +27,8 @@ def simple_tree_from_html_string(html):
     # Remove blacklisted elements
     remove_blacklist(soup)
 
-    # Unwrap elements where we want to keep the text but drop the containing tag
+    # Unwrap elements where we want to keep the text but drop the
+    # containing tag
     unwrap_elements(soup)
 
     # Process elements with special innerText handling
@@ -30,7 +38,8 @@ def simple_tree_from_html_string(html):
     process_unknown_elements(soup)
 
     # Consolidate text, joining any consecutive NavigableStrings together.
-    # Must come before any whitespace operations (eg. remove_empty_strings_and_elements or normalise_strings)
+    # Must come before any whitespace operations
+    # (eg. remove_empty_strings_and_elements or normalise_strings)
     consolidate_text(soup)
 
     # Remove empty string elements
@@ -40,13 +49,15 @@ def simple_tree_from_html_string(html):
     unnest_paragraphs(soup)
 
     # Replace <br> and <hr> elements with paragraph breaks
-    # Must come after remove_empty_strings_and_elements so that consecutive <br>s can be identified
+    # Must come after remove_empty_strings_and_elements so that consecutive
+    # <br>s can be identified
     # Re-consolidates strings at the end, so must come before normalise_strings
     insert_paragraph_breaks(soup)
 
     # Wrap any remaining bare text in a suitable block level element
     # Must come after consolidate_text and identify_and_replace_break_elements
-    # otherwise there may be multiple strings inside a <p> tag which would create nested <p>s
+    # otherwise there may be multiple strings inside
+    # a <p> tag which would create nested <p>s
     wrap_bare_text(soup)
 
     # Normalise all strings, removing whitespace and fixing unicode issues
@@ -54,7 +65,8 @@ def simple_tree_from_html_string(html):
     # strings with semantic whitespace
     normalise_strings(soup)
 
-    # Recursively replace any elements which have no children or only zero-length children
+    # Recursively replace any elements which have no children or
+    # only zero-length children
     recursively_prune_elements(soup)
 
     # Finally ensure that the whole tree is wrapped in a div

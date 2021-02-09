@@ -10,20 +10,27 @@ from .extractors import extract_date, extract_title
 from .simplifiers import normalise_text
 
 
-def simple_json_from_html_string(html, content_digests=False, node_indexes=False, use_readability=False):
+def simple_json_from_html_string(
+        html, content_digests=False, node_indexes=False,
+        use_readability=False):
     if use_readability:
         temp_dir = tempfile.gettempdir()
-        # Write input HTML to temporary file so it is available to the node.js script
+        # Write input HTML to temporary file so it is available to the node.js
+        #  script
         html_path = os.path.join(temp_dir, "full.html")
         with open(html_path, 'w') as f:
             f.write(html)
 
-        # Call Mozilla's Readability.js Readability.parse() function via node, writing output to a temporary file
+        # Call Mozilla's Readability.js Readability.parse()
+        # function via node, writing output to a temporary file
         article_json_path = os.path.join(temp_dir, "article.json")
-        parse_script_path = os.path.join(os.path.dirname(__file__), "..", "javascript", "ExtractArticle.js")
-        check_call(["node", parse_script_path, "-i", html_path, "-o", article_json_path])
+        parse_script_path = os.path.join(os.path.dirname(
+            __file__), "..", "javascript", "ExtractArticle.js")
+        check_call(["node", parse_script_path, "-i",
+                   html_path, "-o", article_json_path])
 
-        # Read output of call to Readability.parse() from JSON file and return as Python dictionary
+        # Read output of call to Readability.parse() from
+        # JSON file and return as Python dictionary
         with open(article_json_path) as f:
             input_json = json.loads(f.read())
 
@@ -34,8 +41,10 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             "content": str(simple_tree_from_html_string(html))
         }
 
-    # Only keep the subset of Readability.js fields we are using (and therefore testing for accuracy of extraction)
-    # NB: Need to add tests for additional fields and include them when we look at packaging this wrapper up for PyPI
+    # Only keep the subset of Readability.js fields we
+    # are using (and therefore testing for accuracy of extraction)
+    # NB: Need to add tests for additional fields and include them
+    # when we look at packaging this wrapper up for PyPI
     # Initialise output article to include all fields with null values
     article_json = {
         "title": None,
@@ -55,8 +64,10 @@ def simple_json_from_html_string(html, content_digests=False, node_indexes=False
             article_json["date"] = input_json["date"]
         if "content" in input_json and input_json["content"]:
             article_json["content"] = input_json["content"]
-            article_json["plain_content"] = plain_content(article_json["content"], content_digests, node_indexes)
-            article_json["plain_text"] = extract_text_blocks_as_plain_text(article_json["plain_content"])
+            article_json["plain_content"] = plain_content(
+                article_json["content"], content_digests, node_indexes)
+            article_json["plain_text"] = extract_text_blocks_as_plain_text(
+                article_json["plain_content"])
 
     return article_json
 
@@ -67,10 +78,12 @@ def extract_text_blocks_as_plain_text(paragraph_html):
     # Select all lists
     lists = soup.find_all(['ul', 'ol'])
     # Prefix text in all list items with "* " and make lists paragraphs
-    for l in lists:
-        plain_items = "".join(list(filter(None, [plain_text_leaf_node(li)["text"] for li in l.find_all('li')])))
-        l.string = plain_items
-        l.name = "p"
+    for single_list in lists:
+        plain_items = "".join(list(filter(
+            None, [plain_text_leaf_node(li)["text"]
+                   for li in single_list.find_all('li')])))
+        single_list.string = plain_items
+        single_list.name = "p"
     # Select all text blocks
     text_blocks = [s.parent for s in soup.find_all(string=True)]
     text_blocks = [plain_text_leaf_node(block) for block in text_blocks]
@@ -119,7 +132,8 @@ def plain_elements(elements, content_digests, node_indexes):
 def plain_element(element, content_digests, node_indexes):
     # For lists, we make each item plain text
     if is_leaf(element):
-        # For leaf node elements, extract the text content, discarding any HTML tags
+        # For leaf node elements, extract the text content,
+        # discarding any HTML tags
         # 1. Get element contents as text
         plain_text = element.get_text()
         # 2. Normalise the extracted text string to a canonical representation
@@ -137,8 +151,10 @@ def plain_element(element, content_digests, node_indexes):
             plain_text = normalise_text(plain_text)
             element = type(element)(plain_text)
     else:
-        # If not a leaf node or leaf type call recursively on child nodes, replacing
-        element.contents = plain_elements(element.contents, content_digests, node_indexes)
+        # If not a leaf node or leaf type call recursively on
+        # child nodes, replacing
+        element.contents = plain_elements(
+            element.contents, content_digests, node_indexes)
     return element
 
 
@@ -183,7 +199,8 @@ def content_digest(element):
         if trimmed_string == "":
             digest = ""
         else:
-            digest = hashlib.sha256(trimmed_string.encode('utf-8')).hexdigest()
+            digest = hashlib.sha256(
+                trimmed_string.encode('utf-8')).hexdigest()
     else:
         contents = element.contents
         num_contents = len(contents)
@@ -197,7 +214,8 @@ def content_digest(element):
             # Build content digest from the "non-empty" digests of child nodes
             digest = hashlib.sha256()
             child_digests = list(
-                filter(lambda x: x != "", [content_digest(content) for content in contents]))
+                filter(lambda x: x != "", [content_digest(content)
+                       for content in contents]))
             for child in child_digests:
                 digest.update(child.encode('utf-8'))
             digest = digest.hexdigest()

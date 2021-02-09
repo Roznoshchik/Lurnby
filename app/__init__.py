@@ -2,11 +2,8 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 
-from oauthlib.oauth2 import WebApplicationClient
-
-
 from config import Config
-from flask import Flask, request, current_app
+from flask import Flask
 from flask_cors import CORS
 from flask_login import LoginManager
 from flask_mail import Mail
@@ -16,11 +13,10 @@ from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
 
 
-
 db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
-login.login_view='auth.login'
+login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page'
 mail = Mail()
 cors = CORS()
@@ -39,13 +35,10 @@ csp = {
 }
 
 
-
-
 def create_app(config_class=Config):
-
     app = Flask(__name__)
     app.config.from_object(config_class)
-    
+
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
     db.init_app(app)
     migrate.init_app(app, db)
@@ -71,18 +64,19 @@ def create_app(config_class=Config):
         app.run(ssl_context=('cert.pem', 'key.pem'))
 
     # OAuth 2 client setup
-    #client = WebApplicationClient(app.config['GOOGLE_CLIENT_ID'])
 
     if not app.debug and not app.testing:
         if app.config['MAIL_SERVER']:
             auth = None
             if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
-                auth = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
+                auth = (app.config['MAIL_USERNAME'],
+                        app.config['MAIL_PASSWORD'])
             secure = None
             if app.config['MAIL_USE_TLS']:
                 secure = ()
             mail_handler = SMTPHandler(
-                mailhost = (app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
+                mailhost=(app.config['MAIL_SERVER'],
+                          app.config['MAIL_PORT']),
                 fromaddr='no-reply@' + app.config['MAIL_SERVER'],
                 toaddrs=app.config['ADMINS'], subject='Learning App Failure',
                 credentials=auth, secure=secure
@@ -95,17 +89,18 @@ def create_app(config_class=Config):
             stream_handler.setLevel(logging.INFO)
             app.logger.addHandler(stream_handler)
         else:
-        
+
             if not os.path.exists('logs'):
                 os.mkdir('logs')
-            file_handler = RotatingFileHandler('logs/learningtool.log', maxBytes=10240, backupCount=10)
+            file_handler = RotatingFileHandler('logs/learningtool.log',
+                                               maxBytes=10240, backupCount=10)
             file_handler.setLevel(logging.INFO)
             app.logger.addHandler(file_handler)
 
             app.logger.setLevel(logging.INFO)
             app.logger.info('Learning tool startup')
-    
+
     return app
 
-from app import models
 
+from app import models # noqa : E402, F401

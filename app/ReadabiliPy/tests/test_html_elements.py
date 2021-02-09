@@ -1,6 +1,8 @@
 """Tests for HTML elements."""
 from pytest import mark
-from .checks import check_html_output_contains_text, check_html_has_no_output, check_html_output_does_not_contain_tag
+from .checks import (check_html_output_contains_text,
+                     check_html_has_no_output,
+                     check_html_output_does_not_contain_tag)
 
 
 # Whitelisted HTML elements

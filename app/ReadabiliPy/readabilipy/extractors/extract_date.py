@@ -6,7 +6,8 @@ def extract_date(html):
     """Return the article date from the article HTML"""
 
     # List of xpaths for HTML tags that could contain a date
-    # Tuple scores reflect confidence in these xpaths and the preference used for extraction
+    # Tuple scores reflect confidence in these xpaths and the
+    # preference used for extraction
     xpaths = [
         ('//meta[@property="article:published_time"]/@content', 13),
         ('//meta[@property="og:updated_time"]/@content', 10),
@@ -24,8 +25,12 @@ def extract_date(html):
     if not extracted_dates:
         return None
 
-    # Search through the extracted date strings in order of score and take the first that is in isoformat
-    for date_string in sorted(extracted_dates, key=lambda ds: extracted_dates[ds]["score"], reverse=True):
+    # Search through the extracted date strings in order of score
+    # and take the first that is in isoformat
+    for date_string in sorted(
+            extracted_dates, key=lambda ds: extracted_dates[ds]["score"],
+            reverse=True):
+
         iso_date = ensure_iso_date_format(date_string)
         if iso_date:
             return iso_date
@@ -45,11 +50,16 @@ def ensure_iso_date_format(date_string, ignoretz=True):
 
     for date_format in supported_date_formats:
         try:
-            # For python < 3.7, strptime() is not able to parse timezones containing
-            # colons (eg. 2014-10-24T17:32:46+12:00). By stripping the colon here,
-            # we ensure that all versions of python can parse datetimes like these
-            if date_format in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z") and date_string[-3] == ':':
-                isodate = datetime.strptime(date_string[:-3] + date_string[-2:], date_format)
+            # For python < 3.7, strptime() is not able to parse
+            # timezones containing colons (eg. 2014-10-24T17:32:46+12:00).
+            # By stripping the colon here, we ensure that all versions of
+            # python can parse datetimes like these
+            if (
+                    date_format in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z")
+                    and date_string[-3] == ':'
+                    ):
+                isodate = (datetime.strptime(date_string[:-3] +
+                           date_string[-2:], date_format))
             else:
                 isodate = datetime.strptime(date_string, date_format)
             if ignoretz:
