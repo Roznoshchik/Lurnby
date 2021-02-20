@@ -17,6 +17,7 @@ from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date
+from sqlalchemy import desc
 
 # from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
@@ -32,8 +33,8 @@ from app.main import bp
 def articles():
     form = ContentForm()
 
-    articles = Article.query.filter_by(user_id=current_user.id,
-                                       archived=False).all()
+    articles = Article.query.filter_by(user_id=current_user.id, archived=False
+                                       ).order_by(desc(Article.date_read)).all()
 
     if (request.method == 'GET'):
         if(request.json):
@@ -43,20 +44,24 @@ def articles():
             a = Article.query.join(tags_articles,
                                    (tags_articles.c.article_id ==
                                     Article.id))
-            articles = a.filter(tags_articles.c.tag_id.in_(tag_ids)).all()
+            articles = a.filter(tags_articles.c.tag_id.in_(tag_ids)
+                                ).order_by(desc(Article.date_read)).all()
 
             return render_template('articles.html', articles)
 
     done_articles = Article.query.filter_by(archived=False, done=True,
-                                            user_id=current_user.id).all()
+                                            user_id=current_user.id
+                                            ).order_by(desc(Article.date_read)).all()
 
     unread_articles = Article.query.filter_by(unread=True, done=False,
                                               archived=False,
-                                              user_id=current_user.id).all()
+                                              user_id=current_user.id
+                                              ).order_by(desc(Article.date_read)).all()
 
     read_articles = Article.query.filter_by(unread=False, done=False,
                                             archived=False,
-                                            user_id=current_user.id).all()
+                                            user_id=current_user.id
+                                            ).order_by(desc(Article.date_read)).all()
 
     return render_template('articles.html', form=form,
                            done_articles=done_articles,
@@ -247,17 +252,18 @@ def add_article():
             os.remove(path)
 
         done_articles = Article.query.filter_by(archived=False, done=True,
-                                                user_id=current_user.id).all()
+                                                user_id=current_user.id
+                                                ).order_by(desc(Article.date_read)).all()
 
         unread_articles = Article.query.filter_by(unread=True, done=False,
                                                   archived=False,
                                                   user_id=current_user.id
-                                                  ).all()
+                                                  ).order_by(desc(Article.date_read)).all()
 
         read_articles = Article.query.filter_by(unread=False, done=False,
                                                 archived=False,
                                                 user_id=current_user.id
-                                                ).all()
+                                                ).order_by(desc(Article.date_read)).all()
 
     return render_template('articles_all.html', form=form,
                            done_articles=done_articles,
@@ -279,17 +285,20 @@ def filter_articles():
     tag_ids = data['tags']
 
     if tag_ids == []:
+
         done_articles = Article.query.filter_by(archived=False, done=True,
-                                                user_id=current_user.id).all()
+                                                user_id=current_user.id
+                                                ).order_by(desc(Article.date_read)).all()
 
         unread_articles = Article.query.filter_by(unread=True, done=False,
                                                   archived=False,
                                                   user_id=current_user.id
-                                                  ).all()
+                                                  ).order_by(desc(Article.date_read)).all()
 
         read_articles = Article.query.filter_by(unread=False, done=False,
                                                 archived=False,
-                                                user_id=current_user.id).all()
+                                                user_id=current_user.id
+                                                ).order_by(desc(Article.date_read)).all()
 
         return render_template('articles_all.html', form=form,
                                done_articles=done_articles,
@@ -307,7 +316,8 @@ def filter_articles():
                                             ).join(tags_articles,
                                                    (join_aid == Article.id))
 
-    done_articles = done_articles.filter(join_tid.in_(tag_ids)).all()
+    done_articles = done_articles.filter(join_tid.in_(tag_ids)
+                                         ).order_by(desc(Article.date_read)).all()
 
     unread_articles = Article.query.filter_by(unread=True, done=False,
                                               archived=False,
@@ -315,7 +325,8 @@ def filter_articles():
                                               ).join(tags_articles,
                                                      (join_aid == Article.id))
 
-    unread_articles = unread_articles.filter(join_tid.in_(tag_ids)).all()
+    unread_articles = unread_articles.filter(join_tid.in_(tag_ids)
+                                             ).order_by(desc(Article.date_read)).all()
 
     read_articles = Article.query.filter_by(unread=False, done=False,
                                             archived=False,
@@ -323,7 +334,8 @@ def filter_articles():
                                             ).join(tags_articles,
                                                    (join_aid == Article.id))
 
-    read_articles = read_articles.filter(join_tid.in_(tag_ids)).all()
+    read_articles = read_articles.filter(join_tid.in_(tag_ids)
+                                         ).order_by(desc(Article.date_read)).all()
 
     return render_template('articles_all.html', form=form,
                            done_articles=done_articles,
@@ -383,6 +395,8 @@ def article(uuid):
         spacing = preferences['spacing']
         color = preferences['color']
         font = preferences['font']
+        article.date_read = datetime.utcnow()
+        db.session.commit()
 
         return render_template('text.html', highlight_id=highlight_id,
                                article=article, user=current_user,
@@ -526,17 +540,17 @@ def updateArticle(uuid):
 
             done_articles = Article.query.filter_by(archived=False, done=True,
                                                     user_id=current_user.id
-                                                    ).all()
+                                                    ).order_by(desc(Article.date_read)).all()
 
             unread_articles = Article.query.filter_by(unread=True, done=False,
                                                       archived=False,
                                                       user_id=current_user.id
-                                                      ).all()
+                                                      ).order_by(desc(Article.date_read)).all()
 
             read_articles = Article.query.filter_by(unread=False, done=False,
                                                     archived=False,
                                                     user_id=current_user.id
-                                                    ).all()
+                                                    ).order_by(desc(Article.date_read)).all()
 
             return render_template('articles_all.html', form=form,
                                    done_articles=done_articles,
