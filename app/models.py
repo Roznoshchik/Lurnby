@@ -6,6 +6,7 @@ from flask_login import UserMixin
 import jwt
 import uuid
 import os
+from sqlalchemy import desc
 from sqlalchemy_utils import UUIDType
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -121,7 +122,7 @@ class Article(db.Model):
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
-    date_read = db.Column(db.DateTime)
+    date_read = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     highlights = db.relationship('Highlight', lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
@@ -131,6 +132,14 @@ class Article(db.Model):
     done = db.Column(db.Boolean, default=False)
     notes = db.Column(db.Text)
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def recent_articles():
+        return Article.query.filter_by(done=False,
+                                       archived=False,
+                                       unread=False
+                                       ).order_by(desc(Article.date_read)
+                                       ).limit(3).all()
+
 
     # api return article resource
     def to_dict(self):

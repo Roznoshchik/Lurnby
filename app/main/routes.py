@@ -49,6 +49,8 @@ def articles():
 
             return render_template('articles.html', articles)
 
+    recent = Article.recent_articles()
+
     done_articles = Article.query.filter_by(archived=False, done=True,
                                             user_id=current_user.id
                                             ).order_by(desc(Article.date_read)).all()
@@ -65,6 +67,7 @@ def articles():
 
     return render_template('articles.html', form=form,
                            done_articles=done_articles,
+                           recent=recent,
                            unread_articles=unread_articles,
                            user=current_user, read_articles=read_articles)
 
@@ -251,6 +254,8 @@ def add_article():
             db.session.commit()
             os.remove(path)
 
+        recent = Article.recent_articles()
+
         done_articles = Article.query.filter_by(archived=False, done=True,
                                                 user_id=current_user.id
                                                 ).order_by(desc(Article.date_read)).all()
@@ -266,6 +271,7 @@ def add_article():
                                                 ).order_by(desc(Article.date_read)).all()
 
     return render_template('articles_all.html', form=form,
+                           recent=recent, 
                            done_articles=done_articles,
                            unread_articles=unread_articles,
                            read_articles=read_articles, user=current_user)
@@ -286,6 +292,8 @@ def filter_articles():
 
     if tag_ids == []:
 
+        recent = Article.recent_articles()
+
         done_articles = Article.query.filter_by(archived=False, done=True,
                                                 user_id=current_user.id
                                                 ).order_by(desc(Article.date_read)).all()
@@ -302,6 +310,7 @@ def filter_articles():
 
         return render_template('articles_all.html', form=form,
                                done_articles=done_articles,
+                               recent=recent,
                                unread_articles=unread_articles,
                                read_articles=read_articles, user=current_user)
 
@@ -310,6 +319,8 @@ def filter_articles():
     # these are just shortcuts to make the lines in the below queries shorter
     join_aid = tags_articles.c.article_id
     join_tid = tags_articles.c.tag_id
+
+    recent = Article.recent_articles()
 
     done_articles = Article.query.filter_by(archived=False, done=True,
                                             user_id=current_user.id
@@ -339,6 +350,7 @@ def filter_articles():
 
     return render_template('articles_all.html', form=form,
                            done_articles=done_articles,
+                           recent=recent,
                            unread_articles=unread_articles,
                            read_articles=read_articles,
                            user=current_user, active_tags=active_tags)
@@ -538,6 +550,8 @@ def updateArticle(uuid):
 
             db.session.commit()
 
+            recent = Article.recent_articles()
+
             done_articles = Article.query.filter_by(archived=False, done=True,
                                                     user_id=current_user.id
                                                     ).order_by(desc(Article.date_read)).all()
@@ -554,6 +568,7 @@ def updateArticle(uuid):
 
             return render_template('articles_all.html', form=form,
                                    done_articles=done_articles,
+                                   recent=recent,
                                    unread_articles=unread_articles,
                                    read_articles=read_articles,
                                    user=current_user)
