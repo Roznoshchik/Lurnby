@@ -94,8 +94,11 @@ function add_new_article(){
             tags.push(tag.firstElementChild.value);
         };
     });
-    
-
+   
+    byId('articles_page').innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
+    <p>Articles with a lot of images take some time to process. Please wait.</p>
+    <img src="static/spinning-circles.svg" width="50" alt="">
+</div>`;
 
     formdata = new FormData();
 
