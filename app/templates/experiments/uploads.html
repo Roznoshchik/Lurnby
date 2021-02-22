@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div style = "display: block; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
+    <form action="{{url_for('experiments.uploads')}}" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>        <p class="card-text">Choose a file to upload it to AWS S3</p>
+           <input type="file" name="file" value="file">
+           <hr>
+      <input type="submit" name="upload" value="Upload" class="btn btn-success">
+    </form>
+</div>
+
+{% if msg is defined and msg %} <img src="{{ msg }}"/> {% endif %}
+
+{% endblock %}
