@@ -2,7 +2,7 @@ import base64
 from app import db, login
 from datetime import datetime, timedelta
 from flask import current_app, url_for
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 import jwt
 import uuid
 import os
@@ -136,7 +136,8 @@ class Article(db.Model):
     def recent_articles():
         return Article.query.filter_by(done=False,
                                        archived=False,
-                                       unread=False
+                                       unread=False,
+                                       user_id = current_user.id
                                        ).order_by(desc(Article.date_read)
                                        ).limit(3).all()
 
