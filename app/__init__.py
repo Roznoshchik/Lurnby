@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
@@ -5,7 +6,7 @@ import os
 from config import Config
 from flask import Flask
 from flask_cors import CORS
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_mail import Mail
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -46,6 +47,14 @@ csp = {
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
+    
+    @app.before_request
+    def before_request_func():
+        if current_user.is_authenticated:
+            current_user.last_active = datetime.utcnow()
+            db.session.commit()
+        else:
+            print('not logged in user')
 
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
     db.init_app(app)

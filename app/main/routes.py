@@ -32,10 +32,10 @@ from app.main import bp
 @login_required
 def articles():
     form = ContentForm()
-
+    """
     articles = Article.query.filter_by(user_id=current_user.id, archived=False
                                        ).order_by(desc(Article.date_read)).all()
-
+    """
     if (request.method == 'GET'):
         if(request.json):
 

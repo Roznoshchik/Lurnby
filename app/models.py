@@ -28,6 +28,7 @@ class User(UserMixin, db.Model):
     topics = db.relationship('Topic', backref='user', lazy='dynamic')
     tags = db.relationship('Tag', backref='user', lazy='dynamic')
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    last_active = db.Column(db.DateTime, default=datetime.utcnow)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
     preferences = db.Column(db.String, index=True, default=preferences)

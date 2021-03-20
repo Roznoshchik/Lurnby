@@ -1,3 +1,6 @@
+import datetime
+from sqlalchemy import desc
+
 from app import create_app
 from app.models import User
 
@@ -20,7 +23,7 @@ def print_data():
 
 
 def data_dashboard():
-    users = User.query.all()
+    users = User.query.order_by(desc(User.last_active)).all()
     user_list = []
     for u in users:
         user = {
@@ -30,6 +33,7 @@ def data_dashboard():
             'highlights': u.highlights.count(),
             'topics': u.topics.count(),
             'tags': u.tags.count(),
+            'last_active': u.last_active,
             'test_account': u.test_account
         }
 
