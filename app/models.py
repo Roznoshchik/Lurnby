@@ -6,7 +6,7 @@ from flask_login import UserMixin, current_user
 import jwt
 import uuid
 import os
-from sqlalchemy import desc
+from sqlalchemy import desc, event
 from sqlalchemy_utils import UUIDType
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -113,7 +113,7 @@ tags_articles = db.Table('tags_articles',
                                                 db.ForeignKey('article.id'),
                                                 nullable=False))
 
-
+    
 class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True)
@@ -133,6 +133,7 @@ class Article(db.Model):
     done = db.Column(db.Boolean, default=False)
     notes = db.Column(db.Text)
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
     def recent_articles():
         return Article.query.filter_by(done=False,
@@ -214,7 +215,6 @@ tags_highlights = db.Table(
               nullable=False)
 )
 
-
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, index=True)  # should I set a max length?
@@ -226,6 +226,7 @@ class Highlight(db.Model):
     archived = db.Column(db.Boolean, index=True)
     tags = db.relationship('Tag', secondary=tags_highlights, lazy='dynamic')
     position = db.Column(db.String)
+    created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     # add highlight to topic
     def AddToTopic(self, topic):
@@ -391,3 +392,38 @@ class Tag(db.Model):
     def is_added_article(self, article):
         return self.articles.filter(
             article.id == tags_articles.c.article_id).count() > 0
+
+
+def after_insert_listener(mapper, connection, target):
+    # 'target' is the inserted object
+    if isinstance(target, Highlight):
+        print('added highlight')
+    elif isinstance(target, Article):
+        print('added article')
+    elif isinstance(target, Tag):
+        print('added tag')
+    elif isinstance(target, Topic):
+        print('added topic')
+
+
+def after_update_listener(mapper, connection, target):
+    # 'target' is the inserted object
+    if isinstance(target, Highlight):
+        print('updated highlight')
+    elif isinstance(target, Article):
+        print('updated article')
+    elif isinstance(target, Tag):
+        print('updated tag')
+    elif isinstance(target, Topic):
+        print('updated topic')
+
+
+db.event.listen(Article, 'after_insert', after_insert_listener)
+db.event.listen(Highlight, 'after_insert', after_insert_listener)
+db.event.listen(Topic, 'after_insert', after_insert_listener)
+db.event.listen(Tag, 'after_insert', after_insert_listener)
+
+db.event.listen(Article, 'after_update', after_update_listener)
+db.event.listen(Highlight, 'after_update', after_update_listener)
+db.event.listen(Topic, 'after_update', after_update_listener)
+db.event.listen(Tag, 'after_update', after_update_listener)
