@@ -29,6 +29,7 @@ class User(UserMixin, db.Model):
     tags = db.relationship('Tag', backref='user', lazy='dynamic')
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
+    last_action = db.Column(db.String)
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
     preferences = db.Column(db.String, index=True, default=preferences)
@@ -394,28 +395,37 @@ class Tag(db.Model):
             article.id == tags_articles.c.article_id).count() > 0
 
 
+def update_user_last_action(action):
+    print(f'last action = {action}')
+    db.session.execute(
+        User.__table__.
+        update().        
+        values(last_action=action).
+        where(User.id == current_user.id))
+
+
 def after_insert_listener(mapper, connection, target):
     # 'target' is the inserted object
     if isinstance(target, Highlight):
-        print('added highlight')
+        update_user_last_action('added highlight')
     elif isinstance(target, Article):
-        print('added article')
+        update_user_last_action('added article')
     elif isinstance(target, Tag):
-        print('added tag')
+        update_user_last_action('added tag')
     elif isinstance(target, Topic):
-        print('added topic')
+        update_user_last_action('added topic')
 
 
 def after_update_listener(mapper, connection, target):
     # 'target' is the inserted object
     if isinstance(target, Highlight):
-        print('updated highlight')
+        update_user_last_action('updated highlight')
     elif isinstance(target, Article):
-        print('updated article')
+        update_user_last_action('updated article')
     elif isinstance(target, Tag):
-        print('updated tag')
+        update_user_last_action('updated tag')
     elif isinstance(target, Topic):
-        print('updated topic')
+        update_user_last_action('updated topic')
 
 
 db.event.listen(Article, 'after_insert', after_insert_listener)
@@ -423,7 +433,13 @@ db.event.listen(Highlight, 'after_insert', after_insert_listener)
 db.event.listen(Topic, 'after_insert', after_insert_listener)
 db.event.listen(Tag, 'after_insert', after_insert_listener)
 
-db.event.listen(Article, 'after_update', after_update_listener)
-db.event.listen(Highlight, 'after_update', after_update_listener)
+# db.event.listen(Article, 'after_update', after_update_listener)
+# db.event.listen(Highlight, 'after_update', after_update_listener)
 db.event.listen(Topic, 'after_update', after_update_listener)
-db.event.listen(Tag, 'after_update', after_update_listener)
+# db.event.listen(Tag, 'after_update', after_update_listener)
+
+def receive_team_users_append(target, value, initiator):
+    update_user_last_action('added/removed highlight from topic')
+
+db.event.listen(Highlight.topics, 'append', receive_team_users_append)
+db.event.listen(Highlight.topics, 'remove', receive_team_users_append)

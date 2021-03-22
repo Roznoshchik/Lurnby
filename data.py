@@ -34,7 +34,8 @@ def data_dashboard():
             'topics': u.topics.count(),
             'tags': u.tags.count(),
             'last_active': u.last_active,
-            'test_account': u.test_account
+            'test_account': u.test_account,
+            'last_action': u.last_action
         }
 
         user_list.append(user)
