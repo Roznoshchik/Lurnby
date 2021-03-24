@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import random
 
 # 0 - 1 day
 # 1 - 3 days
@@ -50,8 +51,11 @@ def order_highlights(user):
     tier5 = []
     tier6 = []
     tier7 = []
+    
+    highlights = user.highlights.filter_by(archived=False).all()
+    random.shuffle(highlights)
 
-    for h in user.highlights.filter_by(archived=False).all():
+    for h in highlights:
         if h.review_schedule == 0:
             if len(tier0) < 10:
                 if check_for_review(h, h.review_schedule):
