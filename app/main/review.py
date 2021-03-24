@@ -51,7 +51,7 @@ def order_highlights(user):
     tier6 = []
     tier7 = []
 
-    for h in user.highlights.all():
+    for h in user.highlights.filter_by(archived=False).all():
         if h.review_schedule == 0:
             if len(tier0) < 10:
                 if check_for_review(h, h.review_schedule):
