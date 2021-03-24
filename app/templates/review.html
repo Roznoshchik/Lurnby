@@ -1,9 +1,86 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    #container {
+        margin: 50px 20px;
+    }
+    
+    .review-item {
+        max-width: 800px;
+        margin: 16px 0 32px 0;
+    }
 
-var add_span;
-var add;
+    .review-header {
+        background-color:white;
+        padding: 16px;
+    }
+
+    .review-content {
+        background-color: white;
+        padding: 0 16px;
+    }
+
+    .review-actions button{
+        margin-bottom: 8px;
+        margin-left: 0;
+    }
+</style>
+{% endblock %}
+
+
+{% block content%}
+<div id="container">
+    {% if empty %}
+    <div class="main-section lurnby-empty-row">
+        <div class=" lurnby-empty-col col text-center">
+            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+            <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">You don't have any highlights to review!</h1>
+            <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
+                <a href = "{{url_for('main.articles')}}" class="main-button articles-empty-cta add-new">Read an article.</a>
+        </div>
+    </div>
+    {% endif %}
+    {% for tier in range(8) %}
+        <div id="tier{{tier}}" class="tier">
+        {% if tiers[tier]|length > 0 %}
+            <div class="heading">
+                <h6>Review tier {{tier}}</h6>
+            </div>
+            <h6 class = "subheading">{{days[tier]}} since last review</h6>
+            {% for number in range(tiers[tier]|length) %}
+            {% set highlight = tiers[tier][number] %}
+            <div id="highlight{{highlight.id}}" class="review-item">
+                <div class="review-header">
+                    <h6>From: {{ highlight.article.title}}</h6>
+                    <div class="underline"></div>
+                </div>
+                <div class="review-content">
+                    <p>{{highlight.text}}</p>
+                    <div class="review-actions">
+                        <button class="main-button view_highlight" onclick="ShowViewHighlightModal({{ highlight.id }})">View Details</button>
+                        <button class=" main-button dont-remember" onclick="KeepTier({{highlight.id}})">I didn't remember</button>
+                        <button class="main-button remember" onclick="RaiseTier({{highlight.id}})">I remembered</button>
+                    </div>
+                </div>
+            </div>       
+            {% endfor %} 
+        {% endif %}
+        </div>
+    {% endfor %}
+
+    
+    <!-- View Highlight Modal-->
+    <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
+    </div>
+</div>
+
+{% endblock%}
+
+{% block JS %}
+<script>
 
 function UpdateNewTopic(){
-
     add_span.innerHTML = `
             <div class="form-row align-items-center">
                 <div class="col-auto">
@@ -22,24 +99,22 @@ function UpdateNewTopic(){
     var input = byId('UpdateAddTopicInput');
     input.focus();
 
+};
 
-  };
-
-  function UpdateCancelNewTopic(){
-      add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
-  };
+function UpdateCancelNewTopic(){
+  add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
+};
 
 
-  function UpdateNewTopicSubmit(){
+function UpdateNewTopicSubmit(){
     input = byId('UpdateAddTopicInput')
-    
+
     if (input.value === '' || input.value === ' ' || input.value === '  ')
     {
         input.classList.add('is-invalid')
         input.focus();
     }
-    else 
-    {   
+    else {   
             
         $.post('/topics/add/from_highlight', {
             title: input.value
@@ -51,13 +126,12 @@ function UpdateNewTopic(){
         });
         
     }
-  
+
 };
 
 
-    
+
 function AddToTopic(id, title){
-    
     var members, newLabel, newInput, newSpan
 
     members = byId('Members')
@@ -66,8 +140,8 @@ function AddToTopic(id, title){
     newSpan = document.createElement('span')
 
     newLabel.setAttribute('id', 'topic'+id)
-    newLabel.classList.add('topic-label', 'btn', 'active', 'initialized')
-    
+    newLabel.classList.add('topic-label','upd-topic-label', 'btn', 'active', 'initialized')
+
     newInput.setAttribute('name', 'members')
     newInput.setAttribute('type', 'checkbox')
     newInput.checked = true
@@ -88,71 +162,57 @@ function AddToTopic(id, title){
             console.log(target.classList)
             target.classList.toggle('active')
             console.log(target.classList)
-
-            /*
-            var target = e.target
-            if (target.classList.contains('active')){
-                target.classList.remove('active')
-            }
-            else {
-                target.classList.add('active')
-            }
-            */
         }
     });
 }
-  
 
-function initialize_topics(){
 
-    var all_topics = byClass('topic-label')
-    
-    for (var i=0; i< all_topics.length; i++){
-        
-        if (all_topics[i].classList.contains('initialized')){
-            continue
+function initialize(){
+    console.log('initializing')
+    var tagged =  byClass('tagged');
+    var untagged = byClass('untagged');
+    add = byId('add_new_tag');
+
+    for (var i = 0; i<tagged.length; i++){
+        if (tagged[i].classList.contains('initialized')){
+            continue;
         }
-        else{
-            all_topics[i].classList.add('initialized');
-            all_topics[i].addEventListener("click", function(e){
-                //console.log('click registered')
+        else {
+            tagged[i].classList.add('initialized');
+            tagged[i].addEventListener("click", function(e) {
                 e=e || window.event;
                 var target = e.target || e.srcElement;
-               
-                //console.log(target.tagName)        
+                if (target.tagName === 'LABEL'){
+                    target.classList.toggle('tagged')
+                    target.classList.toggle('untagged')
+                }  
+            
+            });
+            
+        }
+    }
 
-                
-                if (target.tagName === "LABEL"){
-                    /*
-                    if (target.classList.contains('active')){
-                        console.log('removing')
-                        target.classList.remove('active')
-                    }
-
-                    else {
-                        console.log('adding')
-                        console.log(target.classList)
-                        target.classList.add("active");
-                        console.log(target.classList)
-                    }
-                    */
-                    console.log(target.firstElementChild.value)
-                    console.log(target.classList)
-                    target.classList.toggle('active')
-                    console.log(target.classList)
+    for (var i = 0; i<untagged.length; i++){
+        if (untagged[i].classList.contains('initialized')){
+            continue;
+        }
+        else {
+            untagged[i].classList.add('initialized');
+            untagged[i].addEventListener("click", function(e) {
+                e=e || window.event;
+                var target = e.target || e.srcElement;
+                if (target.tagName === 'LABEL'){
+                    target.classList.toggle('tagged')
+                    target.classList.toggle('untagged')
                 }
             });
-        }   
+        }
     }
 }
-
 
 function initialize_view_topics(){
-
     var all_topics = byClass('upd-topic-label')
-    
     for (var i=0; i< all_topics.length; i++){
-        
         if (all_topics[i].classList.contains('initialized')){
             continue
         }
@@ -162,38 +222,19 @@ function initialize_view_topics(){
                 //console.log('click registered')
                 e=e || window.event;
                 var target = e.target || e.srcElement;
-               
                 //console.log(target.tagName)        
-
-                
-                if (target.tagName === "LABEL"){
-                    /*
-                    if (target.classList.contains('active')){
-                        console.log('removing')
-                        target.classList.remove('active')
-                    }
-
-                    else {
-                        console.log('adding')
-                        console.log(target.classList)
-                        target.classList.add("active");
-                        console.log(target.classList)
-                    }
-                    */
-                    console.log(target.firstElementChild.value)
-                    console.log(target.classList)
+                if (target.tagName === "LABEL"){ 
+                    //console.log(target.firstElementChild.value)
+                    //console.log(target.classList)
                     target.classList.toggle('active')
-                    console.log(target.classList)
+                    //console.log(target.classList)
                 }
             });
         }
-        
     }
 }
 
-    
-function ViewHighlight(id){
-
+function ShowViewHighlightModal(id){
     xhr = $.ajax(
                 '/view_highlight/' + id).done(
                     function(data) {
@@ -202,31 +243,25 @@ function ViewHighlight(id){
                         add_span = byId('new-topic');
                         add = byId('add_new_tag');
 
-                        
-
                         initialize();
                         initialize_view_topics();
                         $('#ViewHighlightModal').modal('toggle')
                     }
     );
-
 }
-    
-    
-function UpdateHighlight(id){
 
+function UpdateHighlight(id){
     $('#ViewHighlightModal').modal('hide')
-    
+
     var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
-    
 
     notes = byId('view_highlight_notes').value
     highlight = byId('view_highlight_text').value
-    
+
     doc_tags= byClass('update-highlight')
     tags=[]
     untags=[]
-    for (var i = 0; i <doc_tags.length; i++){
+    for (var i = 0; i < doc_tags.length; i++){
         if(doc_tags[i].classList.contains('tagged')){
             tags.push(doc_tags[i].firstElementChild.value);
         }
@@ -234,7 +269,6 @@ function UpdateHighlight(id){
             untags.push(doc_tags[i].firstElementChild.value);
         }
     }
-
 
     doc_topics = byClass('upd-topic-label')
     topics=[]
@@ -256,18 +290,18 @@ function UpdateHighlight(id){
 
     var a_tags = byClass('active-tags')
     var a_topics = byClass('active-topics')
-    
+
     atags = []
     atopics = []
-    
+
     for (var i=0;i<a_tags.length;i++){
-      atags.push(a_tags[i].firstElementChild.value)
+    atags.push(a_tags[i].firstElementChild.value)
     }
-    
+
     for (var i=0;i<a_topics.length;i++){
-      atopics.push(a_topics[i].firstElementChild.value)
+    atopics.push(a_topics[i].firstElementChild.value)
     }
-    
+
     topicspace = byId('topics_all')
     if (topicspace){
         data = {
@@ -295,10 +329,10 @@ function UpdateHighlight(id){
             'topics-page':'false'
         }
     }
-    
+
     data = JSON.stringify(data)
     console.log(data)
-       
+    
     url = '/view_highlight/' + id
     topicspace = byId('topics_all')
         if (topicspace){
@@ -318,8 +352,63 @@ function UpdateHighlight(id){
             initialize();
             console.log(data)
         }
-        
     }); 
+}
+
+function reviewed_all(){
+    var container = byId('container')
+    var data = `
+    <div class="main-section lurnby-empty-row">
+        <div class=" lurnby-empty-col col text-center">
+            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+            <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">All done for now!</h1>
+                <p>Great work. Check back later for more review items.</p>
+                <a href = "{{url_for('main.review')}}" class="main-button articles-empty-cta add-new">Review more now</a>
+        </div>
+    </div>
+    `
+    container.innerHTML = data
 
 }
 
+function RaiseTier(id){
+    var reviewitem = byId('highlight'+id)
+    reviewitem.remove()
+    if (byClass('review-item').length == 0) {
+        reviewed_all()
+    }
+    url = '/tier/' + id
+    data = {
+        'tier': 'raise'
+    }
+
+    $.post(url, {
+        'data': JSON.stringify(data)
+    })
+
+}
+
+function KeepTier(id){
+    var reviewitem = byId('highlight'+id)
+    reviewitem.remove()
+    if (byClass('review-item').length == 0) {
+        reviewed_all()
+    }
+
+    url = '/tier/' + id
+    data = {
+        'tier': 'keep'
+    }
+
+    $.post(url, {
+        'data': JSON.stringify(data)
+    })
+}
+
+
+
+</script>
+
+
+{% endblock%}

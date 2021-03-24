@@ -7,6 +7,7 @@ from app import db
 from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
+from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
 from app.models import (User, Article, Topic, Highlight, Tag,
                         tags_articles, tags_highlights)
@@ -1402,3 +1403,46 @@ def unarchivetopic(topic_id):
                            active_topics=active_topics, user=current_user,
                            filter_topics=filter_topics, topics=topics,
                            highlights=highlights, notopics=notopics)
+
+
+@bp.route('/review', methods=['GET', 'POST'])
+def review():
+    tiers = order_highlights(current_user)
+    empty = True
+    for i in range(8):
+        if len(tiers[i]) > 0:
+            empty = False
+            break
+    days = [
+        '1 day', '3 days', '1 week', '2 weeks', '1 month', '3 months', 'half a year', '1 year'
+    ]
+
+    return render_template('review.html', tiers=tiers, days=days, empty=empty)
+
+@bp.route('/tier/<id>', methods=['POST'])
+def tier(id):
+    highlight = Highlight.query.filter_by(id=id).first()
+    data = json.loads(request.form['data'])
+    if data['tier'] == 'keep':
+        print('keep tier', highlight)
+        highlight.review_date = datetime.utcnow()
+        current_user.last_action = 'reviewed highlights'
+        db.session.commit()
+
+        return (json.dumps({'success': True}),
+                200, {'ContentType': 'application/json'})
+    
+    if data['tier'] == 'raise':
+        print('raise tier', highlight)
+        if highlight.review_schedule != 7:
+            highlight.review_schedule = highlight.review_schedule + 1
+            highlight.review_date = datetime.utcnow()
+            current_user.last_action = 'reviewed highlights'
+            db.session.commit()
+
+        return (json.dumps({'success': True}),
+                200, {'ContentType': 'application/json'})
+
+    return (json.dumps({'success': False}),
+                400, {'ContentType': 'application/json'})
+

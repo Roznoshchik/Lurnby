@@ -364,9 +364,12 @@ for(let i=0; i<tables.length; i++){
 </script>
 
 
-<!-- Select and highlight js. -->
+<!-- Included scripts -->
 <script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/TextHighlighter.js')}}"></script>
 <script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+
 
 <script>
   // enable highlighting      
@@ -393,7 +396,7 @@ for(let i=0; i<tables.length; i++){
       $('.popover-dismiss').popover({
         trigger: 'focus'
       });
-    
+  
       
     } 
     
@@ -618,10 +621,6 @@ for(let i=0; i<tables.length; i++){
   <!--
    End WYSIWYG Editor
  --> 
-
-
-<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
-<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 
 
 <script type="text/javascript">

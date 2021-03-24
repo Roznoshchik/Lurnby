@@ -46,8 +46,6 @@ function initialize(){
             });
             
         }
-
-        
     }
 
     for (var i = 0; i<untagged.length; i++){
@@ -59,47 +57,13 @@ function initialize(){
             untagged[i].addEventListener("click", function(e) {
                 e=e || window.event;
                 var target = e.target || e.srcElement;
-    
-                
                 if (target.tagName === 'LABEL'){
                     target.classList.toggle('tagged')
                     target.classList.toggle('untagged')
-
-                    /*
-                    if (target.classList.contains('tagged')){
-                        target.classList.remove('tagged');
-                        target.classList.add('untagged')
-                        target.firstChild.name = 'untags';
-                        target.firstChild.checked=true;
-    
-    
-    
-                    }
-                    else{
-                        target.classList.remove('untagged');
-                        target.classList.add('tagged')
-    
-                        target.firstChild.name = 'tags';
-                        target.firstChild.checked=true;
-    
-                    }
-
-                    */
                 }
-            
             });
-
         }
-
-        
-
-
-
     }
-    
-    
-
-
 }
 
 
