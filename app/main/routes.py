@@ -1431,6 +1431,16 @@ def tier(id):
 
         return (json.dumps({'success': True}),
                 200, {'ContentType': 'application/json'})
+
+    if data['tier'] == 'lower':
+        print('lower tier', highlight)
+        highlight.review_schedule = highlight.review_schedule - 1
+        highlight.review_date = datetime.utcnow()
+        current_user.last_action = 'reviewed highlights'
+        db.session.commit()
+
+        return (json.dumps({'success': True}),
+                200, {'ContentType': 'application/json'})
     
     if data['tier'] == 'raise':
         print('raise tier', highlight)
