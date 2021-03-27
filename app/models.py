@@ -222,8 +222,10 @@ class Highlight(db.Model):
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
     topics = db.relationship(
         'Topic', secondary=highlights_topics, lazy='dynamic')
-    note = db.Column(db.String, index=True)
+    
     archived = db.Column(db.Boolean, index=True)
+    no_topics = db.Column(db.Boolean, default=True, index=True)
+    note = db.Column(db.String, index=True)
     tags = db.relationship('Tag', secondary=tags_highlights, lazy='dynamic')
     position = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)

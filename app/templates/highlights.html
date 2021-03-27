@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+<!--------------->
+<!--  styles   -->
+<!--------------->
+{% block style %}
+<style>
+   
+    .highlight-section {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+
+
+    .highlight-card {
+        background: white;
+        max-width: 300px;
+        margin-right: 16px;
+    }
+</style>
+
+{% endblock %}
+
+
+{% block content %}
+
+<!------------------------------->
+<!--   check for empty state   -->
+<!------------------------------->
+
+{% if highlights_count == 0 %}
+<div id = "highlights_page">
+    <div class="main-section lurnby-empty-row">
+        <div class=" lurnby-empty-col col text-center">
+            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+            <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">You don't have any highlights yet!</h1>
+            <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
+                <a href = "{{url_for('main.articles')}}" class="main-button articles-empty-cta add-new">Start by reading an article.</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-------------------->
+<!--   Statistics   -->
+<!-------------------->
+
+{% if highlights_count >= 1 %}
+<div id = "highlights_page">
+    <div id="overview" class = "main-section row">
+    
+        <div id = "statistics" class ="main-col col-sm-12 col-lg-4">
+            <div class = "heading">
+                <h6 class = "label">Your work in progress</h6>
+            </div>
+    
+            <div class = "col data">
+                {% if articles_count == 1%}
+                    <div class = "data-item">
+                        <p>{{articles_count}} article added</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{articles_count}} articles added</p>
+                    </div>
+                {% endif %}
+    
+                {% if tags_count == 1 %}
+                    <div class = "data-item">
+                        <p>{{tags_count}} tag </p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{tags_count}} tags </p>
+                    </div>
+                {% endif %}
+    
+                {% if highlights_count == 1 %}
+                    <div class = "data-item">
+                        <p>{{highlights_count}} highlight</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{highlights_count}} highlights</p>
+                    </div>
+                {% endif %}
+                {% if topics_count == 1 %}
+                    <div class = "data-item">
+                        <p>{{topics_count}} topic</p>
+                    </div>
+                {% else %}
+                    <div class = "data-item">
+                        <p>{{topics_count}} topics</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!---------------------->
+    <!--   main section   -->
+    <!---------------------->
+
+    <div id = "highlights_all" class = "main-section">
+        {% if no_topics|length > 0 %}
+        <h6 class = "subheading">Highlights without topics</h6>
+        {% endif %}
+        <div class = "highlight-section">
+            {% for highlight in no_topics %}
+            <div id="highlight-{{highlight.id}}" class="highlight-card">
+                <div class="highlight-header">
+                    <h6>From: {{ highlight.article.title}}</h6>
+                    <div class="underline"></div>
+                </div>
+                <div class="highlight-content">
+                    <p>{{highlight.text}}</p>
+    
+                    <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
+                        <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
+                    </div>
+                </div>
+            </div>   
+            {% endfor %}
+        </div>
+    
+        <h6 class = "subheading">Highlights with topics</h6>
+        <div class = "highlight-section">
+            {% for highlight in with_topics %}
+            <div id="highlight-{{highlight.id}}" class="highlight-card">
+                <div class="highlight-header">
+                    <h6>From: {{ highlight.article.title}}</h6>
+                    <div class="underline"></div>
+                </div>
+                <div class="highlight-content">
+                    <p>{{highlight.text}}</p>
+                    <div class="highlight-topics">
+                        <h6>Topics:</h6>
+                        {% for topic in highlight.topics.filter_by(archived=False).all() %}
+                            <span class = "label"><p>{{topic.title}}</p></span>
+                        {% endfor %}
+
+                    </div>
+                    <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
+                        <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
+                    </div>
+                </div>
+            </div>   
+            {% endfor %}
+        </div>
+    
+
+
+    </div>
+
+</div>
+<div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog" aria-labelledby="ViewHighlightModalLabel" aria-hidden="true"> 
+</div>
+{% endif %}
+{% endblock%}
+
+{% block JS %}
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
+{% endblock %}

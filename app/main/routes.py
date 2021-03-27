@@ -848,15 +848,40 @@ def unarchivehighlight(id):
     return redirect(url_for('main.topics'))
 
 
+##########################
+#                        #
+#  Topics functions      #
+#                        #
+##########################
+
+@bp.route('/highlights', methods=['GET', 'POST'])
+@login_required
+def highlights():
+
+    no_topics = current_user.highlights.filter_by(archived=False,
+                                                  no_topics=True).all()
+    with_topics = current_user.highlights.filter_by(archived=False,
+                                                    no_topics=False).all()    
+    articles_count = current_user.highlights.filter_by(archived=False).count()
+    topics_count = current_user.topics.filter_by(archived=False).count()
+    highlights_count = current_user.highlights.filter_by(archived=False).count()
+    tags_count = current_user.tags.count()
+
+    return render_template('highlights.html', tags_count=tags_count,
+                           highlights_count=highlights_count,
+                           articles_count=articles_count,
+                           topics_count=topics_count, no_topics=no_topics,
+                           with_topics=with_topics)
+
+
 @bp.route('/topics', methods=['GET', 'POST'])
 @login_required
 def topics():
 
-    filter_topics = Topic.query.filter_by(archived=False,
-                                          user_id=current_user.id).all()
-
     topics = Topic.query.filter_by(archived=False, user_id=current_user.id
                                    ).all()
+
+    filter_topics = topics
 
     highlights = Highlight.query.filter_by(user_id=current_user.id,
                                            archived=False).all()
