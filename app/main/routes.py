@@ -862,7 +862,7 @@ def highlights():
                                                   no_topics=True).all()
     with_topics = current_user.highlights.filter_by(archived=False,
                                                     no_topics=False).all()    
-    articles_count = current_user.highlights.filter_by(archived=False).count()
+    articles_count = current_user.articles.filter_by(archived=False).count()
     topics_count = current_user.topics.filter_by(archived=False).count()
     highlights_count = current_user.highlights.filter_by(archived=False).count()
     tags_count = current_user.tags.count()
