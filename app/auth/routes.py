@@ -26,7 +26,7 @@ def login():
                .filter_by(username=form.username.data.lower()).first()
         if user is not None:
             if user.check_password(form.password.data):
-                login_user(user, remember=form.remember_me.data)
+                login_user(user, remember=True)
                 next_page = request.args.get('next')
                 if not next_page or url_parse(next_page).netloc != '':
                     next_page = url_for('main.articles')
@@ -42,7 +42,7 @@ def login():
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('auth.login'))
 
-            login_user(user, remember=form.remember_me.data)
+            login_user(user, remember=True)
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('main.articles')
@@ -131,7 +131,7 @@ def callback():
         db.session.add(newuser)
         db.session.commit()
         user = User.query.filter_by(goog_id=unique_id).first()
-        login_user(user)
+        login_user(user, remember=True)
 
     if user is not None:
         if user.goog_id is None:
@@ -139,7 +139,7 @@ def callback():
             user.firstname = users_name
             db.session.commit()
 
-        login_user(user)
+        login_user(user, remember=True)
     return redirect(url_for("main.articles"))
 
 
