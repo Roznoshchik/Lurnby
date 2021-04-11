@@ -3,18 +3,24 @@ import os
 from uuid import UUID
 import validators
 
-from app import db
+from app import csrf, db
 from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
 from app.main.pulltext import pull_text
 from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
-from app.models import (User, Article, Topic, Highlight, Tag,
+from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
                         tags_articles, tags_highlights)
+
+import sys
+sys.path.insert(1, './app/ReadabiliPy')
+from readabilipy import simple_json_from_html_string
+
 from data import data_dashboard
 
+from bs4 import BeautifulSoup
 from flask import flash, redirect, url_for, render_template, request, jsonify
-from flask_login import current_user, login_required
+from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date
@@ -71,6 +77,88 @@ def articles():
                            recent=recent,
                            unread_articles=unread_articles,
                            user=current_user, read_articles=read_articles)
+
+@bp.route('/email', methods=['POST'])
+@csrf.exempt
+def add_by_email():
+    print(request.form['from'])
+    u = User.query.filter_by(add_by_email=request.form['to']).first()
+    emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
+    email = request.form['from']
+    if '<' in email:
+        email = request.form['from'].split('<')[1][:-1]
+        print(email)
+    process = False
+    if email in emails and u:
+        login_user(u)
+        process = True
+    
+    if process:
+        subject = request.form.get('subject', False)
+        html = request.form.get('html', False)
+        text = request.form.get('text', False)        
+      
+        if subject.lower().rstrip() == 'link':
+            url = None
+            
+            if html:
+                soup = BeautifulSoup(html, 'lxml')
+                links = soup.find_all('a')
+                url = links[0]['href']  
+            
+            elif text:
+                url = text.split('\n')[0]
+            else:
+                print('no text in body')
+            
+            if url:
+                if not validators.url(url):
+                    return (json.dumps({'bad_url': True}),
+                            400, {'ContentType': 'application/json'})
+
+                urltext = pull_text(url)
+
+                title = urltext["title"]
+                content = urltext["content"]
+
+                if not title or not content:
+                    return (json.dumps({'bad_url': True}),
+                            400, {'ContentType': 'application/json'})
+
+                new_article = Article(unread=True, progress=0.0,
+                                    title=title, source_url=url, content=content,
+                                    user_id=u.id, archived=False,
+                                    filetype="url")
+                
+        else:
+            content = None
+            if html:
+                article = simple_json_from_html_string(html,
+                                           content_digests=False,
+                                           node_indexes=False,
+                                           use_readability=True)
+                content = article['content'] 
+            elif text.rstrip() != '':
+                content = text
+
+            if subject:
+                title = subject
+            else:
+                title = 'untitled'            
+
+            if content:
+                new_article = Article(unread=True, progress=0.0,
+                                    title=title, source='email', content=content,
+                                    user_id=current_user.id, archived=False,
+                                    filetype="email")
+            else:
+                return 'No Content', 400
+
+        db.session.add(new_article)
+        db.session.commit()
+        logout_user()
+    
+    return ''
 
 
 @bp.route('/app_dashboard', methods=['GET', 'POST'])
@@ -156,7 +244,7 @@ def add_article():
                 if not t:
                     t = Tag(name=tag, archived=False, user_id=current_user.id)
                     db.session.add(t)
-                    new_article.AddToTag(t)
+                    new_article.eAddToTag(t)
                 else:
                     new_article.AddToTag(t)
 

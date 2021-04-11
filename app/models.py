@@ -6,8 +6,10 @@ from flask_login import UserMixin, current_user
 import jwt
 import uuid
 import os
+import random
 from sqlalchemy import desc
 from sqlalchemy_utils import UUIDType
+import string
 from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -15,16 +17,17 @@ from werkzeug.security import generate_password_hash, check_password_hash
 preferences = '{"font": "sans-serif","color": "light-mode", \
               "size": "4","spacing": "line-height-min"}'
 
-
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     goog_id = db.Column(db.String, unique=True, index=True)
     firstname = db.Column(db.String, index=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
+    add_by_email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
     articles = db.relationship('Article', backref='user', lazy='dynamic')
     highlights = db.relationship('Highlight', backref='user', lazy='dynamic')
+    approved_senders = db.relationship('Approved_Sender', backref='user', lazy='dynamic')
     topics = db.relationship('Topic', backref='user', lazy='dynamic')
     tags = db.relationship('Tag', backref='user', lazy='dynamic')
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -50,6 +53,24 @@ class User(UserMixin, db.Model):
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'],
             algorithm='HS256').decode('utf-8')
+
+
+    def create_lurnby_email(self):
+        letters = string.ascii_lowercase + string.digits
+        extra = ''.join(random.choice(letters) for i in range(7))        
+        
+        return f"{self.email.split('@')[0]}-{extra}@add-article.lurnby.com"
+
+
+    def set_lurnby_email(self):
+        unique = False
+        while not unique:
+            email = self.create_lurnby_email()
+            u = User.query.filter_by(add_by_email=email).first()
+            if not u:
+                unique = True
+        self.add_by_email = email
+            
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -105,6 +126,15 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+class Approved_Sender(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    email = db.Column(db.String(120))
+
+    def __repr__(self):
+        return self.email
 
 
 tags_articles = db.Table('tags_articles',

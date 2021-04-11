@@ -34,10 +34,5 @@ def downgrade():
         batch_op.drop_index(batch_op.f('ix_highlight_no_topics'))
         batch_op.drop_column('no_topics')
 
-    with op.batch_alter_table('article', schema=None) as batch_op:
-        batch_op.alter_column('uuid',
-               existing_type=sqlalchemy_utils.types.uuid.UUIDType(),
-               type_=sa.NUMERIC(precision=16),
-               existing_nullable=True)
-
+    
     # ### end Alembic commands ###
