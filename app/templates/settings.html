@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+    .settings-input{
+        width: 300px;
+        padding: 4px 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id = "settings_all" class = "main-section">
+    <div class="heading">
+        <h6>Settings</h6>
+    </div>
+
+    {% if current_user.add_by_email %}
+        <p>Add articles by email: <a href ="mailto:{{current_user.add_by_email }}"><strong>{{current_user.add_by_email}}</strong></a></p>
+        <div class = "heading">
+            <h6>Approved Senders</h6>
+        </div>
+        <p> {% for e in senders %}
+            {{e.email}}{% if not loop.last %},{% endif %} 
+            {% endfor %}</p>
+        <form method="post">
+            {{ form.csrf_token }}
+            {{form.email(class='settings-input', placeholder='add another email')}}
+            {% for error in form.email.errors%}
+            {{ error }}
+            {% endfor %}
+            {{form.submit(class="main-button")}}
+        </form>
+        
+    {% elif current_user.add_by_email == None %}
+    <button id='enable_email' class="main-button">Enable adding articles by email </button>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block JS%}
+<script>
+    enable = document.getElementById('enable_email')
+    enable.addEventListener('click', function(){
+
+        url = '/enable-add-by-email'
+        data = 'enable'
+        
+        $.post(url, {
+        'data':data
+        }).done(function() {
+            location.reload();
+        });
+
+    });
+
+</script>
+
+{% endblock %}

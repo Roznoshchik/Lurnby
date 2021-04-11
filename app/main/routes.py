@@ -5,7 +5,8 @@ import validators
 
 from app import csrf, db
 from app.email import send_email
-from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm
+from app.main.forms import (ContentForm, AddTopicForm,
+                            AddHighlightForm, AddApprovedSenderForm)
 from app.main.pulltext import pull_text
 from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
@@ -160,6 +161,33 @@ def add_by_email():
     
     return ''
 
+@bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+@bp.errorhandler(CSRFError)
+def settings():
+    approved_senders = Approved_Sender.query.filter_by(user_id=current_user.id
+                                                       ).all()
+    form = AddApprovedSenderForm()
+
+    if form.validate_on_submit():
+        e = Approved_Sender(user_id=current_user.id,email=form.email.data)
+        db.session.add(e)
+        db.session.commit()
+
+        return redirect(url_for('main.settings'))
+        
+    return render_template('settings.html',form=form, senders=approved_senders)
+
+@bp.route('/enable-add-by-email', methods=['POST'])
+@login_required
+@bp.errorhandler(CSRFError)
+def enable_add_by_email():
+    current_user.set_lurnby_email()
+    e = Approved_Sender(user_id=current_user.id, email=current_user.email)
+    db.session.add(e)
+    db.session.commit()
+
+    return '', 200
 
 @bp.route('/app_dashboard', methods=['GET', 'POST'])
 @login_required

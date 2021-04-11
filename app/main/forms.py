@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, SubmitField, TextAreaField, DecimalField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, URL, ValidationError,  Optional
+from wtforms.validators import DataRequired, URL, ValidationError, Email, Optional
 from app.models import Topic
 
 
@@ -34,3 +34,7 @@ class AddHighlightForm(FlaskForm):
     text = TextAreaField('Highlight')
     note = TextAreaField('Add a note or description')
     position = DecimalField(places=3, rounding=None, use_locale=False)
+
+class AddApprovedSenderForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Approve email')

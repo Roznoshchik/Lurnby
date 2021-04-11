@@ -26,7 +26,7 @@ def login():
                .filter_by(username=form.username.data.lower()).first()
         if user is not None:
             if user.check_password(form.password.data):
-                login_user(user, remember=form.remember.data)
+                login_user(user, remember=True)
                 next_page = request.args.get('next')
                 if not next_page or url_parse(next_page).netloc != '':
                     next_page = url_for('main.articles')
@@ -42,7 +42,7 @@ def login():
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('auth.login'))
 
-            login_user(user, remember=form.remember.data)
+            login_user(user, remember=True)
             next_page = request.args.get('next')
             if not next_page or url_parse(next_page).netloc != '':
                 next_page = url_for('main.articles')
