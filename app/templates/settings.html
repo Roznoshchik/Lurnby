@@ -5,6 +5,14 @@
         width: 300px;
         padding: 4px 8px;
     }
+
+    #settings_all p{
+        max-width: 800px;
+    }
+
+    #enable_email {
+        margin-left: 0;
+    }
 </style>
 {% endblock %}
 
@@ -16,6 +24,13 @@
 
     {% if current_user.add_by_email %}
         <p>Add articles by email: <a href ="mailto:{{current_user.add_by_email }}"><strong>{{current_user.add_by_email}}</strong></a></p>
+        <div>
+            <div class="heading">
+                <h6>Instructions</h6>
+            </div>
+            <p>To <strong>add an article by link</strong>, your email subject should say "link" and nothing more. This let's Lurnby know that you are sending over a url. In the body of the email, add your link followed by a linebreak.</p>
+            <p>To <strong>add the full text of your email</strong> you just need to forward the whole email to the email address provided by Lurnby. The email subject will become the article title, and the email body content will become the article text.</p>
+        </div>
         <div class = "heading">
             <h6>Approved Senders</h6>
         </div>
@@ -32,6 +47,9 @@
         </form>
         
     {% elif current_user.add_by_email == None %}
+    <h6><strong>Add By Email:</strong></h6>
+        <p>You can add reading content to Lurnby via email. Lurnby can either process links or full emails. At the moment, processing of attachments is not possible.</p>
+        <p>After you enable this feature in your account, you will get a unique email address for sending email to. Additionally, you will be able to specify approved senders. Only emails sent from your approved senders will be processed.</p>
     <button id='enable_email' class="main-button">Enable adding articles by email </button>
     {% endif %}
 </div>
