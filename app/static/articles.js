@@ -239,7 +239,9 @@ function add_new_article(){
 
 function view_article_tiny_init(){
     console.log('pulling up an article')
+
     var existing_notes = byId('notes_edit').value
+    console.log(existing_notes)
     var existing_content = byId('content_edit').value
 
     // cancels any existing editing tiny editors?
@@ -626,6 +628,7 @@ function save(article_id){
     read_status = byId('read_edit').value;
     
     notes = tinymce.get('notes_edit').getContent()
+    console.log(notes)
     content = tinymce.get('content_edit').getContent()
     
     //notes = byId('notes_edit').value;

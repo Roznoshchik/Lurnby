@@ -82,13 +82,13 @@ def articles():
 @bp.route('/email', methods=['POST'])
 @csrf.exempt
 def add_by_email():
-    print(request.form['from'])
+    #print(request.form['from'])
     u = User.query.filter_by(add_by_email=request.form['to']).first()
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
     email = request.form['from']
     if '<' in email:
         email = request.form['from'].split('<')[1][:-1]
-        print(email)
+        #print(email)
     process = False
     if email in emails and u:
         login_user(u)
@@ -547,6 +547,7 @@ def updatearticlenotes(uuid):
     if current_user.id != article.user_id:
         return render_template('errors/404.html'), 404
 
+   
     article.notes = request.form['updated_notes']
     db.session.commit()
 
@@ -753,7 +754,7 @@ def addhighlight():
     db.session.commit()
 
     article_url = url_for('main.article', uuid=article.uuid)
-
+    
     return jsonify({
         'highlight_id': newHighlight.id,
         'highlight_text': newHighlight.text,
@@ -1565,7 +1566,7 @@ def tier(id):
     highlight = Highlight.query.filter_by(id=id).first()
     data = json.loads(request.form['data'])
     if data['tier'] == 'keep':
-        print('keep tier', highlight)
+        # print('keep tier', highlight)
         highlight.review_date = datetime.utcnow()
         current_user.last_action = 'reviewed highlights'
         db.session.commit()
@@ -1584,7 +1585,7 @@ def tier(id):
                 200, {'ContentType': 'application/json'})
     
     if data['tier'] == 'raise':
-        print('raise tier', highlight)
+        #print('raise tier', highlight)
         if highlight.review_schedule != 7:
             highlight.review_schedule = highlight.review_schedule + 1
             highlight.review_date = datetime.utcnow()

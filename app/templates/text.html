@@ -333,16 +333,14 @@ set_position();
   }
 
   function update_notes(){
-    var updated_notes = tinymce.get('notes-editor').getContent();
+    // var updated_notes = tinymce.get('notes-editor').getContent();
+    var updated_notes = tinymce.get('notes-editor').getBody().innerHTML
     
     $.post('/article/{{article_uuid}}/notes', {
-        'updated_notes': updated_notes
+        'updated_notes':updated_notes
       });
 
   }
-
-  
-
 
   document.addEventListener("scroll", getScrollPercent());
 
@@ -467,11 +465,16 @@ for(let i=0; i<tables.length; i++){
       returnedhighlightclass = "highlight"+data['highlight_id'];
       returnedhighlightid = data['highlight_id'];
 
+      console.log(data['article_url'])
+      s = `\n<h4><a href="${data['article_url']}"#highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><h4>Highlight note:</h4>${data['highlight_notes']}<hr><br>`
+      s2 = `\n<h4><a href="${data['article_url']}"#highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><br>`
+      console.log(s)
+
       if (data['highlight_notes'] != ''){
-        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><h4>Highlight note:</h4>` + data['highlight_notes']+ '<hr><br>')
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s )
       }
       else {
-        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + `\n <h4><a href="${data['article_url']+'#highlight'+data['highlight_id']}">Highlight:</a></h4>` + data['highlight_text'] + `<hr><br>`)
+        tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s2 )
 
       }
 
