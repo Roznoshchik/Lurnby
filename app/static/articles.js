@@ -241,7 +241,6 @@ function view_article_tiny_init(){
     console.log('pulling up an article')
 
     var existing_notes = byId('notes_edit').value
-    console.log(existing_notes)
     var existing_content = byId('content_edit').value
 
     // cancels any existing editing tiny editors?

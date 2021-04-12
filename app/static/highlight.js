@@ -109,6 +109,9 @@ $('#addhighlight').click(function(){
 
 $('#AddHighlightModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
+    
+    selectedObj.removeAllRanges();
+
     var rawhighlight = selectedText // selected text
     var highlight_position = position; 
     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
