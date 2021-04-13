@@ -83,8 +83,11 @@ def articles():
 @csrf.exempt
 def add_by_email():
     #print(request.form['from'])
-    print(request.form['to'])
-    u = User.query.filter_by(add_by_email=request.form['to']).first()
+    recipient = request.form['to']
+    if '<' in recipient:
+        recipient = recipient.split('<')[1][:-1]
+
+    u = User.query.filter_by(add_by_email=recipient).first()
     print(u)
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
     email = request.form['from']
