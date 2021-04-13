@@ -458,17 +458,13 @@ for(let i=0; i<tables.length; i++){
       }
 
 
-
-
       selectedObj.removeAllRanges();
       selectedObj.addRange(selectedText);
       returnedhighlightclass = "highlight"+data['highlight_id'];
       returnedhighlightid = data['highlight_id'];
 
-      console.log(data['article_url'])
       s = `\n<h4><a href="${data['article_url']}"#highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><h4>Highlight note:</h4>${data['highlight_notes']}<hr><br>`
       s2 = `\n<h4><a href="${data['article_url']}"#highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><br>`
-      console.log(s)
 
       if (data['highlight_notes'] != ''){
         tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s )
