@@ -121,6 +121,7 @@ def add_by_email():
             
             if url:
                 if not validators.url(url):
+                    print('url')
                     print('bad url')
                     return (json.dumps({'bad_url': True}),
                             400, {'ContentType': 'application/json'})
