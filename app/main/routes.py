@@ -120,8 +120,11 @@ def add_by_email():
                 print('no text in body')
             
             if url:
+                print(url)
+                print('validating url')
+                print(validators.url(url))
+                
                 if not validators.url(url):
-                    print(url)
                     print('bad url')
                     return (json.dumps({'bad_url': True}),
                             400, {'ContentType': 'application/json'})
