@@ -102,7 +102,7 @@ def add_by_email():
     if process:
         subject = request.form.get('subject', False)
         html = request.form.get('html', False)
-        text = request.form.get('text', False)        
+        text = request.form.get('text', False).lstrip()        
       
         if subject.lower().rstrip() == 'link':
             print('\n\n')
