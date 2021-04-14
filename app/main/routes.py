@@ -110,14 +110,16 @@ def add_by_email():
             url = None
             
             if html:
+                print('html')
                 soup = BeautifulSoup(html, 'lxml')
                 links = soup.find_all('a')
-                url = links[0]['href'].rstrip()  
+                url = links[0]['href'].rstrip()
             
             elif text:
                 url = text.split('\n')[0].rstrip()
             else:
                 print('no text in body')
+                return 400
             
             if url:
                 print(url)
