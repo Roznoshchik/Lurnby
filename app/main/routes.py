@@ -121,6 +121,7 @@ def add_by_email():
             
             if url:
                 if not validators.url(url):
+                    print('bad url')
                     return (json.dumps({'bad_url': True}),
                             400, {'ContentType': 'application/json'})
 
@@ -130,6 +131,7 @@ def add_by_email():
                 content = urltext["content"]
 
                 if not title or not content:
+                    print('couldnt process article)
                     return (json.dumps({'bad_url': True}),
                             400, {'ContentType': 'application/json'})
 
