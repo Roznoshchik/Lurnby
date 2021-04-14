@@ -105,6 +105,8 @@ def add_by_email():
         text = request.form.get('text', False)        
       
         if subject.lower().rstrip() == 'link':
+            print('\n\n')
+            print(subject)
             url = None
             
             if html:
