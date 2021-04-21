@@ -66,7 +66,7 @@ function AddToTopic(id, title){
     newSpan = document.createElement('span')
 
     newLabel.setAttribute('id', 'topic'+id)
-    newLabel.classList.add('topic-label', 'btn', 'active', 'initialized')
+    newLabel.classList.add('topic-label','upd-topic-label', 'btn', 'active', 'initialized')
     
     newInput.setAttribute('name', 'members')
     newInput.setAttribute('type', 'checkbox')
@@ -217,6 +217,8 @@ function UpdateHighlight(id){
 
     $('#ViewHighlightModal').modal('hide')
     
+    
+    
     var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
     
 
@@ -317,6 +319,11 @@ function UpdateHighlight(id){
             topicspace.innerHTML = data;
             initialize();
             console.log(data)
+        }
+
+        if (typeof apply_filters === "function") { 
+            console.log('apply filters exists')
+            apply_filters()
         }
         
     }); 

@@ -830,13 +830,14 @@ def view_highlight(id):
             topic = Topic.query.filter_by(title=member,
                                           user_id=current_user.id).first()
             highlight.AddToTopic(topic)
-            db.session.commit()
+            
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:
             topic = Topic.query.filter_by(title=nonmember,
                                           user_id=current_user.id).first()
             highlight.RemoveFromTopic(topic)
+            
 
         tags = data['tags']
 
@@ -853,6 +854,11 @@ def view_highlight(id):
             t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
             highlight.RemoveFromTag(t)
 
+        if highlight.topics.count() == 0:
+            highlight.no_topics = True
+        else:
+            highlight.no_topics = False
+        
         db.session.commit()
 
         # checks to see if the update highlight request is on the topics page
@@ -998,12 +1004,38 @@ def highlights():
     topics_count = current_user.topics.filter_by(archived=False).count()
     highlights_count = current_user.highlights.filter_by(archived=False).count()
     tags_count = current_user.tags.count()
+    topics = Topic.query.filter_by(archived=False).all()
+
+    if request.method == 'POST':
+        data = json.loads(request.form['data'])
+        no_topics = []
+        with_topics = []
+        if data['filters'] == []:
+            no_topics = current_user.highlights.filter_by(archived=False,
+                                                  no_topics=True).all()
+            with_topics = current_user.highlights.filter_by(archived=False,
+                                                    no_topics=False).all()
+        else:
+            for t in data['filters']:
+                topic = Topic.query.filter_by(title=t).first()
+                with_topics += topic.highlights.filter_by(archived=False).all()
+
+            with_topics = list(set(with_topics))
+
+        data = {
+            'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
+            'html': render_template('filter_highlights.html', no_topics=no_topics,
+                            with_topics=with_topics)
+        }
+
+        return json.dumps(data)
+
 
     return render_template('highlights.html', tags_count=tags_count,
                            highlights_count=highlights_count,
                            articles_count=articles_count,
                            topics_count=topics_count, no_topics=no_topics,
-                           with_topics=with_topics)
+                           with_topics=with_topics, topics=topics)
 
 
 @bp.route('/topics', methods=['GET', 'POST'])

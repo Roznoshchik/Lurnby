@@ -1,0 +1,48 @@
+{% if no_topics|length > 0 %}
+<h6 class = "subheading">Highlights without topics</h6>
+{% endif %}
+<div class = "highlight-section">
+    {% for highlight in no_topics %}
+    <div id="highlight-{{highlight.id}}" class="highlight-card">
+        <div class="highlight-header">
+            <h6>From: {{ highlight.article.title}}</h6>
+            <div class="underline"></div>
+        </div>
+        <div class="highlight-content">
+            <p>{{highlight.text}}</p>
+
+            <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
+                <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
+            </div>
+        </div>
+    </div>   
+    {% endfor %}
+</div>
+
+{% if with_topics|length > 0 %}
+<h6 class = "subheading">Highlights with topics</h6>
+<div class = "highlight-section">
+    {% for highlight in with_topics %}
+    <div id="highlight-{{highlight.id}}" class="highlight-card">
+        <div class="highlight-header">
+            <h6>From: {{ highlight.article.title}}</h6>
+            <div class="underline"></div>
+        </div>
+        <div class="highlight-content">
+            <p>{{highlight.text}}</p>
+            <div class="highlight-topics">
+                <h6>Topics:</h6>
+                {% for topic in highlight.topics.filter_by(archived=False).all() %}
+                    <p class = "topic">{{topic.title}}</p>
+                {% endfor %}
+
+            </div>
+            <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
+                <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
+            </div>
+        </div>
+    </div>   
+    {% endfor %}
+</div>
+{% endif %}
+

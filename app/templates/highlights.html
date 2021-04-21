@@ -18,6 +18,70 @@
         max-width: 300px;
         margin-right: 16px;
     }
+
+    .highlight-card .main-button {
+        margin-left:0px;
+    }
+
+
+    .topic {
+        font-weight: 100;
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        display: inline-block;
+        text-align: center;
+        background: #FFF79F;
+        margin: 0px 4px 4px 0px;
+
+    }
+    .topic.filter:hover {
+        cursor: pointer;
+        color: white;
+        background-color: black;
+    }
+
+
+    .autocomplete {
+        /*the container must be positioned relative:*/
+        position: relative;
+        display: inline-block;
+    }
+    .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
+    .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover {
+        /*when hovering an item:*/
+        background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+
+    .filter_form {
+        display: flex;
+    }
+
+    .filter_form input{
+        padding-left: 4px;
+        padding-bottom: 4px;
+    }
+
 </style>
 
 {% endblock %}
@@ -102,6 +166,14 @@
     <!---------------------->
     <!--   main section   -->
     <!---------------------->
+    <div id="filters" class="main-section">
+        <div class="autocomplete">
+            <div class="filter_form" >
+                <input id = "filter_input" type="text" placeholder="Filter by topic ..."> <button class="main-button" onclick="apply_filters()">Apply filter</button>
+            </div>
+        </div>
+        <div id="active_filters"></div>
+    </div>
 
     <div id = "highlights_all" class = "main-section">
         {% if no_topics|length > 0 %}
@@ -124,7 +196,7 @@
             </div>   
             {% endfor %}
         </div>
-    
+        {% if with_topics|length > 0 %}
         <h6 class = "subheading">Highlights with topics</h6>
         <div class = "highlight-section">
             {% for highlight in with_topics %}
@@ -138,7 +210,7 @@
                     <div class="highlight-topics">
                         <h6>Topics:</h6>
                         {% for topic in highlight.topics.filter_by(archived=False).all() %}
-                            <span class = "label"><p>{{topic.title}}</p></span>
+                            <p class = "topic">{{topic.title}}</p>
                         {% endfor %}
 
                     </div>
@@ -149,6 +221,7 @@
             </div>   
             {% endfor %}
         </div>
+        {% endif %}
     
 
 
@@ -161,6 +234,158 @@
 {% endblock%}
 
 {% block JS %}
+<script>
+    var topics = [ {% for t in topics %}'{{t.title}}',{%endfor%}]
+    active_filters = byId('active_filters')
+    var filters = []
+
+    function autocomplete(inp, arr) {
+        /*the autocomplete function takes two arguments,
+        the text field element and an array of possible autocompleted values:*/
+        var currentFocus;
+        /*execute a function when someone writes in the text field:*/
+        inp.addEventListener("input", function(e) {
+            var a, b, i, val = this.value;
+            /*close any already open lists of autocompleted values*/
+            closeAllLists();
+            if (!val) { return false;}
+            currentFocus = -1;
+            /*create a DIV element that will contain the items (values):*/
+            a = document.createElement("DIV");
+            a.setAttribute("id", this.id + "autocomplete-list");
+            a.setAttribute("class", "autocomplete-items");
+            /*append the DIV element as a child of the autocomplete container:*/
+            this.parentNode.appendChild(a);
+            /*for each item in the array...*/
+            for (i = 0; i < arr.length; i++) {
+                var x = arr[i]
+                /*check if the item starts with the same letters as the text field value:*/
+                if (arr[i].toUpperCase().includes(val.toUpperCase())) {
+                /*create a DIV element for each matching element:*/
+                b = document.createElement("DIV");
+                /*insert a input field that will hold the current array item's value:*/
+                b.innerHTML = x
+                /*execute a function when someone clicks on the item value (DIV element):*/
+                    b.addEventListener("click", function(e) {
+                        e=e || window.event;
+                        var elem = e.target || e.srcElement;
+
+                    /*insert the value for the autocomplete text field:*/
+                    if (!filters.includes(elem.innerHTML)){
+                        filters.push(elem.innerHTML)
+                        t = document.createElement('span')
+                        t.classList.add('topic')
+                        t.classList.add('filter')
+                        t.innerHTML = elem.innerHTML
+                        t.id = 'topic'+elem.innerHTML
+                        t.addEventListener('click', function(e){
+                            e=e || window.event;
+                            var target = e.target || e.srcElement;
+                            var rem = target.id.slice(5)
+                            filters = filters.filter(elem => elem !== rem);
+                            byId(target.id).remove()
+                        })
+                        active_filters.appendChild(t)
+                        byId('filter_input').value = ''
+                        byId('filter_input').focus()
+                    }
+                    
+                    /*close the list of autocompleted values,
+                    (or any other open lists of autocompleted values:*/
+                    closeAllLists();
+                });
+                a.appendChild(b);
+                }
+            }
+        });
+        /*execute a function presses a key on the keyboard:*/
+        inp.addEventListener("keydown", function(e) {
+            var x = document.getElementById(this.id + "autocomplete-list");
+            if (x) x = x.getElementsByTagName("div");
+            if (e.keyCode == 40) {
+                /*If the arrow DOWN key is pressed,
+                increase the currentFocus variable:*/
+                currentFocus++;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 38) { //up
+                /*If the arrow UP key is pressed,
+                decrease the currentFocus variable:*/
+                currentFocus--;
+                /*and and make the current item more visible:*/
+                addActive(x);
+            } else if (e.keyCode == 13) {
+                /*If the ENTER key is pressed, prevent the form from being submitted,*/
+                e.preventDefault();
+                if (currentFocus > -1) {
+                /*and simulate a click on the "active" item:*/
+                if (x) x[currentFocus].click();
+                }
+            }
+        });
+        function addActive(x) {
+            /*a function to classify an item as "active":*/
+            if (!x) return false;
+            /*start by removing the "active" class on all items:*/
+            removeActive(x);
+            if (currentFocus >= x.length) currentFocus = 0;
+            if (currentFocus < 0) currentFocus = (x.length - 1);
+            /*add class "autocomplete-active":*/
+            x[currentFocus].classList.add("autocomplete-active");
+        }
+        function removeActive(x) {
+            /*a function to remove the "active" class from all autocomplete items:*/
+            for (var i = 0; i < x.length; i++) {
+            x[i].classList.remove("autocomplete-active");
+            }
+        }
+        function closeAllLists(elmnt) {
+            /*close all autocomplete lists in the document,
+            except the one passed as an argument:*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (var i = 0; i < x.length; i++) {
+            if (elmnt != x[i] && elmnt != inp) {
+            x[i].parentNode.removeChild(x[i]);
+            }
+        }
+    }
+    
+    
+    /*execute a function when someone clicks in the document:*/
+    document.addEventListener("click", function (e) {
+        closeAllLists(e.target);
+    });
+    } 
+
+    autocomplete(document.getElementById("filter_input"), topics);
+
+    function apply_filters(){
+        console.log('applying filters')
+        data = JSON.stringify({'filters':filters})
+
+        var a = byId('highlights_all');
+        a.innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
+                            <p>Getting your highlights now ...</p>
+                            <img src="static/spinning-circles.svg" width="50" alt="">
+                       </div>`;
+
+
+        $.post('/highlights', {
+            'data':data
+        }).done(function( data ) {
+            data = JSON.parse(data)
+            console.log(data)
+            a.innerHTML = data['html']
+            topics = data['topics']
+            autocomplete(document.getElementById("filter_input"), topics);
+        }); 
+
+
+    }
+
+</script>
+
+
 <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
