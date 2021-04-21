@@ -1596,7 +1596,9 @@ def unarchivetopic(topic_id):
 
 @bp.route('/review', methods=['GET', 'POST'])
 def review():
-    tiers = order_highlights(current_user)
+    topics = Topic.query.filter_by(archived=False).all()
+    highlights = current_user.highlights.filter_by(archived=False).all()
+    tiers = order_highlights(highlights)
     empty = True
     for i in range(8):
         if len(tiers[i]) > 0:
@@ -1606,7 +1608,33 @@ def review():
         '1 day', '3 days', '1 week', '2 weeks', '1 month', '3 months', 'half a year', '1 year'
     ]
 
-    return render_template('review.html', tiers=tiers, days=days, empty=empty)
+    if request.method == 'POST':
+        data = json.loads(request.form['data'])
+        highlights = []
+        if data['filters'] != []:
+            for t in data['filters']:
+                topic = Topic.query.filter_by(title=t).first()
+                highlights += topic.highlights.filter_by(archived=False).all()
+
+            highlights = list(set(highlights))
+            tiers = order_highlights(highlights)
+            empty = True
+            for i in range(8):
+                if len(tiers[i]) > 0:
+                    empty = False
+                    break
+
+        data = {
+            'topics': [topic.title for topic in topics],
+            'html': render_template('filter_review.html', tiers=tiers, 
+                                    days=days, empty=empty)
+        }
+
+        return json.dumps(data)
+        
+
+
+    return render_template('review.html', topics=topics, tiers=tiers, days=days, empty=empty)
 
 @bp.route('/tier/<id>', methods=['POST'])
 def tier(id):

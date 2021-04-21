@@ -42,7 +42,7 @@ def check_for_review(highlight, tier):
     return False
 
 
-def order_highlights(user):
+def order_highlights(highlights):
     tier0 = []
     tier1 = []
     tier2 = []
@@ -52,7 +52,7 @@ def order_highlights(user):
     tier6 = []
     tier7 = []
     
-    highlights = user.highlights.filter_by(archived=False).all()
+    #highlights = user.highlights.filter_by(archived=False).all()
     random.shuffle(highlights)
 
     for h in highlights:
