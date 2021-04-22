@@ -1004,7 +1004,7 @@ def highlights():
     topics_count = current_user.topics.filter_by(archived=False).count()
     highlights_count = current_user.highlights.filter_by(archived=False).count()
     tags_count = current_user.tags.count()
-    topics = Topic.query.filter_by(archived=False).all()
+    topics = current_user.topics.filter_by(archived=False).all()
 
     if request.method == 'POST':
         data = json.loads(request.form['data'])
@@ -1596,7 +1596,7 @@ def unarchivetopic(topic_id):
 
 @bp.route('/review', methods=['GET', 'POST'])
 def review():
-    topics = Topic.query.filter_by(archived=False).all()
+    topics = current_user.topics.filter_by(archived=False).all()
     highlights = current_user.highlights.filter_by(archived=False).all()
     tiers = order_highlights(highlights)
     empty = True
