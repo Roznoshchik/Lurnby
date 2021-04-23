@@ -57,10 +57,11 @@ def articles():
 
             return render_template('articles.html', articles)
 
-    recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
-    done_articles = Article.return_articles_with_count(done=True, unread=None)
-    unread_articles = Article.return_articles_with_count(done=False, unread=True)
-    read_articles = Article.return_articles_with_count(done=False, unread=False)
+    articles = Article.return_articles_with_count()
+    recent = articles['recent']
+    done_articles = articles['done']
+    unread_articles = articles['unread']
+    read_articles = articles['read']
    
     return render_template('articles.html', form=form,
                            done_articles=done_articles,
@@ -375,10 +376,11 @@ def add_article():
             db.session.commit()
             os.remove(path)
 
-        recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
-        done_articles = Article.return_articles_with_count(done=True, unread=None)
-        unread_articles = Article.return_articles_with_count(done=False, unread=True)
-        read_articles = Article.return_articles_with_count(done=False, unread=False)
+    articles = Article.return_articles_with_count()
+    recent = articles['recent']
+    done_articles = articles['done']
+    unread_articles = articles['unread']
+    read_articles = articles['read']
 
     return render_template('articles_all.html', form=form,
                            recent=recent, 
@@ -402,10 +404,11 @@ def filter_articles():
 
     if tag_ids == []:
 
-        recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
-        done_articles = Article.return_articles_with_count(done=True, unread=None)
-        unread_articles = Article.return_articles_with_count(done=False, unread=True)
-        read_articles = Article.return_articles_with_count(done=False, unread=False)
+        articles = Article.return_articles_with_count()
+        recent = articles['recent']
+        done_articles = articles['done']
+        unread_articles = articles['unread']
+        read_articles = articles['read']
 
         return render_template('articles_all.html', form=form,
                                done_articles=done_articles,
@@ -650,10 +653,11 @@ def updateArticle(uuid):
 
             db.session.commit()
 
-            recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
-            done_articles = Article.return_articles_with_count(done=True, unread=None)
-            unread_articles = Article.return_articles_with_count(done=False, unread=True)
-            read_articles = Article.return_articles_with_count(done=False, unread=False)
+            articles = Article.return_articles_with_count()
+            recent = articles['recent']
+            done_articles = articles['done']
+            unread_articles = articles['unread']
+            read_articles = articles['read']
 
             return render_template('articles_all.html', form=form,
                                    done_articles=done_articles,

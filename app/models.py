@@ -165,18 +165,7 @@ class Article(db.Model):
     notes = db.Column(db.Text)
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def recent_articles():
-        """
-        return Article.query.filter_by(done=False,
-                                       archived=False,
-                                       unread=False,
-                                       user_id=current_user.id
-                                       ).order_by(desc(Article.date_read)
-                                                  ).limit(3).all()
-        """
-        pass    
-
-
+    """
     @classmethod
     def return_articles_with_count(cls, done=None, unread=None, limit=None):
         if done:
@@ -202,6 +191,65 @@ class Article(db.Model):
             x['tag_count'] = q_tags[i][1]
             articles.append(x)
         return articles
+    """
+
+
+    @classmethod
+    def return_articles_with_count(cls):
+        q_highlights = db.session.query(Article.done, Article.unread, Article.uuid, Article.title, Article.progress, func.count(Highlight.article_id)).outerjoin(Article.highlights).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False).order_by(desc(Article.date_read))    
+        q_tags = db.session.query(Article.id, func.count(tags_articles.c.article_id)).outerjoin(tags_articles, tags_articles.c.article_id==Article.id).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False).order_by(desc(Article.date_read))
+
+        l1 = q_highlights.all()
+        l2 = q_tags.all()
+
+        articles = {}
+        articles['done'] = []
+        articles['unread'] = []
+        articles['read'] = []
+        articles['recent'] = []
+
+        for i in range(q_highlights.count()):
+            y = {}
+
+            if l1[i][0]:
+                y['uuid'] = l1[i][2]
+                y['title'] = l1[i][3]
+                y['progress'] = round(l1[i][4])
+                y['highlight_count'] = l1[i][5]
+                y['tag_count'] = l2[i][1]
+                articles['done'].append(y)
+            elif l1[i][1]:
+                y = {}
+                y['uuid'] = l1[i][2]
+                y['title'] = l1[i][3]
+                y['progress'] = round(l1[i][4])
+                y['highlight_count'] = l1[i][5]
+                y['tag_count'] = l2[i][1]
+                articles['unread'].append(y)
+            else:
+                y = {}
+                y['uuid'] = l1[i][2]
+                y['title'] = l1[i][3]
+                y['progress'] = round(l1[i][4])
+                y['highlight_count'] = l1[i][5]
+                y['tag_count'] = l2[i][1]
+                articles['read'].append(y)
+
+
+        for i in range(len(articles['read'])):
+            if i == 3:
+                break
+            articles['recent'].append(articles['read'][i])
+
+            
+
+
+        return articles
+
+
+
+
+
 
 
 
