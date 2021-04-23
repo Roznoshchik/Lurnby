@@ -7,7 +7,7 @@ import jwt
 import uuid
 import os
 import random
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from sqlalchemy_utils import UUIDType
 import string
 from time import time
@@ -166,12 +166,46 @@ class Article(db.Model):
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     def recent_articles():
+        """
         return Article.query.filter_by(done=False,
                                        archived=False,
                                        unread=False,
                                        user_id=current_user.id
                                        ).order_by(desc(Article.date_read)
                                                   ).limit(3).all()
+        """
+        pass    
+
+
+    @classmethod
+    def return_articles_with_count(cls, done=None, unread=None, limit=None):
+        if done:
+            q_highlights = db.session.query(Article.id, Article.uuid, Article.title, Article.progress, func.count(Highlight.article_id)).outerjoin(Article.highlights).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.done==done).order_by(desc(Article.date_read))    
+            q_tags = db.session.query(Article.id, func.count(tags_articles.c.article_id)).outerjoin(tags_articles, tags_articles.c.article_id==Article.id).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.done==done).order_by(desc(Article.date_read))
+        elif limit:
+            print('limit')
+            q_highlights = db.session.query(Article.id, Article.uuid, Article.title, Article.progress, func.count(Highlight.article_id)).outerjoin(Article.highlights).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.unread==False, Article.done==False).order_by(desc(Article.date_read)).limit(3)    
+            q_tags = db.session.query(Article.id, func.count(tags_articles.c.article_id)).outerjoin(tags_articles, tags_articles.c.article_id==Article.id).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.unread==False, Article.done==False).order_by(desc(Article.date_read)).limit(3)
+        else:
+            print('other')
+            q_highlights = db.session.query(Article.id, Article.uuid, Article.title, Article.progress, func.count(Highlight.article_id)).outerjoin(Article.highlights).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.unread==unread, Article.done==done).order_by(desc(Article.date_read))    
+            q_tags = db.session.query(Article.id, func.count(tags_articles.c.article_id)).outerjoin(tags_articles, tags_articles.c.article_id==Article.id).group_by(Article.id).filter(Article.user_id==current_user.id, Article.archived==False, Article.unread==unread, Article.done==done).order_by(desc(Article.date_read))
+        
+        articles = []
+        for i in range(len(q_highlights.all())):
+            x = {}
+            x['id'] = q_highlights[i][0]
+            x['uuid'] = q_highlights[i][1]
+            x['title'] = q_highlights[i][2]
+            x['progress'] = round(q_highlights[i][3])
+            x['highlight_count'] = q_highlights[i][4]
+            x['tag_count'] = q_tags[i][1]
+            articles.append(x)
+        return articles
+
+
+
+
 
     # api return article resource
     def to_dict(self):

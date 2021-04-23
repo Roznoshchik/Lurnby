@@ -57,22 +57,11 @@ def articles():
 
             return render_template('articles.html', articles)
 
-    recent = Article.recent_articles()
-
-    done_articles = Article.query.filter_by(archived=False, done=True,
-                                            user_id=current_user.id
-                                            ).order_by(desc(Article.date_read)).all()
-
-    unread_articles = Article.query.filter_by(unread=True, done=False,
-                                              archived=False,
-                                              user_id=current_user.id
-                                              ).order_by(desc(Article.date_read)).all()
-
-    read_articles = Article.query.filter_by(unread=False, done=False,
-                                            archived=False,
-                                            user_id=current_user.id
-                                            ).order_by(desc(Article.date_read)).all()
-
+    recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
+    done_articles = Article.return_articles_with_count(done=True, unread=None)
+    unread_articles = Article.return_articles_with_count(done=False, unread=True)
+    read_articles = Article.return_articles_with_count(done=False, unread=False)
+   
     return render_template('articles.html', form=form,
                            done_articles=done_articles,
                            recent=recent,
@@ -386,21 +375,10 @@ def add_article():
             db.session.commit()
             os.remove(path)
 
-        recent = Article.recent_articles()
-
-        done_articles = Article.query.filter_by(archived=False, done=True,
-                                                user_id=current_user.id
-                                                ).order_by(desc(Article.date_read)).all()
-
-        unread_articles = Article.query.filter_by(unread=True, done=False,
-                                                  archived=False,
-                                                  user_id=current_user.id
-                                                  ).order_by(desc(Article.date_read)).all()
-
-        read_articles = Article.query.filter_by(unread=False, done=False,
-                                                archived=False,
-                                                user_id=current_user.id
-                                                ).order_by(desc(Article.date_read)).all()
+        recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
+        done_articles = Article.return_articles_with_count(done=True, unread=None)
+        unread_articles = Article.return_articles_with_count(done=False, unread=True)
+        read_articles = Article.return_articles_with_count(done=False, unread=False)
 
     return render_template('articles_all.html', form=form,
                            recent=recent, 
@@ -424,21 +402,10 @@ def filter_articles():
 
     if tag_ids == []:
 
-        recent = Article.recent_articles()
-
-        done_articles = Article.query.filter_by(archived=False, done=True,
-                                                user_id=current_user.id
-                                                ).order_by(desc(Article.date_read)).all()
-
-        unread_articles = Article.query.filter_by(unread=True, done=False,
-                                                  archived=False,
-                                                  user_id=current_user.id
-                                                  ).order_by(desc(Article.date_read)).all()
-
-        read_articles = Article.query.filter_by(unread=False, done=False,
-                                                archived=False,
-                                                user_id=current_user.id
-                                                ).order_by(desc(Article.date_read)).all()
+        recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
+        done_articles = Article.return_articles_with_count(done=True, unread=None)
+        unread_articles = Article.return_articles_with_count(done=False, unread=True)
+        read_articles = Article.return_articles_with_count(done=False, unread=False)
 
         return render_template('articles_all.html', form=form,
                                done_articles=done_articles,
@@ -480,7 +447,7 @@ def filter_articles():
     read_articles = read_articles.filter(join_tid.in_(tag_ids)
                                          ).order_by(desc(Article.date_read)).all()
 
-    return render_template('articles_all.html', form=form,
+    return render_template('articles_filter.html', form=form,
                            done_articles=done_articles,
                            recent=recent,
                            unread_articles=unread_articles,
@@ -683,21 +650,10 @@ def updateArticle(uuid):
 
             db.session.commit()
 
-            recent = Article.recent_articles()
-
-            done_articles = Article.query.filter_by(archived=False, done=True,
-                                                    user_id=current_user.id
-                                                    ).order_by(desc(Article.date_read)).all()
-
-            unread_articles = Article.query.filter_by(unread=True, done=False,
-                                                      archived=False,
-                                                      user_id=current_user.id
-                                                      ).order_by(desc(Article.date_read)).all()
-
-            read_articles = Article.query.filter_by(unread=False, done=False,
-                                                    archived=False,
-                                                    user_id=current_user.id
-                                                    ).order_by(desc(Article.date_read)).all()
+            recent = Article.return_articles_with_count(unread=False, done=False, limit=True)
+            done_articles = Article.return_articles_with_count(done=True, unread=None)
+            unread_articles = Article.return_articles_with_count(done=False, unread=True)
+            read_articles = Article.return_articles_with_count(done=False, unread=False)
 
             return render_template('articles_all.html', form=form,
                                    done_articles=done_articles,
