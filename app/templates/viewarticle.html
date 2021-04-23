@@ -63,12 +63,13 @@
                     <p class = "not-editing" id="article_notes"></p>
                     <textarea id="notes_edit" class = "large editing">{{ article.notes|safe}}</textarea>
                 </div>
-
+                {% if article.filetype == 'manual' or article.filetype == 'email' %}
                 <div class = "lurnby_data_group article_data_group">
                     <h6>Content: </h6>
                     <p class = "not-editing" id="article_content"> </p>
                     <textarea id="content_edit" class = "large article_content editing" >{{ article.content|safe}}</textarea>
                 </div>
+                {% endif %}
         
         </form>
 
