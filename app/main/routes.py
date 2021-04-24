@@ -925,12 +925,10 @@ def archivehighlight(id):
     highlight.archived = True
     db.session.commit()
 
-    flash('Highlight has been deleted. <a href="' +
-          url_for('main.unarchivehighlight', id=id) +
-          '"  class="alert-link">UNDO</a>', 'error')
+    
 
-    return redirect(url_for('main.topics'))
-
+    return (json.dumps({'success': True}),
+            200, {'ContentType': 'application/json'})
 
 @bp.route('/unarchivehighlight/<id>')
 @login_required
@@ -943,7 +941,8 @@ def unarchivehighlight(id):
     highlight.archived = False
     db.session.commit()
 
-    return redirect(url_for('main.topics'))
+    return (json.dumps({'success': True}),
+        200, {'ContentType': 'application/json'})
 
 
 ##########################

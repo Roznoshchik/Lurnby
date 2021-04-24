@@ -100,9 +100,9 @@
     </div>
 
     <div class="modal-footer">
-      <a href="{{url_for('main.archivehighlight', id = highlight.id )}} " type="button"
-        class="main-button cancel mr-auto">{% if member|length > 1 %}Delete from {{member|length}}
-        topics{% else %}Delete{% endif %}</a>
+      <button type="button" data-dismiss='modal' onclick="ArchiveHighlight({{highlight.id}})" class="main-button save cancel mr-auto">{% if member|length > 1 %}Delete from {{member|length}}
+        topics{% else %}Delete{% endif %}</button>
+      
       <button type="button" data-dismiss='modal' class="main-button save cancel">Cancel</button>
       <button type="button" onclick="UpdateHighlight({{highlight.id}})" class="main-button save">Update</button>
     </div>
