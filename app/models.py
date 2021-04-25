@@ -155,7 +155,7 @@ class Article(db.Model):
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship('Highlight', lazy='dynamic', backref="article")
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String, default='')
@@ -247,14 +247,6 @@ class Article(db.Model):
         return articles
 
 
-
-
-
-
-
-
-
-
     # api return article resource
     def to_dict(self):
         data = {
@@ -313,16 +305,16 @@ class Article(db.Model):
 highlights_topics = db.Table(
     'highlights_topics',
     db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'),
-              nullable=False, primary_key=True),
+              nullable=False, primary_key=True, index=True),
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'),
-              nullable=False, primary_key=True)
+              nullable=False, primary_key=True, index=True)
 )
 
 
 tags_highlights = db.Table(
     'tags_highlights',
-    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False),
-    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'), nullable=False, index=True),
+    db.Column('highlight_id', db.Integer, db.ForeignKey('highlight.id'), index=True,
               nullable=False)
 )
 
@@ -330,8 +322,8 @@ tags_highlights = db.Table(
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String, index=True)  # should I set a max length?
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    article_id = db.Column(db.Integer, db.ForeignKey('article.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),index=True)
+    article_id = db.Column(db.Integer, db.ForeignKey('article.id'), index=True)
     topics = db.relationship(
         'Topic', secondary=highlights_topics, lazy='dynamic')
     
@@ -432,7 +424,7 @@ tags_topics = db.Table(
 class Topic(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(512), index=True)  # how long should it be?
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship(
         'Highlight', secondary=highlights_topics, lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
@@ -484,7 +476,7 @@ class Topic(db.Model):
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     archived = db.Column(db.Boolean, index=True, default=False)
     goal = db.Column(db.String(512))
 
