@@ -212,9 +212,27 @@ function ViewHighlight(id){
 
 }
 
+function clearHighlight(item){
+    console.log('removing attributes!')  	
+    item.removeAttribute('data-highlighted')
+    item.removeAttribute('data-toggle')
+    item.removeAttribute('data-html')
+    item.removeAttribute('data-content')
+    item.removeAttribute('data-timestamp')
+    item.removeAttribute('data-container')
+    item.removeAttribute('data-placement')
+    item.removeAttribute('data-trigger')
+    item.removeAttribute('id')
+    item.removeAttribute('class')
+    item.removeAttribute('tabindex')
+    item.removeAttribute('title')
+    item.removeAttribute('data-original-title')
+  }
+
 function ArchiveHighlight(id){
-    byId(`highlight-${id}`).style.display = 'none'
-    console.log('highlight hidden')
+    if(byId(`highlight-${id}`)){
+        byId(`highlight-${id}`).style.display = 'none'
+        console.log('highlight hidden')
     
     url = 'archivehighlight/'+id
     $.get(url)
@@ -232,6 +250,26 @@ function ArchiveHighlight(id){
       </div>
       `
     });
+
+    }
+    else{
+        highlights = Array.from(byClass(`highlight${id}`))
+        console.log(highlights)
+        highlights.forEach(clearHighlight)
+        url = `https://${window.location.host}/archivehighlight/${id}`
+        $.get(url)
+
+        var updated_content = byId('article_content').innerHTML
+        $.post('/article/' + article_uuid + '/highlight-storage', {
+          'updated_content': updated_content
+        });
+
+
+
+
+    }
+    
+    
     
 }
 

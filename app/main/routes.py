@@ -422,7 +422,7 @@ def filter_articles():
     join_aid = tags_articles.c.article_id
     join_tid = tags_articles.c.tag_id
 
-    recent = Article.recent_articles()
+    # recent = Article.recent_articles()
 
     done_articles = Article.query.filter_by(archived=False, done=True,
                                             user_id=current_user.id
@@ -452,7 +452,6 @@ def filter_articles():
 
     return render_template('articles_filter.html', form=form,
                            done_articles=done_articles,
-                           recent=recent,
                            unread_articles=unread_articles,
                            read_articles=read_articles,
                            user=current_user, active_tags=active_tags)
@@ -631,7 +630,8 @@ def updateArticle(uuid):
 
             article.title = data['title']
             article.notes = data['notes']
-            article.content = data['content']
+            if 'content' in data:
+                article.content = data['content']
 
             for tag in data['tags']:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id

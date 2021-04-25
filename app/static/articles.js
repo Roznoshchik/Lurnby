@@ -641,7 +641,9 @@ function save(article_id){
     
     notes = tinymce.get('notes_edit').getContent()
     console.log(notes)
-    content = tinymce.get('content_edit').getContent()
+    if(byId('content_edit')){
+        content = tinymce.get('content_edit').getContent()
+    }
     
     //notes = byId('notes_edit').value;
     //content = byId('content_edit').value;
