@@ -1,1 +1,1 @@
-web: gunicorn learnbetter:app npm start
+web: flask db upgrade; gunicorn learnbetter:app npm start
