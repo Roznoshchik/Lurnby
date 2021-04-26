@@ -68,11 +68,32 @@ body, #base-main {
   border: #424242 2px solid;
 }
 
+.rendering {
+  display: block; 
+  text-align:center; 
+  float:center; 
+  margin:8px; 
+  padding:88px; 
+  background: white; 
+  border:black 2px solid;
+  width: auto;
+  max-width: 500px; 
+}
+
+
+
+
+
 @media(min-width:768px){
   .lurnby-empty-col,
   .articles-empty-col{
     max-width: 450px;
     padding: 48px;
+  }
+
+  .rendering {
+    margin: auto;
+    margin-top: 88px; 
   }
 }
 
@@ -83,7 +104,7 @@ body, #base-main {
   background: #424242;
 }
 
-.main-button{
+.main-button {
   color: #424242;
   background: #F9F7F4;
   border-radius:0;
@@ -1081,12 +1102,13 @@ background: #fab1a0;
   }
   
   .main-button.add-article{
-    margin: 0;
     min-width: 80px;
+    margin-left: 0px;
     margin-right: 8px;
+    margin-bottom: 8px;
   }
   
-  .epub-input{
+  .file-input{
     width: 0.1px;
 	  height: 0.1px;
 	  opacity: 0;
@@ -1095,12 +1117,12 @@ background: #fab1a0;
 	  z-index: -1;
   }
 
-  .epub-label{
+  .file-label{
     cursor: pointer;
     margin-left: 0;
   }
-  .epub-input:focus + label,
-  .epub-input + label:hover {
+  .file-input:focus + label,
+  .file-input + label:hover {
     color: white;
     background: #424242;
   }

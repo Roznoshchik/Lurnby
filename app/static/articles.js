@@ -42,8 +42,8 @@ function add_epub(){
     byId('add_from').innerHTML = `
     <div class = "article_data_group">
         <h6>Add epub</h6>
-        <input class = "epub-input" id="epub_add" type="file"></input>
-        <label class="main-button add_new epub-label" for="epub_add">choose a file</label>
+        <input class = "file-input" id="epub_add" type="file"></input>
+        <label class="main-button add_new file-label" for="epub_add">choose a file</label>
         </div>
     `
 
@@ -70,6 +70,40 @@ function add_epub(){
 
 }
 
+function add_pdf(){
+    byId('add_from').innerHTML = `
+    <div class = "article_data_group">
+        <h6>Add pdf</h6>
+        <p>Please note pdf support is experimental and not all pdf's can be parsed properly. Currently, tables and diagrams are not processed correctly and only pdfs composed of text and images have a fighting chance.</p>
+        <input class = "file-input" id="pdf_add" type="file"></input>
+        <label class="main-button add_new file-label" for="pdf_add">choose a file</label>
+        </div>
+    `
+
+    var input = byId('pdf_add');
+    console.log('got input')
+    console.log(input)
+    var label = input.nextElementSibling, labelVal=label.innerHTML;
+
+    input.addEventListener('change', function(e){
+        console.log('added event listener?');
+        console.log(input.value)
+        var fileName = '';
+        if (this.files){
+            fileName = e.target.value.split( '\\' ).pop();            
+        };
+
+        if (fileName){
+            label.innerHTML=fileName;
+        }
+        else {
+            label.innerHTML = labelVal;
+        }
+    });
+
+}
+
+
 function add_manual(){
     byId('add_from').innerHTML = `
     <div class = "article_data_group manual_add">
@@ -87,7 +121,7 @@ function add_manual(){
 
 function add_new_article(){
 
-    var title='none', source='none', tags=[], notes='none',content='none', url='none', epub='none', doc_tags; 
+    var title='none', source='none', tags=[], notes='none', content='none', url='none', epub='none', pdf='none', doc_tags; 
     doc_tags=byClass('article-tag');
     Array.prototype.forEach.call(doc_tags, function(tag){
         if (tag.classList.contains('tagged')){
@@ -95,7 +129,7 @@ function add_new_article(){
         };
     });
    
-    byId('articles_page').innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
+    byId('articles_page').innerHTML = `<div class ='rendering'>
     <p>Articles with a lot of images take some time to process. Please wait.</p>
     <img src="static/spinning-circles.svg" width="50" alt="">
 </div>`;
@@ -126,7 +160,12 @@ function add_new_article(){
     }
     formdata.append('epub', epub);
 
-
+    if (byId('pdf_add')){
+        pdf = 'true'
+        pdf_file = byId('pdf_add').files[0];
+        formdata.append('pdf_file', pdf_file);
+    }
+    formdata.append('pdf', pdf);
 
     if (byId('content_add')){
         content = byId('content_add').value;
@@ -169,11 +208,23 @@ function add_new_article(){
     }).fail(function(xhr) {
       
         response = JSON.parse(xhr.responseText)
+        byId('articles_page').innerHTML = response['html'];
         if (response['not_epub']){
             var alert = document.createElement('div')
             alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
             alert.setAttribute('role', 'alert')
             alert.innerHTML = `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>`
+
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);        
+        }
+        if (response['not_pdf']){
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `That didn't seem to be a pdf file.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                                 </button>`
 

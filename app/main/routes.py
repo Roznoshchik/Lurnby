@@ -10,6 +10,7 @@ from app.main.forms import (ContentForm, AddTopicForm,
 from app.main.pulltext import pull_text
 from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
+from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
                         tags_articles, tags_highlights)
 
@@ -238,30 +239,52 @@ def add_article():
 
     form = ContentForm()
 
+
+    def render_articles():
+        articles = Article.return_articles_with_count()
+        recent = articles['recent']
+        done_articles = articles['done']
+        unread_articles = articles['unread']
+        read_articles = articles['read']
+
+        return render_template('articles_all.html', form=form,
+                                recent=recent, 
+                                done_articles=done_articles,
+                                unread_articles=unread_articles,
+                                read_articles=read_articles,
+                                user=current_user)
+
+
+    rendered_articles = render_articles()
+
     if request.method == 'POST':
 
         notes = request.form['notes']
         tags = json.loads(request.form['tags'])
+        pdf = request.form['pdf']
         epub = request.form['epub']
         title = request.form['title']
         source = request.form['source']
         content = request.form['content']
         url = request.form['url']
 
-        if (title == 'none' and url == 'none' and epub == 'none'):
-            return (json.dumps({'no_article': True}),
+        today = date.today()
+        today = today.strftime("%B %d, %Y")
+
+        if (title == 'none' and url == 'none' 
+            and epub == 'none' and pdf == 'none'):
+            
+            return (json.dumps({'no_article': True, 'html': rendered_articles}),
                     400, {'ContentType': 'application/json'})
 
         if (title != 'none'):
 
             if content == '':
-                return (json.dumps({'manual_fail': True}),
+                return (json.dumps({'manual_fail': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
             content = "<pre>" + content + "</pre>"
             if source == '':
-                today = date.today()
-                today = today.strftime("%B %d, %Y")
                 source = 'manually added ' + today
 
             new_article = Article(unread=True, notes=notes, progress=0.0,
@@ -286,7 +309,7 @@ def add_article():
         if (url != 'none'):
 
             if not validators.url(url):
-                return (json.dumps({'bad_url': True}),
+                return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
             urltext = pull_text(url)
@@ -295,7 +318,7 @@ def add_article():
             content = urltext["content"]
 
             if not title or not content:
-                return (json.dumps({'bad_url': True}),
+                return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
             new_article = Article(unread=True, notes=notes, progress=0.0,
@@ -319,6 +342,41 @@ def add_article():
 
             db.session.commit()
 
+
+        if pdf == 'true':
+            f = request.files['pdf_file']
+            filename = f.filename
+            if filename != '':
+                file_ext = os.path.splitext(filename)[1]
+                if file_ext != '.pdf':
+                    return (json.dumps({'not_pdf': True, 'html': rendered_articles}),
+                            400, {'ContentType': 'application/json'})
+
+            filename = secure_filename(f.filename)
+            
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            path = os.path.join(
+                basedir, 'temp'
+            )
+
+            if not os.path.isdir(path):
+                os.mkdir(path)
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+            f.save(path)
+            pdf = importPDF(path)
+
+            source = 'PDF File: added ' + today
+
+            article = Article(content=pdf['content'], archived=False,
+                              source=source, progress = 0.0,
+                              unread=True, title=pdf['title'],
+                              user_id = current_user.id, filetype='pdf')
+            
+            db.session.add(article)
+            db.session.commit()
+
         if epub == "true":
             f = request.files['epub_file']
 
@@ -326,7 +384,7 @@ def add_article():
             if filename != '':
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext != '.epub':
-                    return (json.dumps({'not_epub': True}),
+                    return (json.dumps({'not_epub': True, 'html': rendered_articles}),
                             400, {'ContentType': 'application/json'})
 
             basedir = os.path.abspath(os.path.dirname(__file__))
@@ -350,8 +408,6 @@ def add_article():
             title = title[0][0]
             epubtext = content
 
-            today = date.today()
-            today = today.strftime("%B %d, %Y")
             source = 'Epub File: added ' + today
 
             new_article = Article(unread=True, title=title, content=epubtext,
