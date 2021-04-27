@@ -7,3 +7,5 @@ delete from user;
 delete from tags_highlights;
 delete from tags_topics;
 delete from tags_articles;
+delete from task;
+delete from notification;

@@ -5,6 +5,9 @@
                 <div class="modal-header">
                     <h5 class="modal-title not-editing">{{article.title}}</h5>
                     <textarea id = "title_edit" class="editing title" >{{article.title}}</textarea>
+                    <span id='export'>
+                        <button type = "button" class = "main-button cancel not-editing" onclick="export_method({{article.id}})">Export</button>
+                    </span> 
                     <button type = "button" class = "main-button cancel not-editing" onclick="edit_article()">Edit</button>
                
                 <button type="button"  class="close editing" data-dismiss="modal" onclick="clear_modals()" aria-label="Close">

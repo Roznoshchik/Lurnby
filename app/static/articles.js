@@ -431,7 +431,45 @@ function ViewAddArticle(){
     });
 }
 
+function export_method(id){
+    byId('export').innerHTML=`
+    <button type = "button" class = "main-button cancel not-editing" data-dismiss="modal" onclick="export_highlights(${id}, 'json')">Export as JSON</button>
+    <button type = "button" class = "main-button cancel not-editing" data-dismiss="modal" onclick="export_highlights(${id}, 'txt')">Export as TXT</button>
+    ` 
 
+}
+function export_highlights(id, ext){
+    data = {
+        'article_export': true,
+        'article_id': id, 
+        'ext': ext
+    }
+
+    $.post('/export_highlights', {
+        'data':JSON.stringify(data)
+    }).done(function(){
+        byId('flashMessages').innerHTML=`
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+          <ul>
+              <li>Your export is being prepared. You will receive an email with the file attached when it's ready!</li>
+          </ul>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>`
+    }).fail(function(data){
+        data = JSON.parse(data)
+        byId('flashMessages').innerHTML=`
+        <div class="alert alert-error alert-dismissible fade show" role="alert">
+          <ul>
+              <li>${data['msg']}</li>
+          </ul>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>`
+    }); ; 
+}
     
 function edit_article(){
 

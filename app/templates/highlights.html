@@ -169,7 +169,11 @@
     <div id="filters" class="main-section">
         <div class="autocomplete">
             <div class="filter_form" >
-                <input id = "filter_input" type="text" placeholder="Filter by topic ..."> <button class="main-button" onclick="apply_filters()">Apply filter</button>
+                <input id = "filter_input" type="text" placeholder="Filter by topic ..."> 
+                <button class="main-button" onclick="apply_filters()">Apply filter</button>
+                <span id="export">
+                    <button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>
+                </span>
             </div>
         </div>
         <div id="active_filters"></div>
@@ -359,10 +363,52 @@
 
     autocomplete(document.getElementById("filter_input"), topics);
 
+    function export_method(){
+        byId('export').innerHTML=`
+        <button type = "button" class = "main-button" onclick="export_highlights('json')">Export as JSON</button>
+        <button type = "button" class = "main-button" onclick="export_highlights('txt')">Export as TXT</button>
+        ` 
+    }   
+
+    function export_highlights(ext){
+        data = {
+            'topic_export': true,
+            'filters':filters,
+            'ext': ext
+        }
+
+        $.post('/export_highlights', {
+            'data':JSON.stringify(data)
+        }).done(function(){
+            byId('flashMessages').innerHTML=`
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+              <ul>
+                  <li>Your export is being prepared. You will receive an email with the file attached when it's ready!</li>
+              </ul>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>`
+            byId('export').innerHTML=`<button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>`
+        }).fail(function(data){
+            data = JSON.parse(data)
+            byId('flashMessages').innerHTML=`
+            <div class="alert alert-error alert-dismissible fade show" role="alert">
+              <ul>
+                  <li>${data['msg']}</li>
+              </ul>
+              <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>`
+            byId('export').innerHTML=`<button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>`
+        }); 
+    }
+
     function apply_filters(){
         console.log('applying filters')
         data = JSON.stringify({'filters':filters})
-
+        console.log(filters.length)
         var a = byId('highlights_all');
         a.innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <p>Getting your highlights now ...</p>
@@ -374,8 +420,24 @@
             'data':data
         }).done(function( data ) {
             data = JSON.parse(data)
-            console.log(data)
-            a.innerHTML = data['html']
+            if (filters.length == 0) {
+                byId('export-button').classList.add('invisible')
+            }
+            if(data['highlights_count'] == 0){
+                a.innerHTML = `<div style = "display: block; text-align:center; margin:auto; margin-top: 0px; padding:88px; background: white; border:black 2px solid; width: 500px;">
+                            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
+                <p>No highlights with these topics.</p>
+
+                       </div>`
+            }
+            else {
+                if (filters.length > 0) {
+                    byId('export-button').classList.remove('invisible')
+                }
+                a.innerHTML = data['html']
+            }
+            
             topics = data['topics']
             autocomplete(document.getElementById("filter_input"), topics);
         }); 

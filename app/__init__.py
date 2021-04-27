@@ -12,6 +12,8 @@ from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from flask_talisman import Talisman
 from flask_wtf.csrf import CSRFProtect
+from redis import Redis
+import rq
 from sqlalchemy import MetaData
 import boto3
 
@@ -19,7 +21,7 @@ import boto3
 convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(constraint_name)s",
+    "ck": "ck_%(table_name)s_%(column_0_name)s",
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s"
 }
@@ -58,7 +60,8 @@ csp = {
 def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
-    
+    app.redis = Redis.from_url(app.config['REDIS_URL'])
+    app.task_queue = rq.Queue('lurnby-tasks', connection=app.redis)
     @app.before_request
     def before_request_func():
         if current_user.is_authenticated:

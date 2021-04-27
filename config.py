@@ -25,4 +25,5 @@ class Config(object):
     MAIL_USERNAME = 'apikey'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
-    ADMINS = ['dev@lurnby.com']
+    ADMINS = ['team@lurnby.com']
+    REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'

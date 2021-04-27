@@ -12,7 +12,7 @@ from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
-                        tags_articles, tags_highlights)
+                        tags_articles, tags_highlights, Notification)
 
 import sys
 sys.path.insert(1, './app/ReadabiliPy')
@@ -69,6 +69,50 @@ def articles():
                            recent=recent,
                            unread_articles=unread_articles,
                            user=current_user, read_articles=read_articles)
+
+
+@bp.route('/notifications')
+@login_required
+def notifications():
+    since = request.args.get('since', 0.0, type=float)
+    notifications = current_user.notifications.filter(
+        Notification.timestamp > since).order_by(Notification.timestamp.asc())
+    return jsonify([{
+        'name': n.name,
+        'data': n.get_data(),
+        'timestamp': n.timestamp
+    } for n in notifications])
+
+@bp.route('/export_highlights', methods=['POST'])
+@login_required
+def export_highlights():
+
+    if current_user.get_task_in_progress('export_highlights'):
+        return (json.dumps({'msg': 'An export task is currently in progress'}),
+                    400, {'ContentType': 'application/json'})
+    else:
+        data = json.loads(request.form['data'])
+        u = User.query.get(current_user.id)
+
+        if 'article_export' in data and data['article_export']:
+            article_highlights = Article.query.get(data['article_id']).highlights.filter_by(archived=False).all()
+            current_user.launch_task('export_highlights', 'Exporting highlights...', u, article_highlights, 'article', data['ext'])
+            db.session.commit()
+        
+        elif 'topic_export' in data and data['topic_export']:
+            highlights = []
+            for topic in data['filters']:
+                t = Topic.query.filter_by(title=topic).first() 
+                highlights += t.highlights.filter_by(archived=False).all()
+            highlights = list(set(highlights))
+            current_user.launch_task('export_highlights', 'Exporting highlights...', u, highlights, 'topics', data['ext'])
+            db.session.commit()
+        else:
+            return (json.dumps({'msg': 'Something went wrong.'}),
+                    400, {'ContentType': 'application/json'})
+    return (json.dumps({'success': True}),
+            200, {'ContentType': 'application/json'})
+
 
 @bp.route('/email', methods=['POST'])
 @csrf.exempt
@@ -1040,7 +1084,8 @@ def highlights():
         data = {
             'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
             'html': render_template('filter_highlights.html', no_topics=no_topics,
-                            with_topics=with_topics)
+                            with_topics=with_topics),
+            'highlights_count': len(with_topics)       
         }
 
         return json.dumps(data)

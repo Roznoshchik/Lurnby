@@ -1,0 +1,10 @@
+{% if user.username %}
+Dear {{ user.username }},
+{% else %}
+Hi!
+{% endif %}
+Please find your exported highlights attached.
+
+Sincerely,
+
+The Lurnby Team
