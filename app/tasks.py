@@ -1,3 +1,4 @@
+import os
 import sys
 import json
 from rq import get_current_job
@@ -32,11 +33,21 @@ def export_highlights(user, highlights, source, ext):
         total_highlights = len(highlights)
         
         if ext == 'txt':
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            path = os.path.join(
+                basedir, 'temp'
+            )
+
+            if not os.path.isdir(path):
+                os.mkdir(path)
+            
+            
+            
             if source == 'article':
                 a = Article.query.get(highlights[0].article_id)
                 title = a.title
                 a_source = a.source_url if a.source_url else a.source
-                with open('temp/highlights.txt', 'w', encoding='utf-8') as f:
+                with open(f'{path}/highlights.txt', 'w', encoding='utf-8') as f:
                     f.write(f'FROM: {title} \nSOURCE: {a_source}\n\n')
                     for highlight in highlights:
                         highlight = Highlight.query.get(highlight.id) 
@@ -49,7 +60,7 @@ def export_highlights(user, highlights, source, ext):
                         _set_task_progress(100 * i // total_highlights)
                     f.write('\n')
                     
-                with open('temp/highlights.txt', 'r', encoding='utf-8') as txt:
+                with open(f'{path}/highlights.txt', 'r', encoding='utf-8') as txt:
                     
                     send_email('[Lurnby] Your exported highlights',
                             sender=app.config['ADMINS'][0], recipients=[user.email],
@@ -59,7 +70,7 @@ def export_highlights(user, highlights, source, ext):
                             sync=True)
                     
             else:
-                with open('highlights.txt', 'w') as f:
+                with open(f'{path}/highlights.txt', 'w') as f:
                     for highlight in highlights:
                         highlight = Highlight.query.get(highlight.id) 
                         a = highlight.article
@@ -76,7 +87,7 @@ def export_highlights(user, highlights, source, ext):
                         _set_task_progress(100 * i // total_highlights)
                     f.write('\n')
 
-                with open('highlights.txt', 'r') as f:
+                with open(f'{path}/highlights.txt', 'r') as f:
                     send_email('[Lurnby] Your exported highlights',
                             sender=app.config['ADMINS'][0], recipients=[user.email],
                             text_body=render_template('email/export_highlights.txt', user=user),
