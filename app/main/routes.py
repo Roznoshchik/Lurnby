@@ -110,7 +110,7 @@ def export_highlights():
         else:
             return (json.dumps({'msg': 'Something went wrong.'}),
                     400, {'ContentType': 'application/json'})
-    return (json.dumps({'success': True}),
+    return (json.dumps({'msg': "Your export is being prepared. You will receive an email with download instructions shortly!"}),
             200, {'ContentType': 'application/json'})
 
 

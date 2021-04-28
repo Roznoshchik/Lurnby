@@ -447,16 +447,17 @@ function export_highlights(id, ext){
 
     $.post('/export_highlights', {
         'data':JSON.stringify(data)
-    }).done(function(){
+    }).done(function(data){
+        data = JSON.parse(data)
         byId('flashMessages').innerHTML=`
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
-          <ul>
-              <li>Your export is being prepared. You will receive an email with the file attached when it's ready!</li>
-          </ul>
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>`
+        <div class="alert alert-error alert-dismissible fade show" role="alert">
+        <ul>
+            <li>${data['msg']}</li>
+        </ul>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>`
     }).fail(function(data){
         data = JSON.parse(data)
         byId('flashMessages').innerHTML=`

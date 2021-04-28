@@ -3,7 +3,8 @@ Dear {{ user.username }},
 {% else %}
 Hi!
 {% endif %}
-Please find your exported highlights attached.
+Please click the following link to download your exported highlights:
+{{url}}
 
 Sincerely,
 

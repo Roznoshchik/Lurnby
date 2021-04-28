@@ -67,6 +67,6 @@ Traceback (most recent call last):
     cursor.execute(statement, parameters)
 sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: user.username
 [SQL: INSERT INTO user (goog_id, username, email, password_hash) VALUES (?, ?, ?, ?)]
-[parameters: (None, 'alan', 'roznoshchik@gmail.com', 'pbkdf2:sha256:150000$ye6LBOvR$e0b1afbd9c5a2fb9dc1d3e98ebd0a20b8dee38c69e34735526041f7b9c7f7543')]
+[parameters: (None, 'alan', 'roznoshchik@gmail.com', 'pbkdf2:sha256:150000$oKMTjoZc$71c3a165c9f44fe37f67f352110a03a00295620b22e6ef7d05e716966b9b7245')]
 (Background on this error at: http://sqlalche.me/e/gkpj)
 Learning tool startup

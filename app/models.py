@@ -372,7 +372,7 @@ tags_highlights = db.Table(
 
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    text = db.Column(db.String, index=True)  # should I set a max length?
+    text = db.Column(db.String)  # should I set a max length?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),index=True)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), index=True)
     topics = db.relationship(
@@ -573,6 +573,8 @@ def after_insert_listener(mapper, connection, target):
         update_user_last_action('added tag')
     elif isinstance(target, Topic):
         update_user_last_action('added topic')
+    elif isinstance(target, Task):
+        update_user_last_action('requested export')
 
 
 def after_update_listener(mapper, connection, target):
