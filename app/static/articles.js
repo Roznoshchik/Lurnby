@@ -450,7 +450,7 @@ function export_highlights(id, ext){
     }).done(function(data){
         data = JSON.parse(data)
         byId('flashMessages').innerHTML=`
-        <div class="alert alert-error alert-dismissible fade show" role="alert">
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
         <ul>
             <li>${data['msg']}</li>
         </ul>
