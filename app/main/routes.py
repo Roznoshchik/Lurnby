@@ -102,7 +102,7 @@ def export_highlights():
         elif 'topic_export' in data and data['topic_export']:
             highlights = []
             for topic in data['filters']:
-                t = Topic.query.filter_by(title=topic).first() 
+                t = Topic.query.filter_by(title=topic, user_id=current_user.id).first() 
                 highlights += t.highlights.filter_by(archived=False).all()
             highlights = list(set(highlights))
             current_user.launch_task('export_highlights', 'Exporting highlights...', u, highlights, 'topics', data['ext'])

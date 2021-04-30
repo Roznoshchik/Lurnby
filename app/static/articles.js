@@ -131,8 +131,8 @@ function add_new_article(){
    
     byId('articles_page').innerHTML = `<div class ='rendering'>
     <p>Articles with a lot of images take some time to process. Please wait.</p>
-    <img src="static/spinning-circles.svg" width="50" alt="">
-</div>`;
+    <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+    </div>`;
 
     formdata = new FormData();
 

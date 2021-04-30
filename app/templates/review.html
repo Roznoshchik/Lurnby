@@ -73,14 +73,27 @@
         background-color: DodgerBlue !important;
         color: #ffffff;
     }
-
+    
     .filter_form {
         display: flex;
+        flex-wrap: wrap;
     }
 
     .filter_form input{
         padding-left: 4px;
         padding-bottom: 4px;
+        width: 200px;
+    }
+
+    @media (max-width: 566px){
+        #export {
+            margin-top: 16px;
+        }
+
+        #export .main-button{
+          margin-left: 0px;
+          margin-right: 16px;
+        }
     }
 
 </style>

@@ -15,8 +15,15 @@
 
     .highlight-card {
         background: white;
-        max-width: 300px;
+        max-width: 350px;
         margin-right: 16px;
+    }
+
+    @media(max-width: 566px){
+        .highlight-card {
+            max-width: 375px;
+            margin-right: 4px;
+        }
     }
 
     .highlight-card .main-button {
@@ -75,11 +82,24 @@
 
     .filter_form {
         display: flex;
+        flex-wrap: wrap;
     }
 
     .filter_form input{
         padding-left: 4px;
         padding-bottom: 4px;
+        width: 200px;
+    }
+
+    @media (max-width: 566px){
+        #export {
+            margin-top: 16px;
+        }
+
+        #export .main-button{
+          margin-left: 0px;
+          margin-right: 16px;
+        }
     }
 
 </style>
@@ -172,7 +192,7 @@
                 <input id = "filter_input" type="text" placeholder="Filter by topic ..."> 
                 <button class="main-button" onclick="apply_filters()">Apply filter</button>
                 <span id="export">
-                    <button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>
+                    <button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>
                 </span>
             </div>
         </div>
@@ -390,7 +410,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>`
-            byId('export').innerHTML=`<button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>`
+            byId('export').innerHTML=`<button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>`
         }).fail(function(data){
             data = JSON.parse(data)
             byId('flashMessages').innerHTML=`
@@ -402,7 +422,7 @@
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>`
-            byId('export').innerHTML=`<button id="export-button" class="main-button invisible" onclick="export_method()">Export these highlights</button>`
+            byId('export').innerHTML=`<button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>`
         }); 
     }
 
@@ -413,7 +433,7 @@
         var a = byId('highlights_all');
         a.innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <p>Getting your highlights now ...</p>
-                            <img src="static/spinning-circles.svg" width="50" alt="">
+                            <img id="rrface" class="star mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100">
                        </div>`;
 
 
@@ -422,7 +442,7 @@
         }).done(function( data ) {
             data = JSON.parse(data)
             if (filters.length == 0) {
-                byId('export-button').classList.add('invisible')
+                byId('export-button').classList.add('hidden')
             }
             if(data['highlights_count'] == 0){
                 a.innerHTML = `<div style = "display: block; text-align:center; margin:auto; margin-top: 0px; padding:88px; background: white; border:black 2px solid; width: 500px;">
@@ -434,7 +454,7 @@
             }
             else {
                 if (filters.length > 0) {
-                    byId('export-button').classList.remove('invisible')
+                    byId('export-button').classList.remove('hidden')
                 }
                 a.innerHTML = data['html']
             }
