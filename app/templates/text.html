@@ -612,7 +612,7 @@ for(let i=0; i<tables.length; i++){
     
     setup: function (editor) {
     editor.on('init', function (e) {
-      editor.setContent(`{{article.notes | safe}}`);
+      editor.setContent(`{{article.notes}}`);
       });
     }
 
