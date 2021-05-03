@@ -581,13 +581,14 @@ def article(uuid):
     uuid_hash = UUID(uuid)
 
     highlight_id = request.args.get('highlight_id', None)
-    highlight = request.args.get('highlight', None)
-
-    if highlight == 'burrito':
+    #highlight = request.args.get('highlight', None)
+    """
+    if highlight_id == 'burrito':
         highlight_id = request.args.get('highlight_id')
     else:
         highlight_id = "none"
-
+    """
+    
     article = Article.query.filter_by(uuid=uuid_hash).first()
     if article.user_id == current_user.id:
         article.unread = False
