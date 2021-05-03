@@ -469,16 +469,11 @@ for(let i=0; i<tables.length; i++){
 
       if (data['highlight_notes'] != ''){
         tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s )
-        
-        console.log('s')
-        console.log(s)
+      
       }
       else {
         tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s2 )
         
-        console.log('s2')
-        console.log(s2)
-
       }
 
 
@@ -773,6 +768,7 @@ window.onscroll = function() {
   function hide_controls(){
     console.log('hiding')
     controls.style.display="none"
+    save_preferences()
     //byId('infoDiv').style.display="none"
   }
 
