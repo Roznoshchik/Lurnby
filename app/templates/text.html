@@ -588,6 +588,8 @@ for(let i=0; i<tables.length; i++){
 
 
 <script>
+  var existing_notes = byId('existing_notes').value
+
   tinymce.init({
     selector: '#notes-editor',
     menubar: 'insert format',
@@ -610,8 +612,6 @@ for(let i=0; i<tables.length; i++){
             height:400
     },
     
-    existing_notes = byId('existing_notes').value
-
     setup: function (editor) {
     editor.on('init', function (e) {
       editor.setContent(existing_notes);
