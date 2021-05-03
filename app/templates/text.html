@@ -191,7 +191,7 @@
 <textarea id="notes-editor">
 
 </textarea>
-
+<textarea style = "display:none;" id="existing_notes">{{ article.notes|safe }}</textarea>
 </form>
 
 
@@ -610,9 +610,11 @@ for(let i=0; i<tables.length; i++){
             height:400
     },
     
+    existing_notes = byId('existing_notes').value
+
     setup: function (editor) {
     editor.on('init', function (e) {
-      editor.setContent({{article.notes | safe}});
+      editor.setContent(existing_notes);
       });
     }
 
