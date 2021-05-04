@@ -286,7 +286,7 @@ body, #base-main {
   overflow: auto;
 }
 
-
+/*
 Generic Styling, for Desktops/Laptops 
 */
 table { 
@@ -307,9 +307,6 @@ td, th {
   border: 1px solid #ccc; 
   text-align: left; 
 }
-
-
-
 
 
 #bottom-bar{
@@ -348,6 +345,16 @@ td, th {
   left: 80px;
 }
 
+#bookmark-controls {
+  position: fixed;
+  height: auto;
+  padding: 16px 24px;
+  display:none;
+  top: 165px;
+  left: 80px;
+}
+
+
 #notes-form {
 
   position: fixed;
@@ -367,9 +374,11 @@ td, th {
 
 
 
-#type-controls::after {
+#type-controls::after,
+#bookmark-controls::after {
   top: 4%;
 }
+
 
 .dark-control-mode::after {
 	right: 100%;
@@ -415,7 +424,8 @@ td, th {
 
 
 
-#type-controls .form-group{
+#type-controls .form-group, 
+#bookmark-controls .form-group{
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
@@ -423,11 +433,13 @@ td, th {
 }
 
 
-#type-controls input[type="radio"],  #type-controls input[type="range"]{
+#type-controls input[type="radio"],  #type-controls input[type="range"],
+#bookmark-controls input[type="radio"],  #bookmark-controls input[type="range"]{
   display: none;
 }
 
-#type-controls label {
+#type-controls label,
+#bookmark-controls label {
   cursor: pointer;
   
 }
@@ -443,12 +455,15 @@ label svg {
 }
 
 
-#type-controls input[type="radio"]:checked+ label svg {
+#type-controls input[type="radio"]:checked+ label svg,
+#bookmark-controls input[type="radio"]:checked+ label svg {
 fill: #FAB1A0;
 }
 
 #type-controls input[type="radio"]:checked+ .color-selector,
-#type-controls input[type="radio"]:checked+ .font-selector{
+#type-controls input[type="radio"]:checked+ .font-selector,
+#bookmark-controls input[type="radio"]:checked+ .color-selector,
+#bookmark-controls input[type="radio"]:checked+ .font-selector{
 border: #FAB1A0 2px solid;
 }
 
@@ -706,7 +721,7 @@ background: #fab1a0;
 /* mobile adjustments */
 
 @media(min-width:576px){
-  #bottombar-action, #bottombar-notes {
+  #bottombar-action, #bottombar-notes, #bottombar-bookmarks {
     display: none;
   }
 }
@@ -740,15 +755,26 @@ background: #fab1a0;
   }
   
   /* type controls */
-  #type-controls::after{
+  #type-controls::after,
+  #bookmark-controls::after{
     display: none;
   }
   
-  #type-controls{
+  #type-controls,
+  #bookmark-controls{
     width: 100%;
     left: 0;
     bottom: 0;
     top: auto;
+    
+    .main-button{
+      margin-left: 8px;
+    }
+
+  }
+
+  #bookmark-name {
+    width: 250px;
   }
 
   #notes-form{
@@ -1545,7 +1571,7 @@ margin-bottom: 24px;
    
 }
 
-&::-webkit-scrollbar {
+::-webkit-scrollbar {
     display: none;
   }
 
@@ -1553,7 +1579,7 @@ margin-bottom: 24px;
     overflow-x: scroll;
     overflow-y: hidden;
      white-space: nowrap;
-    -webkit-overflo`w-scrolling: touch;
+    -webkit-overflow-scrolling: touch;
     
     &::-webkit-scrollbar {
         display: none;

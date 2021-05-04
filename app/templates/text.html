@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block style %}
-  <link rel="stylesheet" href = "{{url_for('static', filename='style.css')}}">
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 
   {% endblock %}
@@ -10,9 +9,15 @@
 <main class = "{{color}}" id="standard">
       <div  class = "{{color}}" id = "sidebar">
         <button type="button" onclick ="show_controls()" id= "sidebar-action-button" class=" {{color}} action-button">Aa</button>
-        <button type="button" id = "sidebar-notes" class = "{{color}} action-button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <button type="button" id="sidebar-notes" class="{{color}} action-button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
           <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
         </svg></button>
+        <button type="button" onclick="show_bookmarks()" id="sidebar-bookmarks" class="{{color}} action-button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmarks-fill" viewBox="0 0 16 16">
+            <path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z"/>
+            <path d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"/>
+          </svg>
+      </button>
       </div>  
 
       <div class = "{{font}} size-{{size}} {{spacing}} {{color}}" id="content">
@@ -36,6 +41,12 @@
           <p><button id = "bottombar-notes" class=" {{color}} action-button"><svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
           </svg></button></p>
+          <p><button id="bottombar-bookmarks" class=" {{color}} action-button" onclick="show_bookmarks()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmarks-fill" viewBox="0 0 16 16">
+              <path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z"/>
+              <path d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"/>
+            </svg>
+        </button></p>
           <p class = "ml-auto small"><span id="overview-progress">{{progress|round|int}}</span>%</p>
         </div>
       
@@ -51,6 +62,42 @@
   <button id="infoDiv" type ="button" data-toggle="popover" data-trigger="focus" onclick = "showaddhighlightmodal()" class="highlight-button main-button light-mode" >
     <span id ="addhighlight">Add Highlight</span>
   </button>
+
+<!--  bookmark controls  -->
+{% if color == 'light-mode' %}
+<div class = "light-control-mode" id = "bookmark-controls">
+{% elif color == 'dark-mode' %}
+<div class = "dark-control-mode" id = "bookmark-controls">
+{% else %}
+<div class = "sepia-control-mode" id = "bookmark-controls">
+{% endif %}
+  <div class = "bookmark-section">
+    
+    <input id="bookmark-name" type="text" placeholder="Bookmark name ...">
+    <button id="bookmark-add" class="main-button">Add Bookmark</button> 
+  </div>
+  
+  <h3>Bookmarks</h3>
+  <div class="underline"></div>
+  <div id="bookmarks">
+    <div class="bookmark-row">
+      <button id="furthest-read" onclick="go_to_location({{furthest}})" class="bookmark-location">Furthest Location</button>
+      <button onclick="clear_furthest()" class="clear-button">clear</button>
+    </div>
+    <div id="user-bookmarks">
+      {% for k,v in bookmarks.items() %}
+      <div class="bookmark-row">
+        <button class="bookmark-location" onclick="go_to_location({{v}})">{{k}}</button>
+        <button class="clear-button" onclick="delete_bookmark(this)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+            <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+        </svg></button>
+      </div>      
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
 <!--  type controls  -->
 
 {% if color == 'light-mode' %}
@@ -261,7 +308,21 @@
 
 {% block JS %}
 
+<!-- Included scripts -->
+<script type="text/javascript" src="{{url_for('static', filename='js/bookmarks.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='texthighlighter/TextHighlighter.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+
+
 <script>
+// get page variables
+var uuid = "{{ article_uuid }}";
+var all_bookmarks = {{ bookmarks|safe }};
+var furthest = {{furthest}};
+
+
 
 // scroll to previous position
 
@@ -273,18 +334,7 @@ function set_position() {
   b = document.body,
   st = 'scrollTop',
   sh = 'scrollHeight';
-  /*
-  $.get('/article/' + article_id + '/progress', function(data) {
-    progress = data['Progress'];
-    console.log('progress')
-    console.log(progress)
-
-    var position = (progress / 100) * (h[sh] || b[sh])    
   
-    $window.scrollTop(position);
-  });  
-  */
-
   progress = {{progress}};
   
     var position = (progress / 100) * (h[sh] || b[sh])    
@@ -317,8 +367,13 @@ set_position();
     sh = 'scrollHeight';
     
     var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
-
-
+    
+    if (progress > furthest){
+      furthest = progress;
+      byId('furthest-read').onclick = function() {go_to_location(furthest)};
+      save_bookmarks()
+    }
+    
     clearTimeout(timer)
     timer = setTimeout(update_progress.bind(null, progress), 3000)
   } 
@@ -360,13 +415,6 @@ for(let i=0; i<tables.length; i++){
 
 
 </script>
-
-
-<!-- Included scripts -->
-<script type="text/javascript" src="{{url_for('static', filename='/texthighlighter/TextHighlighter.js')}}"></script>
-<script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
-<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
-<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
 
 
 <script>
@@ -630,11 +678,12 @@ for(let i=0; i<tables.length; i++){
 
  /* type controls functions */
   
-  var size, size_input, increase, decrease, val, content, standard, controls,editor, sidebar_button;
+  var size, size_input, increase, decrease, val, content, standard, bookmark_controls, controls,editor, sidebar_button;
   
   highlight_button = byId('infoDiv')
   sidebar_button = byId('sidebar-action-button')
   controls = byId('type-controls')
+  bookmark_controls = byId('bookmark-controls')
   editor = byId('notes-form')
   standard = byId('standard')
   content = byId('content');
@@ -744,12 +793,27 @@ window.onscroll = function() {
   prevScrollpos = currentScrollPos;
 } 
 
+  function show_bookmarks(event){
+    console.log('showing bookmarks ???')
+    if (bookmark_controls.style.display === "none"){
+        bookmark_controls.style.display = "block";
+        editor.style.display = "none";
+        controls.style.display = "none"
+
+      }
+      else {
+        bookmark_controls.style.display = "none"
+      }
+  }
+
 
   function show_controls(event){
 
     if (controls.style.display=== "none"){
       controls.style.display = "block";
       editor.style.display = "none"
+      bookmark_controls.style.display = "none"
+
     }
     else {
       controls.style.display = "none"
@@ -760,6 +824,8 @@ window.onscroll = function() {
       if (editor.style.display=== "none"){
       editor.style.display = "block";
       controls.style.display = "none"
+      bookmark_controls.style.display = "none"
+
     }
     else {
       editor.style.display = "none"
@@ -770,6 +836,7 @@ window.onscroll = function() {
   function hide_controls(){
     console.log('hiding')
     controls.style.display="none"
+    bookmark_controls.style.display="none"
     save_preferences()
     //byId('infoDiv').style.display="none"
   }
@@ -916,115 +983,58 @@ window.onscroll = function() {
         var sidebar_notes_button = byId('sidebar-notes')
         var bottombar_notes_button = byId('bottombar-notes')
 
+        var sidebar_bookmarks = byId('sidebar-bookmarks')
+        var bottombar_bookmarks = byId('bottombar-bookmarks')
+
         var editor = byId('notes-form')
         var sidebar = byId('sidebar')
         
+        var elements_to_edit = new Array(
+          content, sidebar, sidebar_notes_button, 
+          bottombar_notes_button, sidebar_bookmarks, bottombar_bookmarks, bottom, standard, sidebar_button, bottom_button)
         
+        var second_group_to_edit = new Array(sidebar_notes, controls, bookmark_controls)
+
         if (this.id == 'light-mode'){
 
           update_editor('light')
-          content.classList.remove('dark-mode', 'sepia-mode');
-          content.classList.add('light-mode')
+          elements_to_edit.forEach(function(item){
+            item.classList.remove('dark-mode', 'sepia-mode');
+            item.classList.add('light-mode')
+          });
 
-          sidebar.classList.remove('dark-mode', 'sepia-mode');
-          sidebar.classList.add('light-mode')
-
-          sidebar_notes.classList.remove('dark-control-mode', 'sepia-control-mode');
-          sidebar_notes.classList.add('light-control-mode')
-
-          sidebar_notes_button.classList.remove('dark-mode', 'sepia-mode');
-          sidebar_notes_button.classList.add('light-mode')
-
-          bottombar_notes_button.classList.remove('dark-mode', 'sepia-mode');
-          bottombar_notes_button.classList.add('light-mode')
-
-
-          bottom.classList.remove('dark-mode', 'sepia-mode');
-          bottom.classList.add('light-mode')
-
-          standard.classList.remove('dark-mode', 'sepia-mode');
-          standard.classList.add('light-mode')
-          
-          controls.classList.remove('dark-control-mode', 'sepia-control-mode');
-          controls.classList.add('light-control-mode')
-
-          sidebar_button.classList.remove('dark-mode', 'sepia-mode');
-          sidebar_button.classList.add('light-mode')
-
-          bottom_button.classList.remove('dark-mode', 'sepia-mode');
-          bottom_button.classList.add('light-mode')
+          second_group_to_edit.forEach(function(item){
+            item.classList.remove('dark-control-mode', 'sepia-control-mode');
+            item.classList.add('light-control-mode');
+          });
 
         }
         else if (this.id == 'dark-mode'){
 
           update_editor('dark')
+          elements_to_edit.forEach(function(item){
+            item.classList.remove('light-mode', 'sepia-mode');
+            item.classList.add('dark-mode')
+          });
 
-          content.classList.remove('light-mode', 'sepia-mode');
-          content.classList.add('dark-mode')
-
-          
-          sidebar.classList.remove('light-mode', 'sepia-mode');
-          sidebar.classList.add('dark-mode')
-
-          sidebar_notes.classList.remove('light-control-mode', 'sepia-control-mode');
-          sidebar_notes.classList.add('dark-control-mode')
-
-          sidebar_notes_button.classList.remove('light-mode', 'sepia-mode');
-          sidebar_notes_button.classList.add('dark-mode')
-
-          bottombar_notes_button.classList.remove('light-mode', 'sepia-mode');
-          bottombar_notes_button.classList.add('dark-mode')
-
-          bottom.classList.remove('light-mode', 'sepia-mode');
-          bottom.classList.add('dark-mode')
-
-
-          sidebar_button.classList.remove('light-mode', 'sepia-mode');
-          sidebar_button.classList.add('dark-mode')
-
-          bottom_button.classList.remove('light-mode', 'sepia-mode');
-          bottom_button.classList.add('dark-mode')
-
-          standard.classList.remove('light-mode', 'sepia-mode');
-          standard.classList.add('dark-mode')
-          
-          controls.classList.remove('light-control-mode', 'sepia-control-mode');
-          controls.classList.add('dark-control-mode')	
-          
+          second_group_to_edit.forEach(function(item){
+            item.classList.remove('light-control-mode', 'sepia-control-mode');
+            item.classList.add('dark-control-mode');
+          });
         }
         else if (this.id == 'sepia-mode'){
 
           update_editor('sepia')
+          elements_to_edit.forEach(function(item){
+            item.classList.remove('light-mode', 'dark-mode');
+            item.classList.add('sepia-mode')
+          });
 
-          content.classList.remove('dark-mode', 'light-mode');
-          content.classList.add('sepia-mode')
-
-          sidebar.classList.remove('dark-mode', 'light-mode');
-          sidebar.classList.add('sepia-mode')
-
-          sidebar_notes.classList.remove('dark-control-mode', 'light-control-mode');
-          sidebar_notes.classList.add('sepia-control-mode')
-
-          sidebar_notes_button.classList.remove('dark-mode', 'light-mode');
-          sidebar_notes_button.classList.add('sepia-mode')
-
-          bottombar_notes_button.classList.remove('dark-mode', 'light-mode');
-          bottombar_notes_button.classList.add('sepia-mode')
-
-          bottom.classList.remove('dark-mode', 'light-mode');
-          bottom.classList.add('sepia-mode')
-
-          sidebar_button.classList.remove('dark-mode', 'light-mode');
-          sidebar_button.classList.add('sepia-mode')
-
-          bottom_button.classList.remove('dark-mode', 'light-mode');
-          bottom_button.classList.add('sepia-mode')
+          second_group_to_edit.forEach(function(item){
+            item.classList.remove('dark-control-mode', 'light-control-mode');
+            item.classList.add('sepia-control-mode');
+          });
           
-          standard.classList.remove('dark-mode', 'light-mode');
-          standard.classList.add('sepia-mode')
-          
-          controls.classList.remove('dark-control-mode', 'light-control-mode');
-          controls.classList.add('sepia-control-mode')
         }
         
       };

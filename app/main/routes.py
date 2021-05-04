@@ -603,6 +603,16 @@ def article(uuid):
         addtopicform = AddTopicForm()
 
         form = AddHighlightForm()
+        try: 
+            bookmarks = json.loads(article.bookmarks)
+        except TypeError:
+            bookmarks = {}
+
+        if 'furthest' in bookmarks:
+            furthest = bookmarks['furthest']
+            bookmarks.pop('furthest')
+        else:
+            furthest = progress
 
         preferences = json.loads(current_user.preferences)
         size = preferences['size']
@@ -617,7 +627,8 @@ def article(uuid):
                                progress=progress, size=size, color=color,
                                font=font, spacing=spacing, title=title,
                                article_uuid=uuid, content=content, form=form,
-                               addtopicform=addtopicform, topics=topics)
+                               addtopicform=addtopicform, topics=topics,
+                               furthest=furthest, bookmarks=bookmarks)
     else:
         return render_template('errors/404.html'), 404
 
@@ -686,6 +697,18 @@ def storeProgress(uuid):
             progress = 0
 
         return jsonify({'Progress': article.progress})
+
+@bp.route('/article/<uuid>/bookmarks', methods=['POST'])
+@login_required
+def save_bookmarks(uuid):
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid=uuid_hash).first()
+    if article.user_id == current_user.id:
+        bookmarks = json.loads(request.form['bookmarks'])
+        article.bookmarks = json.dumps(bookmarks)
+        db.session.commit()
+        
+    return 'Saved bookmarks', 200
 
 
 @bp.route('/view_article/<uuid>', methods=['GET'])

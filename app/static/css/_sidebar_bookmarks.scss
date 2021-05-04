@@ -1,0 +1,45 @@
+// This is for the bookmarking modal while reading the article. 
+// perhaps it's extraneous, but for now I'll work like this until
+// I can find a better way to cleanup all of my css code. 
+
+#bookmarks {
+    display: block;
+    height: 150px;
+    overflow-y: scroll;
+}
+
+.bookmark-section {
+    margin-bottom: 32px;
+
+    input {
+        padding: 8px;
+        padding-left: 12px;
+    }
+}
+
+.bookmark-location {
+    border: none;
+    background-color:transparent;
+    text-decoration: underline;
+    padding: 8px;
+}
+
+.bookmark-location:hover {
+    background-color: $dark;
+    color: white;
+}
+
+.clear-button {
+    border: none;
+    border-radius: 24px;
+    padding: 1px 4px;
+    background-color: transparent;
+    color: red;
+    font-size: 12px;
+}
+
+.clear-button:hover {
+    background-color: red;
+    color: white;
+
+}

@@ -1,0 +1,33 @@
+
+.light-control-mode {
+    .main-button {
+        background-color: white;
+    }
+}
+
+.dark-control-mode {
+    input {
+        background: $dark;
+        color: white;
+        border: black;
+    }
+
+    .main-button {
+        background-color: $dark;
+        color: white;
+    }
+
+    .main-button:hover {
+        background-color: white;
+        color: $dark;
+    }
+
+    .bookmark-location {
+        color: white;
+    }
+
+    .clear-button{
+        background: $dark;
+        color: white;
+    }
+}
