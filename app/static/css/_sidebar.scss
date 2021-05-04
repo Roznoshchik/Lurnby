@@ -1,7 +1,13 @@
 
 .light-control-mode {
+    
     .main-button {
         background-color: white;
+    }
+
+    .main-button:hover {
+        background-color: $dark;
+        color: white;
     }
 }
 

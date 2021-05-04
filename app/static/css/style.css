@@ -1542,6 +1542,10 @@ ul ul a {
 .light-control-mode .main-button {
   background-color: white;
 }
+.light-control-mode .main-button:hover {
+  background-color: #424242;
+  color: white;
+}
 
 .dark-control-mode input {
   background: #424242;
