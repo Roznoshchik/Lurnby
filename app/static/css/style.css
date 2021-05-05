@@ -1,3 +1,38 @@
+.title {
+  text-decoration: underline #424242 4px;
+  margin-bottom: 48px;
+}
+
+.blog-roll .post {
+  margin-bottom: 32px;
+}
+.blog-roll .post h3 {
+  font-weight: 900;
+  font-size: 1.5rem;
+}
+.blog-roll .post .video-wrapper {
+  max-width: 560px;
+}
+
+.video-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
+.video-wrapper .video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.video-wrapper::after {
+  padding-top: 56.25%;
+  display: block;
+  content: "";
+}
+
 /* regular styles */
 p, a, li, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;

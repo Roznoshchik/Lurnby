@@ -1757,3 +1757,8 @@ def tier(id):
     return (json.dumps({'success': False}),
                 400, {'ContentType': 'application/json'})
 
+@bp.route('/resources', methods=['GET'])
+@login_required
+def resources():
+
+    return render_template('resources.html')
