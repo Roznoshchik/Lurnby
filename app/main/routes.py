@@ -121,21 +121,26 @@ def add_by_email():
     recipient = request.form['to']
     if '<' in recipient:
         recipient = recipient.split('<')[1][:-1]
+    print('email to: ')
     print(recipient)
     u = User.query.filter_by(add_by_email=recipient).first()
+    print('identified user:')
     print(u)
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
+    print('approved senders:')
+    print(emails)
     email = request.form['from']
     if '<' in email:
         email = request.form['from'].split('<')[1][:-1]
-        #print(email)
+        print('sender: ')
+        print(email)
     process = False
     if email in emails and u:
-        print(email)
         login_user(u)
         process = True
     
     if process:
+        print('processing email')
         subject = request.form.get('subject', False)
         html = request.form.get('html', False)
         text = request.form.get('text', False).lstrip()        
