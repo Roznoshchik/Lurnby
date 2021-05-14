@@ -136,7 +136,7 @@ def add_by_email():
         print(email)
     process = False
     if email in emails and u:
-        login_user(u):
+        login_user(u)
         process = True
     
     if process:
