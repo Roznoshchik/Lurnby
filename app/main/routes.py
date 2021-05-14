@@ -121,7 +121,7 @@ def add_by_email():
     recipient = request.form['to']
     if '<' in recipient:
         recipient = recipient.split('<')[1][:-1]
-
+    print(recipient)
     u = User.query.filter_by(add_by_email=recipient).first()
     print(u)
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
@@ -131,6 +131,7 @@ def add_by_email():
         #print(email)
     process = False
     if email in emails and u:
+        print(email)
         login_user(u)
         process = True
     
@@ -157,9 +158,9 @@ def add_by_email():
                 return 400
             
             if url:
-                print(url)
-                print('validating url')
-                print(validators.url(url))
+                # print(url)
+                # print('validating url')
+                # print(validators.url(url))
                 
                 if not validators.url(url):
                     print('bad url')
