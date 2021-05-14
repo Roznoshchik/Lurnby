@@ -129,14 +129,14 @@ def add_by_email():
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
     print('approved senders:')
     print(emails)
-    email = request.form['from']
+    email = request.form['from'].lower()
     if '<' in email:
         email = request.form['from'].split('<')[1][:-1]
         print('sender: ')
         print(email)
     process = False
     if email in emails and u:
-        login_user(u)
+        login_user(u):
         process = True
     
     if process:
@@ -226,7 +226,12 @@ def settings():
     form = AddApprovedSenderForm()
 
     if form.validate_on_submit():
-        e = Approved_Sender(user_id=current_user.id,email=form.email.data)
+        email = form.email.data
+        print('adding approved sender:')
+        print(email)
+        email = email.lower()
+        print(email)
+        e = Approved_Sender(user_id=current_user.id, email=email)
         db.session.add(e)
         db.session.commit()
 
