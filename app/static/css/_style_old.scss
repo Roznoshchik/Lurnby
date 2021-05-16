@@ -74,7 +74,13 @@ body, #base-main {
   background: white; 
   border:black 2px solid;
   width: auto;
-  max-width: 100%; 
+  max-width: 500px; 
+}
+
+@media(max-width:576px){
+  .rendering {
+    max-width: 100%;
+  }
 }
 
 @media(min-width:768px){
