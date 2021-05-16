@@ -6,13 +6,14 @@ import validators
 from app import csrf, db
 from app.email import send_email
 from app.main.forms import (ContentForm, AddTopicForm,
-                            AddHighlightForm, AddApprovedSenderForm)
+                            AddHighlightForm, AddApprovedSenderForm,
+                            SuggestionForm)
 from app.main.pulltext import pull_text
 from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
-                        tags_articles, tags_highlights, Notification)
+                        tags_articles, tags_highlights, Notification, Suggestion)
 
 import sys
 sys.path.insert(1, './app/ReadabiliPy')
@@ -41,34 +42,19 @@ from app.main import bp
 @login_required
 def articles():
     form = ContentForm()
-    """
-    articles = Article.query.filter_by(user_id=current_user.id, archived=False
-                                       ).order_by(desc(Article.date_read)).all()
-    """
-    if (request.method == 'GET'):
-        if(request.json):
-
-            tag_ids = request.json
-
-            a = Article.query.join(tags_articles,
-                                   (tags_articles.c.article_id ==
-                                    Article.id))
-            articles = a.filter(tags_articles.c.tag_id.in_(tag_ids)
-                                ).order_by(desc(Article.date_read)).all()
-
-            return render_template('articles.html', articles)
-
+    
     articles = Article.return_articles_with_count()
     recent = articles['recent']
     done_articles = articles['done']
     unread_articles = articles['unread']
     read_articles = articles['read']
+
+    suggestion = Suggestion.get_random()
    
     return render_template('articles.html', form=form,
-                           done_articles=done_articles,
-                           recent=recent,
-                           unread_articles=unread_articles,
-                           user=current_user, read_articles=read_articles)
+                           done_articles=done_articles, recent=recent,
+                           unread_articles=unread_articles, user=current_user,
+                           suggestion=suggestion, read_articles=read_articles)
 
 
 @bp.route('/notifications')
@@ -250,10 +236,10 @@ def enable_add_by_email():
 
     return '', 200
 
-@bp.route('/app_dashboard', methods=['GET', 'POST'])
+@bp.route('/app_dashboard/users', methods=['GET', 'POST'])
 @login_required
 @bp.errorhandler(CSRFError)
-def app_dashboard():
+def user_dashboard():
 
     if request.method == 'POST':
         uid = json.loads(request.form['user'])
@@ -263,8 +249,29 @@ def app_dashboard():
 
     users = data_dashboard()
 
-    return render_template('app_dashboard.html', user=current_user,
+    return render_template('dashboard/user_dash.html', user=current_user,
                            users=users)
+
+
+@bp.route('/app_dashboard/suggestions', methods=['GET', 'POST'])
+@login_required
+@bp.errorhandler(CSRFError)
+def suggestions_dashboard():
+
+    form = SuggestionForm()
+    if form.validate_on_submit():
+        url = form.url.data
+        title = form.title.data
+        summary = form.summary.data
+
+        suggestion = Suggestion(title=title, url=url, summary=summary)
+        db.session.add(suggestion)
+        db.session.commit()
+
+    suggestions = Suggestion.query.all()
+
+    return render_template('dashboard/suggestion_dash.html',
+                           form=form, suggestions=suggestions)
 
 
 @bp.route('/feedback', methods=['POST'])
@@ -285,6 +292,43 @@ def feedback():
     send_email(subject, sender, recipients, text_body, html_body)
 
     return 'Thank you for the feedback!'
+
+
+@bp.route('/articles/add_suggestion', methods=['GET'])
+@login_required
+@bp.errorhandler(CSRFError)
+def add_suggested_article():
+    s = Suggestion.get_random()
+    s.users.append(current_user)
+    url = s.url
+    
+    urltext = pull_text(url)
+    title = urltext["title"]
+    content = urltext["content"]
+
+    new_article = Article(unread=True, progress=0.0,
+                                  title=title, source_url=url, content=content,
+                                  user_id=current_user.id, archived=False,
+                                  filetype="url")
+
+    db.session.add(new_article)
+    db.session.commit()
+
+    form = ContentForm()
+
+    articles = Article.return_articles_with_count()
+    recent = articles['recent']
+    done_articles = articles['done']
+    unread_articles = articles['unread']
+    read_articles = articles['read']
+
+    x = render_template('articles_all.html', form=form,
+                           recent=recent, 
+                           done_articles=done_articles,
+                           unread_articles=unread_articles,
+                           read_articles=read_articles, user=current_user)
+
+    return json.dumps({'content': x})
 
 
 @bp.route('/articles/new', methods=['GET', 'POST'])

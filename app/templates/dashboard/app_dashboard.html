@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class='dash_nav'>
+    <ul>
+        <li><a href="{{url_for('main.user_dashboard')}}">Users</a></li>
+        <li><a href="{{url_for('main.suggestions_dashboard')}}">Suggestions</a></li>
+    </ul>
+</div> 
+{% block dash %}
+{% endblock %}
+
+
+{% endblock %}

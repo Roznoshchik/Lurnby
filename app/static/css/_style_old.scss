@@ -7,20 +7,6 @@ p,a, li, h1,h2,h3,h4,h5,h6 {
 }
 
 
-/* admin dashboard*/
-
-.dashboard_container{
-  padding: 16px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.dashboard_item {
-  min-width: 200px;
-  background: white;
-  margin: 16px;
-  padding: 24px;
-}
 
 
 /* feedback button */
@@ -58,14 +44,25 @@ body, #base-main {
 .lurnby-empty-row {
   display: flex;
   justify-content: center;
+
+  .actions {
+    p {
+      margin: 8px;
+    }
+  }
+
+
 }
+
+
+
 
 .lurnby-empty-col,
 .articles-empty-col {
   margin-top: 32px; 
   background: white;
   padding: 24px;
-  border: #424242 2px solid;
+  border: $dark 2px solid;
 }
 
 .rendering {
@@ -77,12 +74,8 @@ body, #base-main {
   background: white; 
   border:black 2px solid;
   width: auto;
-  max-width: 500px; 
+  max-width: 100%; 
 }
-
-
-
-
 
 @media(min-width:768px){
   .lurnby-empty-col,

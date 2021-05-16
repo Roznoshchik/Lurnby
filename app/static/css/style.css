@@ -39,20 +39,6 @@ p, a, li, h1, h2, h3, h4, h5, h6 {
   word-wrap: break-word;
 }
 
-/* admin dashboard*/
-.dashboard_container {
-  padding: 16px;
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.dashboard_item {
-  min-width: 200px;
-  background: white;
-  margin: 16px;
-  padding: 24px;
-}
-
 /* feedback button */
 .feedback {
   cursor: pointer;
@@ -85,6 +71,10 @@ body, #base-main {
   display: flex;
   justify-content: center;
 }
+.articles-empty-row .actions p,
+.lurnby-empty-row .actions p {
+  margin: 8px;
+}
 
 .lurnby-empty-col,
 .articles-empty-col {
@@ -103,7 +93,7 @@ body, #base-main {
   background: white;
   border: black 2px solid;
   width: auto;
-  max-width: 500px;
+  max-width: 100%;
 }
 
 @media (min-width: 768px) {
@@ -1641,6 +1631,58 @@ ul ul a {
 .clear-button:hover {
   background-color: red;
   color: white;
+}
+
+.dash_nav {
+  margin-top: 40px;
+}
+.dash_nav ul {
+  display: flex;
+  list-style-type: none;
+}
+.dash_nav ul li {
+  margin-right: 24px;
+  text-decoration: underline;
+}
+
+.dash_form input, .dash_form textarea {
+  padding-left: 8px;
+  width: 500px;
+  border: 0;
+  margin: 4px 16px;
+}
+.dash_form textarea {
+  border: 0;
+  min-height: 200px;
+}
+
+.dashboard_content {
+  padding: 16px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dashboard_item {
+  min-width: 200px;
+  background: white;
+  margin: 16px;
+  padding: 24px;
+}
+
+.dashboard_item.half {
+  width: 48%;
+}
+
+@media (max-width: 576px) {
+  .dashboard_item.half {
+    width: 90%;
+    margin-right: 16px;
+  }
+
+  .dash_form input, .dash_form textarea {
+    width: 90%;
+    margin-right: 16px;
+  }
 }
 
 /*# sourceMappingURL=style.css.map */

@@ -42,10 +42,11 @@ class User(UserMixin, db.Model):
     token_expiration = db.Column(db.DateTime)
     preferences = db.Column(db.String, index=True, default=preferences)
     admin = db.Column(db.Boolean)
-    test_account = db.Column(db.Boolean)
+    test_account = db.Column(db.Boolean, default=False)
     tasks = db.relationship('Task', backref='user', lazy='dynamic')
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
+    suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -370,6 +371,22 @@ tags_highlights = db.Table(
               nullable=False)
 )
 
+
+class Suggestion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    url = db.Column(db.String)
+    title = db.Column(db.String)
+    summary = db.Column(db.String)
+    users = db.relationship('User', backref='suggestion', lazy='dynamic')
+
+    def __repr__(self):
+        return f'<{self.title}: Users: {self.users.count()}>'
+
+    @classmethod
+    def get_random(cls):
+        x = Suggestion.query.order_by(func.random()).first()
+        
+        return x
 
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)

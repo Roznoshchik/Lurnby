@@ -21,6 +21,15 @@ class ContentForm(FlaskForm):
     submit = SubmitField('Get Content')
 
 
+class SuggestionForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    url = URLField('URL', validators=[
+        URL()
+    ])   
+    summary = TextAreaField('Summary')
+    submit = SubmitField('Add')
+
+
 class AddTopicForm(FlaskForm):
     title = StringField('Topic title ...', validators=[DataRequired()])
 

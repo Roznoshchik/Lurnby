@@ -431,6 +431,42 @@ function ViewAddArticle(){
     });
 }
 
+function AddSuggestion(){
+    byId('articles_page').innerHTML = `<div class ='rendering'>
+    <p>Articles with a lot of images take some time to process. Please wait.</p>
+    <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+    </div>`;
+
+    destination = `/articles/add_suggestion`
+    fetch(destination, {
+        method: 'get',
+        headers: {
+            'Content-type': 'application/html',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(result => {
+        byId('articles_page').innerHTML = result['content'];
+        
+        var alert = document.createElement('div')
+        alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
+        alert.setAttribute('role', 'alert')
+        alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+     `
+        var flash = byId('flashMessages')
+        flash.appendChild(alert);
+    
+    });
+    
+
+}
+
+
+
+
 function export_method(id){
     byId('export').innerHTML=`
     <button type = "button" class = "main-button cancel not-editing" data-dismiss="modal" onclick="export_highlights(${id}, 'json')">Export as JSON</button>

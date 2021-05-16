@@ -23,7 +23,7 @@ def print_data():
 
 
 def data_dashboard():
-    users = User.query.order_by(desc(User.last_active)).all()
+    users = User.query.filter_by(test_account=False).order_by(desc(User.last_active)).limit(15)
     user_list = []
     for u in users:
         user = {
@@ -35,8 +35,13 @@ def data_dashboard():
             'tags': u.tags.count(),
             'last_active': u.last_active,
             'test_account': u.test_account,
-            'last_action': u.last_action
+            'last_action': u.last_action,
         }
+        try:
+            user['suggestion'] = u.suggestion.title
+        except:
+            user['suggestion'] = None
+
 
         user_list.append(user)
 

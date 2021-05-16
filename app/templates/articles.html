@@ -6,23 +6,27 @@
 
 {% block content %}
 
-    {% if user.articles.count() == 0 %}
+    {% if user.articles.filter_by(archived=False).count() == 0 %}
         <div id = "articles_page">
             <div class="main-section articles-empty-row">
                 <div class=" articles-empty-col col text-center">
                 <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
                     src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
                 <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">Welcome to Lurnby</h1>
-                <p>Ever tried, ever failed, no matter,<br> try again, fail again, fail better.<br>Samuel Beckett</p>
-                    <button class="main-button articles-empty-cta add-new" onclick="ViewAddArticle()">Start by adding an article.</button>
-
+                <p>Lurnby helps you remember more of what you read. So let's start reading something!</p>
+                <div class="actions">
+                    <button class="main-button articles-empty-cta add-new" onclick="ViewAddArticle()">Add an article</button> 
+                    <p>or</p>
+                    <button class="main-button articles-empty-cta add-new" onclick="AddSuggestion()">Let us pick one for you.</button>
                 </div>
+                </div>    
+                
             </div>
         </div>
     {% endif %}
 
 
-    {% if user.articles.count() >= 1 %}
+    {% if user.articles.filter_by(archived=False).count() >= 1 %}
         <div id = "articles_page">
             <div id="overview" class = "main-section row">
             
@@ -32,13 +36,13 @@
                     </div>
             
                     <div class = "col data">
-                        {% if user.articles.count() == 1%}
+                        {% if user.articles.filter_by(archived=False).count() == 1%}
                             <div class = "data-item">
-                                <p>{{user.articles.count()}} article added</p>
+                                <p>{{user.articles.filter_by(archived=False).count()}} article added</p>
                             </div>
                         {% else %}
                             <div class = "data-item">
-                                <p>{{user.articles.count()}} articles added</p>
+                                <p>{{user.articles.filter_by(archived=False).count()}} articles added</p>
                             </div>
                         {% endif %}
             

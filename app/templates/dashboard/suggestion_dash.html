@@ -1,0 +1,39 @@
+{% extends "dashboard/app_dashboard.html" %}
+
+{% block style %}
+
+{% endblock %}
+{% block dash %}
+<form class = "dash_form" method="POST" action="">
+    {{ form.hidden_tag() }}
+    <div class = "field">
+        {{form.title( placeholder="Title")}}
+    </div>
+    <div class = "field">
+        {{form.url(placeholder="URL")}}
+    </div>
+    <div class = "field">
+        {{form.summary(placeholder="Summary")}}
+    </div>
+    {{form.submit(class = "main-button")}}
+
+</form>
+
+{% for s in suggestions %}
+<div class = "dashboard_item half">
+    <div class="">
+        <h4>{{ s.title }}</h4>
+    </div>
+    <div class="underline"></div>
+    <h6>Users: {{ s.users.count()}}</h6>   
+
+</div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block JS %}
+
+{% endblock %}
