@@ -25,7 +25,7 @@
         <h4>{{ s.title }}</h4>
     </div>
     <div class="underline"></div>
-    <h6>Users: {{ s.users.count()}}</h6>   
+    <h6>Users: {{ s.users.filter_by(test_account=False).count()}}</h6>   
 
 </div>
 {% endfor %}
