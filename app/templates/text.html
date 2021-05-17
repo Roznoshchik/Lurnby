@@ -253,13 +253,19 @@
       </div>
       <div class="modal-body">
         <p>Hi!</p>
-        <p>A few quick things before you get started.</p>
+        <p>A few quick things to get you started.</p>
         <ol>
-          <li>Lurnby requires a network connection to work properly. If something isn't working as you expect, please double check that you have an internet connection.</li>
-          <li>You can change the design of this page by clicking on the <strong>'Aa'</strong> button. You'll be able to change the typography, the font size, read in dark mode, and modify a few other settings.</li>
-          <li>Clicking on the button with a <strong>pen icon</strong> opens up your notes section. Here you can write down anything that comes to mind, or reflect on the article. Additionally, as you highlight while reading, your highlights will be automatically added to the article notes section.</li>
-          <li>There's also a <strong>bookmarks</strong> button. This allows you to create your own bookmarks to relevant sections of the article you may want to return to. It also allows you to go to your furthest read location. By default, the article will load to the last part of the book you were reading.</li>
-          <li>Finally, you can create highlights by selecting text and hitting the yellow <strong>'add highlight'</strong> button that appears. This will open up a modal window where you can see the highlight as well as optionally add a note. All of your highlights can be found in the 'Highlights' section of the application, and if you wish, you can review your highlights by going to the 'Review' section. There you will see your highlights according to a spaced repetition algorithm, which has been shown to improve retention!</li>
+          <li>You can create highlights by selecting text and hitting the <span class="main-button h-demo highlight-button">Add Highlight</span> button. The 'Highlights' section in the navigation bar lets you see all your highlights and export them. If you want to review highlights using our spaced repetition system, go to the 'Review' section. </li>
+          <li>You can change the look and feel of this page by clicking on the <strong>'Aa'</strong> button.</li>
+          <li>Clicking on the <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd" d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z"/>
+          </svg><strong> pen icon</strong> opens up the article notes. You can write down anything that comes to mind while reading. Additionally, your highlights will be automatically added to this notes section.</li>
+          <li>There's also a <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bookmarks-fill" viewBox="0 0 16 16">
+            <path d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z"/>
+            <path d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z"/>
+          </svg> <strong>bookmarks</strong> button. This allows you to create your own bookmarks anywhere in the article. It also allows you to go to your furthest read location. By default, the article will load to the last part of the article you were reading.</li>
+          <li>Lurnby requires a network connection to work properly. If something isn't working as you expect, please double check that you have a stable internet connection.</li>
+
         </ol>
           <img style=" display:block; margin-left: auto;"src="{{url_for('static', filename='images/smart-cat.gif')}}"/>
         <button type="button" style="display:block; margin-top: 8px; margin-left: auto;"class="main-button" data-dismiss="modal" aria-label="Close">Let's Go!</button>
@@ -342,7 +348,7 @@ var all_bookmarks = {{ bookmarks|safe }};
 var furthest = {{furthest}};
 
 // show onboarding
-{% if current_user.highlights.count() == 0 %}
+{% if current_user.highlights.filter_by(archived=False).count() == 0 %}
 $('#WelcomeModal').modal('show');
 {% endif %}
 

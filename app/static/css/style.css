@@ -36,6 +36,10 @@
 .lurnby_modal li {
   margin-bottom: 16px;
 }
+.lurnby_modal li .h-demo {
+  display: inline-block;
+  margin: 4px;
+}
 
 /* regular styles */
 p, a, li, h1, h2, h3, h4, h5, h6 {
