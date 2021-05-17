@@ -58,31 +58,31 @@
                         
                         {% if user.tags.count() == 1 %}
                             <div class = "data-item">
-                                <p>{{user.tags.count()}} tag </p>
+                                <p>{{user.tags.filter_by(archived=False).count()}} tag </p>
                             </div>
                         {% else %}
                             <div class = "data-item">
-                                <p>{{user.tags.count()}} tags </p>
+                                <p>{{user.tags.filter_by(archived=False).count()}} tags </p>
                             </div>
                         {% endif %}
             
                         {% if user.highlights.count() == 1 %}
                             <div class = "data-item">
-                                <p>{{user.highlights.count()}} highlight</p>
+                                <p>{{user.highlights.filter_by(archived=False).count()}} highlight</p>
                             </div>
                         {% else %}
                             <div class = "data-item">
-                                <p>{{user.highlights.count()}} highlights</p>
+                                <p>{{user.highlights.filter_by(archived=False).count()}} highlights</p>
                             </div>
                         {% endif %}
             
-                        {% if user.topics.count() == 1 %}
+                        {% if user.topics.filter_by(archived=False).count() == 1 %}
                             <div class = "data-item">
-                                <p>{{user.topics.count()}} topic</p>
+                                <p>{{user.topics.filter_by(archived=False).count()}} topic</p>
                             </div>
                         {% else %}
                             <div class = "data-item">
-                                <p>{{user.topics.count()}} topics</p>
+                                <p>{{user.topics.filter_by(archived=False).count()}} topics</p>
                             </div>
                         {% endif %}
                     </div>
@@ -360,15 +360,4 @@
     <script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
     <script text="javascript" src = "{{url_for('static', filename='fileinput.js') }}"> </script>
     
-    {% if not config['DEBUG'] %}
-   <script>
-     FS.setUserVars({
-      displayName: '{{user.id}}',
-      email: '{{user.email}}',
-      uid: "{{user.id}}"
-      });
-  
-  </script>
-
-  {% endif %}
 {% endblock %}

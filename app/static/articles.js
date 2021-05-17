@@ -121,7 +121,7 @@ function add_manual(){
 
 function add_new_article(){
 
-    var title='none', source='none', tags=[], notes='none', content='none', url='none', epub='none', pdf='none', doc_tags; 
+    var title='none', source='none', tags=[], notes='', content='none', url='none', epub='none', pdf='none', doc_tags; 
     doc_tags=byClass('article-tag');
     Array.prototype.forEach.call(doc_tags, function(tag){
         if (tag.classList.contains('tagged')){

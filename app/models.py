@@ -233,7 +233,7 @@ class Article(db.Model):
     progress = db.Column(db.Float, index=True, default=0.0)
     bookmarks = db.Column(db.String)
     done = db.Column(db.Boolean, default=False)
-    notes = db.Column(db.Text)
+    notes = db.Column(db.Text, default='')
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     @classmethod

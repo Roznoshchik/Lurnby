@@ -2,8 +2,7 @@
 
 {% block style %}
   <link rel="stylesheet" href = "https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-
-  {% endblock %}
+{% endblock %}
 
 {% block content %}
 <main class = "{{color}}" id="standard">
@@ -241,13 +240,33 @@
 <textarea style = "display:none;" id="existing_notes">{{ article.notes|safe }}</textarea>
 </form>
 
-
-
-
 <!--   end notes editor  -->
-
-
-
+<!-- First time modal -->
+<div class="lurnby_modal modal fade" id="WelcomeModal" tabindex="-1" role="dialog" aria-labelledby="WelcomeModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="WelcomeModalLabel">Reading in Lurnby</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Hi!</p>
+        <p>A few quick things before you get started.</p>
+        <ol>
+          <li>Lurnby requires a network connection to work properly. If something isn't working as you expect, please double check that you have an internet connection.</li>
+          <li>You can change the design of this page by clicking on the <strong>'Aa'</strong> button. You'll be able to change the typography, the font size, read in dark mode, and modify a few other settings.</li>
+          <li>Clicking on the button with a <strong>pen icon</strong> opens up your notes section. Here you can write down anything that comes to mind, or reflect on the article. Additionally, as you highlight while reading, your highlights will be automatically added to the article notes section.</li>
+          <li>There's also a <strong>bookmarks</strong> button. This allows you to create your own bookmarks to relevant sections of the article you may want to return to. It also allows you to go to your furthest read location. By default, the article will load to the last part of the book you were reading.</li>
+          <li>Finally, you can create highlights by selecting text and hitting the yellow <strong>'add highlight'</strong> button that appears. This will open up a modal window where you can see the highlight as well as optionally add a note. All of your highlights can be found in the 'Highlights' section of the application, and if you wish, you can review your highlights by going to the 'Review' section. There you will see your highlights according to a spaced repetition algorithm, which has been shown to improve retention!</li>
+        </ol>
+          <img style=" display:block; margin-left: auto;"src="{{url_for('static', filename='images/smart-cat.gif')}}"/>
+        <button type="button" style="display:block; margin-top: 8px; margin-left: auto;"class="main-button" data-dismiss="modal" aria-label="Close">Let's Go!</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Add Highlight Modal-->
   <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog" aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
@@ -322,6 +341,10 @@ var uuid = "{{ article_uuid }}";
 var all_bookmarks = {{ bookmarks|safe }};
 var furthest = {{furthest}};
 
+// show onboarding
+{% if current_user.highlights.count() == 0 %}
+$('#WelcomeModal').modal('show');
+{% endif %}
 
 
 // scroll to previous position
@@ -1069,17 +1092,7 @@ window.onscroll = function() {
 
   </script>
 
-  {% if not config['DEBUG'] %}
-   <script>
-     FS.setUserVars({
-      displayName: '{{user.id}}',
-      email: '{{user.email}}',
-      uid: "{{user.id}}"
-      });
   
-  </script>
-
-  {% endif %}
 
    
 
