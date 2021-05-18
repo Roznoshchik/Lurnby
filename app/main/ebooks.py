@@ -127,8 +127,7 @@ def epubConverted(filepath):
                 l['href'] = f'#{x[1]}'
                 print(l['href'])
             elif 'http' not in l['href']:
-                l.decompose()
-            
+                l['href'] = ''            
 
         for i in soup.contents:
             if isinstance(i, Tag):
