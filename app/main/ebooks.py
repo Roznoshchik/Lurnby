@@ -79,6 +79,7 @@ def epubConverted(filepath):
                 location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
                 img['xlink:href'] = url
+    
 
         images = soup.find_all('img')
         if images:
@@ -116,6 +117,16 @@ def epubConverted(filepath):
                 location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
                 img['src'] = url
+        
+        links = soup.find_all('a', href=True)
+        for l in links:
+            print(l['href'])
+            if '#' in l['href']:
+                x = l['href'].split('#')
+                print(x)
+                l['href'] = f'#{x[1]}'
+                print(l['href'])
+            
 
         for i in soup.contents:
             if isinstance(i, Tag):
@@ -154,7 +165,7 @@ blacklist = ['[document]', 'noscript', 'header', 'html', 'meta',
 def chap2text(chapters, path, az_path):
     output = ''
     soup = BeautifulSoup(chapters, 'html.parser')
-
+    
     images = soup.find_all('img')
     if images:
         for img in images:
@@ -177,7 +188,7 @@ def chap2text(chapters, path, az_path):
             location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
             url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
             img['src'] = url
-            
+          
     #text = soup.find_all(text=True)
 
     for t in soup:
@@ -222,3 +233,5 @@ def epub2text(epub):
     content = html2text(html)
 
     return content
+
+
