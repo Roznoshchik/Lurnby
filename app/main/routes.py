@@ -198,6 +198,7 @@ def add_by_email():
                 return 'No Content', 400
 
         db.session.add(new_article)
+        new_article.estimated_reading()
         db.session.commit()
         logout_user()
     
@@ -312,6 +313,7 @@ def add_suggested_article():
                                   filetype="url")
 
     db.session.add(new_article)
+    new_article.estimated_reading()
     db.session.commit()
 
     form = ContentForm()
@@ -392,6 +394,7 @@ def add_article():
                                   filetype="manual")
 
             db.session.add(new_article)
+            new_article.estimated_reading()
             for tag in tags:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id
                                         ).first()
@@ -426,6 +429,7 @@ def add_article():
                                   filetype="url")
 
             db.session.add(new_article)
+            new_article.estimated_reading()
 
             for tag in tags:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id
@@ -474,6 +478,7 @@ def add_article():
                               user_id = current_user.id, filetype='pdf')
             
             db.session.add(article)
+            article.estimated_reading()
             db.session.commit()
 
         if epub == "true":
@@ -515,6 +520,7 @@ def add_article():
                                   filetype="epub")
 
             db.session.add(new_article)
+            new_article.estimated_reading()
 
             for tag in tags:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id

@@ -1,5 +1,6 @@
 import base64
 from app import db, login
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from flask import current_app, url_for
 from flask_login import UserMixin, current_user
@@ -235,13 +236,14 @@ class Article(db.Model):
     done = db.Column(db.Boolean, default=False)
     notes = db.Column(db.Text, default='')
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    read_time = db.Column(db.String)
 
     @classmethod
     def return_articles_with_count(cls):
         q_highlights = db.session.query(Article.done, Article.unread,
                                         Article.uuid, Article.title,
                                         Article.progress,
-                                        func.count(Highlight.article_id)
+                                        func.count(Highlight.article_id), Article.read_time
                                         ).outerjoin(Article.highlights)\
                                         .group_by(Article.id)\
                                         .filter(Article.user_id == current_user.id,
@@ -273,6 +275,7 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 y['progress'] = round(l1[i][4])
                 y['highlight_count'] = l1[i][5]
+                y['read_time'] = l1[i][6]
                 y['tag_count'] = l2[i][1]
                 articles['done'].append(y)
             elif l1[i][1]:
@@ -281,6 +284,7 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 y['progress'] = round(l1[i][4])
                 y['highlight_count'] = l1[i][5]
+                y['read_time'] = l1[i][6]
                 y['tag_count'] = l2[i][1]
                 articles['unread'].append(y)
             else:
@@ -289,6 +293,7 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 y['progress'] = round(l1[i][4])
                 y['highlight_count'] = l1[i][5]
+                y['read_time'] = l1[i][6]                
                 y['tag_count'] = l2[i][1]
                 articles['read'].append(y)
 
@@ -310,6 +315,66 @@ class Article(db.Model):
             }
         }
         return data
+    
+    def estimated_reading(self):
+        soup = BeautifulSoup(self.content, 'html.parser')
+        text = soup.find_all(text=True)
+        output = ''
+        blacklist = [
+            '[document]',
+            'noscript',
+            'header',
+            'html',
+            'meta',
+            'head', 
+            'input',
+            'script',
+            'style',
+        ]
+
+        for t in text:
+            if t.parent.name not in blacklist and t.string != '\n':
+                output += '{} '.format(t)
+
+        word_count = len(output) / 5
+        # English wpm read speed https://iovs.arvojournals.org/article.aspx?articleid=2166061#90715174
+        slow = 198 
+        fast = 258
+
+        low = round(word_count / slow)
+        high = round(word_count / fast)
+
+
+        if high > 60:
+            if high % 60 == 0:
+                high = f'{high / 60}'
+            
+            else:
+                hrs = high // 60
+                minutes = high % 60
+                if minutes > 30:
+                    hrs += 1
+              
+                high = f'{hrs}'
+        else:
+            high = f'{high}'
+
+
+        if low > 60:
+            if low % 60 == 0:
+                low = f'{low / 60}h'
+            
+            else:
+                hrs = low // 60
+                minutes = low % 60
+                if minutes > 30:
+                    hrs += 1
+              
+                low = f'{hrs}h'
+        else:
+            low = f'{low}min'
+
+        self.read_time = (f'{high}-{low} read')
 
     # add article to tag
     def AddToTag(self, tag):

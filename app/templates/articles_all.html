@@ -6,13 +6,13 @@
         </div>
 
         <div class = "col data">
-            {% if user.articles.count() == 1%}
+            {% if user.articles.filter_by(archived=False).count() == 1%}
                 <div class = "data-item">
-                    <p>{{user.articles.count()}} article added</p>
+                    <p>{{user.articles.filter_by(archived=False).count()}} article added</p>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <p>{{user.articles.count()}} articles added</p>
+                    <p>{{user.articles.filter_by(archived=False).count()}} articles added</p>
                 </div>
             {% endif %}
 
@@ -28,31 +28,31 @@
             
             {% if user.tags.count() == 1 %}
                 <div class = "data-item">
-                    <p>{{user.tags.count()}} tag </p>
+                    <p>{{user.tags.filter_by(archived=False).count()}} tag </p>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <p>{{user.tags.count()}} tags </p>
+                    <p>{{user.tags.filter_by(archived=False).count()}} tags </p>
                 </div>
             {% endif %}
 
             {% if user.highlights.count() == 1 %}
                 <div class = "data-item">
-                    <p>{{user.highlights.count()}} highlight</p>
+                    <p>{{user.highlights.filter_by(archived=False).count()}} highlight</p>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <p>{{user.highlights.count()}} highlights</p>
+                    <p>{{user.highlights.filter_by(archived=False).count()}} highlights</p>
                 </div>
             {% endif %}
 
-            {% if user.topics.count() == 1 %}
+            {% if user.topics.filter_by(archived=False).count() == 1 %}
                 <div class = "data-item">
-                    <p>{{user.topics.count()}} topic</p>
+                    <p>{{user.topics.filter_by(archived=False).count()}} topic</p>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <p>{{user.topics.count()}} topics</p>
+                    <p>{{user.topics.filter_by(archived=False).count()}} topics</p>
                 </div>
             {% endif %}
         </div>
@@ -123,6 +123,7 @@
                             {% else %}
                                 <h4>{{ article['title']}}</h4>
                             {% endif %}
+                            <p>{{article['read_time']}}</p>
                             <div class="underline"></div>
 
                         </div>
@@ -176,7 +177,7 @@
                                     {% else %}
                                         <h4>{{ article['title']}}</h4>
                                     {% endif %}
-                                    
+                                    <p>{{article['read_time']}}</p>
                                     <div class="underline"></div>
                                         <span class = "label"><p>New</p></span>
                                 </div>
@@ -221,6 +222,7 @@
                                     {% else %}
                                         <h4>{{ article['title']}}</h4>
                                     {% endif %}
+                                    <p>{{article['read_time']}}</p>
                                     <div class="underline"></div>
                                 </div>
                             </div>
@@ -276,6 +278,7 @@
                                     {% else %}
                                     <h4>{{ article['title']}}</h4>
                                     {% endif %}
+                                    <p>{{article['read_time']}}</p>
                                     <div class="underline"></div>
                                 </div>
                             </div>
