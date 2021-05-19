@@ -77,6 +77,8 @@ body, #base-main {
   max-width: 500px; 
 }
 
+
+
 @media(max-width:576px){
   .rendering {
     max-width: 100%;
@@ -837,7 +839,9 @@ background: #fab1a0;
 /* articles page styles */
 
 
-
+#article_source a {
+  word-break: break-all;
+}
 
 
 @media(min-width:375px){

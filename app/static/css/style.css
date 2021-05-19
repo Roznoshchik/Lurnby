@@ -812,6 +812,10 @@ label svg {
 }
 
 /* articles page styles */
+#article_source a {
+  word-break: break-all;
+}
+
 @media (min-width: 375px) {
   #overview {
     background: #FEF7F6;
