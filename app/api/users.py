@@ -58,6 +58,7 @@ def add_article(id):
                       source_url=data['url'], filetype='url',
                       title=data['title'], content=urltext['content'])
     db.session.add(article)
+    article.estimated_reading()
 
     for tag_name in data['tags']:
         tag = Tag.query.filter_by(name=tag_name).first()
