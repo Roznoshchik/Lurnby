@@ -120,12 +120,12 @@ def epubConverted(filepath):
         
         links = soup.find_all('a', href=True)
         for l in links:
-            print(l['href'])
+            # print(l['href'])
             if '#' in l['href']:
                 x = l['href'].split('#')
-                print(x)
+                # print(x)
                 l['href'] = f'#{x[1]}'
-                print(l['href'])
+                # print(l['href'])
             elif 'http' not in l['href']:
                 l['href'] = ''            
 
