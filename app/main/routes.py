@@ -508,18 +508,20 @@ def add_article():
                             400, {'ContentType': 'application/json'})
             
             basedir = os.path.abspath(os.path.dirname(__file__))
+            print(f'///  basedir ///\n{basedir}')
             filename = secure_filename(f.filename)
 
             path = os.path.join(
                 basedir, 'temp'
             )
-
+            print(f'///  path ///\n{path}')
             if not os.path.isdir(path):
                 os.mkdir(path)
 
             path = os.path.join(
                 basedir, 'temp', filename
             )
+            print(f'///  filebath ///\n{path}')
 
             f.save(path)
             u = User.query.get(current_user.id)
@@ -529,8 +531,6 @@ def add_article():
             return (json.dumps({'processing': True, 'taskID':process.id}),
                     200, {'ContentType': 'application/json'})
 
-
-            
             """
             basedir = os.path.abspath(os.path.dirname(__file__))
             filename = secure_filename(f.filename)
