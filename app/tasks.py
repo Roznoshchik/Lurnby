@@ -175,7 +175,8 @@ def bg_add_article(u, pdf, epub, path, filename, tags):
 
             db.session.commit()
         if epub:
-
+            
+            """
             basedir = os.path.abspath(os.path.dirname(__file__))
             print(f'///  redis basedir ///\n{basedir}')
             filename = secure_filename(filename)
@@ -191,7 +192,8 @@ def bg_add_article(u, pdf, epub, path, filename, tags):
                 basedir, 'temp', filename
             )
             print(f'///  redis filepath ///\n{path}')
-
+            """
+            print(f'///  filepath ///\n{path}')
 
             content = epubConverted(path, u)
             title = epubTitle(path)
