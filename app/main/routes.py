@@ -461,7 +461,7 @@ def add_article():
 
             f.save(path)
             u = User.query.get(current_user.id)
-            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, tags)
+            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, f.filename, tags)
             db.session.commit()
 
             return (json.dumps({'processing': True, 'taskID':process.id}), 200, {'ContentType': 'application/json'})
@@ -521,11 +521,11 @@ def add_article():
             path = os.path.join(
                 basedir, 'temp', filename
             )
-            print(f'///  filebath ///\n{path}')
+            print(f'///  filepath ///\n{path}')
 
             f.save(path)
             u = User.query.get(current_user.id)
-            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, tags)
+            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, f.filename, tags)
             db.session.commit()
         
             return (json.dumps({'processing': True, 'taskID':process.id}),

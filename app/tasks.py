@@ -144,26 +144,22 @@ def export_highlights(user, highlights, source, ext):
         _set_task_progress(100)
 
     
-def bg_add_article(u, pdf, epub, path, tags):
+def bg_add_article(u, pdf, epub, path, filename, tags):
     try:
         _set_task_progress(0)
         today = date.today()
         today = today.strftime("%B %d, %Y")
-        print('made it here!')
         if pdf:
             _set_task_progress(10)
             pdf = importPDF(path, u)
             _set_task_progress(90)
-            print('imported pdf')
             source = 'PDF File: added ' + today
 
             article = Article(content=pdf['content'], archived=False,
                             source=source, progress = 0.0,
                             unread=True, title=pdf['title'],
                             user_id = u.id, filetype='pdf')
-            print('adding article')
             db.session.add(article)
-            print('added article')
             article.estimated_reading()
             for tag in tags:
                 t = Tag.query.filter_by(name=tag, user_id=u.id
@@ -178,8 +174,25 @@ def bg_add_article(u, pdf, epub, path, tags):
                     article.AddToTag(t)
 
             db.session.commit()
-            print('commited')
         if epub:
+
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            print(f'///  redis basedir ///\n{basedir}')
+            filename = secure_filename(filename)
+
+            path = os.path.join(
+                basedir, 'temp'
+            )
+            print(f'///  redis path ///\n{path}')
+            if not os.path.isdir(path):
+                os.mkdir(path)
+
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+            print(f'///  redis filepath ///\n{path}')
+
+
             content = epubConverted(path, u)
             title = epubTitle(path)
             title = title[0][0]
