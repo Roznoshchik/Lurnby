@@ -1,12 +1,19 @@
+from datetime import date
 import os
 import sys
 import json
 from rq import get_current_job
 from flask import render_template
+from flask_login import current_user
+from werkzeug.utils import secure_filename
+
 
 from app import create_app, db, s3, bucket
 from app.email import send_email
-from app.models import Task, Article, Highlight
+from app.main.ebooks import epubTitle, epubConverted
+from app.main.pdf import importPDF
+from app.models import Task, Article, Highlight, Tag
+
 
 app = create_app()
 app.app_context().push()
@@ -131,6 +138,78 @@ def export_highlights(user, highlights, source, ext):
                     html_body=render_template('email/export_highlights.html', url=url, user=user),
                     sync=True)                
                 
+    except:
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+    finally:
+        _set_task_progress(100)
+
+    
+def bg_add_article(u, pdf, epub, path, tags):
+    try:
+        _set_task_progress(0)
+        today = date.today()
+        today = today.strftime("%B %d, %Y")
+        print('made it here!')
+        if pdf:
+            _set_task_progress(10)
+            pdf = importPDF(path, u)
+            _set_task_progress(90)
+            print('imported pdf')
+            source = 'PDF File: added ' + today
+
+            article = Article(content=pdf['content'], archived=False,
+                            source=source, progress = 0.0,
+                            unread=True, title=pdf['title'],
+                            user_id = u.id, filetype='pdf')
+            print('adding article')
+            db.session.add(article)
+            print('added article')
+            article.estimated_reading()
+            for tag in tags:
+                t = Tag.query.filter_by(name=tag, user_id=u.id
+                                        ).first()
+
+                if not t:
+                    t = Tag(name=tag, archived=False, user_id=u.id)
+                    db.session.add(t)
+                    article.AddToTag(t)
+
+                else:
+                    article.AddToTag(t)
+
+            db.session.commit()
+            print('commited')
+        if epub:
+            content = epubConverted(path, u)
+            title = epubTitle(path)
+            title = title[0][0]
+            epubtext = content
+
+            source = 'Epub File: added ' + today
+
+            new_article = Article(unread=True, title=title, content=epubtext,
+                                source=source, user_id=u.id,
+                                archived=False, progress=0.0,
+                                filetype="epub")
+
+            db.session.add(new_article)
+            new_article.estimated_reading()
+
+            for tag in tags:
+                t = Tag.query.filter_by(name=tag, user_id=u.id
+                                        ).first()
+
+                if not t:
+                    t = Tag(name=tag, archived=False, user_id=u.id)
+                    db.session.add(t)
+                    new_article.AddToTag(t)
+
+                else:
+                    new_article.AddToTag(t)
+
+            db.session.commit()
+            os.remove(path)
+            
     except:
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:

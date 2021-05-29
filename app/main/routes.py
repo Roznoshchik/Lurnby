@@ -13,7 +13,8 @@ from app.main.review import order_highlights
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
-                        tags_articles, tags_highlights, Notification, Suggestion)
+                        tags_articles, tags_highlights, Notification, Suggestion,
+                        Task)
 
 import sys
 sys.path.insert(1, './app/ReadabiliPy')
@@ -27,6 +28,7 @@ from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date
+import time
 from sqlalchemy import desc
 
 # from werkzeug.urls import url_parse
@@ -431,30 +433,42 @@ def add_article():
             db.session.add(new_article)
             new_article.estimated_reading()
 
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=current_user.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=current_user.id)
-                    db.session.add(t)
-                    new_article.AddToTag(t)
-
-                else:
-                    new_article.AddToTag(t)
-
-            db.session.commit()
-
-
         if pdf == 'true':
             f = request.files['pdf_file']
+            pdf=True
+            epub=False
+            
             filename = f.filename
             if filename != '':
                 file_ext = os.path.splitext(filename)[1]
                 if file_ext != '.pdf':
                     return (json.dumps({'not_pdf': True, 'html': rendered_articles}),
                             400, {'ContentType': 'application/json'})
+            
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            filename = secure_filename(f.filename)
 
+            path = os.path.join(
+                basedir, 'temp'
+            )
+
+            if not os.path.isdir(path):
+                os.mkdir(path)
+
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+
+            f.save(path)
+            u = User.query.get(current_user.id)
+            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, tags)
+            db.session.commit()
+
+            return (json.dumps({'processing': True, 'taskID':process.id}), 200, {'ContentType': 'application/json'})
+
+
+
+            """
             filename = secure_filename(f.filename)
             
             basedir = os.path.abspath(os.path.dirname(__file__))
@@ -480,9 +494,11 @@ def add_article():
             db.session.add(article)
             article.estimated_reading()
             db.session.commit()
-
+            """
         if epub == "true":
             f = request.files['epub_file']
+            pdf = False
+            epub = True
 
             filename = f.filename
             if filename != '':
@@ -490,7 +506,32 @@ def add_article():
                 if file_ext != '.epub':
                     return (json.dumps({'not_epub': True, 'html': rendered_articles}),
                             400, {'ContentType': 'application/json'})
+            
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            filename = secure_filename(f.filename)
 
+            path = os.path.join(
+                basedir, 'temp'
+            )
+
+            if not os.path.isdir(path):
+                os.mkdir(path)
+
+            path = os.path.join(
+                basedir, 'temp', filename
+            )
+
+            f.save(path)
+            u = User.query.get(current_user.id)
+            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, tags)
+            db.session.commit()
+        
+            return (json.dumps({'processing': True, 'taskID':process.id}),
+                    200, {'ContentType': 'application/json'})
+
+
+            
+            """
             basedir = os.path.abspath(os.path.dirname(__file__))
             filename = secure_filename(f.filename)
 
@@ -536,23 +577,60 @@ def add_article():
 
             db.session.commit()
             os.remove(path)
+            """
 
     articles = Article.return_articles_with_count()
     recent = articles['recent']
     done_articles = articles['done']
     unread_articles = articles['unread']
     read_articles = articles['read']
-
-    return render_template('articles_all.html', form=form,
+    
+    html = render_template('articles_all.html', form=form,
                            recent=recent, 
                            done_articles=done_articles,
                            unread_articles=unread_articles,
                            read_articles=read_articles, user=current_user)
 
+    res = json.dumps({'processing':False, 'html': html})
+    return (res, 200, {'ContentType': 'application/json'})
+    
+   
+
 
 def handle_csrf_error(e):
     return (json.dumps({'success': False}),
             500, {'ContentType': 'application/json'})
+
+
+@bp.route('/articles/processing/<task_id>')
+def process_article(task_id):
+    print(task_id)
+    process = Task.query.get(task_id)
+
+    form = ContentForm()
+
+    articles = Article.return_articles_with_count()
+    recent = articles['recent']
+    done_articles = articles['done']
+    unread_articles = articles['unread']
+    read_articles = articles['read']
+    
+    html = render_template('articles_all.html', form=form,
+                           recent=recent, 
+                           done_articles=done_articles,
+                           unread_articles=unread_articles,
+                           read_articles=read_articles, user=current_user)
+
+    # return (json.dumps({'html': 'success'}), 200, {'ContentType': 'application/json'})
+    for i in range(25):
+        time.sleep(1)
+        if process.complete:
+            return (json.dumps({'html': html}), 200, {'ContentType': 'application/json'})
+
+        else:
+            return (json.dumps({'processing': True, 'taskID':process.id}), 200, {'ContentType': 'application/json'})
+
+    
 
 
 @bp.route('/articles/filter', methods=['GET', 'POST'])

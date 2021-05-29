@@ -7,7 +7,10 @@ from werkzeug.utils import secure_filename
 from app import s3, bucket
 
 
-def importPDF(filepath):
+def importPDF(filepath, u=None):
+    if not u:
+        u = current_user
+    
     doc = fitz.open(filepath)
     content = ''
     title = ''
@@ -64,7 +67,7 @@ def importPDF(filepath):
     if not os.path.isdir(img_path):
         os.mkdir(img_path)
 
-    az_path_base = f'{current_user.id}/{title_for_dir}/'
+    az_path_base = f'{u.id}/{title_for_dir}/'
     # count for img title
     j = 0
     for page in doc:

@@ -187,23 +187,26 @@ function add_new_article(){
         type:'POST',
         contentType: false,
         processData: false,
-    }).done(function(response){
-        byId('articles_page').innerHTML = response;
+    }).done(function(xhr){
+        response = JSON.parse(xhr)
+        if (response['processing']){
+            article_processing(response['taskID'])
+        }
+        else {
+            byId('articles_page').innerHTML = response['html'];
         
-        var alert = document.createElement('div')
-        alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
-        alert.setAttribute('role', 'alert')
-        alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-        </button>
-     `
-        
-       
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            `
 
-        var flash = byId('flashMessages')
-        flash.appendChild(alert);
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);
 
-
+        }
         
     }).fail(function(xhr) {
       
@@ -264,29 +267,47 @@ function add_new_article(){
             var flash = byId('flashMessages')
             flash.appendChild(alert);
         }
-
         
     });
 
 
-/*
-    $.post('/articles/new', {
-        'epub': epub,
-        'url':url,
-        'notes':notes,
-        'tags': JSON.stringify(tags),
-        'title': title,
-        'source':source,
-        'content':content
-        }).done(function( data ) {
-        console.log(data)
-    }); 
-*/
+function article_processing(taskID){
+    url = `/articles/processing/${taskID}`
+        fetch(url, {
+            method: 'get',
+            headers: {
+                'Content-type': 'application/html',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data['error']){
+                throw error
+            }
+            else if(data['processing']){
+                article_processing(taskID)
+            }
+            else {
+                byId('articles_page').innerHTML = data['html'];
+
+                var alert = document.createElement('div')
+                alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
+                alert.setAttribute('role', 'alert')
+                alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+                `
+
+                var flash = byId('flashMessages')
+                flash.appendChild(alert);
+                }
+        });
+    }
+
+
 }
 
-
-
-/*  end add article form  */
 
 function view_article_tiny_init(){
     console.log('pulling up an article')

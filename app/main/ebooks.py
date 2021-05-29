@@ -11,7 +11,9 @@ from werkzeug.utils import secure_filename
 from app import s3, bucket
 
 
-def epubConverted(filepath):
+def epubConverted(filepath, u=None):
+    if not u:
+        u = current_user
     book = epub.read_epub(filepath)
     chapters = []
 
@@ -29,7 +31,7 @@ def epubConverted(filepath):
         basedir, 'temp', title
     )
 
-    az_path_base = f'{current_user.id}/{title}/'
+    az_path_base = f'{u.id}/{title}/'
     with ZipFile(filepath, 'r') as zip: 
         zip.extractall(path=path)
 
