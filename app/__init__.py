@@ -16,6 +16,7 @@ from redis import Redis
 import rq
 from sqlalchemy import MetaData
 import boto3
+from botocore.client import Config as AZConfig
 
 
 convention = {
@@ -38,9 +39,16 @@ cors = CORS()
 csrf = CSRFProtect()
 talisman = Talisman()
 
+my_config = AZConfig(
+    region_name = 'us-east-2',
+    signature_version = 's3v4',
+)
+
+
 s3 = boto3.client('s3',
                     aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
-                    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
+                    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'),
+                    config=my_config
                     )
 bucket = os.environ.get('AWS_BUCKET')
 

@@ -144,12 +144,28 @@ def export_highlights(user, highlights, source, ext):
         _set_task_progress(100)
 
     
-def bg_add_article(u, pdf, epub, path, filename, tags):
+def bg_add_article(u, a_id, pdf, epub, tags):
     try:
         _set_task_progress(0)
         today = date.today()
         today = today.strftime("%B %d, %Y")
-        if pdf:
+        
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(
+            basedir, 'temp'
+        )
+
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        path = f'{path}/{a_id}'
+
+        if pdf == 'true':
+            path = f'{path}.pdf'
+            with open(path, "w") as f:
+                pass
+            s3.download_file(bucket, a_id, path)
+
             _set_task_progress(10)
             pdf = importPDF(path, u)
             _set_task_progress(90)
@@ -174,26 +190,9 @@ def bg_add_article(u, pdf, epub, path, filename, tags):
                     article.AddToTag(t)
 
             db.session.commit()
-        if epub:
-            
-            """
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            print(f'///  redis basedir ///\n{basedir}')
-            filename = secure_filename(filename)
-
-            path = os.path.join(
-                basedir, 'temp'
-            )
-            print(f'///  redis path ///\n{path}')
-            if not os.path.isdir(path):
-                os.mkdir(path)
-
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-            print(f'///  redis filepath ///\n{path}')
-            """
-            print(f'///  filepath ///\n{path}')
+        else:
+            path = f'{path}.epub'
+            s3.download_file(bucket, a_id, path)
 
             content = epubConverted(path, u)
             title = epubTitle(path)

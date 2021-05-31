@@ -1,72 +1,168 @@
-Exception on /register [POST]
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
 Traceback (most recent call last):
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1284, in _execute_context
-    cursor, statement, parameters, context
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/default.py", line 590, in do_execute
-    cursor.execute(statement, parameters)
-sqlite3.IntegrityError: UNIQUE constraint failed: user.username
-
-The above exception was the direct cause of the following exception:
-
+  File "./app/tasks.py", line 28, in export_highlights
+    _set_task_progress(0)
+  File "./app/tasks.py", line 20, in _set_task_progress
+    'progress': progress })
+  File "./app/models.py", line 164, in add_notification
+    n = Notification(name=name, payload_json=json.dumps(data), user=self)
+NameError: name 'json' is not defined
+Unhandled exception
 Traceback (most recent call last):
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/app.py", line 2447, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/app.py", line 1952, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/app.py", line 1821, in handle_user_exception
-    reraise(exc_type, exc_value, tb)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/_compat.py", line 39, in reraise
-    raise value
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/app.py", line 1950, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/flask/app.py", line 1936, in dispatch_request
-    return self.view_functions[rule.endpoint](**req.view_args)
-  File "/Users/rr/Desktop/code/LearnBetter/app/routes.py", line 168, in register
-    db.session.commit()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/scoping.py", line 163, in do
-    return getattr(self.registry(), name)(*args, **kwargs)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 1042, in commit
-    self.transaction.commit()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 504, in commit
-    self._prepare_impl()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 483, in _prepare_impl
-    self.session.flush()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 2523, in flush
-    self._flush(objects)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 2664, in _flush
-    transaction.rollback(_capture_exception=True)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/util/langhelpers.py", line 69, in __exit__
-    exc_value, with_traceback=exc_tb,
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/util/compat.py", line 178, in raise_
-    raise exception
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/session.py", line 2624, in _flush
-    flush_context.execute()
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/unitofwork.py", line 422, in execute
-    rec.execute(self)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/unitofwork.py", line 589, in execute
-    uow,
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/persistence.py", line 245, in save_obj
-    insert,
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/orm/persistence.py", line 1136, in _emit_insert_statements
-    statement, params
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1020, in execute
-    return meth(self, multiparams, params)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/sql/elements.py", line 298, in _execute_on_connection
-    return connection._execute_clauseelement(self, multiparams, params)
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1139, in _execute_clauseelement
-    distilled_params,
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1324, in _execute_context
-    e, statement, parameters, cursor, context
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1518, in _handle_dbapi_exception
-    sqlalchemy_exception, with_traceback=exc_info[2], from_=e
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/util/compat.py", line 178, in raise_
-    raise exception
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/base.py", line 1284, in _execute_context
-    cursor, statement, parameters, context
-  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.7/site-packages/sqlalchemy/engine/default.py", line 590, in do_execute
-    cursor.execute(statement, parameters)
-sqlalchemy.exc.IntegrityError: (sqlite3.IntegrityError) UNIQUE constraint failed: user.username
-[SQL: INSERT INTO user (goog_id, username, email, password_hash) VALUES (?, ?, ?, ?)]
-[parameters: (None, 'alan', 'roznoshchik@gmail.com', 'pbkdf2:sha256:150000$vsgzfzlb$f45d9e9922ae41ddee707a12eaa95ef854254d08f403406cbabef4b016b03d8d')]
-(Background on this error at: http://sqlalche.me/e/gkpj)
+  File "./app/tasks.py", line 28, in export_highlights
+    _set_task_progress(0)
+  File "./app/tasks.py", line 20, in _set_task_progress
+    'progress': progress })
+  File "./app/models.py", line 164, in add_notification
+    n = Notification(name=name, payload_json=json.dumps(data), user=self)
+NameError: name 'json' is not defined
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 31, in export_highlights
+    total_highlights = len(highlights)
+TypeError: object of type 'function' has no len()
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 31, in export_highlights
+    total_highlights = len(highlights)
+TypeError: object of type 'function' has no len()
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 31, in export_highlights
+    total_highlights = len(highlights)
+TypeError: object of type 'function' has no len()
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 31, in export_highlights
+    total_highlights = len(highlights)
+TypeError: object of type 'function' has no len()
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x11263ebe0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x11263ebe0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x112606be0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x112606be0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x112605be0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    a = highlights[0].article
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x112605be0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    title = highlights[0].article.title
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x11277dbe0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 35, in export_highlights
+    title = highlights[0].article.title
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
+    return self.impl.get(instance_state(instance), dict_)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 723, in get
+    value = self.callable_(state, passive)
+  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/strategies.py", line 710, in _load_for_state
+    % (orm_util.state_str(state), self.key)
+sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Highlight at 0x11277dbe0> is not bound to a Session; lazy load operation of attribute 'article' cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+Learning tool startup
+Learning tool startup
+Learning tool startup
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 53, in export_highlights
+    text_body=render_template('email/export_highlights.txt', user=user),
+NameError: name 'render_template' is not defined
+Unhandled exception
+Traceback (most recent call last):
+  File "./app/tasks.py", line 53, in export_highlights
+    text_body=render_template('email/export_highlights.txt', user=user),
+NameError: name 'render_template' is not defined
+Learning tool startup
+Learning tool startup
 Learning tool startup

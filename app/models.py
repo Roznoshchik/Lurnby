@@ -656,8 +656,7 @@ def after_insert_listener(mapper, connection, target):
         update_user_last_action('added tag')
     elif isinstance(target, Topic):
         update_user_last_action('added topic')
-    elif isinstance(target, Task):
-        update_user_last_action('requested export')
+    
 
 
 def after_update_listener(mapper, connection, target):

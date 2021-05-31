@@ -134,7 +134,7 @@ function add_new_article(){
     <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
     </div>`;
 
-    formdata = new FormData();
+    data = {}
 
     notes = byId('notes_add').value;
 
@@ -155,46 +155,175 @@ function add_new_article(){
 
     if (byId('epub_add')){
         epub = 'true'
-        epub_file = byId('epub_add').files[0];
-        formdata.append('epub_file', epub_file);
+        file = byId('epub_add').files[0];
+        var filename = file.name;
+        ext = filename.split('.').pop();
+        if (ext != 'epub'){
+           data['not_epub'] = true     
+        }
     }
-    formdata.append('epub', epub);
+   
+    data['epub'] = epub
 
     if (byId('pdf_add')){
         pdf = 'true'
-        pdf_file = byId('pdf_add').files[0];
-        formdata.append('pdf_file', pdf_file);
+        file = byId('pdf_add').files[0];
+        var filename = file.name;
+        ext = filename.split('.').pop();
+        if (ext != 'pdf'){
+           data['not_pdf'] = true     
+        }
     }
-    formdata.append('pdf', pdf);
+    data['pdf'] = pdf
 
     if (byId('content_add')){
         content = byId('content_add').value;
     };
     
+    data['notes'] = notes
+    data['tags'] = JSON.stringify(tags)
+    data['title'] = title
+    data['source'] = source
+    data['url'] = url
+    data['content'] = content
 
+    /////////////////////////
+    //  failure responses  //
+    /////////////////////////
 
-    formdata.append('notes', notes);
-    formdata.append('tags', JSON.stringify(tags));
-    formdata.append('title', title);
-    formdata.append('source', source);
-    formdata.append('url', url);
-    formdata.append('content', content);
+    function handleErrors(response){
+        if (!response.ok) {
+            response.text().then(function(text){
+                data = JSON.parse(text)
+                byId('articles_page').innerHTML = data['html'];
+                var alert = document.createElement('div')
+                alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
+                alert.setAttribute('role', 'alert')
 
+                if (data['not_epub']){
+                    alert.innerHTML = `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`      
+                }
+                if (data['not_pdf']){
+                    alert.innerHTML = `That didn't seem to be a pdf file.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`       
+                }
+                if (data['bad_url']){
+                    alert.innerHTML = `Please check the url and try again.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`
+                }
+                if (data['manual_fail']){
+                    alert.innerHTML = `Something went wrong, please try again. <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`
+                }
+                if (data['no_article']){
+                    alert.innerHTML = `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`
+                }
+                var flash = byId('flashMessages')
+                flash.appendChild(alert);  
+                throw 'Failed to add article'
+            })
+            
+        }
+        return response
+    }
+
+    url = '/articles/new'
+    fetch(url, {
+        method: 'post',
+        headers: {
+            'Content-type': 'application/json',
+            'X-CSRFToken': csrf_token
+        },
+        body: JSON.stringify(data)
+    })
+    .then(handleErrors)
+    .then(response => response.json())
+    .then(data => {
+        if (!data['processing']){
+            byId('articles_page').innerHTML = data['html'];
     
-    $.ajax({
-        url:'/articles/new',
-        data:formdata,
-        type:'POST',
-        contentType: false,
-        processData: false,
-    }).done(function(xhr){
-        response = JSON.parse(xhr)
-        if (response['processing']){
-            article_processing(response['taskID'])
+            var alert = document.createElement('div')
+            alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
+            alert.setAttribute('role', 'alert')
+            alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+            `
+            var flash = byId('flashMessages')
+            flash.appendChild(alert);
+
         }
         else {
-            byId('articles_page').innerHTML = response['html'];
-        
+            
+            az_url = data['url']
+            a_id = data['a_id']
+            
+            fetch(az_url, {
+                mode: 'cors',
+                method: 'put',
+                body: file
+            })
+            .then(function(response) {
+                if (!response.ok){
+                    alert.innerHTML = `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`
+                
+                    var flash = byId('flashMessages')
+                    flash.appendChild(alert);  
+                    throw 'Failed to add article'
+                }
+            })
+            .then(function(){
+                url = `/articles/bg`
+                fetch(url, {
+                    method: 'post',
+                    headers: {
+                        'Content-type': 'application/json',
+                        'X-CSRFToken': csrf_token
+                    },
+                    body: JSON.stringify({
+                        'a_id': a_id,
+                        'tags':JSON.stringify(tags),
+                        'pdf': pdf,
+                        'epub': epub
+                    })
+                })
+                .then(response => response.json())
+                .then(data => article_processing(data['taskID'], a_id))
+                
+            })
+        }  
+    });
+}
+
+function article_processing(taskID, a_id){
+    url = `/articles/processing/${taskID}/${a_id}`
+    fetch(url, {
+        method: 'get',
+        headers: {
+            'Content-type': 'application/html',
+            'X-CSRFToken': csrf_token
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data['error']){
+            throw error
+        }
+        else if(data['processing']){
+            article_processing(taskID, a_id)
+        }
+        else {
+            byId('articles_page').innerHTML = data['html'];
+
             var alert = document.createElement('div')
             alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
             alert.setAttribute('role', 'alert')
@@ -205,109 +334,9 @@ function add_new_article(){
 
             var flash = byId('flashMessages')
             flash.appendChild(alert);
-
         }
-        
-    }).fail(function(xhr) {
-      
-        response = JSON.parse(xhr.responseText)
-        byId('articles_page').innerHTML = response['html'];
-        if (response['not_epub']){
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>`
-
-            var flash = byId('flashMessages')
-            flash.appendChild(alert);        
-        }
-        if (response['not_pdf']){
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `That didn't seem to be a pdf file.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>`
-
-            var flash = byId('flashMessages')
-            flash.appendChild(alert);        
-        }
-        if (response['bad_url']){
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Please check the url and try again.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>`
-
-            var flash = byId('flashMessages')
-            flash.appendChild(alert);
-        }
-        if (response['manual_fail']){
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Something went wrong, please try again. <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>`
-
-            var flash = byId('flashMessages')
-            flash.appendChild(alert);
-        }
-        if (response['no_article']){
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert', 'alert','alert-dismissable', 'alert-danger')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                                </button>`
-
-            var flash = byId('flashMessages')
-            flash.appendChild(alert);
-        }
-        
     });
-
-
-function article_processing(taskID){
-    url = `/articles/processing/${taskID}`
-        fetch(url, {
-            method: 'get',
-            headers: {
-                'Content-type': 'application/html',
-                'X-CSRFToken': '{{ csrf_token() }}'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data['error']){
-                throw error
-            }
-            else if(data['processing']){
-                article_processing(taskID)
-            }
-            else {
-                byId('articles_page').innerHTML = data['html'];
-
-                var alert = document.createElement('div')
-                alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
-                alert.setAttribute('role', 'alert')
-                alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-                </button>
-                `
-
-                var flash = byId('flashMessages')
-                flash.appendChild(alert);
-                }
-        });
-    }
-
-
 }
-
 
 function view_article_tiny_init(){
     console.log('pulling up an article')

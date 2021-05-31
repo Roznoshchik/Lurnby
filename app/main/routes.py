@@ -1,9 +1,10 @@
 import json
 import os
-from uuid import UUID
+from threading import Thread
+from uuid import UUID, uuid4
 import validators
 
-from app import csrf, db
+from app import csrf, db, s3, bucket
 from app.email import send_email
 from app.main.forms import (ContentForm, AddTopicForm,
                             AddHighlightForm, AddApprovedSenderForm,
@@ -14,7 +15,7 @@ from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
                         tags_articles, tags_highlights, Notification, Suggestion,
-                        Task)
+                        Task, update_user_last_action)
 
 import sys
 sys.path.insert(1, './app/ReadabiliPy')
@@ -23,7 +24,7 @@ from readabilipy import simple_json_from_html_string
 from data import data_dashboard
 
 from bs4 import BeautifulSoup
-from flask import flash, redirect, url_for, render_template, request, jsonify
+from flask import flash, redirect, url_for, render_template, request, jsonify, current_app
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
 
@@ -31,9 +32,7 @@ from datetime import datetime, date
 import time
 from sqlalchemy import desc
 
-# from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
-# from wtforms import BooleanField
 
 from app.main import bp
 
@@ -58,6 +57,9 @@ def articles():
                            unread_articles=unread_articles, user=current_user,
                            suggestion=suggestion, read_articles=read_articles)
 
+# ########################################################### #
+# ##     notifications / not finished needs front end      ## #
+# ########################################################### #
 
 @bp.route('/notifications')
 @login_required
@@ -70,6 +72,10 @@ def notifications():
         'data': n.get_data(),
         'timestamp': n.timestamp
     } for n in notifications])
+
+# ################################ #
+# ##     export highlights      ## #
+# ################################ #
 
 @bp.route('/export_highlights', methods=['POST'])
 @login_required
@@ -85,6 +91,7 @@ def export_highlights():
         if 'article_export' in data and data['article_export']:
             article_highlights = Article.query.get(data['article_id']).highlights.filter_by(archived=False).all()
             current_user.launch_task('export_highlights', 'Exporting highlights...', u, article_highlights, 'article', data['ext'])
+            update_user_last_action('requested export')
             db.session.commit()
         
         elif 'topic_export' in data and data['topic_export']:
@@ -94,6 +101,7 @@ def export_highlights():
                 highlights += t.highlights.filter_by(archived=False).all()
             highlights = list(set(highlights))
             current_user.launch_task('export_highlights', 'Exporting highlights...', u, highlights, 'topics', data['ext'])
+            update_user_last_action('requested export')
             db.session.commit()
         else:
             return (json.dumps({'msg': 'Something went wrong.'}),
@@ -101,6 +109,9 @@ def export_highlights():
     return (json.dumps({'msg': "Your export is being prepared. You will receive an email with download instructions shortly!"}),
             200, {'ContentType': 'application/json'})
 
+# ##################################### #
+# ##     Process incoming email      ## #
+# ##################################### #
 
 @bp.route('/email', methods=['POST'])
 @csrf.exempt
@@ -206,6 +217,10 @@ def add_by_email():
     
     return ''
 
+# ########################### #
+# ##     app settings      ## #
+# ########################### #
+
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 @bp.errorhandler(CSRFError)
@@ -216,6 +231,7 @@ def settings():
 
     if form.validate_on_submit():
         email = form.email.data
+        update_user_last_action('added approved sender')
         print('adding approved sender:')
         print(email)
         email = email.lower()
@@ -233,11 +249,16 @@ def settings():
 @bp.errorhandler(CSRFError)
 def enable_add_by_email():
     current_user.set_lurnby_email()
+    update_user_last_action('enabled add by email')
     e = Approved_Sender(user_id=current_user.id, email=current_user.email)
     db.session.add(e)
     db.session.commit()
 
     return '', 200
+
+# ######################## #
+# ##     dashboard      ## #
+# ######################## #
 
 @bp.route('/app_dashboard/users', methods=['GET', 'POST'])
 @login_required
@@ -276,6 +297,9 @@ def suggestions_dashboard():
     return render_template('dashboard/suggestion_dash.html',
                            form=form, suggestions=suggestions)
 
+# ########################## #
+# ##    app feedback      ## #
+# ########################## #
 
 @bp.route('/feedback', methods=['POST'])
 @login_required
@@ -293,9 +317,14 @@ def feedback():
                  + '</p><p>' + data['feedback'] + '</p>')
 
     send_email(subject, sender, recipients, text_body, html_body)
+    update_user_last_action('submitted feedback')
 
     return 'Thank you for the feedback!'
 
+
+# ###################################### #
+# ##     Pre load random article      ## #
+# ###################################### #
 
 @bp.route('/articles/add_suggestion', methods=['GET'])
 @login_required
@@ -335,6 +364,11 @@ def add_suggested_article():
     return json.dumps({'content': x})
 
 
+# ############################# #
+# ##     Add New Article     ## #
+# ############################# #
+
+
 @bp.route('/articles/new', methods=['GET', 'POST'])
 @login_required
 @bp.errorhandler(CSRFError)
@@ -362,14 +396,36 @@ def add_article():
 
     if request.method == 'POST':
 
-        notes = request.form['notes']
-        tags = json.loads(request.form['tags'])
-        pdf = request.form['pdf']
-        epub = request.form['epub']
-        title = request.form['title']
-        source = request.form['source']
-        content = request.form['content']
-        url = request.form['url']
+        data = json.loads(request.data)
+
+        notes = data['notes']
+        tags = json.loads(data['tags'])
+        pdf = data['pdf']
+        epub = data['epub']
+        title = data['title']
+        source = data['source']
+        content = data['content']
+        url = data['url']
+
+        try:
+             not_epub = data['not_epub']
+             
+             if not_epub:
+                return (json.dumps({'not_epub': True, 'html': rendered_articles}),
+                        400, {'ContentType': 'application/json'})
+        except:
+            pass
+
+        try:
+            not_pdf = data['not_pdf']
+            if not_pdf:
+                return (json.dumps({'not_pdf': True, 'html': rendered_articles}),
+                        400, {'ContentType': 'application/json'})
+        except:
+            pass
+
+        
+        
 
         today = date.today()
         today = today.strftime("%B %d, %Y")
@@ -415,8 +471,12 @@ def add_article():
             if not validators.url(url):
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
-
-            urltext = pull_text(url)
+            
+            try:
+                urltext = pull_text(url)
+            except:
+                return (json.dumps({'bad_url': True, 'html': rendered_articles}),
+                        400, {'ContentType': 'application/json'})
 
             title = urltext["title"]
             content = urltext["content"]
@@ -433,152 +493,19 @@ def add_article():
             db.session.add(new_article)
             new_article.estimated_reading()
 
-        if pdf == 'true':
-            f = request.files['pdf_file']
-            pdf=True
-            epub=False
+        if pdf == 'true' or epub =='true':
             
-            filename = f.filename
-            if filename != '':
-                file_ext = os.path.splitext(filename)[1]
-                if file_ext != '.pdf':
-                    return (json.dumps({'not_pdf': True, 'html': rendered_articles}),
-                            400, {'ContentType': 'application/json'})
+            a_id = str(uuid4())
+            url = s3.generate_presigned_url(
+                ClientMethod='put_object', 
+                Params={'Bucket': bucket, 'Key': a_id},
+                ExpiresIn=3600)
+
+            return (json.dumps({'processing': True, 'url':url, 'a_id': a_id}), 200, {'ContentType': 'application/json'})
+
             
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            filename = secure_filename(f.filename)
-
-            path = os.path.join(
-                basedir, 'temp'
-            )
-
-            if not os.path.isdir(path):
-                os.mkdir(path)
-
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-
-            f.save(path)
-            u = User.query.get(current_user.id)
-            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, f.filename, tags)
-            db.session.commit()
-
-            return (json.dumps({'processing': True, 'taskID':process.id}), 200, {'ContentType': 'application/json'})
-
-
-
-            """
-            filename = secure_filename(f.filename)
             
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            path = os.path.join(
-                basedir, 'temp'
-            )
-
-            if not os.path.isdir(path):
-                os.mkdir(path)
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-            f.save(path)
-            pdf = importPDF(path)
-
-            source = 'PDF File: added ' + today
-
-            article = Article(content=pdf['content'], archived=False,
-                              source=source, progress = 0.0,
-                              unread=True, title=pdf['title'],
-                              user_id = current_user.id, filetype='pdf')
-            
-            db.session.add(article)
-            article.estimated_reading()
-            db.session.commit()
-            """
-        if epub == "true":
-            f = request.files['epub_file']
-            pdf = False
-            epub = True
-
-            filename = f.filename
-            if filename != '':
-                file_ext = os.path.splitext(filename)[1]
-                if file_ext != '.epub':
-                    return (json.dumps({'not_epub': True, 'html': rendered_articles}),
-                            400, {'ContentType': 'application/json'})
-            
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            print(f'///  basedir ///\n{basedir}')
-            filename = secure_filename(f.filename)
-
-            path = os.path.join(
-                basedir, 'temp'
-            )
-            print(f'///  path ///\n{path}')
-            if not os.path.isdir(path):
-                os.mkdir(path)
-
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-            print(f'///  filepath ///\n{path}')
-
-            f.save(path)
-            u = User.query.get(current_user.id)
-            process = current_user.launch_task('bg_add_article', 'Adding article...',u, pdf, epub, path, f.filename, tags)
-            db.session.commit()
-        
-            return (json.dumps({'processing': True, 'taskID':process.id}),
-                    200, {'ContentType': 'application/json'})
-
-            """
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            filename = secure_filename(f.filename)
-
-            path = os.path.join(
-                basedir, 'temp'
-            )
-
-            if not os.path.isdir(path):
-                os.mkdir(path)
-
-            path = os.path.join(
-                basedir, 'temp', filename
-            )
-
-            f.save(path)
-
-            content = epubConverted(path)
-            title = epubTitle(path)
-            title = title[0][0]
-            epubtext = content
-
-            source = 'Epub File: added ' + today
-
-            new_article = Article(unread=True, title=title, content=epubtext,
-                                  source=source, user_id=current_user.id,
-                                  archived=False, progress=0.0,
-                                  filetype="epub")
-
-            db.session.add(new_article)
-            new_article.estimated_reading()
-
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=current_user.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=current_user.id)
-                    db.session.add(t)
-                    new_article.AddToTag(t)
-
-                else:
-                    new_article.AddToTag(t)
-
-            db.session.commit()
-            os.remove(path)
-            """
-
+    db.session.commit()
     articles = Article.return_articles_with_count()
     recent = articles['recent']
     done_articles = articles['done']
@@ -602,9 +529,32 @@ def handle_csrf_error(e):
             500, {'ContentType': 'application/json'})
 
 
-@bp.route('/articles/processing/<task_id>')
-def process_article(task_id):
-    print(task_id)
+# ################################ #
+# ##     epub + pdf bg add      ## #
+# ################################ #
+@bp.route('/articles/bg', methods=['POST'])
+def bg_add_article():
+    data = json.loads(request.data)
+    a_id = data['a_id']
+    tags = json.loads(data['tags'])
+    pdf = data['pdf']
+    epub = data['epub']
+
+    u = User.query.get(current_user.id)
+    processing = current_user.launch_task('bg_add_article', 'adding article...',u, a_id, pdf, epub, tags)
+    update_user_last_action('added article')
+    db.session.commit()
+
+    res = json.dumps({'taskID': processing.id})
+    return (res, 200, {'ContentType': 'application/json'})
+
+
+# ########################################### #
+# ##     epub + pdf processing status      ## #
+# ########################################### #
+
+@bp.route('/articles/processing/<task_id>/<a_id>')
+def process_article(task_id, a_id):
     process = Task.query.get(task_id)
 
     form = ContentForm()
@@ -625,13 +575,19 @@ def process_article(task_id):
     for i in range(25):
         time.sleep(1)
         if process.complete:
+            # delete object from amazon
+            s3.delete_object(
+                Bucket = bucket,
+                Key = a_id
+            )
             return (json.dumps({'html': html}), 200, {'ContentType': 'application/json'})
 
-        else:
-            return (json.dumps({'processing': True, 'taskID':process.id}), 200, {'ContentType': 'application/json'})
+    return (json.dumps({'processing': True, 'taskID':process.id, 'a_id':a_id}), 200, {'ContentType': 'application/json'})
 
     
-
+# ################################ #
+# ##     Article filtering      ## #
+# ################################ #
 
 @bp.route('/articles/filter', methods=['GET', 'POST'])
 @login_required
@@ -696,6 +652,10 @@ def filter_articles():
                            user=current_user, active_tags=active_tags)
 
 
+# ##################################### #
+# ##     Get Reader preferences      ## #
+# ##################################### #
+
 @bp.route('/article/preferences', methods=['POST', 'GET'])
 @login_required
 def reader_preferences():
@@ -713,6 +673,9 @@ def reader_preferences():
 
         return jsonify({'Preferences': preferences})
 
+# ########################### #
+# ##     View Article      ## #
+# ########################### #
 
 @bp.route('/article/<uuid>', methods=['GET'])
 @login_required
@@ -759,6 +722,7 @@ def article(uuid):
         color = preferences['color']
         font = preferences['font']
         article.date_read = datetime.utcnow()
+        update_user_last_action('opened article for reading')
         db.session.commit()
 
         return render_template('text.html', highlight_id=highlight_id,
@@ -775,6 +739,7 @@ def article(uuid):
 @bp.route('/article/<uuid>/notes', methods=['POST'])
 @login_required
 def updatearticlenotes(uuid):
+
     uuid_hash = UUID(uuid)
 
     article = Article.query.filter_by(uuid=uuid_hash).first()
