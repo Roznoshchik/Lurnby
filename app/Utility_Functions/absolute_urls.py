@@ -8,11 +8,18 @@ def set_absolute_urls(*articles):
             soup = BeautifulSoup(a.content, "html5lib")
             images = soup.find_all("img")
             for img in images:
-                if 'http' not in img['src']:
-                    img['src'] = f'{a.source_url}{img["src"]}'
+                try:
+                    if 'http' not in img['src']:
+                        img['src'] = f'{a.source_url}{img["src"]}'
+                except:
+                    print(f'error with article: {a.uuid}\n img: \n{img}')
             links = soup.find_all('a')
             for l in links:
-                if 'http' not in l['href']:
-                    l['href'] = f'{a.source_url}{l["href"]}'
+                try:
+                    if 'http' not in l['href']:
+                        l['href'] = f'{a.source_url}{l["href"]}'
+                except:
+                    print(f'error with article: {a.uuid}\n url: \n{l}')
+
             a.content = str(soup.prettify())
     db.session.commit()
