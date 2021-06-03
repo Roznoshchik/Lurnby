@@ -85,7 +85,8 @@ def epubConverted(filepath, u=None):
 
         images = soup.find_all('img')
         if images:
-            for img in images: 
+            for img in images:
+                img["loading"] = "lazy" 
                 filename = img['src']   
                 filename = filename.replace("../", path+"/")
                 if not os.path.exists(filename):

@@ -6,6 +6,7 @@ from rq import get_current_job
 from flask import render_template
 from flask_login import current_user
 from werkzeug.utils import secure_filename
+from bs4 import BeautifulSoup
 
 
 from app import create_app, db, s3, bucket
@@ -224,6 +225,21 @@ def bg_add_article(u, a_id, pdf, epub, tags):
             db.session.commit()
             os.remove(path)
             
+    except:
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+    finally:
+        _set_task_progress(100)
+
+def set_images_lazy(aid):
+    try:
+        _set_task_progress(0)
+        a = Article.query.get(aid)
+        soup = BeautifulSoup(a.content, "html5lib")
+        images = soup.find_all("img")
+        for img in images:
+            img["loading"] = "lazy"
+        a.content = str(soup.prettify())
+        db.session.commit()
     except:
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:

@@ -97,7 +97,7 @@ def importPDF(filepath, u=None):
                         )
                 location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-                content += f'<img src ={url}>'
+                content += f'<img src ={url} loading="lazy">'
             else:
                 lines = i['lines']
                 font_size = None                   

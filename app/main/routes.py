@@ -212,7 +212,9 @@ def add_by_email():
 
         db.session.add(new_article)
         new_article.estimated_reading()
+        u.launch_task("set_images_lazy", "lazy load images", new_article.id)
         db.session.commit()
+
         logout_user()
     
     return ''
@@ -424,9 +426,6 @@ def add_article():
         except:
             pass
 
-        
-        
-
         today = date.today()
         today = today.strftime("%B %d, %Y")
 
@@ -463,8 +462,9 @@ def add_article():
                     new_article.eAddToTag(t)
                 else:
                     new_article.AddToTag(t)
-
+            
             db.session.commit()
+            
 
         if (url != 'none'):
 
@@ -502,10 +502,11 @@ def add_article():
                 ExpiresIn=3600)
 
             return (json.dumps({'processing': True, 'url':url, 'a_id': a_id}), 200, {'ContentType': 'application/json'})
-
-            
-            
+     
     db.session.commit()
+    current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
+    db.session.commit()
+
     articles = Article.return_articles_with_count()
     recent = articles['recent']
     done_articles = articles['done']
@@ -521,7 +522,6 @@ def add_article():
     res = json.dumps({'processing':False, 'html': html})
     return (res, 200, {'ContentType': 'application/json'})
     
-   
 
 
 def handle_csrf_error(e):
