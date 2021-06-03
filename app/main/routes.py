@@ -212,7 +212,10 @@ def add_by_email():
 
         db.session.add(new_article)
         new_article.estimated_reading()
+        
         u.launch_task("set_images_lazy", "lazy load images", new_article.id)
+        u.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
+
         db.session.commit()
 
         logout_user()
@@ -505,6 +508,8 @@ def add_article():
      
     db.session.commit()
     current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
+    current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
+
     db.session.commit()
 
     articles = Article.return_articles_with_count()

@@ -244,3 +244,24 @@ def set_images_lazy(aid):
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
+
+def set_absolute_urls(aid):
+    try:
+        _set_task_progress(0)
+        a = Article.query.get(aid)
+        if a.source_url:
+            soup = BeautifulSoup(a.content, "html5lib")
+            images = soup.find_all("img")
+            for img in images:
+                if 'http' not in img['src']:
+                    img['src'] = f'{a.source_url}{img["src"]}'
+            links = soup.find_all('a')
+            for l in links:
+                if 'http' not in l['href']:
+                    l['href'] = f'{a.source_url}{l["href"]}'
+            a.content = str(soup.prettify())
+            db.session.commit()
+    except:
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+    finally:
+        _set_task_progress(100)
