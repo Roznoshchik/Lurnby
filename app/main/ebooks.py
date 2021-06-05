@@ -119,7 +119,7 @@ def epubConverted(filepath, u=None):
                         )
                 location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-                url = f"/download/{az_path}"
+                url = f"/download/{current_user.id}/{az_path}"
 
                 img['src'] = url
         

@@ -9,8 +9,8 @@ def protect_images():
         images = soup.find_all('img')
         for img in images:
             try:
-                if "https://s3-us-east-2.amazonaws.com/lurnby/" in img['src']:
-                    u = img['src'].replace('https://s3-us-east-2.amazonaws.com/lurnby/', '/download/')
+                if "/download/" in img['src']:
+                    u = img['src'].replace('/download/', f'/download/{a.user_id}/')
                     img['src'] = u
             except:
                 pass

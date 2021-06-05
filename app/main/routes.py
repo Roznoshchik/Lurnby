@@ -682,8 +682,12 @@ def reader_preferences():
 # ##     Download images for article      ## #
 # ########################################## #
 
-@bp.route('/download/<path:resource>')
+@bp.route('/download/<id>/<path:resource>')
+@login_required
 def download_image(resource):
+    if id != current_user.id:
+        return redirect('resource not found', code=403)
+
     """ resource: name of the file to download"""
     url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': resource}, ExpiresIn = 30)
     return redirect(url, code=302)
