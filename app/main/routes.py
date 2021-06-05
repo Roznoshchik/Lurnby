@@ -678,6 +678,16 @@ def reader_preferences():
 
         return jsonify({'Preferences': preferences})
 
+# ########################################## #
+# ##     Download images for article      ## #
+# ########################################## #
+
+@bp.route('/download/<path:resource>')
+def download_image(resource):
+    """ resource: name of the file to download"""
+    url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': resource}, ExpiresIn = 30)
+    return redirect(url, code=302)
+
 # ########################### #
 # ##     View Article      ## #
 # ########################### #

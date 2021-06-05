@@ -118,7 +118,9 @@ def epubConverted(filepath, u=None):
                         Key=az_path
                         )
                 location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-                url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+                # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+                url = f"/download/{az_path}"
+
                 img['src'] = url
         
         links = soup.find_all('a', href=True)
