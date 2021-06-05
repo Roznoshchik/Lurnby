@@ -11,6 +11,7 @@ def protect_images():
             try:
                 if "https://s3-us-east-2.amazonaws.com/lurnby/" in img['src']:
                     u = img['src'].replace('https://s3-us-east-2.amazonaws.com/lurnby/', '/download/')
+                    img['src'] = u
             except:
                 pass
         a.content = str(soup.prettify())
