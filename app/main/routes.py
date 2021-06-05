@@ -687,7 +687,7 @@ def reader_preferences():
 def download_image(id,resource):
     
     if id != current_user.id:
-        return redirect('resource not found', code=403)
+        return 'resource not found', 403
 
     """ resource: name of the file to download"""
     url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': resource}, ExpiresIn = 30)
