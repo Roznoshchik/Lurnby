@@ -682,9 +682,10 @@ def reader_preferences():
 # ##     Download images for article      ## #
 # ########################################## #
 
-@bp.route('/download/<id>/<path:resource>')
+@bp.route('/download/<int:id>/<path:resource>')
 @login_required
-def download_image(resource):
+def download_image(id,resource):
+    
     if id != current_user.id:
         return redirect('resource not found', code=403)
 
