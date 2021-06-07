@@ -46,27 +46,43 @@ def epubConverted(filepath, u=None):
         images = soup.find_all('image')
         if images:
             for img in images:
+                img["loading"] = "lazy"
                 filename = img['xlink:href']
                 print(filename)
                 filename = filename.replace("../", path+"/")
+                print(f'filename: {filename}')
                 if not os.path.exists(filename):
                     filename = img['xlink:href']
                     filename = filename.replace("../", path+"/OEBPS/")
                     print(filename)
+                else:
+                    print(f'found at: {filename}')
 
                 if not os.path.exists(filename):
                     filename = img['xlink:href']
                     filename = filename.replace("../", path+"/OPS/")
                     print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = f'{path}/{img["xlink:href"]}'
                     print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = f'{path}/OEBPS/{img["xlink:href"]}' 
                     print(filename) 
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = f'{path}/OPS/{img["xlink:href"]}'
                     print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     continue   
                 
@@ -78,8 +94,9 @@ def epubConverted(filepath, u=None):
                         Filename=filename,
                         Key=az_path
                         )
-                location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-                url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+                # location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
+                # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+                url = f"/download/{u.id}/{az_path}"
                 img['xlink:href'] = url
     
 
@@ -89,22 +106,42 @@ def epubConverted(filepath, u=None):
                 img["loading"] = "lazy" 
                 filename = img['src']   
                 filename = filename.replace("../", path+"/")
+                print(f'path: {path}')
                 if not os.path.exists(filename):
                     filename = f"{path}/{img['src']}"
+                    print(f'filename: {filename}')
                     # print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/OEBPS/")
+                    print(f'filename: {filename}')
                     # print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/OPS/")
+                    print(f'filename: {filename}')
                     # print(filename)
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     filename = f"{path}/OEBPS/{img['src']}"
-                    # print (filename)
+                    print(f'filename: {filename}')
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
-                    filename = f"{path}/OPS/{img['src']}" 
+                    filename = f"{path}/OPS/{img['src']}"
+                    print(f'filename: {filename}') 
+                else:
+                    print(f'found at: {filename}')
+                    
                 if not os.path.exists(filename):
                     print('still cant find img folder')
                     continue
@@ -117,7 +154,7 @@ def epubConverted(filepath, u=None):
                         Filename=filename,
                         Key=az_path
                         )
-                location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
+                # location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
                 url = f"/download/{u.id}/{az_path}"
 
