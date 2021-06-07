@@ -76,9 +76,21 @@ def epubConverted(filepath, u=None):
                     print(filename) 
                 else:
                     print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = f'{path}/oebps/{img["xlink:href"]}' 
+                    print(filename) 
+                else:
+                    print(f'found at: {filename}')
                     
                 if not os.path.exists(filename):
                     filename = f'{path}/OPS/{img["xlink:href"]}'
+                    print(filename)
+                else:
+                    print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = f'{path}/ops/{img["xlink:href"]}'
                     print(filename)
                 else:
                     print(f'found at: {filename}')
@@ -121,10 +133,26 @@ def epubConverted(filepath, u=None):
                     # print(filename)
                 else:
                     print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = img['src']
+                    filename = filename.replace("../", path+"/oebps/")
+                    print(f'filename: {filename}')
+                    # print(filename)
+                else:
+                    print(f'found at: {filename}')
                     
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/OPS/")
+                    print(f'filename: {filename}')
+                    # print(filename)
+                else:
+                    print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = img['src']
+                    filename = filename.replace("../", path+"/ops/")
                     print(f'filename: {filename}')
                     # print(filename)
                 else:
@@ -135,9 +163,21 @@ def epubConverted(filepath, u=None):
                     print(f'filename: {filename}')
                 else:
                     print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = f"{path}/oebps/{img['src']}"
+                    print(f'filename: {filename}')
+                else:
+                    print(f'found at: {filename}')
                     
                 if not os.path.exists(filename):
                     filename = f"{path}/OPS/{img['src']}"
+                    print(f'filename: {filename}') 
+                else:
+                    print(f'found at: {filename}')
+                
+                if not os.path.exists(filename):
+                    filename = f"{path}/ops/{img['src']}"
                     print(f'filename: {filename}') 
                 else:
                     print(f'found at: {filename}')
