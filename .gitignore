@@ -12,6 +12,14 @@ app/__pycache__/*
 .DS_Store
 
 
+.vscode/
+
+
+app/main/temp
+
+# redis stuff. Does it need to be committed?
+*.rdb
+
 #ssl stuff - not sure this should be added here or not. 
 *.pem
 
