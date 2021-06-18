@@ -190,6 +190,12 @@
         const byClass = function(classname){
             return document.getElementsByClassName(classname);
         };
+
+        const CACHE_NAME = 'static-cache';
+
+        const FILES_TO_CACHE = [
+          '/static/offline.html',
+        ];
         
         /* Progressive Web App Register Service Worker */
         if ('serviceWorker' in navigator) {
