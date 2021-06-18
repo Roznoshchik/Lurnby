@@ -1,0 +1,37 @@
+{
+    "name": "Lurnby - A Learning Tool",
+    "short_name": "Lurnby",
+    "theme_color": "#FFF79F",
+    "background_color": "#cbc1bf",
+    "icons": [
+        {
+          "src": "/static/images/rr-19.png",
+          "type": "image/png",
+          "sizes": "19x19"
+        },
+        {
+            "src": "/static/images/rr-48.png",
+            "type": "image/png",
+            "sizes": "48x48"
+        },
+        {
+            "src": "/static/images/rr-64.png",
+            "type": "image/png",
+            "sizes": "64x64"
+        },
+        {
+            "src": "/static/images/rr-96.png",
+            "type": "image/png",
+            "sizes": "96x96"
+        },
+        {
+            "src": "/static/images/rr-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        }
+        
+    ],
+    "start_url": "/",
+    "display": "standalone",
+    "orientation": "portrait"
+  }

@@ -73,6 +73,16 @@ def notifications():
         'timestamp': n.timestamp
     } for n in notifications])
 
+
+# ########################################################### #
+# ##     notifications / not finished needs front end      ## #
+# ########################################################### #
+
+@bp.route('/service-worker.js')
+def sw():
+    return current_app.send_static_file('service-worker.js')
+
+
 # ################################ #
 # ##     export highlights      ## #
 # ################################ #
