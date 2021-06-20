@@ -112,12 +112,12 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
     
     selectedObj.removeAllRanges();
 
-    var rawhighlight = selectedText.toString() // selected text
+    var rawhighlight = selectedObj.toString() // selected text
     var highlight_position = position; 
     // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     //$('#HighlightField').val(rawhighlight);
-    byId('HighlightField').value =rawhighlight
+    byId('HighlightField').value = rawhighlight
     byId('highlight_position').value = highlight_position
     //$('#highlight_position').val(highlight_position);
     byId('message-text').value='';
