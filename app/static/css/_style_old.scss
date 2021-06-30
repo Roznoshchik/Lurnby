@@ -1010,6 +1010,14 @@ background: #fab1a0;
       font-weight: 100;
     }
   
+    //statistics overview
+    .data a {
+      display: block;
+      font-size: 1.2rem;
+      font-weight: 100;
+      margin-bottom: 1rem;
+      color: $dark;
+    }
   
   .lurnby_modal .modal-dialog, 
   #edit_article .modal-dialog,

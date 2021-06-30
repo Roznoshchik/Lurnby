@@ -1249,11 +1249,9 @@ def highlights():
         return json.dumps(data)
 
 
-    return render_template('highlights.html', tags_count=tags_count,
-                           highlights_count=highlights_count,
-                           articles_count=articles_count,
-                           topics_count=topics_count, no_topics=no_topics,
-                           with_topics=with_topics, topics=topics)
+    return render_template('highlights.html', user=current_user, 
+                           no_topics=no_topics, with_topics=with_topics, 
+                           topics=topics, highlights_count=highlights_count)
 
 
 @bp.route('/topics', methods=['GET', 'POST'])

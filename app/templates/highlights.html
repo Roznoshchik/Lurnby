@@ -133,55 +133,8 @@
 
 {% if highlights_count >= 1 %}
 <div id = "highlights_page">
-    <div id="overview" class = "main-section row">
-    
-        <div id = "statistics" class ="main-col col-sm-12 col-lg-4">
-            <div class = "heading">
-                <h6 class = "label">Your work in progress</h6>
-            </div>
-    
-            <div class = "col data">
-                {% if articles_count == 1%}
-                    <div class = "data-item">
-                        <p>{{articles_count}} article added</p>
-                    </div>
-                {% else %}
-                    <div class = "data-item">
-                        <p>{{articles_count}} articles added</p>
-                    </div>
-                {% endif %}
-    
-                {% if tags_count == 1 %}
-                    <div class = "data-item">
-                        <p>{{tags_count}} tag </p>
-                    </div>
-                {% else %}
-                    <div class = "data-item">
-                        <p>{{tags_count}} tags </p>
-                    </div>
-                {% endif %}
-    
-                {% if highlights_count == 1 %}
-                    <div class = "data-item">
-                        <p>{{highlights_count}} highlight</p>
-                    </div>
-                {% else %}
-                    <div class = "data-item">
-                        <p>{{highlights_count}} highlights</p>
-                    </div>
-                {% endif %}
-                {% if topics_count == 1 %}
-                    <div class = "data-item">
-                        <p>{{topics_count}} topic</p>
-                    </div>
-                {% else %}
-                    <div class = "data-item">
-                        <p>{{topics_count}} topics</p>
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+    {% include '_overview.html'%}
+
 
     <!---------------------->
     <!--   main section   -->

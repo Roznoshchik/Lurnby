@@ -962,6 +962,14 @@ label svg {
     font-weight: 100;
   }
 
+  .data a {
+    display: block;
+    font-size: 1.2rem;
+    font-weight: 100;
+    margin-bottom: 1rem;
+    color: #424242;
+  }
+
   .lurnby_modal .modal-dialog,
 #edit_article .modal-dialog,
 #add_article .modal-dialog {

@@ -28,66 +28,7 @@
 
     {% if user.articles.filter_by(archived=False).count() >= 1 %}
         <div id = "articles_page">
-            <div id="overview" class = "main-section row">
-            
-                <div id = "statistics" class ="main-col col-sm-12 col-lg-4">
-                    <div class = "heading">
-                        <h6 class = "label">Your work in progress</h6>
-                    </div>
-            
-                    <div class = "col data">
-                        {% if user.articles.filter_by(archived=False).count() == 1%}
-                            <div class = "data-item">
-                                <p>{{user.articles.filter_by(archived=False).count()}} article added</p>
-                            </div>
-                        {% else %}
-                            <div class = "data-item">
-                                <p>{{user.articles.filter_by(archived=False).count()}} articles added</p>
-                            </div>
-                        {% endif %}
-            
-                        {% if done_articles|count == 1 %}
-                            <div class = "data-item">
-                                <p>{{done_articles|count}} article read </p>
-                            </div>
-                        {% else %}
-                            <div class = "data-item">
-                                <p>{{done_articles|count}} articles read </p>
-                            </div>
-                        {% endif %}
-                        
-                        {% if user.tags.count() == 1 %}
-                            <div class = "data-item">
-                                <p>{{user.tags.filter_by(archived=False).count()}} tag </p>
-                            </div>
-                        {% else %}
-                            <div class = "data-item">
-                                <p>{{user.tags.filter_by(archived=False).count()}} tags </p>
-                            </div>
-                        {% endif %}
-            
-                        {% if user.highlights.count() == 1 %}
-                            <div class = "data-item">
-                                <p>{{user.highlights.filter_by(archived=False).count()}} highlight</p>
-                            </div>
-                        {% else %}
-                            <div class = "data-item">
-                                <p>{{user.highlights.filter_by(archived=False).count()}} highlights</p>
-                            </div>
-                        {% endif %}
-            
-                        {% if user.topics.filter_by(archived=False).count() == 1 %}
-                            <div class = "data-item">
-                                <p>{{user.topics.filter_by(archived=False).count()}} topic</p>
-                            </div>
-                        {% else %}
-                            <div class = "data-item">
-                                <p>{{user.topics.filter_by(archived=False).count()}} topics</p>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            {% include '_overview.html'%}
             
             <div id = "articles_all" class = "main-section">
                 <div class = "heading row">
