@@ -350,7 +350,25 @@
           
     {% endif %}
     
-    <div class="lurnby_modal modal" id = "edit_article" tabindex="-1">           
+    <div class="lurnby_modal modal" id = "edit_article" tabindex="-1">   
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button"  class="close" data-dismiss="modal" onclick="clear_modals()" aria-label="Close">
+                        <span aria-hidden="false">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class ='rendering'>
+                        <p>Pulling up the article. Please wait.</p>
+                        <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+                    </div>        
+                </div>
+                <div class="modal-footer">                
+                  <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="lurby_modal modal" id = "add_article" tabindex="-1"> 

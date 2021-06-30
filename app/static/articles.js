@@ -15,7 +15,24 @@ function clear_modals(){
 
     $('#add_article').modal('hide')    
     $('#edit_article').modal('hide') 
-    byId('edit_article').innerHTML='';
+    byId('edit_article').innerHTML=`<div class="modal-dialog modal-lg">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button"  class="close" data-dismiss="modal" onclick="clear_modals()" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class ='rendering'>
+                <p>Pulling up the article. Please wait.</p>
+                <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+            </div>        
+        </div>
+        <div class="modal-footer">                
+          <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>`;
     byId('add_article').innerHTML='';
 }
 
@@ -458,6 +475,7 @@ function edit_article_tiny_init(){
 
 
 function ViewArticle(id){
+    $('#edit_article').modal('toggle');
 
     $.get('/view_article/' + id, function(data) {
         var modal = byId('edit_article');
@@ -465,7 +483,6 @@ function ViewArticle(id){
         initialize();
         //intialize tiny mce here?
         view_article_tiny_init()
-        $('#edit_article').modal('toggle');
     });
 }
 
