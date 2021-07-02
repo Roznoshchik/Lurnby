@@ -85,7 +85,7 @@
       <button type="button" class="main-button cancel editing"  onclick="clear_modals()" data-dismiss="modal">Close</button>
       <button type="button" class="main-button save editing"  data-dismiss="modal" onclick="save('{{article.uuid}}')">Save changes</button>
       <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
-      <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article['uuid'])}}">Start reading</a>
+      <a class = "main-button" type="button not-editing" href="{{url_for('main.article', uuid=article['uuid'])}}">Start reading</a>
 
 
     </div>
