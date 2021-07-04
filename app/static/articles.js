@@ -475,7 +475,7 @@ function edit_article_tiny_init(){
 
 
 function ViewArticle(id){
-    $('#edit_article').modal('toggle');
+    //$('#edit_article').modal('toggle');
 
     $.get('/view_article/' + id, function(data) {
         var modal = byId('edit_article');
