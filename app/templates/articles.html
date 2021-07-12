@@ -118,7 +118,7 @@
                             </div>
                             <div id = "open">
                             
-                                <a class = "main-button edit" type="button" onclick = "ViewArticle('{{uuid}}')"href="#">Details</a>
+                                <button class = "main-button edit" type="button" data-toggle="modal" data-target="#edit_article" onclick = "ViewArticle('{{uuid}}')" href="#">Details</button>
                                 <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article['uuid'])}}">Start reading</a>
                 
                             </div>
@@ -172,7 +172,7 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{uuid}}')"href="#">Details</a>
+                                        <button class = "main-button edit" type="button" data-toggle="modal" data-target="#edit_article" onclick = "ViewArticle('{{uuid}}')" href="#">Details</button>
                                         <a class = "main-button" type="button" href="{{url_for('main.article', uuid=uuid)}}">Start reading</a>
                         
                                     </div>
@@ -216,7 +216,7 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{uuid}}')"href="#">Details</a>
+                                        <button class = "main-button edit" type="button" data-toggle="modal" data-target="#edit_article" onclick = "ViewArticle('{{uuid}}')" href="#">Details</button>
                                         <a class = "main-button" type="button" href="{{url_for('main.article', uuid=uuid)}}">Start reading</a>
                                     </div>
                                 </div>
@@ -272,7 +272,7 @@
                                     </div>
                                     <div id = "open">
                                     
-                                        <a class = "main-button edit" type="button" onclick = "ViewArticle('{{uuid}}')"href="#">Details</a>
+                                        <button class = "main-button edit" type="button" data-toggle="modal" data-target="#edit_article" onclick = "ViewArticle('{{uuid}}')" href="#">Details</button>
                                         <a class = "main-button" type="button" href="{{url_for('main.article', uuid=uuid)}}">Start reading</a>
                                     </div>
                                 </div>
@@ -315,7 +315,7 @@
     <div class="lurby_modal modal" id = "add_article" tabindex="-1"> 
     </div>
 
-    {% endblock%}
+{% endblock%}
 
 
 {% block JS %}
