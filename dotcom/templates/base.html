@@ -16,37 +16,25 @@
                 }}();
             }
           </script>
-          
+          {% block css%}{% endblock %}
     </head>
     <body>
         <nav>
             <ul>
-                <li><a class="" href= "https://lurnby.com">Lurnby</a></li>
-                <li><a class="" href= "who-is-lurnby-for.html">Who is it for?</a></li>
-                <li><a class="" href= "how-lurnby-works.html">How does it work?</a></li>
-                <li><a class="active" href= "how-much-lurnby-costs.html">How much does it cost?</a></li>
-                <li><a class="" href= "how-to-start-using-lurnby.html">How can I start using it?</a></li>
-                <li><a class="" href= "find-out-more-about-lurnby.html">I have questions.</a></li>
-                <li><a class="" href= "tutorials-and-demos.html">Videos, tutorials, and demos</a></li>
+                <li><a class="{{ 'active' if active == 'index' }}" href= "https://lurnby.com">Lurnby</a></li>
+                <li><a class="{{ 'active' if active == 'who' }}" href= "who-is-lurnby-for.html">Who is it for?</a></li>
+                <li><a class="{{ 'active' if active == 'works'}}" href= "how-lurnby-works.html">How does it work?</a></li>
+                <li><a class="{{ 'active' if active == 'costs'}}" href= "how-much-lurnby-costs.html">How much does it cost?</a></li>
+                <li><a class="{{ 'active' if active == 'start'}}" href= "how-to-start-using-lurnby.html">How can I start using it?</a></li>
+                <li><a class="{{ 'active' if active == 'more'}}" href= "find-out-more-about-lurnby.html">I have questions.</a></li>
+                <li><a class="{{ 'active' if active == 'tutorials'}}" href= "tutorials-and-demos.html">Videos, tutorials, and demos</a></li>
             </ul>
         </nav>
         
 
-        
-<main id = "main-index">
-    <div >
-        <h2>We're swimming in investor money. Not.</h2>
-        <p>We believe everyone who wants to learn better, should be supported by the best tools to do so. We currently operate on a pay-what-you-think-it's-worth model. And we plan to keep this model for as long as it's sustainable.</p> 
-        <p>This means that if you're not sure how much this is worth for you yet, you can use Lurnby at no cost. If you think that Lurnby is solving a meaningful problem, then please visit Lurnby's Patreon page below to support us.</p>             
-        <a class="btn patreon" target = "_blank" href="https://www.patreon.com/lurnby">Support Lurnby on Patreon, please.</a>
-        <p>and then,</p>
-        <a class="btn" href="how-to-start-using-lurnby.html">Can I see it now?</a>
+        {% block content %}
+        {% endblock %}
 
-    </div>
-    
-</main>
-
-
-        
+        {% block js %}{% endblock %}
     </body>
 </html>
