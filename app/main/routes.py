@@ -37,25 +37,143 @@ from werkzeug.utils import secure_filename
 from app.main import bp
 
 
+# @bp.route("/", methods=['GET', 'POST'])
+# @bp.route("/index", methods=['GET', 'POST'])
+# @bp.route('/articles', methods=['GET'])
+# @login_required
+# def articles():
+#     form = ContentForm()
+    
+#     articles = Article.return_articles_with_count()
+#     recent = articles['recent']
+#     done_articles = articles['done']
+#     unread_articles = articles['unread']
+#     read_articles = articles['read']
+
+#     suggestion = Suggestion.get_random()
+   
+#     return render_template('articles.html', form=form,
+#                            done_articles=done_articles, recent=recent,
+#                            unread_articles=unread_articles, user=current_user,
+#                            suggestion=suggestion, read_articles=read_articles)
+
+
+# ############################################ #
+# ##     New table layout for articles      ## #
+# ############################################ #
+# @bp.route('/articles2', methods=['GET', 'POST'])
+
 @bp.route("/", methods=['GET', 'POST'])
 @bp.route("/index", methods=['GET', 'POST'])
-@bp.route('/articles', methods=['GET'])
+@bp.route('/articles', methods=['GET', 'POST'])
 @login_required
 def articles():
-    form = ContentForm()
-    
-    articles = Article.return_articles_with_count()
-    recent = articles['recent']
-    done_articles = articles['done']
-    unread_articles = articles['unread']
-    read_articles = articles['read']
-
+    query = current_user.articles.filter_by(archived=False)
+    col = getattr(Article, "date_read")
+    col = col.desc()
+    articles = query.order_by(col).all()
+    count = query.count()
     suggestion = Suggestion.get_random()
-   
-    return render_template('articles.html', form=form,
-                           done_articles=done_articles, recent=recent,
-                           unread_articles=unread_articles, user=current_user,
-                           suggestion=suggestion, read_articles=read_articles)
+    showing = f'Showing {count} out of {count} articles.'
+
+    if request.method == 'POST':
+        data = json.loads(request.data)
+        
+        # per_page = data['per_page']
+        title_sort = data['title_sort'].lower()
+        opened_sort = data['opened_sort'].lower()
+        status = data['status'].lower()
+        search = data['search']
+        tag_ids = data['tags']
+
+        # first make user specific and unarchived
+        query = Article.query.filter_by(user_id=current_user.id, archived=False)
+        total_count = query.count()
+
+        # then filter for search
+        if search != "":
+
+            query =  query.filter(db.or_(
+                Article.title.ilike(f'%{search}%'),
+                Article.source_url.ilike(f'%{search}%'),
+                Article.source.ilike(f'%{search}%'),
+                Article.notes.ilike(f'%{search}%')
+            ))
+        
+        # then filter by read status
+        if status == "new":
+           query = query.filter(Article.unread==True, Article.done==False)
+        elif status == 'in progress':
+            query = query.filter(Article.unread==False, Article.done==False)
+        elif status == 'finished reading':
+            query = query.filter(Article.unread==False, Article.done==True)
+
+        # then filter by tags        
+        if tag_ids != []:
+            # these are just shortcuts to make the lines in the below queries shorter
+            join_aid = tags_articles.c.article_id
+            join_tid = tags_articles.c.tag_id
+
+            query = query.join(tags_articles, (join_aid == Article.id))   
+            query = query.filter(join_tid.in_(tag_ids))      
+
+        # then sort 
+        order = []
+        if opened_sort == 'desc':
+            col = getattr(Article, "date_read")
+            col = col.desc()
+            order.append(col)
+        elif opened_sort == 'asc':
+            col = getattr(Article, "date_read")
+            col = col.asc()
+            order.append(col)
+
+        if title_sort == 'desc':
+            col = getattr(Article, "title")
+            col = col.desc()
+            order.append(col)
+        elif title_sort == 'asc':
+            col = getattr(Article, "title")
+            col = col.asc()
+            order.append(col)
+
+        if order:
+            query = query.order_by(*order)
+
+        filtered_count = query.count()
+
+
+        return json.dumps({'html': render_template('_all_articles.html', articles = query.all()),
+                            'showing':f'Showing {filtered_count} out of {total_count} articles.'})
+
+
+
+    return render_template('articles_new.html', showing=showing,
+                           articles=articles, user=current_user,
+                           suggestion=suggestion)
+
+
+@bp.route('/articles2/api', methods=['GET'])
+@login_required
+def articles_api():
+    query = current_user.articles
+
+    total_filtered = query.count()
+
+    # pagination
+    start = request.args.get('start', type=int)
+    length = request.args.get('length', type=int)
+    query = query.offset(start).limit(length)
+
+    # response
+    return {
+        'data': [article.to_table() for article in query],
+        'recordsFiltered': total_filtered,
+        'recordsTotal': query.count(),
+        'draw': request.args.get('draw', type=int),
+    }
+
+
 
 # ########################################################### #
 # ##     notifications / not finished needs front end      ## #
@@ -393,18 +511,28 @@ def add_article():
 
 
     def render_articles():
-        articles = Article.return_articles_with_count()
-        recent = articles['recent']
-        done_articles = articles['done']
-        unread_articles = articles['unread']
-        read_articles = articles['read']
+        query = current_user.articles.filter_by(archived=False)
+        col = getattr(Article, "date_read")
+        col = col.desc()
+        articles = query.order_by(col).all()
+        count = query.count()
+        showing = f'Showing {count} out of {count} articles.'
+        
+        return render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
 
-        return render_template('articles_all.html', form=form,
-                                recent=recent, 
-                                done_articles=done_articles,
-                                unread_articles=unread_articles,
-                                read_articles=read_articles,
-                                user=current_user)
+
+        # articles = Article.return_articles_with_count()
+        # recent = articles['recent']
+        # done_articles = articles['done']
+        # unread_articles = articles['unread']
+        # read_articles = articles['read']
+
+        # return render_template('articles_all.html', form=form,
+        #                         recent=recent, 
+        #                         done_articles=done_articles,
+        #                         unread_articles=unread_articles,
+        #                         read_articles=read_articles,
+        #                         user=current_user)
 
 
     rendered_articles = render_articles()
@@ -465,18 +593,6 @@ def add_article():
 
             db.session.add(new_article)
             new_article.estimated_reading()
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=current_user.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=current_user.id)
-                    db.session.add(t)
-                    new_article.eAddToTag(t)
-                else:
-                    new_article.AddToTag(t)
-            
-            db.session.commit()
             
 
         if (url != 'none'):
@@ -515,7 +631,18 @@ def add_article():
                 ExpiresIn=3600)
 
             return (json.dumps({'processing': True, 'url':url, 'a_id': a_id}), 200, {'ContentType': 'application/json'})
-     
+
+        for tag in tags:
+            t = Tag.query.filter_by(name=tag, user_id=current_user.id
+                                    ).first()
+
+            if not t:
+                t = Tag(name=tag, archived=False, user_id=current_user.id)
+                db.session.add(t)
+                new_article.AddToTag(t)
+            else:
+                new_article.AddToTag(t)
+            
     db.session.commit()
     current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
     current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
@@ -528,11 +655,13 @@ def add_article():
     unread_articles = articles['unread']
     read_articles = articles['read']
     
-    html = render_template('articles_all.html', form=form,
-                           recent=recent, 
-                           done_articles=done_articles,
-                           unread_articles=unread_articles,
-                           read_articles=read_articles, user=current_user)
+    html = render_articles()
+
+    # html = render_template('articles_all.html', form=form,
+    #                        recent=recent, 
+    #                        done_articles=done_articles,
+    #                        unread_articles=unread_articles,
+    #                        read_articles=read_articles, user=current_user)
 
     res = json.dumps({'processing':False, 'html': html})
     return (res, 200, {'ContentType': 'application/json'})

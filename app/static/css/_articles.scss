@@ -1,0 +1,330 @@
+@import "fa/scss/fontawesome.scss";
+@import "fa/scss/solid.scss";
+
+
+
+.action-icon {
+    cursor: pointer;
+    padding: 8px;
+    border: none;
+    background-color: lightgrey;
+    color: black;
+    border-radius: 6px;
+    margin-bottom: 8px;
+
+}
+
+.action-icon:hover{
+    background-color: #4a4a4a;
+    color: white;
+}
+
+.grid-icon{
+    @extend %fa-icon;
+    @extend .fas;
+
+    &:before {
+        content: fa-content($fa-var-th);
+    }
+}
+
+.list-icon{
+    @extend %fa-icon;
+    @extend .fas;
+
+    &:before {
+        content: fa-content($fa-var-list);
+    }
+}
+
+#ChangeView {
+    position: relative;
+    display: inline-block;
+    margin-left:16px;
+
+    #change-icon-tooltip {
+        visibility:hidden;
+        width: 90px;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -45px; /* Use half of the width (120/2 = 60), to center the tooltip */
+        background-color: #4a4a4a;
+        color: #fff;
+        text-align:center;
+        padding: 6px 2px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: -1;
+        font-size: 12px;
+    
+        &:after{
+            content: " ";
+            position: absolute;
+            top: 100%; /* At the bottom of the tooltip */
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #4a4a4a transparent transparent transparent;
+        }
+    
+    }
+
+}
+
+
+
+#ChangeView:hover {
+
+    #change-icon-tooltip {
+        visibility: visible;
+        z-index: 1000;
+    }
+} 
+
+
+.all-filters {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    //align-items: flex-start;
+    padding: 32px 0 0 0;
+
+    > * {
+        margin-right: 32px;
+    }
+
+    .lurnby-filter{
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        margin: 0 16px 16px 0;
+        
+        * {
+            vertical-align: middle;
+        }
+
+
+        input, select {
+            background: white;
+            border-radius: 0;
+            border: $dark 1px solid;
+            color: $dark;
+            height: 32px;
+    
+        }
+
+        input {
+            padding: 4px 8px;
+            margin-right: 8px;
+        }
+
+        label[for="search"] {
+            margin-right: 4px;
+            width: 100%;
+        }
+
+        @media(min-width: $sm){
+            label[for="search"] {
+                width: auto;
+            }
+        }
+
+
+        .main-button {
+            padding: 4px 8px;
+            margin-left: 0;
+            border: $dark 1px solid;
+            line-height: normal;
+
+            &:hover, &:focus, &:active {
+
+                #tag_count {
+                    color:$dark;
+                    background: white;
+                }
+            }
+        }
+
+        .sort-button {
+            border: $dark 1px solid;
+            margin-right: 16px;
+            //display: inline-flex;            
+            
+            span {
+                display: inline-block;
+                margin-top: -4px;
+            }
+
+            &.sort_desc {
+                
+                &:focus, &:active, &:hover {
+                    &::after{
+                        color: white;
+                    }
+                }
+
+                &::after {
+                    content:"▼";
+                    color: $dark;
+                    margin: -4px 0 0 4px;
+                }
+            }
+
+            &.sort_asc {
+
+
+                &:focus, &:active, &:hover {
+                    &::after{
+                        color: white;
+                    }
+                }
+
+                &::after {
+                    content:"▲";
+                    color: $dark;
+                    margin: -4px 0 0 4px;
+                }
+            }
+            
+        }
+
+
+        #tag_count {
+            display: inline-block;
+            background: $dark;
+            color: white;
+            padding: 2px;
+            border-radius: 10px;
+            height: 20px;
+            width: 20px;
+            font-size: 12px;
+            margin-top: -4px;
+          }
+
+        #active_tags {
+            
+            @media(min-width: $sm){
+                &.show {
+                    min-width: 300px;
+                }
+            
+            
+            }
+            padding: 4px;
+            
+           
+
+            label {
+                margin: 0 4px 4px 0;
+                padding: 2px 4px;
+                background: $main-grey;
+                border: $dark 1px solid;
+                font-size: 12px;
+                cursor: pointer;
+
+                &:hover, &:focus, &:active {
+                    color: white;
+                    background: $dark;
+
+                }
+
+                input {
+                    display: inline-block;
+                    margin-left: 4px;
+                }
+            }
+        }
+          
+
+    }    
+
+}
+
+#filter_submit {
+    background: $highlight-yellow;
+    vertical-align: middle ; 
+    &:hover, &:focus, &:active {
+        background: $dark;
+        color: white;
+    }
+}
+
+#article-items{
+    display: flex;
+    flex-wrap: wrap;
+
+    .label.done p{
+        background-color: $main-grey;
+    }
+
+    .label.in-progress p{
+        background-color: $green;
+    }
+
+    .article_card {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        min-height: 250px;
+        width: px;
+        margin: 0 8px 8px 0;
+        padding: 1.25rem;
+        background-color: #fff;
+        //color: #4a4a4a;
+        border-radius: 6px;
+        border: none;
+        box-shadow:0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
+        
+        h4 {
+            margin: 0;
+        }
+
+
+        .open {
+                //background: white;
+                //padding: 16px;
+                width: 100%;
+                height: 40px;
+                margin-top: 32px;
+                margin-left: 0px;
+                //margin-bottom: 16px;
+                display: flex;
+                justify-content: flex-end;
+                
+                button {
+                    margin-left: 0;
+                }
+        }
+        
+        .article_data{
+            margin-top: 0;
+        }
+
+
+        .article-status{
+            width: 100%;
+
+            .underline{
+                height: 1px;
+                width: 100%;
+            }
+
+            p {
+                margin-bottom: 0;
+            }
+
+            .label {
+                p {
+                    display: inline-block;
+                    width: auto;
+                    margin-bottom: 12px;
+                }
+                
+            }
+            
+        }
+        
+    }
+}
+        

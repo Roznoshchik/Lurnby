@@ -16,13 +16,14 @@
                 </div>
             {% endif %}
 
-            {% if done_articles|count == 1 %}
+            {% set done_articles = user.articles.filter_by(archived=False, done=True).count() %}
+            {% if done_articles == 1 %}
                 <div class = "data-item">
-                    <a href = "{{url_for('main.articles')}}">{{done_articles|count}} article read </a>
+                    <a href = "{{url_for('main.articles')}}">1 article read </a>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <a href = "{{url_for('main.articles')}}">{{done_articles|count}} articles read </a>
+                    <a href = "{{url_for('main.articles')}}">{{done_articles}} articles read </a>
                 </div>
             {% endif %}
             

@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block content %}
+
+    {% if user.articles.filter_by(archived=False).count() == 0 %}
+        <div id = "articles_page">
+            <div class="main-section articles-empty-row">
+                <div class=" articles-empty-col col text-center">
+                <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                    src="{{url_for('static', filename='rr-100.png')}}" alt="" height="100"></span>
+                <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">Welcome to Lurnby</h1>
+                <p>Lurnby helps you remember more of what you read. So let's start reading something!</p>
+                <div class="actions">
+                    <button class="main-button articles-empty-cta add-new" onclick="ViewAddArticle()">Add an article</button> 
+                    <p>or</p>
+                    <button class="main-button articles-empty-cta add-new" onclick="AddSuggestion()">Let us pick one for you.</button>
+                </div>
+                </div>    
+                
+            </div>
+        </div>
+    {% endif %}
+
+
+    {% if articles|length >= 1 %}
+        <div id = "articles_page">
+            {% include '_overview.html'%}
+            
+            <div id = "articles_all" class = "main-section">
+                <div class = "heading row">
+                    <div class = "">
+                        <h6>Articles</h6>
+                        <!-- <button id="ChangeView" class = "action-icon" onclick="change()"><i id="change-icon" class="list-icon"></i><span id="change-icon-tooltip">List View</span></button> -->
+                        <button class="main-button cancel" onclick="ViewAddArticle()">Add new</button>
+                    </div>
+                    
+                    <!-- Filters   -->
+                    <div class = "all-filters">
+                        <!-- <div class = "lurnby-filter">
+                            <span>Show 
+                                <select id = "per_page">
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="50">50</option>
+                                    <option value="all">all</option>
+                                </select> articles
+                            </span>
+                        </div> -->
+                        {% if current_user.tags.count() > 0 %}
+                        <div id = "tags_filter" class = "lurnby-filter">
+                            <div class = "dropdown">
+                                <button class="main-button" type="button" id="tags_dropdown" data-toggle="dropdown" data-display="static" aria-haspopup="true" aria-expanded="false">
+                                    Tags <span id="tag_count">0</span>
+                                </button>
+                                <div id = "active_tags" class="dropdown-menu">
+                                    <form>
+                                        {% for tag in user.tags.all() %}
+                                        <label for= "tag{{tag.id}}" class="lurnby-tag">{{tag.name}}<input type="checkbox" id="tag{{tag.id}}" class="single-tag" name="tags" value="{{tag.id}}"></input></label>
+                                        {% endfor %}
+                                    </form>
+                                  
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="lurnby-filter">
+                            <input type="hidden" id="title_sort_value"/>
+                            <input type="hidden" id="opened_sort_value"/>
+                            <span>Sort By: 
+                                <button id="title_sort" class="main-button sort-button"><span>Title</span></button>
+                                <button id="last_opened_sort" class="main-button sort-button"><span>Last Opened</span></button>
+                            </span>
+                        </div>
+                        <div class="lurnby-filter">
+                            <span>Status:  
+                                <select id = "article_status">
+                                    <option value="All">All</option>
+                                    <option value="New">New</option>
+                                    <option value="In progress">In Progress</option>
+                                    <option value="Finished reading">Finished reading</option>
+                                    
+                                </select>
+                            </span>
+                            
+                        </div>
+                        
+                        <div class="lurnby-filter">
+                            <label for="search">Search:</label><input type="text" id="search">
+                            <button id="filter_submit" class="main-button"><span>Apply</span><span class="mobile-hidden"> filters</span></button> 
+                        </div>
+                        <div class="lurnby-filter">
+                            <span id="record_count">{{showing}}</span>
+                        </div>
+                        
+                        
+                    </div>
+                
+                    <!-- End Filters   -->
+                        
+                </div>
+                <hr>
+          
+                <!-- Where the actual articles live -->
+                <div id="article-items" class="gallery-view">
+                    {% for article in articles %}
+                        {% include '_article.html' %}
+                    {% endfor %}
+                </div>
+            
+            </div>
+          
+        </div>
+          
+    {% endif %}
+    
+    <div class="lurnby_modal modal" id = "edit_article" tabindex="-1">   
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button"  class="close" data-dismiss="modal" onclick="clear_modals()" aria-label="Close">
+                        <span aria-hidden="false">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class ='rendering'>
+                        <p>Pulling up the article. Please wait.</p>
+                        <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+                    </div>        
+                </div>
+                <div class="modal-footer">                
+                  <button type="button" class="main-button not-editing" onclick="clear_modals()" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="lurby_modal modal" id = "add_article" tabindex="-1"> 
+    </div>
+
+{% endblock%}
+
+
+{% block JS %}
+
+    <!-- Datatables requirements -->
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script> -->
+    <!-- <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.css"> -->
+    <!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script> -->
+   
+
+    <!-- Application code -->
+    <script text="javascript" src = "{{url_for('static', filename='articles.js') }}"> </script>
+    <script text="javascript" src = "{{url_for('static', filename='fileinput.js') }}"> </script>
+    
+    <!-- Custom Data tables code -->
+    <script type="application/javascript">
+        ///////////////////////////////////////////////////
+        //                                               //
+        //   function for choosing sort asc or descend   //
+        //                                               //
+        ///////////////////////////////////////////////////
+
+        sort_items = Array.from(document.querySelectorAll('.sort-button'))
+          
+        sort_items.forEach(function(item){
+            item.addEventListener('click', function(){
+                if(!(item.classList.contains('sort_asc')) && 
+                   !(item.classList.contains('sort_desc'))){
+                    item.classList.add('sort_desc')
+                    
+                    // set hidden input values
+                    if (item.id == 'title_sort'){
+                        byId('title_sort_value').value = 'desc'
+
+                    }
+                    else if(item.id == 'last_opened_sort'){
+                        byId('opened_sort_value').value = 'desc'
+                    }
+                }
+                else if (item.classList.contains('sort_desc')){
+                    item.classList.remove('sort_desc')
+                    item.classList.add('sort_asc')
+
+                    // set hidden input values
+                    if (item.id == 'title_sort'){
+                        byId('title_sort_value').value = 'asc'
+                    }
+                    else if(item.id == 'last_opened_sort'){
+                        byId('opened_sort_value').value = 'asc'
+                    }
+
+                }
+                else if(item.classList.contains('sort_asc')){
+                    item.classList.remove('sort_asc')
+
+                    // set hidden input values
+                    if (item.id == 'title_sort'){
+                        byId('title_sort_value').value = ''
+                    }
+                    else if(item.id == 'last_opened_sort'){
+                        byId('opened_sort_value').value = ''
+                    }
+
+                }
+            })
+        })
+
+        ///////////////////////////////////////////////////
+        //                                               //
+        //    function for tags and changing counter     //
+        //                                               //
+        ///////////////////////////////////////////////////
+        tags = Array.from(document.querySelectorAll('.lurnby-tag'))
+
+        tags.forEach(function(item){
+        item.addEventListener('input', function(){
+            checked = Array.from(document.querySelectorAll('.single-tag:checked'))
+            byId('tag_count').innerText = checked.length
+        })
+        })
+
+        ////////////////////////////////////
+        //                                //
+        //    submitting filter query     //
+        //                                //
+        ////////////////////////////////////
+
+        byId('filter_submit').addEventListener('click', filter_submit)
+ 
+        function filter_submit(){
+            submit_tags = []
+            Array.from(document.querySelectorAll('.single-tag:checked')).forEach(function(item){
+                submit_tags.push(item.value)
+            })
+            var data = {
+                "title_sort": byId('title_sort_value').value,
+                "opened_sort" : byId('opened_sort_value').value,
+                "tags" : submit_tags,
+                // "per_page" : byId('per_page').value,
+                "status" : byId('article_status').value,
+                "search" : byId('search').value,
+            }
+            
+            function handleErrors(response){
+                if (response.ok){
+                    return response
+                }
+            
+                throw 'Error'
+            }
+            
+            byId('article-items').innerHTML = `
+                <div class ='rendering'>
+                    <p>Getting your articles. Please wait.</p>
+                    <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+                </div>   
+            `
+
+            url = '/articles'
+            fetch(url, {
+                method: 'post',
+                headers: {
+                    'Content-type': 'application/json',
+                    'X-CSRFToken': csrf_token
+                },
+                body: JSON.stringify(data)
+            })
+            .then(handleErrors)
+            .then(response => response.json())
+            .then(data => {
+                byId('article-items').innerHTML = data['html']
+                byId('record_count').innerHTML = data['showing']
+            })
+
+
+        }
+
+
+
+
+            
+            var icon = byId('change-icon');
+            var tooltip = byId('change-icon-tooltip');
+            var table = byId('main-table');
+
+            function change(){
+                table.classList.toggle("gallery-view");
+                table.classList.toggle("list-view");
+
+                
+                if (icon.classList.contains('list-icon')){
+                    tooltip.innerText = 'Gallery View'
+                }
+                else {
+                    tooltip.innerText = 'List View'
+                }
+
+                icon.classList.toggle("grid-icon");
+                icon.classList.toggle("list-icon");
+            }
+
+        </script>
+{% endblock %}

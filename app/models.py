@@ -304,6 +304,18 @@ class Article(db.Model):
 
         return articles
 
+    # return resource for datatable rendering
+    def to_table(self):
+        return {
+            'uuid': self.uuid,
+            'title': self.title,
+            'progress': self.progress,
+            'unread': self.unread,
+            'done': self.done,
+            'date_read': self.date_read,
+            'read_time': self.read_time
+        } 
+
 
     # api return article resource
     def to_dict(self):
@@ -341,11 +353,11 @@ class Article(db.Model):
         slow = 198 
         fast = 258
 
-        low = round(word_count / slow)
-        high = round(word_count / fast)
+        low = int(round(word_count / slow))
+        high = int(round(word_count / fast))
 
 
-        if high > 60:
+        if high >= 60:
             if high % 60 == 0:
                 high = f'{high / 60}'
             
@@ -358,7 +370,10 @@ class Article(db.Model):
                 high = f'{hrs}'
         else:
             high = f'{high}'
+            high_min = True
 
+        if high_min and low > 60:
+            high = f'{high}min'
 
         if low > 60:
             if low % 60 == 0:

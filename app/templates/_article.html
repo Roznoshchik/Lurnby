@@ -1,0 +1,39 @@
+<div id="article{{uuid}}" class = "article_card">
+    <div class="article_title">
+        {% if article.title|length > 88 %}
+        <h4>{{'%.88s' % article.title}} ...</h4>
+        {% else %}
+        <h4>{{ article.title}}</h4>
+        {% endif %}
+        
+    </div>
+    <div class="article-status">
+        <p>{{article['read_time']}}</p>
+        <div class="underline"></div>
+        {% if article.unread  %}
+        <span class = "label unread"><p>New</p></span>
+        {% elif article.done %}
+        <span class = "label done"><p>Finished reading</p></span>
+        {% else %}
+        <span class = "label in-progress"><p>In progress</p></span>
+        {% endif %}
+    </div>                        
+    
+    <div class="article-progress article_data">
+        <div >
+            <h6>Progress:</h6>
+            <p class ="data">{{article.progress|int}}%</p>
+        </div>
+        
+    </div>
+    <div class = "article-opened article_data" data-sort="{{article.date_read.strftime('%Y%m%d%H%M%s')}}">
+        <div>
+            <h6>Last opened:</h6>
+            <p class ="data">{{ article.date_read.strftime("%d %b, %Y") }}</p>
+        </div>
+    </div>
+    <div class="open">
+        <button class = "main-button edit" type="button" data-toggle="modal" data-target="#edit_article" onclick = "ViewArticle('{{article.uuid}}')" href="#">Details</button>
+        <a class = "main-button" type="button" href="{{url_for('main.article', uuid=article.uuid)}}">Start reading</a>
+    </div>
+</div>
