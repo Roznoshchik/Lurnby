@@ -226,6 +226,9 @@
                 byId('tag_count').innerText = checked.length
             })
             })
+
+            // filter submit event listener
+            byId('filter_submit').addEventListener('click', filter_submit)
         }
         initialize_articles_page()
 
@@ -235,7 +238,7 @@
         //                                //
         ////////////////////////////////////
 
-        byId('filter_submit').addEventListener('click', filter_submit)
+        
  
         function filter_submit(){
             submit_tags = []
