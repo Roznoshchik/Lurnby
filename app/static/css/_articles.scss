@@ -203,13 +203,9 @@
           }
 
         #active_tags {
-            
-            @media(min-width: $sm){
-                &.show {
-                    min-width: 300px;
-                }
-            
-            
+           
+            &.show {
+                min-width: 325px;
             }
             padding: 4px;
             

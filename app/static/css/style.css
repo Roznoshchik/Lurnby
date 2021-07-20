@@ -7988,10 +7988,8 @@ readers do not read off random characters that represent icons */
 .all-filters .lurnby-filter #active_tags {
   padding: 4px;
 }
-@media (min-width: 576px) {
-  .all-filters .lurnby-filter #active_tags.show {
-    min-width: 300px;
-  }
+.all-filters .lurnby-filter #active_tags.show {
+  min-width: 325px;
 }
 .all-filters .lurnby-filter #active_tags label {
   margin: 0 4px 4px 0;
