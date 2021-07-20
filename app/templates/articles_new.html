@@ -158,70 +158,76 @@
     
     <!-- Custom Data tables code -->
     <script type="application/javascript">
-        ///////////////////////////////////////////////////
-        //                                               //
-        //   function for choosing sort asc or descend   //
-        //                                               //
-        ///////////////////////////////////////////////////
 
-        sort_items = Array.from(document.querySelectorAll('.sort-button'))
+        function initialize_articles_page(){
+            ///////////////////////////////////////////////////
+            //                                               //
+            //   function for choosing sort asc or descend   //
+            //                                               //
+            ///////////////////////////////////////////////////
+
+        
+
+            sort_items = Array.from(document.querySelectorAll('.sort-button'))
           
-        sort_items.forEach(function(item){
-            item.addEventListener('click', function(){
-                if(!(item.classList.contains('sort_asc')) && 
-                   !(item.classList.contains('sort_desc'))){
-                    item.classList.add('sort_desc')
-                    
-                    // set hidden input values
-                    if (item.id == 'title_sort'){
-                        byId('title_sort_value').value = 'desc'
-
+            sort_items.forEach(function(item){
+                item.addEventListener('click', function(){
+                    if(!(item.classList.contains('sort_asc')) && 
+                        !(item.classList.contains('sort_desc'))){
+                        item.classList.add('sort_desc')
+                        
+                        // set hidden input values
+                        if (item.id == 'title_sort'){
+                            byId('title_sort_value').value = 'desc'
+    
+                        }
+                        else if(item.id == 'last_opened_sort'){
+                            byId('opened_sort_value').value = 'desc'
+                        }
                     }
-                    else if(item.id == 'last_opened_sort'){
-                        byId('opened_sort_value').value = 'desc'
+                    else if (item.classList.contains('sort_desc')){
+                        item.classList.remove('sort_desc')
+                        item.classList.add('sort_asc')
+    
+                        // set hidden input values
+                        if (item.id == 'title_sort'){
+                            byId('title_sort_value').value = 'asc'
+                        }
+                        else if(item.id == 'last_opened_sort'){
+                            byId('opened_sort_value').value = 'asc'
+                        }
+    
                     }
-                }
-                else if (item.classList.contains('sort_desc')){
-                    item.classList.remove('sort_desc')
-                    item.classList.add('sort_asc')
-
-                    // set hidden input values
-                    if (item.id == 'title_sort'){
-                        byId('title_sort_value').value = 'asc'
+                    else if(item.classList.contains('sort_asc')){
+                        item.classList.remove('sort_asc')
+    
+                        // set hidden input values
+                        if (item.id == 'title_sort'){
+                            byId('title_sort_value').value = ''
+                        }
+                        else if(item.id == 'last_opened_sort'){
+                            byId('opened_sort_value').value = ''
+                        }
+    
                     }
-                    else if(item.id == 'last_opened_sort'){
-                        byId('opened_sort_value').value = 'asc'
-                    }
-
-                }
-                else if(item.classList.contains('sort_asc')){
-                    item.classList.remove('sort_asc')
-
-                    // set hidden input values
-                    if (item.id == 'title_sort'){
-                        byId('title_sort_value').value = ''
-                    }
-                    else if(item.id == 'last_opened_sort'){
-                        byId('opened_sort_value').value = ''
-                    }
-
-                }
+                })
             })
-        })
-
-        ///////////////////////////////////////////////////
-        //                                               //
-        //    function for tags and changing counter     //
-        //                                               //
-        ///////////////////////////////////////////////////
-        tags = Array.from(document.querySelectorAll('.lurnby-tag'))
-
-        tags.forEach(function(item){
-        item.addEventListener('input', function(){
-            checked = Array.from(document.querySelectorAll('.single-tag:checked'))
-            byId('tag_count').innerText = checked.length
-        })
-        })
+    
+            ///////////////////////////////////////////////////
+            //                                               //
+            //    function for tags and changing counter     //
+            //                                               //
+            ///////////////////////////////////////////////////
+            tags = Array.from(document.querySelectorAll('.lurnby-tag'))
+    
+            tags.forEach(function(item){
+            item.addEventListener('input', function(){
+                checked = Array.from(document.querySelectorAll('.single-tag:checked'))
+                byId('tag_count').innerText = checked.length
+            })
+            })
+        }
+        initialize_articles_page()
 
         ////////////////////////////////////
         //                                //

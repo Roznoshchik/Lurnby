@@ -265,7 +265,7 @@ function add_new_article(){
     .then(data => {
         if (!data['processing']){
             byId('articles_page').innerHTML = data['html'];
-    
+            initialize_articles_page()
             var alert = document.createElement('div')
             alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
             alert.setAttribute('role', 'alert')
@@ -855,6 +855,7 @@ function save(article_id){
             'data':JSON.stringify(data)
         }).done(function( data ) {
             article_updated(data)
+            initialize_articles_page()
         }); 
 
 }

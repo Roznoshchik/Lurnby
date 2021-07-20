@@ -1040,18 +1040,29 @@ def updateArticle(uuid):
 
             db.session.commit()
 
-            articles = Article.return_articles_with_count()
-            recent = articles['recent']
-            done_articles = articles['done']
-            unread_articles = articles['unread']
-            read_articles = articles['read']
+            query = current_user.articles.filter_by(archived=False)
+            col = getattr(Article, "date_read")
+            col = col.desc()
+            articles = query.order_by(col).all()
+            count = query.count()
+            showing = f'Showing {count} out of {count} articles.'
+            
+            return render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
 
-            return render_template('articles_all.html', form=form,
-                                   done_articles=done_articles,
-                                   recent=recent,
-                                   unread_articles=unread_articles,
-                                   read_articles=read_articles,
-                                   user=current_user)
+
+
+            # articles = Article.return_articles_with_count()
+            # recent = articles['recent']
+            # done_articles = articles['done']
+            # unread_articles = articles['unread']
+            # read_articles = articles['read']
+
+            # return render_template('articles_all.html', form=form,
+            #                        done_articles=done_articles,
+            #                        recent=recent,
+            #                        unread_articles=unread_articles,
+            #                        read_articles=read_articles,
+            #                        user=current_user)
     else:
         render_template('errors/404.html'), 404
 
