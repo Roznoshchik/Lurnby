@@ -701,19 +701,14 @@ def bg_add_article():
 def process_article(task_id, a_id):
     process = Task.query.get(task_id)
 
-    form = ContentForm()
+    query = current_user.articles.filter_by(archived=False)
+    col = getattr(Article, "date_read")
+    col = col.desc()
+    articles = query.order_by(col).all()
+    count = query.count()
+    showing = f'Showing {count} out of {count} articles.'
+    html = render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
 
-    articles = Article.return_articles_with_count()
-    recent = articles['recent']
-    done_articles = articles['done']
-    unread_articles = articles['unread']
-    read_articles = articles['read']
-    
-    html = render_template('articles_all.html', form=form,
-                           recent=recent, 
-                           done_articles=done_articles,
-                           unread_articles=unread_articles,
-                           read_articles=read_articles, user=current_user)
 
     # return (json.dumps({'html': 'success'}), 200, {'ContentType': 'application/json'})
     for i in range(25):
@@ -727,73 +722,6 @@ def process_article(task_id, a_id):
             return (json.dumps({'html': html}), 200, {'ContentType': 'application/json'})
 
     return (json.dumps({'processing': True, 'taskID':process.id, 'a_id':a_id}), 200, {'ContentType': 'application/json'})
-
-    
-# ################################ #
-# ##     Article filtering      ## #
-# ################################ #
-
-@bp.route('/articles/filter', methods=['GET', 'POST'])
-@login_required
-def filter_articles():
-
-    form = ContentForm()
-    data = json.loads(request.form['data'])
-    tag_ids = data['tags']
-
-    if tag_ids == []:
-
-        articles = Article.return_articles_with_count()
-        recent = articles['recent']
-        done_articles = articles['done']
-        unread_articles = articles['unread']
-        read_articles = articles['read']
-
-        return render_template('articles_all.html', form=form,
-                               done_articles=done_articles,
-                               recent=recent,
-                               unread_articles=unread_articles,
-                               read_articles=read_articles, user=current_user)
-
-    active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
-
-    # these are just shortcuts to make the lines in the below queries shorter
-    join_aid = tags_articles.c.article_id
-    join_tid = tags_articles.c.tag_id
-
-    # recent = Article.recent_articles()
-
-    done_articles = Article.query.filter_by(archived=False, done=True,
-                                            user_id=current_user.id
-                                            ).join(tags_articles,
-                                                   (join_aid == Article.id))
-
-    done_articles = done_articles.filter(join_tid.in_(tag_ids)
-                                         ).order_by(desc(Article.date_read)).all()
-
-    unread_articles = Article.query.filter_by(unread=True, done=False,
-                                              archived=False,
-                                              user_id=current_user.id
-                                              ).join(tags_articles,
-                                                     (join_aid == Article.id))
-
-    unread_articles = unread_articles.filter(join_tid.in_(tag_ids)
-                                             ).order_by(desc(Article.date_read)).all()
-
-    read_articles = Article.query.filter_by(unread=False, done=False,
-                                            archived=False,
-                                            user_id=current_user.id
-                                            ).join(tags_articles,
-                                                   (join_aid == Article.id))
-
-    read_articles = read_articles.filter(join_tid.in_(tag_ids)
-                                         ).order_by(desc(Article.date_read)).all()
-
-    return render_template('articles_filter.html', form=form,
-                           done_articles=done_articles,
-                           unread_articles=unread_articles,
-                           read_articles=read_articles,
-                           user=current_user, active_tags=active_tags)
 
 
 # ##################################### #
