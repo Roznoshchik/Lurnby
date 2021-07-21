@@ -355,7 +355,7 @@ class Article(db.Model):
 
         low = int(round(word_count / slow))
         high = int(round(word_count / fast))
-
+        high_min = False
 
         if high >= 60:
             if high % 60 == 0:
