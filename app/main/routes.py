@@ -15,7 +15,7 @@ from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import (User, Approved_Sender, Article, Topic, Highlight, Tag,
                         tags_articles, tags_highlights, Notification, Suggestion,
-                        Task, update_user_last_action)
+                        Task, update_user_last_action, highlights_topics)
 
 import sys
 sys.path.insert(1, './app/ReadabiliPy')
@@ -1277,14 +1277,63 @@ def unarchivehighlight(id):
 #                        #
 ##########################
 
+# @bp.route('/highlights2', methods=['GET', 'POST'])
+# @login_required
+# def highlights2():
+#     no_topics = current_user.highlights.filter_by(archived=False,
+#                                                   no_topics=True).all()
+#     with_topics = current_user.highlights.filter_by(archived=False,
+#                                                     no_topics=False).all()    
+#     articles_count = current_user.articles.filter_by(archived=False).count()
+#     topics_count = current_user.topics.filter_by(archived=False).count()
+#     highlights_count = current_user.highlights.filter_by(archived=False).count()
+#     tags_count = current_user.tags.count()
+#     topics = current_user.topics.filter_by(archived=False).all()
+
+#     if request.method == 'POST':
+#         data = json.loads(request.form['data'])
+#         no_topics = []
+#         with_topics = []
+#         if data['filters'] == []:
+#             no_topics = current_user.highlights.filter_by(archived=False,
+#                                                   no_topics=True).all()
+#             with_topics = current_user.highlights.filter_by(archived=False,
+#                                                     no_topics=False).all()
+#         else:
+#             for t in data['filters']:
+#                 topic = Topic.query.filter_by(title=t).first()
+#                 with_topics += topic.highlights.filter_by(archived=False).all()
+
+#             with_topics = list(set(with_topics))
+
+#         data = {
+#             'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
+#             'html': render_template('filter_highlights.html', no_topics=no_topics,
+#                             with_topics=with_topics),
+#             'highlights_count': len(with_topics)       
+#         }
+
+#         return json.dumps(data)
+
+
+#     return render_template('highlights.html', user=current_user, 
+#                            no_topics=no_topics, with_topics=with_topics, 
+#                            topics=topics, highlights_count=highlights_count)
+
+
+
 @bp.route('/highlights', methods=['GET', 'POST'])
 @login_required
 def highlights():
 
-    no_topics = current_user.highlights.filter_by(archived=False,
-                                                  no_topics=True).all()
-    with_topics = current_user.highlights.filter_by(archived=False,
-                                                    no_topics=False).all()    
+    query = Highlight.query.filter_by(user_id=current_user.id, archived=False)
+    total_count = query.count()
+    filtered_count = total_count
+    showing_count = '0 to 15'
+    col = getattr(Highlight, "created_date")
+    col.desc()
+    highlights = query.order_by(col).paginate(1, 15, False).items
+
     articles_count = current_user.articles.filter_by(archived=False).count()
     topics_count = current_user.topics.filter_by(archived=False).count()
     highlights_count = current_user.highlights.filter_by(archived=False).count()
@@ -1293,33 +1342,93 @@ def highlights():
 
     if request.method == 'POST':
         data = json.loads(request.form['data'])
-        no_topics = []
-        with_topics = []
-        if data['filters'] == []:
-            no_topics = current_user.highlights.filter_by(archived=False,
-                                                  no_topics=True).all()
-            with_topics = current_user.highlights.filter_by(archived=False,
-                                                    no_topics=False).all()
-        else:
-            for t in data['filters']:
+        
+        search = data['search']
+        has_topics = data['has_topics']
+        created_sort = data['created_sort']
+        topics = data['filters']
+        per_page = data['per_page']          
+        page = data['page']
+
+        
+        # first query unarchived highlights
+        query = Highlight.query.filter_by(user_id=current_user.id, archived=False)
+        
+        # set desc order default
+        col = getattr(Highlight, "created_date")
+        col.desc()
+
+        # filter for topics
+        if topics != []:
+    
+            topic_ids = []
+            
+            for t in topics:
                 topic = Topic.query.filter_by(title=t).first()
-                with_topics += topic.highlights.filter_by(archived=False).all()
+                topic_ids.append(topic.id)
 
-            with_topics = list(set(with_topics))
+            h_tid = highlights_topics.c.topic_id
+            t_hid = highlights_topics.c.highlight_id
 
+            query = query.join(highlights_topics, (t_hid == Highlight.id))
+            query = query.filter(h_tid.in_(topic_ids))
+
+        #filter for no_topics
+        if has_topics.lower() == 'with_topics':
+            query = query.filter(Highlight.no_topics==False)
+        elif has_topics.lower() == 'no_topics':
+            query = query.filter(Highlight.no_topics==True)
+    
+
+
+        # filter for sort 
+        if created_sort == 'asc':
+            col.asc()
+        
+        query = query.order_by(col)
+
+
+ 
+        # then filter for search
+        if data['search'] != "":
+            query =  query.filter(db.or_(
+                Highlight.text.ilike(f'%{search}%'),
+                Highlight.note.ilike(f'%{search}%'),
+            ))
+        
+
+        filtered_count = query.count()
+        #highlights = query.all() 
+
+        # paginate
+        if per_page == 'all':
+            per_page = filtered_count
+            showing_count = filtered_count
+        else:
+            per_page = int(per_page)
+            showing_count = f'{(per_page * page) - per_page} to {per_page * page}'
+                
+
+
+        if not page:
+            page = 1
+
+        highlights = query.paginate(page, per_page, False)
+        
         data = {
             'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
-            'html': render_template('filter_highlights.html', no_topics=no_topics,
-                            with_topics=with_topics),
-            'highlights_count': len(with_topics)       
+            'html': render_template('filter_highlights.html', highlights=highlights.items, page=page),
+            'filtered_count': filtered_count,
+            'showing_count': showing_count,
+            'has_next': highlights.has_next if highlights.has_next else None       
         }
 
         return json.dumps(data)
 
 
     return render_template('highlights.html', user=current_user, 
-                           no_topics=no_topics, with_topics=with_topics, 
-                           topics=topics, highlights_count=highlights_count)
+                           highlights = highlights, topics=topics, page=1,
+                           showing_count=showing_count, filtered_count=filtered_count)
 
 
 @bp.route('/topics', methods=['GET', 'POST'])

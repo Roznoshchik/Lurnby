@@ -1,0 +1,90 @@
+.highlight-topics {
+    margin-bottom: 16px;
+}
+
+
+.highlight-section {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+
+
+.highlight-card {
+    background: white;
+    max-width: 350px;
+    margin-right: 16px;
+}
+
+@media(max-width: 566px){
+    .highlight-card {
+        max-width: 375px;
+        margin-right: 4px;
+    }
+}
+
+.highlight-card .main-button {
+    margin-left:0px;
+}
+
+
+.topic {
+    font-weight: 100;
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    display: inline-block;
+    text-align: center;
+    background: #FFF79F;
+    margin: 0px 4px 4px 0px;
+
+}
+.topic.filter:hover {
+    cursor: pointer;
+    color: white;
+    background-color: black;
+}
+
+
+.autocomplete {
+    /*the container must be positioned relative:*/
+    position: relative;
+    display: inline-block;
+}
+.autocomplete-items {
+    position: absolute;
+    border: 1px solid #d4d4d4;
+    border-bottom: none;
+    border-top: none;
+    z-index: 99;
+    /*position the autocomplete items to be the same width as the container:*/
+    top: 100%;
+    left: 0;
+    right: 0;
+}
+.autocomplete-items div {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+}
+.autocomplete-items div:hover {
+    /*when hovering an item:*/
+    background-color: #e9e9e9;
+}
+.autocomplete-active {
+    /*when navigating through the items using the arrow keys:*/
+    background-color: DodgerBlue !important;
+    color: #ffffff;
+}
+
+
+@media (max-width: 566px){
+    #export {
+        margin-top: 16px;
+    }
+
+    #export .main-button{
+      margin-left: 0px;
+      margin-right: 16px;
+    }
+}

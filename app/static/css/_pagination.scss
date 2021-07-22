@@ -1,0 +1,115 @@
+.pagination {
+
+    font-size: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .pagination-link.is-current {
+        background-color: $salmon;
+        border-color: $salmon;
+        color: $dark;
+    }
+
+    ul {
+        list-style: none;
+        padding: 0;
+    }
+    .pagination-list {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        text-align: center;
+        flex-grow: 1;
+        flex-shrink: 1;
+        justify-content: flex-start;
+        order: 1;
+        margin-left: auto;
+    }
+    .pagination-navigate {
+        order: 2;
+        margin-left: auto;
+    }
+
+
+    .pagination-list li {
+        list-style: none;
+    }
+
+    *, ::after, ::before {
+        box-sizing: inherit;
+    }
+
+
+    .pagination-ellipsis, .pagination-link, .pagination-next, .pagination-previous {
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        align-items: center;
+        border: 1px solid transparent;
+            border-top-color: transparent;
+            border-right-color: transparent;
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+        border-radius: .375em;
+        box-shadow: none;
+        display: inline-flex;
+        height: 2.5em;
+        justify-content: flex-start;
+        line-height: 1.5;
+        padding-bottom: calc(.5em - 1px);
+        padding-left: calc(.75em - 1px);
+        padding-right: calc(.75em - 1px);
+        padding-top: calc(.5em - 1px);
+        position: relative;
+        vertical-align: top;
+        user-select: none;
+
+        font-size: 1em;
+        justify-content: center;
+        margin: .25rem;
+        margin-top: 0.25rem;
+        margin-bottom: 0.25rem;
+        padding-left: .5em;
+        padding-right: .5em;
+        text-align: center;
+
+        border-color: #dbdbdb;
+        color: #363636;
+        min-width: 2.5em;
+    
+    }
+
+
+
+    .pagination-link[disabled], .pagination-next[disabled], .pagination-previous[disabled] {
+        background-color: #dbdbdb;
+        border-color: #dbdbdb;
+        box-shadow: none;
+        color: #7a7a7a;
+        opacity: .5;
+    }
+
+    .pagination-link:hover, .pagination-next:hover, .pagination-previous:hover {
+        border-color: #b5b5b5;
+        color: #363636;
+    }
+
+    .pagination-next, .pagination-previous {
+        flex-grow: 1;
+        flex-shrink: 1;
+    }
+
+    .pagination-next, .pagination-previous {
+        padding-left: .75em;
+        padding-right: .75em;
+        white-space: nowrap;
+    }
+
+
+    padding-right: 20px;
+    @media(max-width: $mobile-max) {
+        padding-right: 0;
+    }
+}
+

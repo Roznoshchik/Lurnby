@@ -14,6 +14,10 @@
 
 .mobile-hidden {
     @media(max-width: $mobile-max) {
-        display: none;    
+        display: none !important;    
     }
+}
+
+.no-bottom {
+    padding-bottom: 0;
 }

@@ -4,6 +4,105 @@
 <!--  styles   -->
 <!--------------->
 {% block style %}
+<style>
+   
+    .highlight-section {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+
+
+    .highlight-card {
+        background: white;
+        max-width: 350px;
+        margin-right: 16px;
+    }
+
+    @media(max-width: 566px){
+        .highlight-card {
+            max-width: 375px;
+            margin-right: 4px;
+        }
+    }
+
+    .highlight-card .main-button {
+        margin-left:0px;
+    }
+
+
+    .topic {
+        font-weight: 100;
+        font-size: 0.8rem;
+        padding: 4px 8px;
+        display: inline-block;
+        text-align: center;
+        background: #FFF79F;
+        margin: 0px 4px 4px 0px;
+
+    }
+    .topic.filter:hover {
+        cursor: pointer;
+        color: white;
+        background-color: black;
+    }
+
+
+    .autocomplete {
+        /*the container must be positioned relative:*/
+        position: relative;
+        display: inline-block;
+    }
+    .autocomplete-items {
+        position: absolute;
+        border: 1px solid #d4d4d4;
+        border-bottom: none;
+        border-top: none;
+        z-index: 99;
+        /*position the autocomplete items to be the same width as the container:*/
+        top: 100%;
+        left: 0;
+        right: 0;
+    }
+    .autocomplete-items div {
+        padding: 10px;
+        cursor: pointer;
+        background-color: #fff;
+        border-bottom: 1px solid #d4d4d4;
+    }
+    .autocomplete-items div:hover {
+        /*when hovering an item:*/
+        background-color: #e9e9e9;
+    }
+    .autocomplete-active {
+        /*when navigating through the items using the arrow keys:*/
+        background-color: DodgerBlue !important;
+        color: #ffffff;
+    }
+
+    .filter_form {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .filter_form input{
+        padding-left: 4px;
+        padding-bottom: 4px;
+        width: 200px;
+    }
+
+    @media (max-width: 566px){
+        #export {
+            margin-top: 16px;
+        }
+
+        #export .main-button{
+          margin-left: 0px;
+          margin-right: 16px;
+        }
+    }
+
+</style>
 
 {% endblock %}
 
@@ -14,7 +113,7 @@
 <!--   check for empty state   -->
 <!------------------------------->
 
-{% if filtered_count == 0 %}
+{% if highlights_count == 0 %}
 <div id = "highlights_page">
     <div class="main-section lurnby-empty-row">
         <div class=" lurnby-empty-col col text-center">
@@ -32,7 +131,7 @@
 <!--   Statistics   -->
 <!-------------------->
 
-{% if filtered_count >= 1 %}
+{% if highlights_count >= 1 %}
 <div id = "highlights_page">
     {% include '_overview.html'%}
 
@@ -40,72 +139,25 @@
     <!---------------------->
     <!--   main section   -->
     <!---------------------->
-    <div class = "main-section no-bottom">
-        <div class = "heading row">
-            <div id="filters" class="all-filters">
-    
-                <div class = "lurnby-filter">
-                    <span>Show 
-                        <select id = "per_page">
-                            <option value="15">15</option>
-                            <option value="30">30</option>
-                            <option value="50">50</option>
-                            <option value="all">all</option>
-                        </select> articles
-                    </span>
-                </div>
-        
-                <div class="lurnby-filter">
-                    <input type="hidden" id="created_sort_value"/>
-                    <span>Sort By: 
-                        <button id="created_sort" class="main-button sort-button"><span>Date Created</span></button>
-                    </span>
-                </div>
-        
-                <div class="lurnby-filter">
-                    <span>Status:  
-                        <select id = "has_topics">
-                            <option value="all">All</option>
-                            <option value="no_topics">Without Topics</option>
-                            <option value="with_topics">With Topics</option>                    
-                        </select>
-                    </span> 
-                </div>
-                
-                <div class="lurnby-filter">
-                    <label for="search">Search:</label><input type="text" id="search">
-                </div>
-                <div class="lurnby-filter">
-                    <span id="visible_highlights_count"> Showing <span id="showing_count">{{showing_count}}</span> out of <span id="filtered_count"> {{filtered_count}}</span> highlights.</span>
-                </div>
-        
-                {% if current_user.topics.count() > 0 %}
-                <div class = "lurnby-filter">
-                    <div class="autocomplete">
-                        <div class="filter_form" >
-                            <input id = "filter_input" type="text" placeholder="Filter by topic ..."> 
-                            <button id="filter_submit" class="main-button" onclick="apply_filters()">Apply filter</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="lurnby-filter">
-                    <span id="export">
-                        <button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>
-                    </span>
-                </div>
-                
-                <div id="active_filters" class = "lurnby-filter width-100"></div>
-                {% endif %}
+    <div id="filters" class="main-section">
+        <div class="autocomplete">
+            <div class="filter_form" >
+                <input id = "filter_input" type="text" placeholder="Filter by topic ..."> 
+                <button class="main-button" onclick="apply_filters()">Apply filter</button>
+                <span id="export">
+                    <button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>
+                </span>
             </div>
         </div>
+        <div id="active_filters"></div>
     </div>
 
-
-    
-
     <div id = "highlights_all" class = "main-section">
+        {% if no_topics|length > 0 %}
+        <h6 class = "subheading">Highlights without topics</h6>
+        {% endif %}
         <div class = "highlight-section">
-            {% for highlight in highlights %}
+            {% for highlight in no_topics %}
             <div id="highlight-{{highlight.id}}" class="highlight-card">
                 <div class="highlight-header">
                     <h6>From: {{ highlight.article.title}}</h6>
@@ -113,14 +165,7 @@
                 </div>
                 <div class="highlight-content">
                     <p>{{highlight.text}}</p>
-                    {% if not highlight.no_topics %}
-                    <div class="highlight-topics">
-                        <h6>Topics:</h6>
-                        {% for topic in highlight.topics.filter_by(archived=False).all() %}
-                            <p class = "topic">{{topic.title}}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
+    
                     <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
                         <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
                     </div>
@@ -128,24 +173,34 @@
             </div>   
             {% endfor %}
         </div>
-        <nav id="pagination" class="pagination" role="navigation" aria-label="pagination">
-            <span class = "pagination-navigate">
-                <button onclick="paginate({{page - 1}})" class="pagination-previous" {% if page == 1 %} title="This is the first page" disabled {% endif %}>Previous</button>
-                <button id="has_next" onclick="paginate({{page + 1}})" class="pagination-next">Next page</button>
-            </span>
-            
-            <!-- <ul class="pagination-list mobile-hidden">
-              <li>
-                <button onclick="paginate({{page}})" class="pagination-link is-current" aria-label="Page {{page}}" aria-current="page">{{page}}</button>
-              </li>
-              <li>
-                <button onclick="paginate({{page + 1}})" class="pagination-link" aria-label="Goto page {{page + 1}}">{{page + 1}}</button>
-              </li>
-              <li>
-                <button onclick="paginate({{page + 2}})" class="pagination-link" aria-label="Goto page {{page + 2}}">{{page + 2}}</button>
-              </li>
-            </ul> -->
-        </nav>
+        {% if with_topics|length > 0 %}
+        <h6 class = "subheading">Highlights with topics</h6>
+        <div class = "highlight-section">
+            {% for highlight in with_topics %}
+            <div id="highlight-{{highlight.id}}" class="highlight-card">
+                <div class="highlight-header">
+                    <h6>From: {{ highlight.article.title}}</h6>
+                    <div class="underline"></div>
+                </div>
+                <div class="highlight-content">
+                    <p>{{highlight.text}}</p>
+                    <div class="highlight-topics">
+                        <h6>Topics:</h6>
+                        {% for topic in highlight.topics.filter_by(archived=False).all() %}
+                            <p class = "topic">{{topic.title}}</p>
+                        {% endfor %}
+
+                    </div>
+                    <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
+                        <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
+                    </div>
+                </div>
+            </div>   
+            {% endfor %}
+        </div>
+        {% endif %}
+    
+
 
     </div>
 
@@ -157,74 +212,9 @@
 
 {% block JS %}
 <script>
-    var page = 1
-    var topics = [ {% for t in topics %}'{{t.title}}',{% endfor %}]
+    var topics = [ {% for t in topics %}'{{t.title}}',{%endfor%}]
     active_filters = byId('active_filters')
     var filters = []
-
-
-    ///////////////////////////////////////////////////
-    //                                               //
-    //   function for choosing sort asc or descend   //
-    //                                               //
-    ///////////////////////////////////////////////////
-
-    function paginate(n){
-        page = n
-        apply_filters()
-    }
-
-    sort_items = Array.from(document.querySelectorAll('.sort-button'))
-    
-    sort_items.forEach(function(item){
-        item.addEventListener('click', function(){
-            if(!(item.classList.contains('sort_asc')) && 
-                !(item.classList.contains('sort_desc'))){
-                item.classList.add('sort_desc')
-                
-                // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = 'desc'
-
-                }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = 'desc'
-                }
-            }
-            else if (item.classList.contains('sort_desc')){
-                item.classList.remove('sort_desc')
-                item.classList.add('sort_asc')
-
-                // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = 'asc'
-                }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = 'asc'
-                }
-
-            }
-            else if(item.classList.contains('sort_asc')){
-                item.classList.remove('sort_asc')
-
-                // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = ''
-                }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = ''
-                }
-
-            }
-        })
-    })
-
-    //////////////////////
-    //                  //
-    //   Autocomplete   //
-    //                  //
-    //////////////////////
-
 
     function autocomplete(inp, arr) {
         /*the autocomplete function takes two arguments,
@@ -389,22 +379,10 @@
         }); 
     }
 
-    function apply_filters(){        
-        if(typeof page === 'undefined'){
-            page = null
-        }
-
-        data = {
-            'filters':filters,
-            'search':byId('search').value,
-            'created_sort':byId('created_sort_value').value,
-            'has_topics': byId('has_topics').value,
-            'per_page': byId('per_page').value,
-            'page': page
-        }
-
-        data = JSON.stringify(data)
-        
+    function apply_filters(){
+        console.log('applying filters')
+        data = JSON.stringify({'filters':filters})
+        console.log(filters.length)
         var a = byId('highlights_all');
         a.innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <p>Getting your highlights now ...</p>
@@ -419,30 +397,21 @@
             if (filters.length == 0) {
                 byId('export-button').classList.add('hidden')
             }
-            if(data['filtered_count'] == 0){
+            if(data['highlights_count'] == 0){
                 a.innerHTML = `<div style = "display: block; text-align:center; margin:auto; margin-top: 0px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
                 src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
-                <p>No highlights found.</p>
+                <p>No highlights with these topics.</p>
+
                        </div>`
-                console.log('made it ')
-                byId('showing_count').innerHTML = '0'
-                console.log('made it here too')
             }
             else {
                 if (filters.length > 0) {
                     byId('export-button').classList.remove('hidden')
                 }
                 a.innerHTML = data['html']
-                byId('showing_count').innerHTML = data['showing_count']
-                if(!data['has_next']){
-                    byId('has_next').classList.add('disabled')
-                    byId('has_next').setAttribute('title', 'This is the last page')
-                }
             }
-            byId('filtered_count').innerHTML = data['filtered_count']
             
-           
             topics = data['topics']
             autocomplete(document.getElementById("filter_input"), topics);
         }); 
