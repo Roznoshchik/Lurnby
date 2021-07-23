@@ -1386,19 +1386,17 @@ def highlights():
 
  
         # then filter for search
-        
-        query2 = Article.query.filter_by(user_id = current_user.id, archived=False)
-        query2 = query2.filter(Article.title.ilike(f'%{search}%'))
-        article_ids = [a.id for a in query2.all()]
-
-
         if data['search'] != "":
+            query = query.join(Article, Highlight.article_id == Article.id)
+
             query =  query.filter(db.or_(
                 Highlight.text.ilike(f'%{search}%'),
                 Highlight.note.ilike(f'%{search}%'),
-                Highlight.article_id.in_(article_ids)
+                # Highlight.article_id.in_(article_ids)
+                Article.title.ilike(f'%{search}%')
             ))
         
+            print(str(query))
 
         filtered_count = query.count()
         #highlights = query.all() 
