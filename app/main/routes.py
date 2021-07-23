@@ -223,11 +223,81 @@ def export_highlights():
             db.session.commit()
         
         elif 'topic_export' in data and data['topic_export']:
-            highlights = []
-            for topic in data['filters']:
-                t = Topic.query.filter_by(title=topic, user_id=current_user.id).first() 
-                highlights += t.highlights.filter_by(archived=False).all()
-            highlights = list(set(highlights))
+            data = json.loads(request.form['data'])
+        
+            search = data['search']
+            has_topics = data['has_topics']
+            created_sort = data['created_sort']
+            topics = data['filters']
+            per_page = data['per_page']          
+            page = data['page']
+
+            
+            # first query unarchived highlights
+            query = Highlight.query.filter_by(user_id=current_user.id, archived=False)
+            
+            # set desc order default
+            col = getattr(Highlight, "created_date")
+            col.desc()
+
+            # filter for topics
+            if topics != []:
+        
+                topic_ids = []
+                
+                for t in topics:
+                    topic = Topic.query.filter_by(title=t).first()
+                    topic_ids.append(topic.id)
+
+                h_tid = highlights_topics.c.topic_id
+                t_hid = highlights_topics.c.highlight_id
+
+                query = query.join(highlights_topics, (t_hid == Highlight.id))
+                query = query.filter(h_tid.in_(topic_ids))
+
+            #filter for no_topics
+            if has_topics.lower() == 'with_topics':
+                query = query.filter(Highlight.no_topics==False)
+            elif has_topics.lower() == 'no_topics':
+                query = query.filter(Highlight.no_topics==True)
+
+            # filter for sort 
+            if created_sort == 'asc':
+                col.asc()
+            
+            query = query.order_by(col)
+    
+            # then filter for search
+            if data['search'] != "":
+                query = query.join(Article, Highlight.article_id == Article.id)
+
+                query =  query.filter(db.or_(
+                    Highlight.text.ilike(f'%{search}%'),
+                    Highlight.note.ilike(f'%{search}%'),
+                    # Highlight.article_id.in_(article_ids)
+                    Article.title.ilike(f'%{search}%')
+                ))
+
+            filtered_count = query.count()
+            #highlights = query.all() 
+
+            # paginate
+            if per_page == 'all':
+                per_page = filtered_count
+                showing_count = filtered_count
+            else:
+                per_page = int(per_page)
+                showing_count = f'{(per_page * page) - per_page} to {per_page * page}'
+                
+                if filtered_count < per_page:
+                    showing_count = filtered_count  
+
+
+            if not page:
+                page = 1
+
+            highlights = query.paginate(page, per_page, False).items
+
             current_user.launch_task('export_highlights', 'Exporting highlights...', u, highlights, 'topics', data['ext'])
             update_user_last_action('requested export')
             db.session.commit()
@@ -1396,7 +1466,6 @@ def highlights():
                 Article.title.ilike(f'%{search}%')
             ))
         
-            print(str(query))
 
         filtered_count = query.count()
         #highlights = query.all() 
