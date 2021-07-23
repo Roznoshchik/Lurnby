@@ -1334,10 +1334,6 @@ def highlights():
     col.desc()
     highlights = query.order_by(col).paginate(1, 15, False).items
 
-    articles_count = current_user.articles.filter_by(archived=False).count()
-    topics_count = current_user.topics.filter_by(archived=False).count()
-    highlights_count = current_user.highlights.filter_by(archived=False).count()
-    tags_count = current_user.tags.count()
     topics = current_user.topics.filter_by(archived=False).all()
 
     if request.method == 'POST':
@@ -1390,10 +1386,17 @@ def highlights():
 
  
         # then filter for search
+        
+        query2 = Article.query.filter_by(user_id = current_user.id, archived=False)
+        query2 = query2.filter(Article.title.ilike(f'%{search}%'))
+        article_ids = [a.id for a in query2.all()]
+
+
         if data['search'] != "":
             query =  query.filter(db.or_(
                 Highlight.text.ilike(f'%{search}%'),
                 Highlight.note.ilike(f'%{search}%'),
+                Highlight.article_id.in_(article_ids)
             ))
         
 
