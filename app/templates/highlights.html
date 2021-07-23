@@ -51,7 +51,7 @@
                             <option value="30">30</option>
                             <option value="50">50</option>
                             <option value="all">all</option>
-                        </select> articles
+                        </select> highlights
                     </span>
                 </div>
         
@@ -104,49 +104,7 @@
     
 
     <div id = "highlights_all" class = "main-section">
-        <div class = "highlight-section">
-            {% for highlight in highlights %}
-            <div id="highlight-{{highlight.id}}" class="highlight-card">
-                <div class="highlight-header">
-                    <h6>From: {{ highlight.article.title}}</h6>
-                    <div class="underline"></div>
-                </div>
-                <div class="highlight-content">
-                    <p>{{highlight.text}}</p>
-                    {% if not highlight.no_topics %}
-                    <div class="highlight-topics">
-                        <h6>Topics:</h6>
-                        {% for topic in highlight.topics.filter_by(archived=False).all() %}
-                            <p class = "topic">{{topic.title}}</p>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
-                        <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">View Details</button>
-                    </div>
-                </div>
-            </div>   
-            {% endfor %}
-        </div>
-        <nav id="pagination" class="pagination" role="navigation" aria-label="pagination">
-            <span class = "pagination-navigate">
-                <button onclick="paginate({{page - 1}})" class="pagination-previous" {% if page == 1 %} title="This is the first page" disabled {% endif %}>Previous</button>
-                <button id="has_next" onclick="paginate({{page + 1}})" class="pagination-next">Next page</button>
-            </span>
-            
-            <!-- <ul class="pagination-list mobile-hidden">
-              <li>
-                <button onclick="paginate({{page}})" class="pagination-link is-current" aria-label="Page {{page}}" aria-current="page">{{page}}</button>
-              </li>
-              <li>
-                <button onclick="paginate({{page + 1}})" class="pagination-link" aria-label="Goto page {{page + 1}}">{{page + 1}}</button>
-              </li>
-              <li>
-                <button onclick="paginate({{page + 2}})" class="pagination-link" aria-label="Goto page {{page + 2}}">{{page + 2}}</button>
-              </li>
-            </ul> -->
-        </nav>
-
+        {% include 'filter_highlights.html' %}
     </div>
 
 </div>

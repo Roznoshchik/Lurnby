@@ -1407,7 +1407,9 @@ def highlights():
         else:
             per_page = int(per_page)
             showing_count = f'{(per_page * page) - per_page} to {per_page * page}'
-                
+            
+            if filtered_count < per_page:
+                showing_count = filtered_count  
 
 
         if not page:
