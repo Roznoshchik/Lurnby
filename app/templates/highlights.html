@@ -394,7 +394,7 @@
                 a.innerHTML = data['html']
                 byId('showing_count').innerHTML = data['showing_count']
                 if(!data['has_next']){
-                    byId('has_next').classList.add('disabled')
+                    byId('has_next').setAttribute('disabled', true)
                     byId('has_next').setAttribute('title', 'This is the last page')
                 }
             }
