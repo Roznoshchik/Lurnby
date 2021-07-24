@@ -315,7 +315,13 @@
         data = {
             'topic_export': true,
             'filters':filters,
-            'ext': ext
+            'ext': ext,
+            'search':byId('search').value,
+            'created_sort':byId('created_sort_value').value,
+            'has_topics': byId('has_topics').value,
+            'per_page': byId('per_page').value,
+            'page': page
+        
         }
 
         $.post('/export_highlights', {
@@ -374,30 +380,28 @@
             'data':data
         }).done(function( data ) {
             data = JSON.parse(data)
-            if (filters.length == 0) {
-                byId('export-button').classList.add('hidden')
-            }
+            
             if(data['filtered_count'] == 0){
                 a.innerHTML = `<div style = "display: block; text-align:center; margin:auto; margin-top: 0px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
                 src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="100"></span>
                 <p>No highlights found.</p>
                        </div>`
-                console.log('made it ')
+                byId('export-button').classList.add('hidden')
                 byId('showing_count').innerHTML = '0'
-                console.log('made it here too')
             }
             else {
-                if (filters.length > 0) {
-                    byId('export-button').classList.remove('hidden')
-                }
+                byId('export-button').classList.remove('hidden')
+                
                 a.innerHTML = data['html']
+                
                 byId('showing_count').innerHTML = data['showing_count']
                 if(!data['has_next']){
                     byId('has_next').setAttribute('disabled', true)
                     byId('has_next').setAttribute('title', 'This is the last page')
                 }
             }
+
             byId('filtered_count').innerHTML = data['filtered_count']
             
            

@@ -3,7 +3,7 @@ import os
 import sys
 import json
 from rq import get_current_job
-from flask import render_template
+from flask import render_template, url_for
 from flask_login import current_user
 from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
@@ -93,8 +93,11 @@ def export_highlights(user, highlights, source, ext):
                 Key=az_path
                 )
             location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-            url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-            
+            #url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+            url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
+
+
+
             send_email('[Lurnby] Your exported highlights',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
                     text_body=render_template('email/export_highlights.txt', url=url, user=user),
@@ -131,8 +134,10 @@ def export_highlights(user, highlights, source, ext):
                 Key=az_path
                 )
             location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-            url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-            
+            # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+            url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
+
+
             send_email('[Lurnby] Your exported highlights',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
                     text_body=render_template('email/export_highlights.txt', url=url, user=user),
