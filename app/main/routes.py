@@ -69,9 +69,15 @@ from app.main import bp
 @login_required
 def articles():
     query = current_user.articles.filter_by(archived=False)
+    order = []
+    col = getattr(Article, 'done')
+    col = col.asc()
+    order.append(col)
     col = getattr(Article, "date_read")
     col = col.desc()
-    articles = query.order_by(col).all()
+    order.append(col)
+  
+    articles = query.order_by(*order).all()
     count = query.count()
     suggestion = Suggestion.get_random()
     showing = f'Showing {count} out of {count} articles.'
@@ -119,6 +125,9 @@ def articles():
 
         # then sort 
         order = []
+        col = getattr(Article, 'done')
+        order.append(col.asc())
+        
         if opened_sort == 'desc':
             col = getattr(Article, "date_read")
             col = col.desc()
@@ -136,9 +145,9 @@ def articles():
             col = getattr(Article, "title")
             col = col.asc()
             order.append(col)
-
-        if order:
-            query = query.order_by(*order)
+        col = getattr(Article, 'done')
+        order.append(col.asc())
+        query = query.order_by(*order)
 
         filtered_count = query.count()
 
