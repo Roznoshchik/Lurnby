@@ -943,6 +943,21 @@ def storeHighlights(uuid):
                 200, {'ContentType': 'application/json'})
 
 
+@bp.route('/article/<uuid>/finished', methods=['GET'])
+@login_required
+def mark_read(uuid):
+    uuid_hash = UUID(uuid)
+    article = Article.query.filter_by(uuid=uuid_hash).first()
+    
+    if article.user_id == current_user.id:
+        article.done = True
+        db.session.commit()
+        flash('Another article finished!', 'success')
+        return redirect(url_for('main.articles'))
+    else:
+        return render_template('errors/404.html'), 404
+
+
 @bp.route('/article/<uuid>/progress', methods=['GET', 'POST'])
 @login_required
 def storeProgress(uuid):

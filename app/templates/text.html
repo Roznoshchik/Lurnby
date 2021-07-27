@@ -20,8 +20,7 @@
       </div>  
 
       <div class = "{{font}} size-{{size}} {{spacing}} {{color}}" id="content">
-        
-
+      
         <h1>{{ title|safe}}</h1>
 
         <h3>{{ author|safe}}</h3>
@@ -29,7 +28,9 @@
         <div id="article_content">
           {{ content|safe }}
         </div>
-        
+        <div class="action-container">
+          <a href = "{{url_for('main.mark_read', uuid=article_uuid)}}" class ="main-button">Mark article "Finished"</a>
+        </div>
       </div>
 
       <!-- bottom-bar -->  

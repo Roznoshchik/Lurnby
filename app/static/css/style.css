@@ -165,20 +165,17 @@ body, #base-main {
   display: flex;
   justify-content: center;
 }
-
 #flashMessages .alert {
   width: 90vw;
+  margin: 44px auto;
 }
-
+#flashMessages .alert ul {
+  list-style-type: none;
+}
 #flashMessages .close {
   position: absolute;
   top: 8px;
   right: 8px;
-}
-
-.alert {
-  margin: 0;
-  border-radius: 0;
 }
 
 /* filter styles */
@@ -291,6 +288,13 @@ body, #base-main {
 #content {
   max-width: 100%;
   padding: 0 88px;
+  padding-bottom: 88px;
+}
+#content .action-container {
+  margin-top: 16px;
+}
+#content .main-button {
+  margin-left: 0;
 }
 
 #content {
@@ -1741,6 +1745,10 @@ ul ul a {
 
 .no-bottom {
   padding-bottom: 0;
+}
+
+.main-button {
+  cursor: pointer !important;
 }
 
 /*!

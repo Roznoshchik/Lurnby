@@ -141,22 +141,26 @@ body, #base-main {
   padding: 8px;
   display: flex;
   justify-content: center;
-  }
+  
 
-  #flashMessages .alert {
+  .alert {
     width: 90vw;
+    margin: 44px auto;
+    ul {
+      list-style-type: none;
+    }
   }
 
-  #flashMessages .close {
+  .close {
     position: absolute;
     top: 8px;
     right: 8px;
   }
 
-.alert {
-  margin: 0;
-  border-radius: 0;
 }
+
+
+
 
 
 /* filter styles */
@@ -277,6 +281,14 @@ body, #base-main {
 #content{
   max-width:100%;
   padding: 0 88px;
+  padding-bottom: 88px;
+
+  .action-container{
+    margin-top: 16px;
+  }
+  .main-button {
+    margin-left: 0;
+  }
 }
 
 #content {
