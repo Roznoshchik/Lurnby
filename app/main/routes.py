@@ -145,8 +145,6 @@ def articles():
             col = getattr(Article, "title")
             col = col.asc()
             order.append(col)
-        col = getattr(Article, 'done')
-        order.append(col.asc())
         query = query.order_by(*order)
 
         filtered_count = query.count()
@@ -1048,9 +1046,12 @@ def updateArticle(uuid):
             db.session.commit()
 
             query = current_user.articles.filter_by(archived=False)
+            order = []
+            col = getattr(Article, 'done')
+            order.append(col.asc())
             col = getattr(Article, "date_read")
-            col = col.desc()
-            articles = query.order_by(col).all()
+            order.append(col.desc())
+            articles = query.order_by(*order).all()
             count = query.count()
             showing = f'Showing {count} out of {count} articles.'
             
