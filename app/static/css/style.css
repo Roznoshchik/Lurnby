@@ -292,6 +292,7 @@ body, #base-main {
 }
 #content .action-container {
   margin-top: 16px;
+  margin-bottom: 44px;
 }
 #content .main-button {
   margin-left: 0;
