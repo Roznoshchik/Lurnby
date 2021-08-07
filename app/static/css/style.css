@@ -297,6 +297,10 @@ body, #base-main {
 #content .main-button {
   margin-left: 0;
 }
+#content iframe {
+  max-width: 100%;
+  height: auto;
+}
 
 #content {
   cursor: url("/static/highlighter.png"), auto;

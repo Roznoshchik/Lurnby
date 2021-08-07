@@ -291,6 +291,11 @@ body, #base-main {
     margin-left: 0;
     
   }
+
+  iframe{
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 #content {
