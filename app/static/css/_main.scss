@@ -26,7 +26,13 @@
     cursor: pointer !important;
 }
 
-img {
-    max-width: 100%;
-    height: auto;
+#content {
+    img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    p {
+        margin-bottom: 1rem;
+    }
 }

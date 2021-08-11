@@ -77,15 +77,17 @@ def articles():
     col = col.desc()
     order.append(col)
   
-    articles = query.order_by(*order).all()
+    articles = query.order_by(*order).paginate(1, 15, False)
+    has_next = articles.has_next if articles.has_next else None 
     count = query.count()
     suggestion = Suggestion.get_random()
-    showing = f'Showing {count} out of {count} articles.'
+    showing = f'Showing 0 to {count if count < 15 else 15} out of {count} articles.'
 
     if request.method == 'POST':
         data = json.loads(request.data)
         
-        # per_page = data['per_page']
+        page = int(data['page'])
+        per_page = data['per_page']
         title_sort = data['title_sort'].lower()
         opened_sort = data['opened_sort'].lower()
         status = data['status'].lower()
@@ -94,7 +96,7 @@ def articles():
 
         # first make user specific and unarchived
         query = Article.query.filter_by(user_id=current_user.id, archived=False)
-        total_count = query.count()
+        # total_count = query.count()
 
         # then filter for search
         if search != "":
@@ -148,16 +150,28 @@ def articles():
         query = query.order_by(*order)
 
         filtered_count = query.count()
+        if per_page == 'all':
+            per_page = filtered_count
+        else:
+            per_page = int(per_page)
+        
+        if filtered_count < per_page:
+            visible_count = f'0 to {filtered_count}' 
+        else:
+            visible_count = f'{(per_page * page) - per_page } to {per_page * page}'
 
+        query = query.paginate(page, per_page, False)
+        has_next = query.has_next if query.has_next else None
 
-        return json.dumps({'html': render_template('_all_articles.html', articles = query.all()),
-                            'showing':f'Showing {filtered_count} out of {total_count} articles.'})
+        return json.dumps({'html': render_template('_all_articles.html', page=page, articles = query.items),
+                            'showing':f'Showing {visible_count} out of {filtered_count} articles.',
+                            'has_next': has_next })
 
 
 
     return render_template('articles_new.html', showing=showing,
-                           articles=articles, user=current_user,
-                           suggestion=suggestion)
+                           articles=articles.items, user=current_user,
+                           suggestion=suggestion, page=1, has_next=has_next)
 
 
 @bp.route('/articles2/api', methods=['GET'])

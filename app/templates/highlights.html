@@ -116,6 +116,7 @@
 {% block JS %}
 <script>
     var page = 1
+    var should_paginate = false
     var topics = [ {% for t in topics %}'{{t.title}}',{% endfor %}]
     active_filters = byId('active_filters')
     var filters = []
@@ -129,6 +130,7 @@
 
     function paginate(n){
         page = n
+        should_paginate = true
         apply_filters()
     }
 
@@ -354,8 +356,8 @@
     }
 
     function apply_filters(){        
-        if(typeof page === 'undefined'){
-            page = null
+        if(!should_paginate){
+            page = 1
         }
 
         data = {
@@ -400,6 +402,7 @@
                     byId('has_next').setAttribute('disabled', true)
                     byId('has_next').setAttribute('title', 'This is the last page')
                 }
+                should_paginate = false 
             }
 
             byId('filtered_count').innerHTML = data['filtered_count']

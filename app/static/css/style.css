@@ -1756,9 +1756,12 @@ ul ul a {
   cursor: pointer !important;
 }
 
-img {
+#content img {
   max-width: 100%;
   height: auto;
+}
+#content p {
+  margin-bottom: 1rem;
 }
 
 /*!
@@ -7927,6 +7930,9 @@ readers do not read off random characters that represent icons */
 #article-items {
   display: flex;
   flex-wrap: wrap;
+}
+#article-items nav {
+  width: 100%;
 }
 #article-items .label.done p {
   background-color: #F9F7F4;

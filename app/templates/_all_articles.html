@@ -1,3 +1,10 @@
 {% for article in articles %}
     {% include '_article.html' %}
 {% endfor %}    
+<nav id="pagination" class="pagination" role="navigation" aria-label="pagination">
+    <span class = "pagination-navigate">
+        <button onclick="paginate({{page - 1}})" class="pagination-previous" {% if page == 1 %} title="This is the first page" disabled {% endif %}>Previous</button>
+        <button id="has_next" onclick="paginate({{page + 1}})" class="pagination-next">Next page</button>
+    </span>
+    
+</nav>

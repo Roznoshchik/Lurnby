@@ -86,6 +86,11 @@
 #article-items{
     display: flex;
     flex-wrap: wrap;
+    
+    nav{
+        width: 100%;
+    }
+
 
     .label.done p{
         background-color: $main-grey;

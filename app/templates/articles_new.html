@@ -23,10 +23,7 @@
                 
             </div>
         </div>
-    {% endif %}
-
-
-    {% if articles|length >= 1 %}
+    {% else %}
         <div id = "articles_page">
             {% include '_overview.html'%}
             
@@ -40,7 +37,7 @@
                     
                     <!-- Filters   -->
                     <div class = "all-filters">
-                        <!-- <div class = "lurnby-filter">
+                        <div class = "lurnby-filter">
                             <span>Show 
                                 <select id = "per_page">
                                     <option value="15">15</option>
@@ -49,7 +46,7 @@
                                     <option value="all">all</option>
                                 </select> articles
                             </span>
-                        </div> -->
+                        </div>
                         {% if current_user.tags.count() > 0 %}
                         <div id = "tags_filter" class = "lurnby-filter">
                             <div class = "dropdown">
@@ -109,7 +106,15 @@
                     {% for article in articles %}
                         {% include '_article.html' %}
                     {% endfor %}
+                    <nav id="pagination" class="pagination" role="navigation" aria-label="pagination">
+                        <span class = "pagination-navigate">
+                            <button onclick="paginate({{page - 1}})" class="pagination-previous" {% if page == 1 %} title="This is the first page" disabled {% endif %}>Previous</button>
+                            <button id="has_next" onclick="paginate({{page + 1}})" class="pagination-next" {% if not has_next %} title="This is the first page" disabled {% endif %}>Next page</button>
+                        </span>
+                        
+                    </nav>
                 </div>
+                
             
             </div>
           
@@ -158,6 +163,8 @@
     
     <!-- Custom Data tables code -->
     <script type="application/javascript">
+        var page = 1
+        var should_paginate = false
 
         function initialize_articles_page(){
             ///////////////////////////////////////////////////
@@ -238,9 +245,19 @@
         //                                //
         ////////////////////////////////////
 
+        function paginate(n){
+            page = n
+            should_paginate = true
+            filter_submit()
+        }
         
  
         function filter_submit(){
+
+            if(!should_paginate){
+                page = 1
+            }
+
             submit_tags = []
             Array.from(document.querySelectorAll('.single-tag:checked')).forEach(function(item){
                 submit_tags.push(item.value)
@@ -249,9 +266,10 @@
                 "title_sort": byId('title_sort_value').value,
                 "opened_sort" : byId('opened_sort_value').value,
                 "tags" : submit_tags,
-                // "per_page" : byId('per_page').value,
+                "per_page" : byId('per_page').value,
                 "status" : byId('article_status').value,
                 "search" : byId('search').value,
+                "page" : page
             }
             
             function handleErrors(response){
@@ -283,6 +301,11 @@
             .then(data => {
                 byId('article-items').innerHTML = data['html']
                 byId('record_count').innerHTML = data['showing']
+                if(!data['has_next']){
+                    byId('has_next').setAttribute('disabled', true)
+                    byId('has_next').setAttribute('title', 'This is the last page')
+                }
+                should_paginate = false
             })
 
 
