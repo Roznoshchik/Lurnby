@@ -7956,6 +7956,9 @@ readers do not read off random characters that represent icons */
 #article-items .article_card h4 {
   margin: 0;
 }
+#article-items .article_card h4 a {
+  color: inherit;
+}
 #article-items .article_card .open {
   width: 100%;
   height: 40px;
