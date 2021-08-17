@@ -88,3 +88,25 @@
       margin-right: 16px;
     }
 }
+
+
+//////////////////////////////
+//    Add Highlight form    //
+//////////////////////////////
+
+.skip-review{
+    display: flex;
+    align-items: center;
+
+    .form-control{
+        width: auto;
+        min-width: 16px;
+    }
+
+    label {
+        margin: 0;
+        margin-left: 8px;
+    }
+      
+
+}

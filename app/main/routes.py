@@ -1132,19 +1132,23 @@ def unarchiveArticle(uuid):
 
     return redirect(url_for('main.articles'))
 
+# ############################ #
+# ##     Add highlight      ## #
+# ############################ #
 
 @bp.route('/article/addhighlight', methods=['POST'])
 @login_required
 def addhighlight():
 
     data = json.loads(request.form['data'])
-
+    print(data)
     article = Article.query.filter_by(uuid=data['article_uuid']).first()
 
     newHighlight = Highlight(user_id=current_user.id,
                              article_id=article.id,
                              position=data['position'],
                              text=data['text'],
+                             do_not_review=data['do_not_review'],
                              note=data['notes'], archived=False)
 
     db.session.add(newHighlight)
@@ -2101,7 +2105,7 @@ def unarchivetopic(topic_id):
 @bp.route('/review', methods=['GET', 'POST'])
 def review():
     topics = current_user.topics.filter_by(archived=False).all()
-    highlights = current_user.highlights.filter_by(archived=False).all()
+    highlights = current_user.highlights.filter_by(archived=False, do_not_review=False).all()
     tiers = order_highlights(highlights)
     empty = True
     for i in range(8):

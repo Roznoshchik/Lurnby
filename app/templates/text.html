@@ -297,7 +297,13 @@
               <h6>Add a note</h6>
               {{ form.note(class="form-control", id="message-text") }}              
             </div>
-                        
+            <div class="lurnby_data_group form-group skip-review">
+              {{ form.do_not_review(class="form-control", id="do_not_review") }}
+              {{form.do_not_review.label('This highlight should not be reviewed')}}
+
+              
+            </div>
+
             <div style = "display: none;" class="lurnby_data_group topics-group" data-toggle="buttons">
               <h6 class="inline-block">Topics:</h6><span  id="CreateTopic">
                 <button onclick ="NewTopic()" class="main-button save">
@@ -488,10 +494,11 @@ for(let i=0; i<tables.length; i++){
     function SubmitHighlight(){
       $('#AddHighlightModal').modal('hide');
 
-      var text, notes, topics, doctopics, article_uuid, position
+      var text, notes, topics, doctopics, article_uuid, position, do_not_review
 
       text = byId('HighlightField').value
       notes = byId('message-text').value
+      do_not_review = byId('do_not_review').checked
       topics = []
       doctopics = byClass('topic-label')
       article_uuid = byId('article_uuid').value
@@ -507,6 +514,7 @@ for(let i=0; i<tables.length; i++){
         text:text,
         notes:notes,
         topics:topics,
+        do_not_review,
         article_uuid:article_uuid,
         position:position
       }
@@ -528,7 +536,7 @@ for(let i=0; i<tables.length; i++){
     var returnedhighlightclass;
 
     function AddedHighlight(data){
-      
+      byId('do_not_review').checked = false;
       $('#AddHighlightModal').modal('hide');
 
       var active = byClass('active')

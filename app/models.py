@@ -484,6 +484,7 @@ class Highlight(db.Model):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_schedule = db.Column(db.Integer, default=0)
+    do_not_review = db.Column(db.Boolean, default=False)
 
     # add highlight to topic
     def AddToTopic(self, topic):
