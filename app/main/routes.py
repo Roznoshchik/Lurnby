@@ -1445,8 +1445,7 @@ def highlights():
     filtered_count = total_count
     showing_count = '0 to 15'
     col = getattr(Highlight, "created_date")
-    col.desc()
-    highlights = query.order_by(col).paginate(1, 15, False).items
+    highlights = query.order_by(col.desc()).paginate(1, 15, False).items
 
     topics = current_user.topics.filter_by(archived=False).all()
 
@@ -1466,7 +1465,7 @@ def highlights():
         
         # set desc order default
         col = getattr(Highlight, "created_date")
-        col.desc()
+        
 
         # filter for topics
         if topics != []:
@@ -1490,13 +1489,11 @@ def highlights():
             query = query.filter(Highlight.no_topics==True)
     
 
-
         # filter for sort 
-        if created_sort == 'asc':
-            col.asc()
-        
-        query = query.order_by(col)
-
+        if created_sort == 'asc':        
+            query = query.order_by(col.asc())
+        else:
+            query = query.order_by(col.desc())
 
  
         # then filter for search

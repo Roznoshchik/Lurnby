@@ -143,12 +143,9 @@
                 item.classList.add('sort_desc')
                 
                 // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = 'desc'
+                if (item.id == 'created_sort'){
+                    byId('created_sort_value').value = 'desc'
 
-                }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = 'desc'
                 }
             }
             else if (item.classList.contains('sort_desc')){
@@ -156,23 +153,17 @@
                 item.classList.add('sort_asc')
 
                 // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = 'asc'
+                if (item.id == 'created_sort'){
+                    byId('created_sort_value').value = 'asc'
                 }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = 'asc'
-                }
-
+                
             }
             else if(item.classList.contains('sort_asc')){
                 item.classList.remove('sort_asc')
 
                 // set hidden input values
-                if (item.id == 'title_sort'){
-                    byId('title_sort_value').value = ''
-                }
-                else if(item.id == 'last_opened_sort'){
-                    byId('opened_sort_value').value = ''
+                if (item.id == 'created_sort'){
+                    byId('created_sort_value').value = ''
                 }
 
             }
