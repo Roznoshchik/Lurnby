@@ -32,7 +32,16 @@
 
       <form class="main-form" id="UpdateHighlightForm" action="" method="post">
         {{ form.hidden_tag() }}
+        <div class="lurnby_data_group form-group skip-review">
+          {% if highlight.do_not_review %}
+          {{ form.do_not_review(class="form-control", id="do_not_review", checked=True) }}
+          {% else %}
+          {{ form.do_not_review(class="form-control", id="do_not_review", checked=False) }}
+          {% endif %}
+          {{form.do_not_review.label('This highlight should not be reviewed')}}
 
+          
+        </div>
         <div class="lurnby_data_group">
           <h6>Highlight</h6>
           <div class="form-group">
@@ -74,13 +83,13 @@
          
         </div>
     
-        <div class="lurnby_data_group article_data_group">
+        <!-- <div class="lurnby_data_group article_data_group">
 
           <h6 class="inline-block">Tags:</h6>
           <span class="inline-button" id="add_new_tag">
             <button type = "button" onclick="add_tag_start('update-highlight')" class="main-button add_new">Add New</button>
           </span><br>
-
+          
           <span id="tags">
             <span id="new_tags"></span>
             {% for tag in highlight.tags %}
@@ -91,10 +100,7 @@
             <label class="untagged update-highlight"><input type="checkbox" name="untags" checked value="{{tag.name}}"></input>{{tag.name}}</label>
             {% endfor %}
           </span>
-        </div>
-
-       
-
+        </div> -->
 
       </form>
     </div>

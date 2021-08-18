@@ -1222,6 +1222,7 @@ def view_highlight(id):
 
         highlight.text = data['highlight']
         highlight.note = data['notes']
+        highlight.do_not_review = data['do_not_review']
 
         members = data['topics']
 
@@ -1238,20 +1239,20 @@ def view_highlight(id):
             highlight.RemoveFromTopic(topic)
             
 
-        tags = data['tags']
+        # tags = data['tags']
 
-        for tag in tags:
-            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-            if not t:
-                t = Tag(name=tag, archived=False, user_id=current_user.id)
-                db.session.add(t)
+        # for tag in tags:
+        #     t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
+        #     if not t:
+        #         t = Tag(name=tag, archived=False, user_id=current_user.id)
+        #         db.session.add(t)
 
-            highlight.AddToTag(t)
+        #     highlight.AddToTag(t)
 
-        untags = data['untags']
-        for tag in untags:
-            t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-            highlight.RemoveFromTag(t)
+        # untags = data['untags']
+        # for tag in untags:
+        #     t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
+        #     highlight.RemoveFromTag(t)
 
         if highlight.topics.count() == 0:
             highlight.no_topics = True
@@ -1269,27 +1270,27 @@ def view_highlight(id):
                     or (data['atopics'] and data['atopics'] != [])
                     ):
 
-                tag_ids = data['atags']
+                # tag_ids = data['atags']
                 topic_ids = data['atopics']
                 active_tags = []
                 active_topics = []
 
-                if tag_ids != [] and tag_ids:
-                    active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
-                    t_hid = tags_highlights.c.highlight_id
+                # if tag_ids != [] and tag_ids:
+                #     active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
+                #     t_hid = tags_highlights.c.highlight_id
 
-                    h = Highlight.query \
-                        .filter_by(user_id=current_user.id,
-                                   archived=False
-                                   ).join(tags_highlights,
-                                          (t_hid == Highlight.id))
+                #     h = Highlight.query \
+                #         .filter_by(user_id=current_user.id,
+                #                    archived=False
+                #                    ).join(tags_highlights,
+                #                           (t_hid == Highlight.id))
 
-                    highlights = h.filter(tags_highlights.c.tag_id.in_(tag_ids)
-                                          ).all()
-                else:
-                    highlights = Highlight.query \
-                                 .filter_by(user_id=current_user.id,
-                                            archived=False).all()
+                #     highlights = h.filter(tags_highlights.c.tag_id.in_(tag_ids)
+                #                           ).all()
+                # else:
+                #     highlights = Highlight.query \
+                #                  .filter_by(user_id=current_user.id,
+                #                             archived=False).all()
 
                 if topic_ids != [] and topic_ids:
                     active_topics = Topic.query.filter(Topic.id.in_(topic_ids)

@@ -367,11 +367,13 @@ function UpdateHighlight(id){
             'highlight':highlight,
             'topics':topics,
             'untopics':untopics,
-            'tags':tags,
-            'untags':untags,
-            'atags':atags,
+            // 'tags':tags,
+            // 'untags':untags,
+            // 'atags':atags,
             'atopics':atopics,
-            'topics-page':'true'
+            'topics-page':'true',
+            'do_not_review': byId('do_not_review').checked
+
         }
     }
     else {
@@ -380,11 +382,12 @@ function UpdateHighlight(id){
             'highlight':highlight,
             'topics':topics,
             'untopics':untopics,
-            'tags':tags,
-            'untags':untags,
-            'atags':false,
+            // 'tags':tags,
+            // 'untags':untags,
+            // 'atags':false,
             'atopics':false,
-            'topics-page':'false'
+            'topics-page':'false',
+            'do_not_review': byId('do_not_review').checked
         }
     }
     
