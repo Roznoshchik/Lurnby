@@ -1756,6 +1756,10 @@ ul ul a {
   cursor: pointer !important;
 }
 
+#content {
+  margin: auto;
+  max-width: 1000px;
+}
 #content img {
   max-width: 100%;
   height: auto;
