@@ -23,3 +23,18 @@ def set_absolute_urls(*articles):
 
             a.content = str(soup.prettify())
     db.session.commit()
+
+
+
+def fix_article_note_links(a):
+    if a.notes and a.notes != '':
+        soup = BeautifulSoup(a.notes, "html5lib")
+        links = soup.find_all('a')
+        for l in links:
+            try:
+                if '/article/' not in l['href']:
+                    l['href'] = f'/article/{l["href"]}'
+            except:
+                print(f'error with article: {a.uuid}\n url: \n{l}')
+        a.notes = str(soup.prettify())
+    db.session.commit()
