@@ -40,23 +40,39 @@ function delete_bookmark(element){
 }
 
 function go_to_location(location) { 
-    var $window = $(window);
-    console.log('going to location')
-    console.log(location)
+    // var $window = $(window);
+    // console.log('going to location')
+    // console.log(location)
 
-    var h = document.documentElement, 
-    b = document.body,
-    sh = 'scrollHeight';
-    var position = (location / 100) * (h[sh] || b[sh])    
-    $window.scrollTop(position);
+    // var h = document.documentElement, 
+    // b = document.body,
+    // sh = 'scrollHeight';
+    // var position = (location / 100) * (h[sh] || b[sh])    
+    // $window.scrollTop(position);
+
+    let docElem = document.documentElement,
+        docBody = document.body,
+        scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+        position = (location / 100) * scrollBottom
+        $(window).scrollTop(position)
+
   };
 
 function get_location(){
-    var h = document.documentElement, 
-    b = document.body,
-    st = 'scrollTop',
-    sh = 'scrollHeight';
-    return (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+    // var h = document.documentElement, 
+    // b = document.body,
+    // st = 'scrollTop',
+    // sh = 'scrollHeight';
+    // return (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+
+    let docElem = document.documentElement,
+        docBody = document.body,
+        scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
+        scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+        scrollPercent = scrollTop / scrollBottom;
+
+        return scrollPercent * 100;
+
 }
 
 function save_bookmarks(){

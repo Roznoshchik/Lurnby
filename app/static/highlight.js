@@ -7,42 +7,24 @@ var activeRange;
 var selectedObj;
 var position;
 
-/*
-function textActions(event) {
-  selectedObj = window.getSelection();
- 
- if (selectedObj.rangeCount > 0){
-    selectedText = selectedObj.getRangeAt(0);
- }
-
-if (selectedText != "") {
- 
- $('#infoDiv').css('display', 'block');
- $('#infoDiv').css('position', 'absolute');
- $('#infoDiv').css('left', event.pageX);
- $('#infoDiv').css('top', event.pageY);
- //infodiv.style.visibility = 'visible';
-}
-
-else{
-      infodiv.style.display = 'none';
-
-}
-
-}
-*/
-
-//test code
 
 function textActions(event) {
 
+  // var h = document.documentElement, 
+  // b = document.body,
+  // st = 'scrollTop',
+  // sh = 'scrollHeight';
   
-  var h = document.documentElement, 
-  b = document.body,
-  st = 'scrollTop',
-  sh = 'scrollHeight';
-  
-  position =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+  // position =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+
+  let docElem = document.documentElement,
+      docBody = document.body,
+      scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
+      scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+      scrollPercent = scrollTop / scrollBottom;
+
+      position =  scrollPercent * 100;
+
 
 
 
@@ -80,9 +62,6 @@ function textActions(event) {
 
 }
 
-
-
-//test code end
 
 
 

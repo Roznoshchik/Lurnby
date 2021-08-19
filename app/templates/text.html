@@ -366,16 +366,23 @@ function set_position() {
   var progress; 
   var $window = $(window);
 
-  var h = document.documentElement, 
-  b = document.body,
-  st = 'scrollTop',
-  sh = 'scrollHeight';
+  // var h = document.documentElement, 
+  // b = document.body,
+  // st = 'scrollTop',
+  // sh = 'scrollHeight';
+
+  // var position = (progress / 100) * (h[sh] || b[sh])    
   
+  // $window.scrollTop(position);
+
   progress = {{progress}};
-  
-    var position = (progress / 100) * (h[sh] || b[sh])    
-  
-    $window.scrollTop(position);
+  let docElem = document.documentElement,
+        docBody = document.body,
+        scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+        position = (progress / 100) * scrollBottom;
+    
+  $window.scrollTop(position)
+
 };
 
 {% if not highlight_id %}
@@ -396,13 +403,19 @@ set_position();
 
   function getScrollPercent() {
     
-    console.log('getting scroll')
-    var h = document.documentElement, 
-    b = document.body,
-    st = 'scrollTop',
-    sh = 'scrollHeight';
+    // console.log('getting scroll')
+    // var h = document.documentElement, 
+    // b = document.body,
+    // st = 'scrollTop',
+    // sh = 'scrollHeight';
     
-    var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+    // var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+    let docElem = document.documentElement,
+        docBody = document.body,
+        scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
+        scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+        scrollPercent = scrollTop / scrollBottom,
+        progress = scrollPercent * 100;
     
     if (progress > furthest){
       furthest = progress;
