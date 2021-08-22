@@ -1768,6 +1768,9 @@ ul ul a {
 #content p {
   margin-bottom: 1rem;
 }
+#content pre {
+  white-space: pre-wrap;
+}
 
 /*!
  * Font Awesome Free 5.15.3 by @fontawesome - https://fontawesome.com
