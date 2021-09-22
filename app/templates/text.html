@@ -354,6 +354,7 @@ var uuid = "{{ article_uuid }}";
 var all_bookmarks = {{ bookmarks|safe }};
 var furthest = {{furthest}}; 
 var progress = {{progress}}; 
+console.log(`\n\n progress is: ${progress}\n\n`)
 
 // show onboarding
 {% if current_user.highlights.filter_by(archived=False).count() == 0 %}
@@ -364,7 +365,7 @@ $('#WelcomeModal').modal('show');
 // scroll to previous position
 
 function set_position() { 
-  
+  console.log(`\n\n progress is: ${progress}\n\n`)  
   var $window = $(window);
 
   // var h = document.documentElement, 
@@ -380,7 +381,8 @@ function set_position() {
         docBody = document.body,
         scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
         position = (progress / 100) * scrollBottom;
-    
+  console.log(`\n\n position is: ${position}\n\n`)
+  
   $window.scrollTop(position)
 
 };
