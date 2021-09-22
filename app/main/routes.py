@@ -2,6 +2,8 @@ import json
 import os
 from threading import Thread
 from uuid import UUID, uuid4
+
+from sqlalchemy.sql.sqltypes import JSON
 import validators
 
 from app import csrf, db, s3, bucket
@@ -134,7 +136,7 @@ def articles():
             col = getattr(Article, "date_read")
             col = col.desc()
             order.append(col)
-        elif opened_sort == 'asc':
+        else:
             col = getattr(Article, "date_read")
             col = col.asc()
             order.append(col)
@@ -1208,13 +1210,15 @@ def view_highlight(id):
     if request.method == 'GET':
         form.text.data = highlight.text
         form.note.data = highlight.note
-
-        return render_template('highlight.html', user=current_user,
+        topics_list = [t.title for t in Topic.query.filter_by(archived=False, user_id=current_user.id).all()]
+        html = render_template('highlight.html', user=current_user,
                                highlight=highlight,
                                addtopicform=addtopicform, form=form,
                                member=member, nonmember=nonmember,
                                article_title=article_title, source=source,
                                source_url=source_url, inappurl=inappurl)
+        return (json.dumps({'html': html, 'topics_list':topics_list}),
+                200, {'ContentType': 'application/json'})
 
     if request.method == 'POST':
 
