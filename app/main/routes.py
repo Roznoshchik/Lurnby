@@ -132,13 +132,13 @@ def articles():
         col = getattr(Article, 'done')
         order.append(col.asc())
         
-        if opened_sort == 'desc':
+        if opened_sort == 'asc':
             col = getattr(Article, "date_read")
-            col = col.desc()
+            col = col.asc()
             order.append(col)
         else:
             col = getattr(Article, "date_read")
-            col = col.asc()
+            col = col.desc()
             order.append(col)
 
         if title_sort == 'desc':
