@@ -352,7 +352,8 @@
 // get page variables
 var uuid = "{{ article_uuid }}";
 var all_bookmarks = {{ bookmarks|safe }};
-var furthest = {{furthest}};
+var furthest = {{furthest}}; 
+var progress = {{progress}}; 
 
 // show onboarding
 {% if current_user.highlights.filter_by(archived=False).count() == 0 %}
@@ -362,8 +363,12 @@ $('#WelcomeModal').modal('show');
 
 // scroll to previous position
 
-function set_position() { 
-  var progress; 
+function set_position(message=null) { 
+  if(message){
+    console.log(message);
+    alert('rotation changed')
+
+  }
   var $window = $(window);
 
   // var h = document.documentElement, 
@@ -375,7 +380,6 @@ function set_position() {
   
   // $window.scrollTop(position);
 
-  progress = {{progress}};
   let docElem = document.documentElement,
         docBody = document.body,
         scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
@@ -384,6 +388,8 @@ function set_position() {
   $window.scrollTop(position)
 
 };
+
+screen.orientation.addEventListener('change', set_position())
 
 {% if not highlight_id %}
 set_position();
