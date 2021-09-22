@@ -353,8 +353,8 @@
 var uuid = "{{ article_uuid }}";
 var all_bookmarks = {{ bookmarks|safe }};
 var furthest = {{furthest}}; 
-var progress = {{progress}}; 
-console.log(`\n\n progress is: ${progress}\n\n`)
+var read_progress = {{progress}};
+var current_progress = read_progress 
 
 // show onboarding
 {% if current_user.highlights.filter_by(archived=False).count() == 0 %}
@@ -364,8 +364,7 @@ $('#WelcomeModal').modal('show');
 
 // scroll to previous position
 
-function set_position() { 
-  console.log(`\n\n progress is: ${progress}\n\n`)  
+function set_position(progress) { 
   var $window = $(window);
 
   // var h = document.documentElement, 
@@ -387,10 +386,13 @@ function set_position() {
 
 };
 
-//screen.orientation.addEventListener('change', set_position())
+window.addEventListener('resize', function(){
+  console.log('screen resized')
+  set_position(current_progress)
+});
 
 {% if not highlight_id %}
-set_position();
+set_position(read_progress);
 {% else %}
   console.log('I should scroll now ')
   console.log('{{highlight_id }}')
@@ -432,6 +434,7 @@ set_position();
   } 
 
   function update_progress(progress, article_uuid){
+    current_progress = progress;
     console.log('updating progress');
     byId('overview-progress').innerText = Math.round(progress);
 
