@@ -363,12 +363,8 @@ $('#WelcomeModal').modal('show');
 
 // scroll to previous position
 
-function set_position(message=null) { 
-  if(message){
-    console.log(message);
-    alert('rotation changed')
-
-  }
+function set_position() { 
+  
   var $window = $(window);
 
   // var h = document.documentElement, 
@@ -389,7 +385,7 @@ function set_position(message=null) {
 
 };
 
-screen.orientation.addEventListener('change', set_position())
+//screen.orientation.addEventListener('change', set_position())
 
 {% if not highlight_id %}
 set_position();
