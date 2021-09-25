@@ -197,12 +197,13 @@ function ViewHighlight(id){
     xhr = $.ajax(
                 '/view_highlight/' + id).done(
                     function(data) {
+                        json = JSON.parse(data)
+                        
                         xhr = null
-                        $('#ViewHighlightModal').html(data);
+                        //$('#ViewHighlightModal').html(data);
+                        byId('ViewHighlightModal').innerHTML = json['html'] 
                         add_span = byId('new-topic');
                         add = byId('add_new_tag');
-
-                        
 
                         initialize();
                         initialize_view_topics();
