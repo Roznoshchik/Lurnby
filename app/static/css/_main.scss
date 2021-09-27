@@ -27,6 +27,9 @@
 }
 
 #content {
+    user-select: text;
+    -webkit-user-select: text;
+    
     img {
         max-width: 100%;
         height: auto;

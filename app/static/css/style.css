@@ -1757,6 +1757,8 @@ ul ul a {
 }
 
 #content {
+  user-select: text;
+  -webkit-user-select: text;
   margin: auto;
   width: 100%;
   max-width: 1000px;
