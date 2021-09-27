@@ -28,7 +28,8 @@ function textActions(event) {
 
 
 
-  selectedObj = window.getSelection();
+      selectedObj = window.getSelection();
+      highlightText = window.getSelection().toString();
  
   var x = selectedObj.toString().length
 
@@ -88,7 +89,9 @@ $('#addhighlight').click(function(){
 
 $('#AddHighlightModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget) // Button that triggered the modal
-    var rawhighlight = selectedObj.toString() // selected text
+    //var rawhighlight = selectedObj.toString() // selected text
+    var rawhighlight = highlightText;
+
     selectedObj.removeAllRanges();
 
     var highlight_position = position; 
