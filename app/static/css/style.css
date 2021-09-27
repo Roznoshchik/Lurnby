@@ -1763,6 +1763,10 @@ ul ul a {
   width: 100%;
   max-width: 1000px;
 }
+#content * {
+  user-select: text;
+  -webkit-user-select: text;
+}
 #content img {
   max-width: 100%;
   height: auto;
