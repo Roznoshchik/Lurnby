@@ -579,6 +579,7 @@ class Topic(db.Model):
         'Highlight', secondary=highlights_topics, lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
     tags = db.relationship('Tag', secondary=tags_topics, lazy='dynamic')
+    last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
     # this checks if a specific highlight is in this topic
     def is_added_highlight(self, highlight):

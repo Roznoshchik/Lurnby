@@ -674,33 +674,6 @@ label svg {
   margin-top: 16px;
 }
 
-.topic-label {
-  border-radius: 0;
-  display: inline-flex;
-  margin-bottom: 8px;
-  margin-right: 4px;
-  font-weight: 100;
-  font-size: 0.8rem;
-  padding: 4px 8px;
-  background: #F9F7F4;
-}
-
-.topic-label * {
-  pointer-events: none;
-}
-
-.topic-label.active {
-  background: #fab1a0;
-}
-
-.topic-label:hover {
-  background: #fab1a0;
-}
-
-.topic-label.active:hover {
-  /*background: #F9F7F4;*/
-}
-
 .highlighted {
   background-color: rgba(255, 255, 0, 0.411);
   display: inline;
@@ -1305,62 +1278,6 @@ img.star {
 .main-button, .close {
   -moz-appearance: none !important;
   -webkit-appearance: none !important;
-}
-
-.topic-member {
-  border-radius: 20px;
-  margin-bottom: 15px !important;
-  margin-left: 10px;
-  border-color: #bbbbbb;
-  background-color: #fff;
-  color: #424242;
-  padding-left: 32px;
-}
-
-.topic-member:hover {
-  border-color: #dc3545;
-  background-color: #dc3545;
-  color: #fff;
-  transition: 0.15s ease-in-out;
-}
-
-.topic-non-member {
-  border-radius: 20px;
-  margin-bottom: 15px !important;
-  margin-left: 10px;
-  border-color: #bbbbbb;
-  background-color: #fff;
-  color: #424242;
-  padding-left: 32px;
-}
-
-.topic-non-member:hover {
-  border-color: #28a745;
-  background-color: #28a745;
-  color: #fff;
-  transition: 0.15s ease-in-out;
-}
-
-.topic-icon {
-  margin-top: 2px;
-  opacity: 0;
-  float: right;
-  font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 1;
-  color: #000;
-  text-shadow: 0 1px 0 #fff;
-  padding-left: 8px;
-}
-
-.topic-member:hover .topic-icon {
-  color: white;
-  opacity: 100;
-}
-
-.topic-non-member:hover .topic-icon {
-  color: white;
-  opacity: 100;
 }
 
 .highlight-title:hover {
@@ -8037,11 +7954,15 @@ readers do not read off random characters that represent icons */
   background: #FFF79F;
   margin: 0px 4px 4px 0px;
 }
-
-.topic.filter:hover {
+.topic.filter:hover, .topic.member:hover {
   cursor: pointer;
   color: white;
   background-color: black;
+}
+.topic.filter:hover::after, .topic.member:hover::after {
+  content: " x";
+  color: red;
+  font-weight: 900;
 }
 
 .autocomplete {
@@ -8101,6 +8022,93 @@ readers do not read off random characters that represent icons */
 .skip-review label {
   margin: 0;
   margin-left: 8px;
+}
+
+.topic-member {
+  border-radius: 20px;
+  margin-bottom: 15px !important;
+  margin-left: 10px;
+  border-color: #bbbbbb;
+  background-color: #fff;
+  color: #424242;
+  padding-left: 32px;
+}
+
+.topic-member:hover {
+  border-color: #dc3545;
+  background-color: #dc3545;
+  color: #fff;
+  transition: 0.15s ease-in-out;
+}
+
+.topic-non-member {
+  border-radius: 20px;
+  margin-bottom: 15px !important;
+  margin-left: 10px;
+  border-color: #bbbbbb;
+  background-color: #fff;
+  color: #424242;
+  padding-left: 32px;
+}
+
+.topic-non-member:hover {
+  border-color: #28a745;
+  background-color: #28a745;
+  color: #fff;
+  transition: 0.15s ease-in-out;
+}
+
+.topic-icon {
+  margin-top: 2px;
+  opacity: 0;
+  float: right;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #000;
+  text-shadow: 0 1px 0 #fff;
+  padding-left: 8px;
+}
+
+.topic-member:hover .topic-icon {
+  color: white;
+  opacity: 100;
+}
+
+.topic-non-member:hover .topic-icon {
+  color: white;
+  opacity: 100;
+}
+
+.topic-label {
+  border-radius: 0;
+  display: inline-flex;
+  margin-bottom: 8px;
+  margin-right: 4px;
+  font-weight: 100;
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  background: #F9F7F4;
+}
+
+.topic-label * {
+  pointer-events: none;
+}
+
+.topic-label.active {
+  background: #fab1a0;
+}
+
+.topic-label:hover {
+  background: #fab1a0;
+}
+
+.topic-label.active:hover {
+  /*background: #F9F7F4;*/
+}
+
+.nonmember {
+  display: none;
 }
 
 .all-filters {

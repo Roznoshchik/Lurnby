@@ -60,48 +60,32 @@
         
         <div class="lurnby_data_group">
           <h6 class="inline-block"> Topics:</h6> 
-          <span class="inline-button" id="new-topic">
+          <!-- <span class="inline-button" id="new-topic">
             <button type = "button" onclick="UpdateNewTopic()" class="main-button save">
               Create new topic
             </button>
-          </span>
+          </span> -->
+          <div class = "inline-block lurnby-filter">
+            <div class="autocomplete">
+                <div class="filter_form" >
+                    <input id = "topic_input" type="text" placeholder="add to topic ..."> 
+                </div>
+            </div>
+          </div>
+
           <br>
+        
           <span id="Members" class="topics-group">
             {% for m in member %}
-            <label class="btn active topic-label upd-topic-label" id="topic{{ m.id }}">
-              <input name="members" type="checkbox" checked value="{{m.title}}">
-                {{m.title}}
-              </label>
+            <span id="member-topic{{m.title}}" class= "topic member">{{m.title}}</span>
+        
             {% endfor %}
-            {% for n in nonmember %}
-            <label class="btn topic-label upd-topic-label" id="topic{{ n.id }}">
-              <input name="nonmembers" type="checkbox" checked value="{{n.title}}">
-                {{n.title}}
-              </label>
-            {% endfor %}
+   
           </span>
          
         </div>
     
-        <!-- <div class="lurnby_data_group article_data_group">
-
-          <h6 class="inline-block">Tags:</h6>
-          <span class="inline-button" id="add_new_tag">
-            <button type = "button" onclick="add_tag_start('update-highlight')" class="main-button add_new">Add New</button>
-          </span><br>
-          
-          <span id="tags">
-            <span id="new_tags"></span>
-            {% for tag in highlight.tags %}
-            <label class="tagged update-highlight"><input type="checkbox" name="tags" checked
-                value="{{tag.name}}"></input>{{tag.name}}</label>
-            {% endfor %}
-            {% for tag in highlight.not_in_tags(current_user) %}
-            <label class="untagged update-highlight"><input type="checkbox" name="untags" checked value="{{tag.name}}"></input>{{tag.name}}</label>
-            {% endfor %}
-          </span>
-        </div> -->
-
+      
       </form>
     </div>
 

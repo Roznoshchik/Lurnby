@@ -193,23 +193,19 @@ function initialize_view_topics(){
 
     
 function ViewHighlight(id){
+    url = '/view_highlight/' + id
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        $('#ViewHighlightModal').html(data['html']);
+        add_span = byId('new-topic');
+        add = byId('add_new_tag');
+        initialize();
+        initialize_view_topics();
+        autocomplete(byId("topic_input"), data['topics_list'], create=true)
+        $('#ViewHighlightModal').modal('toggle')
+    });
 
-    xhr = $.ajax(
-                '/view_highlight/' + id).done(
-                    function(data) {
-                        json = JSON.parse(data)
-                        
-                        xhr = null
-                        //$('#ViewHighlightModal').html(data);
-                        byId('ViewHighlightModal').innerHTML = json['html'] 
-                        add_span = byId('new-topic');
-                        add = byId('add_new_tag');
-
-                        initialize();
-                        initialize_view_topics();
-                        $('#ViewHighlightModal').modal('toggle')
-                    }
-    );
 
 }
 
