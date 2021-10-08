@@ -316,21 +316,39 @@ function initialize_view_topics(){
     }
 }
 
-function ShowViewHighlightModal(id){
-    xhr = $.ajax(
-                '/view_highlight/' + id).done(
-                    function(data) {
-                        xhr = null
-                        $('#ViewHighlightModal').html(data);
-                        add_span = byId('new-topic');
-                        add = byId('add_new_tag');
+// function ShowViewHighlightModal(id){
+//     xhr = $.ajax(
+//                 '/view_highlight/' + id).done(
+//                     function(data) {
+//                         xhr = null
+//                         $('#ViewHighlightModal').html(data);
+//                         add_span = byId('new-topic');
+//                         add = byId('add_new_tag');
 
-                        initialize();
-                        initialize_view_topics();
-                        $('#ViewHighlightModal').modal('toggle')
-                    }
-    );
+//                         initialize();
+//                         initialize_view_topics();
+//                         $('#ViewHighlightModal').modal('toggle')
+//                     } 
+//     );
+// }
+
+function ShowViewHighlightModal(id){
+    url = '/view_highlight/' + id
+    fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        $('#ViewHighlightModal').html(data['html']);
+        add_span = byId('new-topic');
+        add = byId('add_new_tag');
+        initialize();
+        initialize_view_topics();
+        $('#ViewHighlightModal').modal('toggle')
+    });
+
 }
+
+
+
 function ArchiveHighlight(id){
     byId(`highlight-${id}`).style.display = 'none'
     console.log('highlight hidden')
