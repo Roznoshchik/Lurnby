@@ -299,27 +299,27 @@
             </div>
             <div class="lurnby_data_group form-group skip-review">
               {{ form.do_not_review(class="form-control", id="do_not_review") }}
-              {{form.do_not_review.label('This highlight should not be reviewed')}}
-
-              
+              {{form.do_not_review.label('This highlight should not be reviewed')}}     
             </div>
 
-            <div style = "display: none;" class="lurnby_data_group topics-group" data-toggle="buttons">
-              <h6 class="inline-block">Topics:</h6><span  id="CreateTopic">
-                <button onclick ="NewTopic()" class="main-button save">
+            <div class="lurnby_data_group">
+              <h6 class="inline-block"> Topics:</h6> 
+              <!-- <span class="inline-button" id="new-topic">
+                <button type = "button" onclick="UpdateNewTopic()" class="main-button save">
                   Create new topic
                 </button>
-              </span><br>
-              <div class = "topics-all">
-                <span id = "topicplaceholder">
-                {% for topic in topics %}
-                <label id= "add_highlight_topic{{topic.id}}" class="topic-label btn">
-                  <input name = "topics" type="checkbox" value="{{topic.title}}">
-                  {{topic.title}}
-                </label>
-                {% endfor %}
+              </span> -->
+              <div class = "inline-block lurnby-filter">
+                <span id="NewHighlightMembers" class="topics-group">
                 </span>
+                <div class="autocomplete">
+                    <div class="filter_form" >
+                        <input id = "new_highlight_topic_input" type="text" placeholder="add to topic ..."> 
+                    </div>
+                </div>
               </div>
+    
+              <br>
             </div>
             <input  style = "display:none;" type="submit" value="Submit" disabled>
           </form>
@@ -346,6 +346,8 @@
 <script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
 <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='js/autocomplete.js' )}}"></script>
+
 
 
 <script>
@@ -355,6 +357,8 @@ var all_bookmarks = {{ bookmarks|safe }};
 var furthest = {{furthest}}; 
 var read_progress = {{progress}};
 var current_progress = read_progress 
+var topics = [ {% for t in topics %}'{{t.title}}',{% endfor %}]
+
 
 // show onboarding
 {% if current_user.highlights.filter_by(archived=False).count() == 0 %}
@@ -520,15 +524,13 @@ for(let i=0; i<tables.length; i++){
       notes = byId('message-text').value
       do_not_review = byId('do_not_review').checked
       topics = []
-      doctopics = byClass('topic-label')
+      doctopics = Array.from(byClass('add_highlight_member'))
       article_uuid = byId('article_uuid').value
       position = byId('highlight_position').value
 
-      for (var i = 0; i < doctopics.length; i++){
-        if (doctopics[i].classList.contains('active')){
-          topics.push(doctopics[i].firstElementChild.value)
-        }
-      }
+      doctopics.forEach(t => topics.push(t.innerText))
+      console.log(topics)
+      byId('NewHighlightMembers').innerHTML = ''
 
       var data = {
         text:text,
@@ -558,7 +560,7 @@ for(let i=0; i<tables.length; i++){
     function AddedHighlight(data){
       byId('do_not_review').checked = false;
       $('#AddHighlightModal').modal('hide');
-
+      topics = data['topics']
       var active = byClass('active')
       for (var i = active.length - 1; i>=0; i--){
         active[i].classList.remove('active')

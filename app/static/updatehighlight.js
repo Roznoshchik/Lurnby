@@ -1,6 +1,8 @@
 
 var add_span;
 var add;
+var nonmember_list;
+
 
 function UpdateNewTopic(){
 
@@ -149,46 +151,63 @@ function initialize_topics(){
 
 function initialize_view_topics(){
 
-    var all_topics = byClass('upd-topic-label')
-    
-    for (var i=0; i< all_topics.length; i++){
+    var all_topics = Array.from(byClass('member'))
+
+    console.log(all_topics)
+    all_topics.forEach( topic => topic.addEventListener("click", function(e){
+        e=e || window.event;
+        var target = e.target || e.srcElement;
+        byId(target.id).remove()
+        nonmember_list.push(topic.innerText)
+
+    }))
+
+
+    // for (var i=0; i< all_topics.length; i++){
+    //     title = all_topics[i].innerText
+    //     all_topics[i].addEventListener("click", function(e){
+    //         e=e || window.event;
+    //         var target = e.target || e.srcElement;
+    //         byId(target.id).remove()
+    //         nonmember_list.push(title)
+    //     })
         
-        if (all_topics[i].classList.contains('initialized')){
-            continue
-        }
-        else{
-            all_topics[i].classList.add('initialized');
-            all_topics[i].addEventListener("click", function(e){
-                //console.log('click registered')
-                e=e || window.event;
-                var target = e.target || e.srcElement;
+    //     if (all_topics[i].classList.contains('initialized')){
+    //         continue
+    //     }
+    //     else{
+    //         all_topics[i].classList.add('initialized');
+    //         all_topics[i].addEventListener("click", function(e){
+    //             //console.log('click registered')
+    //             e=e || window.event;
+    //             var target = e.target || e.srcElement;
                
-                //console.log(target.tagName)        
+    //             //console.log(target.tagName)        
 
                 
-                if (target.tagName === "LABEL"){
-                    /*
-                    if (target.classList.contains('active')){
-                        console.log('removing')
-                        target.classList.remove('active')
-                    }
+    //             if (target.tagName === "LABEL"){
+    //                 /*
+    //                 if (target.classList.contains('active')){
+    //                     console.log('removing')
+    //                     target.classList.remove('active')
+    //                 }
 
-                    else {
-                        console.log('adding')
-                        console.log(target.classList)
-                        target.classList.add("active");
-                        console.log(target.classList)
-                    }
-                    */
-                    console.log(target.firstElementChild.value)
-                    console.log(target.classList)
-                    target.classList.toggle('active')
-                    console.log(target.classList)
-                }
-            });
-        }
+    //                 else {
+    //                     console.log('adding')
+    //                     console.log(target.classList)
+    //                     target.classList.add("active");
+    //                     console.log(target.classList)
+    //                 }
+    //                 */
+    //                 console.log(target.firstElementChild.value)
+    //                 console.log(target.classList)
+    //                 target.classList.toggle('active')
+    //                 console.log(target.classList)
+    //             }
+    //         });
+    //     }
         
-    }
+    // }
 }
 
     
@@ -198,11 +217,13 @@ function ViewHighlight(id){
     .then(response => response.json())
     .then(data => {
         $('#ViewHighlightModal').html(data['html']);
+        nonmember_list = data['nonmember_list'];
+        console.log(nonmember_list)
         add_span = byId('new-topic');
         add = byId('add_new_tag');
         initialize();
         initialize_view_topics();
-        autocomplete(byId("topic_input"), data['topics_list'], create=true)
+        autocomplete(byId("topic_input"), nonmember_list, byId('Members'), create=true, 'viewhighlight');
         $('#ViewHighlightModal').modal('toggle')
     });
 
@@ -299,63 +320,65 @@ function UnarchiveHighlight(id){
 
 
     
-function UpdateHighlight(id){
-
-    
+function UpdateHighlight(id, review=false){
     $('#ViewHighlightModal').modal('hide')
-    
-    
     
     var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
     
 
     notes = byId('view_highlight_notes').value
     highlight = byId('view_highlight_text').value
+    console.log(highlight)
+    untopics = nonmember_list
+    topics = []
+    Array.from(byClass('member')).forEach(t => topics.push(t.innerText));
+    console.log(topics)
+
     
-    doc_tags= byClass('update-highlight')
-    tags=[]
-    untags=[]
-    for (var i = 0; i <doc_tags.length; i++){
-        if(doc_tags[i].classList.contains('tagged')){
-            tags.push(doc_tags[i].firstElementChild.value);
-        }
-        else {
-            untags.push(doc_tags[i].firstElementChild.value);
-        }
-    }
+    // doc_tags= byClass('update-highlight')
+    // tags=[]
+    // untags=[]
+    // for (var i = 0; i <doc_tags.length; i++){
+    //     if(doc_tags[i].classList.contains('tagged')){
+    //         tags.push(doc_tags[i].firstElementChild.value);
+    //     }
+    //     else {
+    //         untags.push(doc_tags[i].firstElementChild.value);
+    //     }
+    // }
 
 
-    doc_topics = byClass('upd-topic-label')
-    topics=[]
-    untopics=[]
+    // doc_topics = byClass('upd-topic-label')
+    // topics=[]
+    // untopics=[]
 
-    for (var i = 0; i < doc_topics.length; i++){
+    // for (var i = 0; i < doc_topics.length; i++){
 
-        console.log(i)
-        console.log(doc_topics[i].firstElementChild.value)
-        console.log('\n')
+    //     console.log(i)
+    //     console.log(doc_topics[i].firstElementChild.value)
+    //     console.log('\n')
         
-        if (doc_topics[i].classList.contains('active')){
-            topics.push(doc_topics[i].firstElementChild.value);
-        }
-        else {
-            untopics.push(doc_topics[i].firstElementChild.value);
-        }
-    }
+    //     if (doc_topics[i].classList.contains('active')){
+    //         topics.push(doc_topics[i].firstElementChild.value);
+    //     }
+    //     else {
+    //         untopics.push(doc_topics[i].firstElementChild.value);
+    //     }
+    // }
 
-    var a_tags = byClass('active-tags')
-    var a_topics = byClass('active-topics')
+    // var a_tags = byClass('active-tags')
+    // var a_topics = byClass('active-topics')
     
-    atags = []
-    atopics = []
+    // atags = []
+    // atopics = []
     
-    for (var i=0;i<a_tags.length;i++){
-      atags.push(a_tags[i].firstElementChild.value)
-    }
+    // for (var i=0;i<a_tags.length;i++){
+    //   atags.push(a_tags[i].firstElementChild.value)
+    // }
     
-    for (var i=0;i<a_topics.length;i++){
-      atopics.push(a_topics[i].firstElementChild.value)
-    }
+    // for (var i=0;i<a_topics.length;i++){
+    //   atopics.push(a_topics[i].firstElementChild.value)
+    // }
     
     topicspace = byId('topics_all')
     if (topicspace){
@@ -367,7 +390,7 @@ function UpdateHighlight(id){
             // 'tags':tags,
             // 'untags':untags,
             // 'atags':atags,
-            'atopics':atopics,
+            //'atopics':atopics,
             'topics-page':'true',
             'do_not_review': byId('do_not_review').checked
 
@@ -382,7 +405,7 @@ function UpdateHighlight(id){
             // 'tags':tags,
             // 'untags':untags,
             // 'atags':false,
-            'atopics':false,
+            //'atopics':false,
             'topics-page':'false',
             'do_not_review': byId('do_not_review').checked
         }
@@ -411,10 +434,10 @@ function UpdateHighlight(id){
             console.log(data)
         }
 
-        if (typeof apply_filters === "function") { 
-            console.log('apply filters exists')
-            apply_filters()
-        }
+        // if (typeof apply_filters === "function") { 
+        //     console.log('apply filters exists')
+        //     apply_filters()
+        // }
         
     }); 
 

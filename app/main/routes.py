@@ -877,7 +877,7 @@ def article(uuid):
         article.last_reviewed = datetime.utcnow()
         db.session.commit()
 
-        topics = Topic.query.filter_by(user_id=current_user.id, archived=False)
+        topics = Topic.query.filter_by(user_id=current_user.id, archived=False).order_by(Topic.last_used.desc()).all()
         content = article.content
         title = article.title
         progress = article.progress
@@ -1163,7 +1163,12 @@ def addhighlight():
 
     for t in topics:
         topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
-        newHighlight.AddToTopic(topic)
+        if topic:
+            newHighlight.AddToTopic(topic)
+        else:
+            newTopic = Topic(user_id=current_user.id, title=t, archived=False)
+            db.session.add(newTopic)
+            newHighlight.AddToTopic(newTopic)
 
     db.session.commit()
     newHighlight.position = "#" + str(newHighlight.id)
@@ -1175,7 +1180,8 @@ def addhighlight():
         'highlight_id': newHighlight.id,
         'highlight_text': newHighlight.text,
         'highlight_notes': newHighlight.note,
-        'article_url': article_url
+        'article_url': article_url,
+        'topics': [t.title for t in Topic.query.filter_by(user_id=current_user.id, archived=False).order_by(Topic.last_used.desc()).all()]
     })
 
 
@@ -1211,13 +1217,14 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
         topics_list = [t.title for t in Topic.query.filter_by(archived=False, user_id=current_user.id).all()]
+        nonmember_list = [t.title for t in nonmember]
         html = render_template('highlight.html', user=current_user,
                                highlight=highlight,
                                addtopicform=addtopicform, form=form,
                                member=member, nonmember=nonmember,
                                article_title=article_title, source=source,
                                source_url=source_url, inappurl=inappurl)
-        return (json.dumps({'html': html, 'topics_list':topics_list}),
+        return (json.dumps({'html': html,'nonmember_list':nonmember_list, 'topics_list':topics_list}),
                 200, {'ContentType': 'application/json'})
 
     if request.method == 'POST':
@@ -1229,18 +1236,25 @@ def view_highlight(id):
         highlight.do_not_review = data['do_not_review']
 
         members = data['topics']
+        print(members)
 
         for member in members:
             topic = Topic.query.filter_by(title=member,
                                           user_id=current_user.id).first()
-            highlight.AddToTopic(topic)
+            if topic:
+                highlight.AddToTopic(topic)
+            else:
+                t = Topic(user_id=current_user.id, title=member, archived=False)
+                db.session.add(t)
+                highlight.AddToTopic(t)
             
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:
             topic = Topic.query.filter_by(title=nonmember,
                                           user_id=current_user.id).first()
-            highlight.RemoveFromTopic(topic)
+            if topic:
+                highlight.RemoveFromTopic(topic)
             
 
         # tags = data['tags']
@@ -1395,51 +1409,6 @@ def unarchivehighlight(id):
 #                        #
 ##########################
 
-# @bp.route('/highlights2', methods=['GET', 'POST'])
-# @login_required
-# def highlights2():
-#     no_topics = current_user.highlights.filter_by(archived=False,
-#                                                   no_topics=True).all()
-#     with_topics = current_user.highlights.filter_by(archived=False,
-#                                                     no_topics=False).all()    
-#     articles_count = current_user.articles.filter_by(archived=False).count()
-#     topics_count = current_user.topics.filter_by(archived=False).count()
-#     highlights_count = current_user.highlights.filter_by(archived=False).count()
-#     tags_count = current_user.tags.count()
-#     topics = current_user.topics.filter_by(archived=False).all()
-
-#     if request.method == 'POST':
-#         data = json.loads(request.form['data'])
-#         no_topics = []
-#         with_topics = []
-#         if data['filters'] == []:
-#             no_topics = current_user.highlights.filter_by(archived=False,
-#                                                   no_topics=True).all()
-#             with_topics = current_user.highlights.filter_by(archived=False,
-#                                                     no_topics=False).all()
-#         else:
-#             for t in data['filters']:
-#                 topic = Topic.query.filter_by(title=t).first()
-#                 with_topics += topic.highlights.filter_by(archived=False).all()
-
-#             with_topics = list(set(with_topics))
-
-#         data = {
-#             'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
-#             'html': render_template('filter_highlights.html', no_topics=no_topics,
-#                             with_topics=with_topics),
-#             'highlights_count': len(with_topics)       
-#         }
-
-#         return json.dumps(data)
-
-
-#     return render_template('highlights.html', user=current_user, 
-#                            no_topics=no_topics, with_topics=with_topics, 
-#                            topics=topics, highlights_count=highlights_count)
-
-
-
 @bp.route('/highlights', methods=['GET', 'POST'])
 @login_required
 def highlights():
@@ -1449,9 +1418,11 @@ def highlights():
     filtered_count = total_count
     showing_count = '0 to 15'
     col = getattr(Highlight, "created_date")
+    topic_sort = getattr(Topic, "last_used").desc()
+
     highlights = query.order_by(col.desc()).paginate(1, 15, False).items
 
-    topics = current_user.topics.filter_by(archived=False).all()
+    topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
 
     if request.method == 'POST':
         data = json.loads(request.form['data'])
@@ -1469,15 +1440,19 @@ def highlights():
         
         # set desc order default
         col = getattr(Highlight, "created_date")
-        
+        topic_sort = getattr(Topic, "last_used").desc()
 
+        
+        all_user_topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
+        print(topics)
         # filter for topics
         if topics != []:
     
             topic_ids = []
             
             for t in topics:
-                topic = Topic.query.filter_by(title=t).first()
+                topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
+                all_user_topics.remove(topic)
                 topic_ids.append(topic.id)
 
             h_tid = highlights_topics.c.topic_id
@@ -1531,9 +1506,12 @@ def highlights():
             page = 1
 
         highlights = query.paginate(page, per_page, False)
+
+        print(highlights.items)
+
         
         data = {
-            'topics': [topic.title for topic in Topic.query.filter_by(archived=False).all()],
+            'topics': [topic.title for topic in all_user_topics],
             'html': render_template('filter_highlights.html', highlights=highlights.items, page=page),
             'filtered_count': filtered_count,
             'showing_count': showing_count,
@@ -2106,7 +2084,9 @@ def unarchivetopic(topic_id):
 
 @bp.route('/review', methods=['GET', 'POST'])
 def review():
-    topics = current_user.topics.filter_by(archived=False).all()
+
+    col = getattr(Topic, "last_used").desc()
+    topics = current_user.topics.filter_by(archived=False).order_by(col).all()
     highlights = current_user.highlights.filter_by(archived=False, do_not_review=False).all()
     tiers = order_highlights(highlights)
     empty = True
@@ -2123,10 +2103,22 @@ def review():
         highlights = []
         if data['filters'] != []:
             for t in data['filters']:
-                topic = Topic.query.filter_by(title=t).first()
+                topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
+                
                 highlights += topic.highlights.filter_by(archived=False).all()
-
+            
+            #print(highlights)
             highlights = list(set(highlights))
+            #print(highlights)
+            tiers = order_highlights(highlights)
+            #print(tiers)
+            empty = True
+            for i in range(8):
+                if len(tiers[i]) > 0:
+                    empty = False
+                    break
+        else:
+            highlights = current_user.highlights.filter_by(archived=False, do_not_review=False).all()  
             tiers = order_highlights(highlights)
             empty = True
             for i in range(8):

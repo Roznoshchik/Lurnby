@@ -19,7 +19,7 @@ def create_fake_highlights(n, u):
         t = Topic(user_id=u.id, title=title, archived=False)
         db.session.add(t)
     db.session.commit()
-    topics = Topic.query.all()
+    topics = Topic.query.filter_by(user_id = u.id).all()
 
 
     for i in range(n):

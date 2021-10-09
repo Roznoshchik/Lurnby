@@ -37,7 +37,7 @@
     background: #FFF79F;
     margin: 0px 4px 4px 0px;
 
-    &.filter, &.member {
+    &.filter, &.member, &.filter_highlight_member, &.add_highlight_member {
 
         &:hover{
             cursor: pointer;
@@ -70,6 +70,10 @@
     top: 100%;
     left: 0;
     right: 0;
+    max-height: 200px;
+    height: fit-content;
+    overflow: auto;
+
 }
 .autocomplete-items div {
     padding: 10px;

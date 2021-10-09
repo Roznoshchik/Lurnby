@@ -7954,12 +7954,12 @@ readers do not read off random characters that represent icons */
   background: #FFF79F;
   margin: 0px 4px 4px 0px;
 }
-.topic.filter:hover, .topic.member:hover {
+.topic.filter:hover, .topic.member:hover, .topic.filter_highlight_member:hover, .topic.add_highlight_member:hover {
   cursor: pointer;
   color: white;
   background-color: black;
 }
-.topic.filter:hover::after, .topic.member:hover::after {
+.topic.filter:hover::after, .topic.member:hover::after, .topic.filter_highlight_member:hover::after, .topic.add_highlight_member:hover::after {
   content: " x";
   color: red;
   font-weight: 900;
@@ -7981,6 +7981,9 @@ readers do not read off random characters that represent icons */
   top: 100%;
   left: 0;
   right: 0;
+  max-height: 200px;
+  height: fit-content;
+  overflow: auto;
 }
 
 .autocomplete-items div {

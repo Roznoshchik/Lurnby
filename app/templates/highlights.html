@@ -78,8 +78,7 @@
                 <div class="lurnby-filter">
                     <span id="visible_highlights_count"> Showing <span id="showing_count">{{showing_count}}</span> out of <span id="filtered_count"> {{filtered_count}}</span> highlights.</span>
                 </div>
-        
-            
+                <div id="active_filters" class = "lurnby-filter "></div>
                 <div class = "lurnby-filter">
                     <div class="autocomplete">
                         <div class="filter_form" >
@@ -115,6 +114,10 @@
 
 {% block JS %}
 <script type="text/javascript" src="{{url_for( 'static', filename='js/autocomplete.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
+
 <script>
     var page = 1
     var should_paginate = false
@@ -172,7 +175,7 @@
     })
     
 
-    autocomplete(document.getElementById("filter_input"), topics);
+    autocomplete(byId('filter_input'), topics, byId('active_filters'), create=false, 'filterhighlight');
 
     function export_method(){
         byId('export').innerHTML=`
@@ -227,7 +230,9 @@
         if(!should_paginate){
             page = 1
         }
-
+        filters = []
+        Array.from(byClass('filter_highlight_member')).forEach(t => filters.push(t.innerText))
+        console.log(filters)
         data = {
             'filters':filters,
             'search':byId('search').value,
@@ -261,7 +266,13 @@
                 byId('showing_count').innerHTML = '0'
             }
             else {
-                byId('export-button').classList.remove('hidden')
+                try {
+                    byId('export-button').classList.remove('hidden')
+                } 
+                catch (error) {
+                    console.log(error)
+                }
+                
                 
                 a.innerHTML = data['html']
                 
@@ -277,7 +288,7 @@
             
            
             topics = data['topics']
-            autocomplete(document.getElementById("filter_input"), topics);
+            autocomplete(byId("filter_input"),topics, byId('active_filters'), create=false, 'filterhighlight' );
         }); 
 
 
@@ -286,7 +297,5 @@
 </script>
 
 
-<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
-<script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
-<script type="text/javascript" src="{{url_for( 'static', filename='topic.js' )}}"></script>
+
 {% endblock %}

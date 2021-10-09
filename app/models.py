@@ -488,12 +488,12 @@ class Highlight(db.Model):
 
     # add highlight to topic
     def AddToTopic(self, topic):
-        if not self.is_added_topic(topic):
+        if not self.is_added_topic(topic) and topic.user_id == self.user_id:
             self.topics.append(topic)
 
     # remove highlight from topic
     def RemoveFromTopic(self, topic):
-        if self.is_added_topic(topic):
+        if self.is_added_topic(topic) and topic.user_id == self.user_id:
             self.topics.remove(topic)
 
     # checks if a highlight is in a topic
@@ -520,18 +520,18 @@ class Highlight(db.Model):
         q = db.session.query(
             Topic).filter(
                 ~Topic.id.in_(sub)).filter_by(
-                    user_id=user.id, archived=False).all()
+                    user_id=user.id, archived=False).order_by(Topic.last_used.desc()).all()
 
         return q
 
     # add highlight to tag
     def AddToTag(self, tag):
-        if not self.is_added_tag(tag):
+        if not self.is_added_tag(tag) and tag.user_id == self.user_id:
             self.tags.append(tag)
 
     # remove highlight from tag
     def RemoveFromTag(self, tag):
-        if self.is_added_tag(tag):
+        if self.is_added_tag(tag) and tag.user_id == self.user_id:
             self.tags.remove(tag)
 
     # checks if an highlight is in a tag

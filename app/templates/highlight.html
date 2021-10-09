@@ -66,6 +66,13 @@
             </button>
           </span> -->
           <div class = "inline-block lurnby-filter">
+            <span id="Members" class="topics-group">
+              {% for m in member %}
+              <span id="member-topic{{m.title}}" class= "topic member">{{m.title}}</span>
+          
+              {% endfor %}
+     
+            </span>
             <div class="autocomplete">
                 <div class="filter_form" >
                     <input id = "topic_input" type="text" placeholder="add to topic ..."> 
@@ -75,13 +82,7 @@
 
           <br>
         
-          <span id="Members" class="topics-group">
-            {% for m in member %}
-            <span id="member-topic{{m.title}}" class= "topic member">{{m.title}}</span>
-        
-            {% endfor %}
-   
-          </span>
+         
          
         </div>
     
