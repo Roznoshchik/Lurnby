@@ -1165,10 +1165,13 @@ def addhighlight():
         topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()
         if topic:
             newHighlight.AddToTopic(topic)
+            topic.last_used = datetime.utcnow()
         else:
             newTopic = Topic(user_id=current_user.id, title=t, archived=False)
             db.session.add(newTopic)
             newHighlight.AddToTopic(newTopic)
+            newTopic.last_used = datetime.utcnow()
+
 
     db.session.commit()
     newHighlight.position = "#" + str(newHighlight.id)
@@ -1243,10 +1246,13 @@ def view_highlight(id):
                                           user_id=current_user.id).first()
             if topic:
                 highlight.AddToTopic(topic)
+                topic.last_used = datetime.utcnow()
             else:
                 t = Topic(user_id=current_user.id, title=member, archived=False)
                 db.session.add(t)
                 highlight.AddToTopic(t)
+                topic.last_used = datetime.utcnow()
+
             
 
         nonmembers = data['untopics']
