@@ -323,117 +323,44 @@ function UnarchiveHighlight(id){
 function UpdateHighlight(id, review=false){
     $('#ViewHighlightModal').modal('hide')
     
-    var doc_tags,tags,untags, doc_topics, topics, untopics, notes, highlight, topicspace
+    var doc_tags,tags,untags, doc_topics, activetopics, untopics, notes, highlight, topicspace
     
 
     notes = byId('view_highlight_notes').value
     highlight = byId('view_highlight_text').value
     console.log(highlight)
     untopics = nonmember_list
-    topics = []
-    Array.from(byClass('member')).forEach(t => topics.push(t.innerText));
-    console.log(topics)
+    activetopics = []
+    Array.from(byClass('member')).forEach(t => activetopics.push(t.innerText));
+    console.log(activetopics)
 
     
-    // doc_tags= byClass('update-highlight')
-    // tags=[]
-    // untags=[]
-    // for (var i = 0; i <doc_tags.length; i++){
-    //     if(doc_tags[i].classList.contains('tagged')){
-    //         tags.push(doc_tags[i].firstElementChild.value);
-    //     }
-    //     else {
-    //         untags.push(doc_tags[i].firstElementChild.value);
-    //     }
-    // }
-
-
-    // doc_topics = byClass('upd-topic-label')
-    // topics=[]
-    // untopics=[]
-
-    // for (var i = 0; i < doc_topics.length; i++){
-
-    //     console.log(i)
-    //     console.log(doc_topics[i].firstElementChild.value)
-    //     console.log('\n')
-        
-    //     if (doc_topics[i].classList.contains('active')){
-    //         topics.push(doc_topics[i].firstElementChild.value);
-    //     }
-    //     else {
-    //         untopics.push(doc_topics[i].firstElementChild.value);
-    //     }
-    // }
-
-    // var a_tags = byClass('active-tags')
-    // var a_topics = byClass('active-topics')
     
-    // atags = []
-    // atopics = []
-    
-    // for (var i=0;i<a_tags.length;i++){
-    //   atags.push(a_tags[i].firstElementChild.value)
-    // }
-    
-    // for (var i=0;i<a_topics.length;i++){
-    //   atopics.push(a_topics[i].firstElementChild.value)
-    // }
-    
-    topicspace = byId('topics_all')
-    if (topicspace){
-        data = {
-            'notes': notes,
-            'highlight':highlight,
-            'topics':topics,
-            'untopics':untopics,
-            // 'tags':tags,
-            // 'untags':untags,
-            // 'atags':atags,
-            //'atopics':atopics,
-            'topics-page':'true',
-            'do_not_review': byId('do_not_review').checked
-
-        }
+    data = {
+        'notes': notes,
+        'highlight':highlight,
+        'topics':activetopics,
+        'untopics':untopics,
+        // 'tags':tags,
+        // 'untags':untags,
+        // 'atags':false,
+        //'atopics':false,
+        'topics-page':'false',
+        'do_not_review': byId('do_not_review').checked
     }
-    else {
-        data = {
-            'notes': notes,
-            'highlight':highlight,
-            'topics':topics,
-            'untopics':untopics,
-            // 'tags':tags,
-            // 'untags':untags,
-            // 'atags':false,
-            //'atopics':false,
-            'topics-page':'false',
-            'do_not_review': byId('do_not_review').checked
-        }
-    }
+    
     
     data = JSON.stringify(data)
     console.log(data)
        
     url = '/view_highlight/' + id
-    topicspace = byId('topics_all')
-        if (topicspace){
-            topicspace.innerHTML=`
-                <div class = "loading">
-                    <p>Loading...</p>
-                    <svg xmlns="http://www.w3.org/2000/svg" style="margin:auto;background:0 0" width="64" height="64" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" display="block"><circle cx="50" cy="50" fill="none" stroke="#e3e3e3" stroke-width="5" r="32" stroke-dasharray="150.79644737231007 52.26548245743669" transform="rotate(144.01 50 50)"><animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50" keyTimes="0;1"/></circle></svg>
-                </div>
-            `
-        }
-        
+    
     $.post(url, {
         'data':data
     }).done(function( data ) {
-        if (topicspace){
-            topicspace.innerHTML = data;
-            initialize();
-            console.log(data)
-        }
-
+        data = JSON.parse(data)
+        topics = data['topics']
+        console.log(topics)
         // if (typeof apply_filters === "function") { 
         //     console.log('apply filters exists')
         //     apply_filters()

@@ -1239,7 +1239,6 @@ def view_highlight(id):
         highlight.do_not_review = data['do_not_review']
 
         members = data['topics']
-        print(members)
 
         for member in members:
             topic = Topic.query.filter_by(title=member,
@@ -1263,27 +1262,14 @@ def view_highlight(id):
                 highlight.RemoveFromTopic(topic)
             
 
-        # tags = data['tags']
-
-        # for tag in tags:
-        #     t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-        #     if not t:
-        #         t = Tag(name=tag, archived=False, user_id=current_user.id)
-        #         db.session.add(t)
-
-        #     highlight.AddToTag(t)
-
-        # untags = data['untags']
-        # for tag in untags:
-        #     t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
-        #     highlight.RemoveFromTag(t)
-
         if highlight.topics.count() == 0:
             highlight.no_topics = True
         else:
             highlight.no_topics = False
         
         db.session.commit()
+        
+        topics_list = [t.title for t in current_user.topics.order_by(Topic.last_used.desc()).all()]
 
         # checks to see if the update highlight request is on the topics page
         if (data['topics-page'] == 'true'):
@@ -1327,7 +1313,7 @@ def view_highlight(id):
                 else:
                     topics = Topic.query.filter_by(archived=False,
                                                    user_id=current_user.id
-                                                   ).all()
+                                                   ).order_by(Topic.last_used.desc()).all()
 
                 notopics = []
 
@@ -1374,7 +1360,7 @@ def view_highlight(id):
                                    topics=topics, highlights=highlights,
                                    notopics=notopics)
 
-        return (json.dumps({'success': True}),
+        return (json.dumps({'success': True, 'topics':topics_list}),
                 200, {'ContentType': 'application/json'})
 
 
