@@ -1251,7 +1251,7 @@ def view_highlight(id):
                 t = Topic(user_id=current_user.id, title=member, archived=False)
                 db.session.add(t)
                 highlight.AddToTopic(t)
-                topic.last_used = datetime.utcnow()
+                t.last_used = datetime.utcnow()
 
             
 
