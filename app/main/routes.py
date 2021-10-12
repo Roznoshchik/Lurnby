@@ -2130,6 +2130,18 @@ def review():
 
     return render_template('review.html', topics=topics, tiers=tiers, days=days, empty=empty)
 
+@bp.route('/review/settings', methods=['POST'])
+def update_review_settings():
+    data = json.loads(request.data)
+    count = data['count']
+    current_user.review_count = count
+    db.session.commit()
+
+    return (json.dumps({'success': True}),
+                200, {'ContentType': 'application/json'})
+
+
+
 @bp.route('/tier/<id>', methods=['POST'])
 def tier(id):
     highlight = Highlight.query.filter_by(id=id).first()

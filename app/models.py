@@ -48,6 +48,7 @@ class User(UserMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
+    review_count = db.Column(db.Integer, default=5)
 
     def __repr__(self):
         return '<User {}>'.format(self.email)

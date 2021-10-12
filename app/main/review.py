@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import random
+from flask_login import current_user
 
 # 0 - 1 day
 # 1 - 3 days
@@ -54,38 +55,39 @@ def order_highlights(highlights):
     
     #highlights = user.highlights.filter_by(archived=False).all()
     random.shuffle(highlights)
+    count = current_user.review_count
 
     for h in highlights:
         if h.review_schedule == 0:
-            if len(tier0) < 10:
+            if len(tier0) < count:
                 if check_for_review(h, h.review_schedule):
                     tier0.append(h)
         if h.review_schedule == 1:
-            if len(tier1) < 10:
+            if len(tier1) < count:
                 if check_for_review(h, h.review_schedule):
                     tier1.append(h)
         if h.review_schedule == 2:
-            if len(tier2) < 10:
+            if len(tier2) < count:
                 if check_for_review(h, h.review_schedule):
                     tier2.append(h)
         if h.review_schedule == 3:
-            if len(tier3) < 10:
+            if len(tier3) < count:
                 if check_for_review(h, h.review_schedule):
                     tier3.append(h)
         if h.review_schedule == 4:
-            if len(tier4) < 10:
+            if len(tier4) < count:
                 if check_for_review(h, h.review_schedule):
                     tier4.append(h)
         if h.review_schedule == 5:
-            if len(tier5) < 10:
+            if len(tier5) < count:
                 if check_for_review(h, h.review_schedule):
                     tier5.append(h)
         if h.review_schedule == 6:
-            if len(tier6) < 10:
+            if len(tier6) < count:
                 if check_for_review(h, h.review_schedule):
                     tier6.append(h)
         if h.review_schedule == 7:
-            if len(tier7) < 10:
+            if len(tier7) < count:
                 if check_for_review(h, h.review_schedule):
                     tier7.append(h)
     
