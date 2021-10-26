@@ -794,19 +794,19 @@ def bg_add_article():
 def process_article(task_id, a_id):
     process = Task.query.get(task_id)
 
-    query = current_user.articles.filter_by(archived=False)
-    col = getattr(Article, "date_read")
-    col = col.desc()
-    articles = query.order_by(col).all()
-    count = query.count()
-    showing = f'Showing {count} out of {count} articles.'
-    html = render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
-
 
     # return (json.dumps({'html': 'success'}), 200, {'ContentType': 'application/json'})
     for i in range(25):
         time.sleep(1)
         if process.complete:
+            query = current_user.articles.filter_by(archived=False)
+            col = getattr(Article, "date_read")
+            col = col.desc()
+            articles = query.order_by(col).all()
+            count = query.count()
+            showing = f'Showing {count} out of {count} articles.'
+            html = render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
+
             # delete object from amazon
             s3.delete_object(
                 Bucket = bucket,

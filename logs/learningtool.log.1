@@ -1,13 +1,21 @@
 Unhandled exception
 Traceback (most recent call last):
-  File "./app/tasks.py", line 237, in set_images_lazy
-    art = Article.query.get(a.id)
-  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 287, in __get__
-    return self.impl.get(instance_state(instance), dict_)
-  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/attributes.py", line 718, in get
-    value = state._load_expired(state, passive)
-  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/state.py", line 652, in _load_expired
-    self.manager.deferred_scalar_loader(self, toload)
-  File "/Users/rr/Desktop/RR/code/LearnBetter/venv/lib/python3.6/site-packages/sqlalchemy/orm/loading.py", line 946, in load_scalar_attributes
-    "attribute refresh operation cannot proceed" % (state_str(state))
-sqlalchemy.orm.exc.DetachedInstanceError: Instance <Article at 0x104cc9da0> is not bound to a Session; attribute refresh operation cannot proceed (Background on this error at: http://sqlalche.me/e/bhk3)
+  File "/Users/rr/Desktop/code/LearnBetter/./app/tasks.py", line 176, in bg_add_article
+    pdf = importPDF(path, u)
+  File "/Users/rr/Desktop/code/LearnBetter/./app/main/pdf.py", line 93, in importPDF
+    s3.upload_file(
+  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.9/site-packages/boto3/s3/inject.py", line 129, in upload_file
+    return transfer.upload_file(
+  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.9/site-packages/boto3/s3/transfer.py", line 279, in upload_file
+    future.result()
+  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.9/site-packages/s3transfer/futures.py", line 106, in result
+    return self._coordinator.result()
+  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.9/site-packages/s3transfer/futures.py", line 260, in result
+    self._done_event.wait(MAXINT)
+  File "/usr/local/Cellar/python@3.9/3.9.6/Frameworks/Python.framework/Versions/3.9/lib/python3.9/threading.py", line 574, in wait
+    signaled = self._cond.wait(timeout)
+  File "/usr/local/Cellar/python@3.9/3.9.6/Frameworks/Python.framework/Versions/3.9/lib/python3.9/threading.py", line 312, in wait
+    waiter.acquire()
+  File "/Users/rr/Desktop/code/LearnBetter/venv/lib/python3.9/site-packages/rq/timeouts.py", line 63, in handle_death_penalty
+    raise self._exception('Task exceeded maximum timeout value '
+rq.timeouts.JobTimeoutException: Task exceeded maximum timeout value (180 seconds)
