@@ -292,16 +292,22 @@
                 }
             }
         });
-    </script>
-      
-     
-      <script>
+        
+        function create_alert(type, message){
+          var alert = document.createElement('div')
+          alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', type)
+          alert.setAttribute('role', 'alert')
+          alert.innerHTML = message
+          return alert
+        }
+
+
         function rrtoggle() {
 
         var rr = document.getElementById('rrface')
         var title = document.getElementById('rrtitle')
 
-        title.innerHTML = "... loading ..."
+        title.innerHTML = "... Hello old friend! It's really good to see you once again ..."
         rr.classList.toggle('star')
         }
 

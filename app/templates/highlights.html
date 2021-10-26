@@ -201,27 +201,27 @@
             'data':JSON.stringify(data)
         }).done(function(data){
             data = JSON.parse(data)
-            byId('flashMessages').innerHTML=`
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
+            alert = create_alert('alert-success',`
               <ul>
                 <li>${data['msg']}</li>
               </ul>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
-            </div>`
+            `)
+            byId('flashMessages').appendChild(alert)
             byId('export').innerHTML=`<button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>`
         }).fail(function(data){
             data = JSON.parse(data)
-            byId('flashMessages').innerHTML=`
-            <div class="alert alert-error alert-dismissible fade show" role="alert">
+            alert = create_alert('alert-danger',`
               <ul>
                   <li>${data['msg']}</li>
               </ul>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
-            </div>`
+            `)
+            byId('flashMessages').appendChild(alert)
             byId('export').innerHTML=`<button id="export-button" class="main-button hidden" onclick="export_method()">Export these highlights</button>`
         }); 
     }

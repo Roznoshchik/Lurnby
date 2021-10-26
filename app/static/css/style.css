@@ -155,29 +155,6 @@ body, #base-main {
   padding-left: 0;
 }
 
-#flashMessages {
-  position: fixed;
-  top: 52px;
-  right: 0;
-  left: 0;
-  z-index: 1030;
-  padding: 8px;
-  display: flex;
-  justify-content: center;
-}
-#flashMessages .alert {
-  width: 90vw;
-  margin: 44px auto;
-}
-#flashMessages .alert ul {
-  list-style-type: none;
-}
-#flashMessages .close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-}
-
 /* filter styles */
 .filter-dropdown svg {
   pointer-events: none;
@@ -8342,6 +8319,65 @@ readers do not read off random characters that represent icons */
   .pagination {
     padding-right: 0;
   }
+}
+
+#flashMessages {
+  position: fixed;
+  top: 52px;
+  right: 0;
+  left: 0;
+  z-index: 1030;
+  padding: 8px;
+  display: flex;
+  justify-content: center;
+}
+#flashMessages .alert, #flashMessages .alert-dismissable {
+  display: flex;
+  margin: 44px 20px 44px auto;
+  justify-content: space-between;
+  max-width: 350px;
+  width: auto;
+  min-width: 250px;
+  padding: 1.25rem;
+  background-color: #fff;
+  border-radius: 6px;
+  border: none;
+  box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+}
+#flashMessages .alert .close, #flashMessages .alert-dismissable .close {
+  position: unset;
+  padding: 0;
+  display: block;
+  height: 24px;
+  margin-left: 16px;
+}
+#flashMessages .alert ul, #flashMessages .alert-dismissable ul {
+  padding: 0;
+}
+#flashMessages .alert .main-button, #flashMessages .alert-dismissable .main-button {
+  display: block;
+  margin-left: 0;
+  margin-top: 8px;
+  border: #424242 1px solid;
+  text-align: center;
+  width: 100%;
+}
+#flashMessages .alert.alert-danger, #flashMessages .alert-dismissable.alert-danger {
+  color: #424242;
+}
+#flashMessages .alert.alert-danger::before, #flashMessages .alert-dismissable.alert-danger::before {
+  content: url(../images/error.svg);
+  margin-right: 16px;
+}
+#flashMessages .alert.alert-success, #flashMessages .alert-dismissable.alert-success {
+  color: #424242;
+}
+#flashMessages .alert.alert-success::before, #flashMessages .alert-dismissable.alert-success::before {
+  content: url(../images/success.svg);
+  margin-right: 16px;
+}
+#flashMessages .alert ul, #flashMessages .alert-dismissable ul {
+  list-style-type: none;
 }
 
 /*# sourceMappingURL=style.css.map */

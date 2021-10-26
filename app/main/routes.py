@@ -1117,7 +1117,7 @@ def archiveArticle(uuid):
         db.session.commit()
         flash('Article has been archived. <a href="' +
               url_for('main.unarchiveArticle', uuid=uuid) +
-              '"  class="alert-link">UNDO</a>', 'error')
+              '"  class="main-button ">UNDO</a>', 'error')
 
         return redirect(url_for('main.articles'))
     else:

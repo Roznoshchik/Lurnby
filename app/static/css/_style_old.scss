@@ -132,36 +132,6 @@ body, #base-main {
   padding-left: 0;
 }
 
-#flashMessages{
-  position: fixed;
-  top: 52px;
-  right: 0;
-  left: 0;
-  z-index: 1030;
-  padding: 8px;
-  display: flex;
-  justify-content: center;
-  
-
-  .alert {
-    width: 90vw;
-    margin: 44px auto;
-    ul {
-      list-style-type: none;
-    }
-  }
-
-  .close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-  }
-
-}
-
-
-
-
 
 /* filter styles */
 

@@ -1,0 +1,75 @@
+#flashMessages{
+    position: fixed;
+    top: 52px;
+    right: 0;
+    left: 0;
+    z-index: 1030;
+    padding: 8px;
+    display: flex;
+    justify-content: center;
+    
+  
+    .alert, .alert-dismissable {
+        display:flex;
+        margin: 44px 20px 44px auto;
+        justify-content: space-between;
+        max-width: 350px;
+        width: auto;
+        min-width: 250px;
+        padding: 1.25rem;
+        background-color: #fff;
+        //color: #4a4a4a;
+        border-radius: 6px;
+        border: none;
+        box-shadow:0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
+        
+        .close {
+              position: unset;
+              padding: 0;
+            //   margin-left: 4px;
+            //   top: 12px;
+            //   right: 12px;
+                display: block;
+                height: 24px;
+                margin-left: 16px;
+                
+        }
+
+        ul{
+            padding: 0;
+        }
+        
+        .main-button {
+            display: block;
+            margin-left: 0;
+            margin-top:8px;
+            border: $dark 1px solid;
+            text-align: center;
+            width: 100%;
+        }
+
+
+        &.alert-danger {
+            &::before{ 
+                content: url(../images/error.svg);
+                margin-right: 16px;
+            } 
+            color:$dark;
+        }
+
+        &.alert-success {
+            &::before{ 
+                content: url(../images/success.svg);
+                margin-right: 16px;
+            } 
+            color:$dark;
+        }
+        
+        ul {
+            list-style-type: none;
+        }
+    }
+  
+    
+  
+  }

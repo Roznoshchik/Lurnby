@@ -255,18 +255,17 @@ function ArchiveHighlight(id){
     url = 'archivehighlight/'+id
     $.get(url)
     .done(function(){
-        byId('flashMessages').innerHTML=`
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        alert = create_alert('alert-danger',`
         <ul>
         <li>
-            Highlight has been deleted. <button type="button" data-dismiss="alert" onclick="UnarchiveHighlight(${id})"class="main-button save cancel">UNDO</button>
+            Highlight has been deleted. <button type="button" data-dismiss="alert" onclick="UnarchiveHighlight(${id})"class="main-button ">UNDO</button>
         </li>
         </ul>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      `
+      `)
+        byId('flashMessages').appendChild(alert)
     });
 
     }
@@ -300,8 +299,7 @@ function UnarchiveHighlight(id){
     .done(function(){
         byId(`highlight-${id}`).style.display = 'block'
 
-        byId('flashMessages').innerHTML=`
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        alert=create_alert('alert-success',`
         <ul>
         <li>
             Highlight has been unarchived.
@@ -310,8 +308,8 @@ function UnarchiveHighlight(id){
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>
-      `
+      `)
+      byId('flashMessages').appendChild(alert)
     });
     
 }

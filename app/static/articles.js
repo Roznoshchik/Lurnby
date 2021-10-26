@@ -136,6 +136,8 @@ function add_manual(){
     byId('title_add').focus()
 }
 
+
+
 function add_new_article(){
 
     var title='none', source='none', tags=[], notes='', content='none', url='none', epub='none', pdf='none', doc_tags; 
@@ -213,34 +215,32 @@ function add_new_article(){
             response.text().then(function(text){
                 data = JSON.parse(text)
                 byId('articles_page').innerHTML = data['html'];
-                var alert = document.createElement('div')
-                alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', 'alert-danger')
-                alert.setAttribute('role', 'alert')
+              
 
                 if (data['not_epub']){
-                    alert.innerHTML = `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    alert = create_alert('alert-danger', `Only .epub files are accepted.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
-                                        </button>`      
+                                        </button>`)      
                 }
                 if (data['not_pdf']){
-                    alert.innerHTML = `That didn't seem to be a pdf file.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    alert = create_alert('alert-danger', `That didn't seem to be a pdf file.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
-                                        </button>`       
+                                        </button>`)       
                 }
                 if (data['bad_url']){
-                    alert.innerHTML = `Please check the url and try again.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    alert = create_alert('alert-danger', `Please check the url and try again.<button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
-                                        </button>`
+                                        </button>`)
                 }
                 if (data['manual_fail']){
-                    alert.innerHTML = `Something went wrong, please try again. <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    alert = create_alert('alert-danger', `<ul><li>Something went wrong, please try again.</li></ul> <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
-                                        </button>`
+                                        </button>`)
                 }
                 if (data['no_article']){
-                    alert.innerHTML = `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    alert = create_alert('alert-danger', `Something went wrong, please try again.  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
-                                        </button>`
+                                        </button>`)
                 }
                 var flash = byId('flashMessages')
                 flash.appendChild(alert);  
@@ -266,13 +266,11 @@ function add_new_article(){
         if (!data['processing']){
             byId('articles_page').innerHTML = data['html'];
             initialize_articles_page()
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+           
+            alert = create_alert('alert-success', `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
-            `
+            `)
             var flash = byId('flashMessages')
             flash.appendChild(alert);
 
@@ -341,13 +339,10 @@ function article_processing(taskID, a_id){
         else {
             byId('articles_page').innerHTML = data['html'];
 
-            var alert = document.createElement('div')
-            alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
-            alert.setAttribute('role', 'alert')
-            alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            alert = create_alert('alert-success',`Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
             </button>
-            `
+            `)
 
             var flash = byId('flashMessages')
             flash.appendChild(alert);
@@ -515,14 +510,11 @@ function AddSuggestion(){
     .then(response => response.json())
     .then(result => {
         byId('articles_page').innerHTML = result['content'];
-        
-        var alert = document.createElement('div')
-        alert.classList.add('main-alert','fade','show', 'alert','alert-dismissable', 'alert-success')
-        alert.setAttribute('role', 'alert')
-        alert.innerHTML = `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    
+        alert = create_alert('alert-success', `Article added! <button type="button" class="close" data-dismiss="alert" aria-label="Close">
         <span aria-hidden="true">&times;</span>
         </button>
-     `
+     `)
         var flash = byId('flashMessages')
         flash.appendChild(alert);
     
@@ -552,26 +544,27 @@ function export_highlights(id, ext){
         'data':JSON.stringify(data)
     }).done(function(data){
         data = JSON.parse(data)
-        byId('flashMessages').innerHTML=`
-        <div class="alert alert-info alert-dismissible fade show" role="alert">
+        alert = create_alert('alert-success',`
         <ul>
             <li>${data['msg']}</li>
         </ul>
         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
-      </div>`
+      `)
+      byId('flashMessages').appendChild(alert)
     }).fail(function(data){
         data = JSON.parse(data)
-        byId('flashMessages').innerHTML=`
-        <div class="alert alert-error alert-dismissible fade show" role="alert">
+        alert = create_alert('alert-error',`
           <ul>
               <li>${data['msg']}</li>
           </ul>
           <button type="button" class="close" data-dismiss="alert" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
-        </div>`
+       `)
+        byId('flashMesssages').appendChild(alert)
+
     }); ; 
 }
     
