@@ -5,7 +5,16 @@
 {% endblock %}
 
 {% block dash %}
+<div class = "dashboard_content">
+    <div class = "dashboard_item">
+        <p>{{daily_active}} daily active users </p>
+        <p>{{monthly_active}} monthly active users </p>
+    </div>
+</div>
+
 <div class="dashboard_content">
+
+
     {% for user in users %}
     <div class = "dashboard_item">
         <div class="">

@@ -56,9 +56,8 @@ def articles():
         db.session.add(ev)
         db.session.commit()
     
-    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
-    thirty_days_ago = today_start - timedelta(days=30)
-    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= thirty_days_ago).count()
+    month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
+    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= month_start).count()
 
 
     query = current_user.articles.filter_by(archived=False)
@@ -487,9 +486,18 @@ def user_dashboard():
         db.session.commit()
 
     users = data_dashboard()
+    
+    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
+    month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
+    daily_active = Event.query.filter(Event.date >= today_start).distinct(Event.user_id).group_by(Event.user_id).count()
+
+    monthly_active = Event.query.filter(Event.date >= month_start).distinct(Event.user_id).group_by(Event.user_id).count()
+
+
 
     return render_template('dashboard/user_dash.html', user=current_user,
-                           users=users)
+                           users=users, daily_active=daily_active,
+                           monthly_active = monthly_active)
 
 
 @bp.route('/app_dashboard/suggestions', methods=['GET', 'POST'])
@@ -1405,9 +1413,8 @@ def unarchivehighlight(id):
 @bp.route('/highlights', methods=['GET', 'POST'])
 @login_required
 def highlights():
-    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
-    thirty_days_ago = today_start - timedelta(days=30)
-    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= thirty_days_ago).count()
+    month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
+    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= month_start).count()
 
 
     query = Highlight.query.filter_by(user_id=current_user.id, archived=False)

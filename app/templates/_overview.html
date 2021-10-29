@@ -53,11 +53,11 @@
                 </div>
             {% elif review_streak == 1 %}
                 <div class = "data-item">
-                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlight reviewed in the last 30 days</a>
+                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlight reviewed this month</a>
                 </div>
             {% else %}
                 <div class = "data-item">
-                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlights reviewed in the last 30 days</a>
+                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlights reviewed this month</a>
                 </div>
             {% endif %}
 
