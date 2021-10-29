@@ -32,7 +32,7 @@ from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date, timedelta
 import time
-from sqlalchemy import desc
+from sqlalchemy import desc, or_
 
 from werkzeug.utils import secure_filename
 
@@ -489,9 +489,12 @@ def user_dashboard():
     
     today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
-    daily_active = Event.query.filter(Event.date >= today_start).distinct(Event.user_id).group_by(Event.user_id).count()
+    # daily_active = Event.query.filter(Event.date >= today_start).distinct(Event.user_id).group_by(Event.user_id).count()
 
-    monthly_active = Event.query.filter(Event.date >= month_start).distinct(Event.user_id).group_by(Event.user_id).count()
+    # monthly_active = Event.query.filter(Event.date >= month_start).distinct(Event.user_id).group_by(Event.user_id).count()
+    daily_active = len(set([ e.user_id for e in Event.query.filter(Event.date >= today_start).all()]))
+    monthly_active = len(set([ e.user_id for e in Event.query.filter(Event.date >= month_start).all()]))
+
 
 
 
