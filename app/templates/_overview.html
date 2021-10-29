@@ -27,7 +27,7 @@
                 </div>
             {% endif %}
             
-            {% if user.tags.count() == 1 %}
+            <!-- {% if user.tags.count() == 1 %}
                 <div class = "data-item">
                     <p>{{user.tags.filter_by(archived=False).count()}} tag </p>
                 </div>
@@ -35,7 +35,7 @@
                 <div class = "data-item">
                     <p>{{user.tags.filter_by(archived=False).count()}} tags </p>
                 </div>
-            {% endif %}
+            {% endif %} -->
 
             {% if user.highlights.count() == 1 %}
                 <div class = "data-item">
@@ -47,7 +47,21 @@
                 </div>
             {% endif %}
 
-            {% if user.topics.filter_by(archived=False).count() == 1 %}
+            {% if  review_streak == 0 %}
+                <div class = "data-item">
+                    <a href = "{{url_for('main.review')}}">0 reviews</a>
+                </div>
+            {% elif review_streak == 1 %}
+                <div class = "data-item">
+                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlight reviewed in the last 30 days</a>
+                </div>
+            {% else %}
+                <div class = "data-item">
+                    <a href = "{{url_for('main.review')}}">{{review_streak}} highlights reviewed in the last 30 days</a>
+                </div>
+            {% endif %}
+
+            <!-- {% if user.topics.filter_by(archived=False).count() == 1 %}
                 <div class = "data-item">
                     <a href = "{{url_for('main.highlights')}}">{{user.topics.filter_by(archived=False).count()}} topic</a>
                 </div>
@@ -55,7 +69,7 @@
                 <div class = "data-item">
                     <a href = "{{url_for('main.highlights')}}">{{user.topics.filter_by(archived=False).count()}} topics</a>
                 </div>
-            {% endif %}
+            {% endif %} -->
         </div>
     </div>
 </div>

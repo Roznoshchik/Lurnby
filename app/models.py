@@ -176,6 +176,27 @@ class Event(db.Model):
     name = db.Column(db.String())
     date = db.Column(db.DateTime())
 
+    """
+    Tracked Events
+
+    -> visited platform          //    daily
+    -> added article             //    all
+    -> added suggested article   //    all
+    -> opened article            //    all
+    -> added highlight           //    all
+    -> exported highlights       //    all
+    -> added topic               //    all
+    -> reviewed highlights       //    daily
+    -> reviewed a highlight      //    all
+    -> enabled add by email      //    all
+    -> added approved sender     //    all
+    -> submitted feedback        //    all
+    
+    """
+
+    def __repr__(self):
+        return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'
+
 
 class Approved_Sender(db.Model):
     id = db.Column(db.Integer, primary_key=True)
