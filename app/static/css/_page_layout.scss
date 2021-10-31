@@ -1,3 +1,7 @@
+html {
+    scroll-behavior: smooth;
+}
+
 .title {
     text-decoration: underline $dark 4px;
     margin-bottom: 48px;
@@ -51,4 +55,70 @@
         display: inline-block;
         margin: 4px;
     }
+}
+
+////////////////////////
+//     text pages     //
+////////////////////////
+.lurnby-container {
+    max-width: 630px;
+    margin: auto;
+    padding: 120px 24px;
+    
+    line-height: 1.5em;
+}
+
+@media(max-width: $mobile-max){
+    .lurnby-container {
+        max-width: 630px;
+        margin: auto;
+        padding: 60px 24px;
+        
+    }
+}
+
+.lurnby-subsection{
+    margin-bottom: 44px;
+}
+
+.lurnby-subsection .lurnby-subsection {
+    margin-bottom: 24px;
+}
+
+
+ul.minimal {
+    list-style-type: none;
+    padding: 0;
+}
+
+li{
+    margin-bottom: 8px;
+}
+
+
+////////////////////
+//     footer     //
+////////////////////
+
+.lurnby-footer{
+    padding: 44px 0px;
+    display: block;
+    text-align: center;
+    background-color: #dbdbdb;
+    
+    p{
+        font-size: 12px;
+        margin-bottom: 0;
+    }
+    .terms {
+        margin-bottom: 24px;
+       
+        a {
+            color: $dark;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+    
+    }
+   
 }

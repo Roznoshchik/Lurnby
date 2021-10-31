@@ -38,6 +38,11 @@ from werkzeug.utils import secure_filename
 
 from app.main import bp
 
+
+
+
+
+
 # ############################################ #
 # ##     New table layout for articles      ## #
 # ############################################ #

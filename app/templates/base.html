@@ -160,7 +160,14 @@
         {% endwith %}
       </div>
       {% block content %}{% endblock %}
-
+      <div class="lurnby-footer">
+        <div class="terms">
+          <a href="{{url_for('content.terms')}}">Terms of Service</a>
+          <a href="{{url_for('content.privacy')}}">Privacy Policy</a>
+          <a href="{{url_for('content.ipp')}}">Intellectual Property Policy</a>
+        </div>
+        <p>© {{now.year}} Lurnby All rights reserved.</p>
+      </div>
       {% if current_user.is_authenticated %}
       <!--  Feedback Modal Code  -->
       <div class="lurnby_modal modal fade" id="FeedbackModal" tabindex="-1" role="dialog" aria-labelledby="FeedbackModalLabel" aria-hidden="true">

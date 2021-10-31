@@ -70,6 +70,8 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.redis = Redis.from_url(app.config['REDIS_URL'])
     app.task_queue = rq.Queue('lurnby-tasks', connection=app.redis)
+   
+   
     @app.before_request
     def before_request_func():
         if current_user.is_authenticated:
@@ -77,7 +79,12 @@ def create_app(config_class=Config):
             db.session.commit()
         else:
             print('not logged in user')
-
+    
+    # Add a variable into the app that can be used in all routes and blueprints
+    # This one is so that I can have a now variable that automatically updates the copyright notice at the bottom.
+    @app.context_processor
+    def inject_now():
+        return {'now': datetime.utcnow()}
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
     
    
@@ -104,6 +111,9 @@ def create_app(config_class=Config):
 
     from app.experiments import bp as experiments_bp
     app.register_blueprint(experiments_bp)
+
+    from app.content import bp as content_bp
+    app.register_blueprint(content_bp)
 
     if __name__ == "__main__":
         app.run(ssl_context=('cert.pem', 'key.pem'))

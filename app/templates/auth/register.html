@@ -4,66 +4,68 @@
 {% block style %}
 
     <link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">   
-
+<style></style>
 {% endblock %}
 
 {% block content %}
-    <form class="form-signin" action="" method="post" novalidate>
-        <div class="text-center mb-4">
-            <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
-            <p>
-                <a class="button" href="{{url_for('auth.google_login')}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
-            </p>
-            <p>or</p>
-            {{ form.hidden_tag() }}
-        </div>
-        
-        <div class="form-label-group">
-        {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
-        {{ form.username.label}}
-        </div>
-        {% for error in form.username.errors %}
-            <div class="alert alert-danger" role="alert">
-            {{ error }}
+    <div class="lurnby-container">
+        <form class="form-signin" action="" method="post" novalidate>
+            <div class="text-center mb-4">
+                <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
+                <p>
+                    <a class="button" href="{{url_for('auth.google_login')}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
+                </p>
+                <p>or</p>
+                {{ form.hidden_tag() }}
             </div>
-        {% endfor %}
-        <div class="form-label-group">
-            {{ form.firstname(class="form-control", placeholder="First name", autofocus=true )}}
-            {{ form.firstname.label}}
-        </div>
-        <div class="form-label-group">
-            {{ form.email(class="form-control", placeholder="Email", required=true, autofocus=true)}}
-            {{ form.email.label}}
-        </div>
-        {% for error in form.email.errors %}
-            <div class="alert alert-danger" role="alert">
-            {{ error }}
+            
+            <div class="form-label-group">
+            {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
+            {{ form.username.label}}
             </div>
-        {% endfor %}
-        <div class="form-label-group">
-            {{ form.password(class="form-control", placeholder="Password", required=true, autofocus=true)}}
-            {{ form.password.label}}
-        </div>
-        {% for error in form.password.errors %}
-            <div class="alert alert-danger" role="alert">
-            {{ error }}
+            {% for error in form.username.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+            <div class="form-label-group">
+                {{ form.firstname(class="form-control", placeholder="First name", autofocus=true )}}
+                {{ form.firstname.label}}
             </div>
-        {% endfor %}
-        <div class="form-label-group">
-            {{ form.repeat_password(class="form-control", placeholder="Repeat Password", required=true, autofocus=true)}}
-            {{ form.repeat_password.label}}
-        </div>
-        {% for error in form.repeat_password.errors %}
-            <div class="alert alert-danger" role="alert">
-            {{ error }}
+            <div class="form-label-group">
+                {{ form.email(class="form-control", placeholder="Email", required=true, autofocus=true)}}
+                {{ form.email.label}}
             </div>
-        {% endfor %}
-
-
-        <div>     
-            <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
-        </div>
-    </form>
+            {% for error in form.email.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+            <div class="form-label-group">
+                {{ form.password(class="form-control", placeholder="Password", required=true, autofocus=true)}}
+                {{ form.password.label}}
+            </div>
+            {% for error in form.password.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+            <div class="form-label-group">
+                {{ form.repeat_password(class="form-control", placeholder="Repeat Password", required=true, autofocus=true)}}
+                {{ form.repeat_password.label}}
+            </div>
+            {% for error in form.repeat_password.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+    
+    
+            <div>     
+                <button class="btn btn-lg btn-primary btn-block" type="submit">Register</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}
 
 {% block JS %}
