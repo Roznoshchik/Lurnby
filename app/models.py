@@ -303,7 +303,10 @@ class Article(db.Model):
             if l1[i][0]:
                 y['uuid'] = l1[i][2]
                 y['title'] = l1[i][3]
-                y['progress'] = round(l1[i][4])
+                try:
+                    y['progress'] = round(l1[i][4])
+                except:
+                    y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
                 y['read_time'] = l1[i][6]
                 y['tag_count'] = l2[i][1]
@@ -312,7 +315,10 @@ class Article(db.Model):
                 y = {}
                 y['uuid'] = l1[i][2]
                 y['title'] = l1[i][3]
-                y['progress'] = round(l1[i][4])
+                try:
+                    y['progress'] = round(l1[i][4])
+                except:
+                    y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
                 y['read_time'] = l1[i][6]
                 y['tag_count'] = l2[i][1]
@@ -321,7 +327,10 @@ class Article(db.Model):
                 y = {}
                 y['uuid'] = l1[i][2]
                 y['title'] = l1[i][3]
-                y['progress'] = round(l1[i][4])
+                try:
+                    y['progress'] = round(l1[i][4])
+                except:
+                    y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
                 y['read_time'] = l1[i][6]                
                 y['tag_count'] = l2[i][1]
