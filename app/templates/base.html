@@ -159,7 +159,10 @@
           {% endif %}
         {% endwith %}
       </div>
-      {% block content %}{% endblock %}
+      
+      <div id="base_content">
+        {% block content %}{% endblock %}
+      </div>
       <div class="lurnby-footer">
         <div class="terms">
           <a href="{{url_for('content.terms')}}">Terms of Service</a>

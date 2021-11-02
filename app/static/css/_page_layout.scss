@@ -95,6 +95,16 @@ li{
     margin-bottom: 8px;
 }
 
+#base-main {
+    position: relative;
+    min-height: 100vh;
+    #base_content{
+        padding-bottom: 150px;
+    }
+  }
+
+
+
 
 ////////////////////
 //     footer     //
@@ -105,6 +115,10 @@ li{
     display: block;
     text-align: center;
     background-color: #dbdbdb;
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+    height: 150px;
     
     p{
         font-size: 12px;
