@@ -458,7 +458,8 @@ def settings():
 
         return redirect(url_for('main.settings'))
         
-    return render_template('settings.html',form=form, senders=approved_senders)
+    # return render_template('settings.html',form=form, senders=approved_senders)
+    return render_template('settings/settings_email.html',form=form, senders=approved_senders)
 
 @bp.route('/enable-add-by-email', methods=['POST'])
 @login_required

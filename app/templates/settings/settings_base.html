@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block style %}
+<style>
+   #settings_page{
+       display: flex;
+       flex-wrap: wrap;
+       margin: 0 44px;
+   }
+
+   .menu {
+       list-style-type: none;
+       margin-right: 80px;
+   }
+
+   .menu li {
+       margin-bottom: 8px;
+   }
+   .menu a {
+       color: black;
+   }
+
+   .menu a.active {
+       padding: 4px 8px;
+       margin-left: -8px;
+       background-color: darkgrey;
+   }
+
+
+   #settings_body{
+       flex-grow: 1;
+       width: auto;
+       margin-bottom: 40px;
+   }
+
+   {% block sub_css %}
+   {% endblock %}
+</style>
+{% endblock %}
+
+{% block content %}
+<div id = "settings_page" class="page">
+    <div id = "settings_nav">
+        <ul class = " minimal menu">
+            <li><a class="active disabled" href="#">Email Settings</a></li>
+            <li><a class="disabled" href="#">Account</a></li>
+            <li><a class="disabled" href="#">Payments</a></li>
+            <li><a class="disabled" href="#">Data</a></li>
+            <li><a class="disabled" href="#">Notifications</a></li>
+
+
+            
+        </ul>
+    </div>
+    <div id = "settings_body" class = "card">
+        <!-- <h1>this is some content</h1>
+        <p>this is an option</p>
+        <button class="main-button">This is a button</button> -->
+
+        {% block settings_content %}
+        {% endblock %}
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block JS %}
+<script src="{{url_for('static', filename='js/settings.js')}}"></script>
+
+{% block sub_JS %}
+{% endblock %}
+{% endblock %}
