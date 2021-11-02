@@ -62,7 +62,7 @@ def articles():
         db.session.commit()
     
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
-    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= month_start).count()
+    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.user_id==current_user.id , Event.date >= month_start).count()
 
 
     query = current_user.articles.filter_by(archived=False)
@@ -1417,7 +1417,7 @@ def unarchivehighlight(id):
 @login_required
 def highlights():
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
-    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.date >= month_start).count()
+    review_streak = Event.query.filter(Event.name =='reviewed a highlight', Event.user_id==current_user.id , Event.date >= month_start).count()
 
 
     query = Highlight.query.filter_by(user_id=current_user.id, archived=False)
