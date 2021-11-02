@@ -494,8 +494,8 @@ def user_dashboard():
     
     today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
-    daily_active = db.session.query(Event.user_id).filter(Event.date >= today_start).distinct().count()
-    monthly_active = db.session.query(Event.user_id).filter(Event.date >= month_start).distinct().count()
+    daily_active = db.session.query(Event.user_id).filter(Event.date >= today_start).distinct().join(User, Event.user_id == User.id).filter(User.test_account==False).count() - 1
+    monthly_active = db.session.query(Event.user_id).filter(Event.date >= month_start).distinct().join(User, Event.user_id == User.id).filter(User.test_account==False).count() - 1
     
 
     return render_template('dashboard/user_dash.html', user=current_user,
