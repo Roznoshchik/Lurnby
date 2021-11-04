@@ -109,6 +109,7 @@ li{
     min-height: 100vh;
     
     #base_content{
+        padding-top: 58px;
         padding-bottom: 150px;
     }
   }
@@ -155,4 +156,40 @@ li{
 #navigation {
     padding-left:  40px;
     padding-right: 40px;
+}
+
+
+/////////////////////
+//     general     //
+/////////////////////
+
+.main-section {
+    padding: 24px 40px;
+  }
+  
+  #overview {
+    background: #FEF7F6;
+    margin: 0;
+    padding: 56px 40px;
+
+  }
+  
+  
+  
+/////////////////////
+//     mobile      //
+/////////////////////
+@media(max-width:$mobile-max){
+    .main-section {
+        padding: 24px;
+    }
+
+    #navigation {
+        padding-left:  24px;
+        padding-right: 24px;
+    }
+
+    #overview {
+        padding: 56px 24px;
+    }
 }

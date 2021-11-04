@@ -1,25 +1,14 @@
 {% extends 'settings/settings_base.html' %}
 {% block sub_css %}
 <style>
-    .settings-input{
-        width: 300px;
-        padding: 4px 8px;
-    }
-
-    #settings_all p{
-        max-width: 630px;
-    }
-
-    #enable_email {
-        margin-left: 0;
-    }
+  
 </style>
 {% endblock %}
 
 {% block settings_content %}
 <div id = "settings_all" class = "main-section">
     <div class="heading">
-        <h6>Settings</h6>
+        <h6>Email Settings</h6>
     </div>
 
     {% if current_user.add_by_email %}

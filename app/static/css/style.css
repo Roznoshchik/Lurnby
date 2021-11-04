@@ -90,6 +90,7 @@ li {
   min-height: 100vh;
 }
 #base-main #base_content {
+  padding-top: 58px;
   padding-bottom: 150px;
 }
 
@@ -125,6 +126,30 @@ li {
   padding-right: 40px;
 }
 
+.main-section {
+  padding: 24px 40px;
+}
+
+#overview {
+  background: #FEF7F6;
+  margin: 0;
+  padding: 56px 40px;
+}
+
+@media (max-width: 575px) {
+  .main-section {
+    padding: 24px;
+  }
+
+  #navigation {
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  #overview {
+    padding: 56px 24px;
+  }
+}
 .summary {
   margin: 24px 0;
   padding: 1.25rem;
@@ -132,6 +157,79 @@ li {
   border-radius: 6px;
   border: none;
   box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+}
+
+#settings_page {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 40px;
+}
+
+.menu {
+  list-style-type: none;
+  margin-right: 80px;
+}
+
+@media (max-width: 575px) {
+  #settings_nav {
+    z-index: 1000;
+    width: 576px;
+    white-space: nowrap;
+    overflow-x: auto;
+  }
+  #settings_nav .menu {
+    display: flex;
+    overflow-y: scroll;
+    margin-right: 0;
+  }
+  #settings_nav .menu li {
+    margin-right: 8px;
+    padding: 4px 8px;
+  }
+
+  #settings_page {
+    margin: 0 24px;
+    padding-top: 24px;
+  }
+
+  #settings_body.card {
+    padding: 0;
+  }
+}
+.menu li {
+  margin-bottom: 8px;
+}
+
+.menu a {
+  color: black;
+}
+
+.menu a.active {
+  padding: 4px 8px;
+  margin-left: -8px;
+  background-color: darkgrey;
+}
+
+#settings_body {
+  flex-grow: 1;
+  width: auto;
+  margin-bottom: 40px;
+}
+
+.settings-input {
+  width: 300px;
+  padding: 4px 8px;
+}
+
+#settings_all p {
+  max-width: 630px;
+}
+#settings_all .card {
+  padding: 0;
+}
+
+#enable_email {
+  margin-left: 0;
 }
 
 /* regular styles */
@@ -232,11 +330,6 @@ body, #base-main {
 .main-button:hover {
   color: white;
   background: #424242;
-}
-
-.main-section {
-  padding: 24px;
-  padding-left: 24px;
 }
 
 .main-col {
@@ -869,12 +962,6 @@ label svg {
 }
 
 @media (min-width: 375px) {
-  #overview {
-    background: #FEF7F6;
-    margin: 0;
-    padding-top: 56px;
-  }
-
   #articles, #done_articles {
     display: flex;
     flex-wrap: wrap;
@@ -1363,7 +1450,6 @@ body {
   display: -ms-flexbox;
   -ms-flex-align: center;
   align-items: center;
-  padding-top: 40px;
   background: #F2F1EE;
 }
 

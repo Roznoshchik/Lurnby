@@ -119,10 +119,7 @@ body, #base-main {
   background: #424242;
 
 }
-.main-section {
-  padding: 24px;
-  padding-left:24px;
-}
+
 
 .main-col {
   padding: 0;
@@ -703,8 +700,6 @@ border: #FAB1A0 2px solid;
     padding: 16px;
   }
 
- 
-  
   .article-overview{
     padding: 8px 16px 0 0;
   }
@@ -806,15 +801,10 @@ border: #FAB1A0 2px solid;
 }
 
 
+
 @media(min-width:375px){
 
-
-  
-    #overview {
-      background: #FEF7F6;
-      margin: 0;
-      padding-top: 56px;
-    }
+   
 
   
     #articles, #done_articles {
@@ -1383,7 +1373,7 @@ body {
     display: -ms-flexbox;
     -ms-flex-align: center;
     align-items: center;
-    padding-top: 40px;
+    //padding-top: 40px;
     background:#F2F1EE;
     
   }
