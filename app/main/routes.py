@@ -55,7 +55,7 @@ from app.main import bp
 def articles():
     today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     today_end = today_start + timedelta(days=1)
-    ev = Event.query.filter(Event.name =='visited platform', Event.date >= today_start, Event.date < today_end).first()
+    ev = Event.query.filter(Event.name =='visited platform', Event.date >= today_start, Event.date < today_end, Event.user_id==current_user.id).first()
     if not ev:
         ev = Event(user_id=current_user.id, name='visited platform', date=datetime.utcnow())
         db.session.add(ev)

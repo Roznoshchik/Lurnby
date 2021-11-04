@@ -2,7 +2,7 @@ import datetime
 from sqlalchemy import desc
 
 from app import create_app
-from app.models import User
+from app.models import User, Event
 
 app = create_app()
 
@@ -26,6 +26,19 @@ def data_dashboard():
     users = User.query.filter_by(test_account=False).order_by(desc(User.last_active)).limit(15)
     user_list = []
     for u in users:
+        ev = u.events.order_by(Event.date.desc()).limit(1).first()
+        try: 
+            last_active = ev.date
+        except:
+            last_active = u.last_active
+
+        try:
+            last_action = ev.name
+        except:
+            last_action = u.last_action
+
+
+
         user = {
             'id': u.id,
             'email': u.email,
@@ -33,9 +46,9 @@ def data_dashboard():
             'highlights': u.highlights.count(),
             'topics': u.topics.count(),
             'tags': u.tags.count(),
-            'last_active': u.last_active,
+            'last_active': last_active,
             'test_account': u.test_account,
-            'last_action': u.last_action,
+            'last_action': last_action,
         }
         try:
             user['suggestion'] = u.suggestion.title
