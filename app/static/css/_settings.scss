@@ -1,0 +1,140 @@
+#settings_page{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 40px;
+}
+
+.menu {
+    list-style-type: none;
+    margin:0 80px 0 0;
+    
+}
+
+@media(min-width:$sm){
+    .mobile_nav_container {
+        display: none;
+    }
+}
+
+.mobile_nav{
+    padding: 0 2px;
+    border: none;
+    height: 100%;
+    background-color: transparent;
+
+
+    &.nav_right{
+        border-left: $dark-grey 1px solid;
+        // &::before{
+        //     content:url(../images/icons/nav_right.svg)
+        // }
+        transition: opacity 0.3s;
+
+    }
+
+
+    &.nav_left{
+        border-right: $dark-grey 1px solid;
+        opacity: 0;
+        transition: opacity 0.3s;
+        // &::before{
+        //     content:url(../images/icons/nav_left.svg)
+        // }
+    }
+
+}
+
+@media(max-width:$mobile-max) {
+    #settings_nav{
+        display: flex;
+        width: 576px;
+        white-space: nowrap;
+        align-items: center;
+        overflow-x: auto;
+        
+        &::-webkit-scrollbar {
+            display: none;
+          }
+
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+
+        margin-bottom: 8px;
+        
+        .menu {
+            display: flex;
+            margin-right: 0;
+            padding: 0 8px;
+            overflow-x: auto;
+            &::-webkit-scrollbar {
+                display: none;
+              }
+    
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+
+            
+
+            li {
+                margin-right: 8px;
+                margin-bottom: 0;
+                padding: 4px 8px;
+            };
+        }
+    }
+    
+
+    #settings_page {
+        margin: 0 24px;
+        padding-top: 24px;
+    }
+
+    #settings_body {
+      &.card {
+          padding: 0;
+      }
+    }
+
+}
+
+
+.menu li {
+    margin-bottom: 8px;
+}
+.menu a {
+    color: black;
+}
+
+.menu a.active {
+    padding: 4px 8px;
+    margin-left: -8px;
+    background-color: darkgrey;
+}
+
+
+#settings_body{
+    flex-grow: 1;
+    width: auto;
+    margin-bottom: 40px;
+}
+
+// email page
+
+.settings-input{
+    width: 300px;
+    padding: 4px 8px;
+}
+
+#settings_all {
+    p  {
+        max-width: 630px;
+    }
+    .card {
+        padding: 0;
+    }
+
+}
+
+#enable_email {
+    margin-left: 0;
+}

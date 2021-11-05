@@ -11,16 +11,15 @@
 {% block content %}
 <div id = "settings_page" class="page">
     <div id = "settings_nav">
-        <ul class = " minimal menu">
+        <span class="mobile_nav_container"><button class="mobile_nav nav_left"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button></span>
+        <ul id ="settings_menu" class = "minimal menu">
             <li><a class="active disabled" href="#">Email Settings</a></li>
             <li><a class="disabled" href="#">Account</a></li>
             <li><a class="disabled" href="#">Payments</a></li>
             <li><a class="disabled" href="#">Data</a></li>
             <li><a class="disabled" href="#">Notifications</a></li>
-
-
-            
         </ul>
+        <span class="mobile_nav_container"><button class="mobile_nav nav_right"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button></span>
     </div>
     <div id = "settings_body" class = "card">
         <!-- <h1>this is some content</h1>
