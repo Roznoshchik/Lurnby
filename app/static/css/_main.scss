@@ -57,9 +57,15 @@
     
     ::-moz-selection { /* Code for Firefox */
         background: $highlight-yellow;
+        color: $dark;
       }
+    ::-webkit-selection {
+        background: $highlight-yellow;
+        color: $dark; 
+    }
       
       ::selection {
         background: $highlight-yellow;
+        color: $dark;
       }
  }

@@ -892,6 +892,7 @@ label svg {
 
 .highlighted {
   background-color: #FFF79F;
+  color: #424242;
   display: inline;
   border: none;
 }
@@ -1894,9 +1895,15 @@ ul ul a {
 #content ::-moz-selection {
   /* Code for Firefox */
   background: #FFF79F;
+  color: #424242;
+}
+#content ::-webkit-selection {
+  background: #FFF79F;
+  color: #424242;
 }
 #content ::selection {
   background: #FFF79F;
+  color: #424242;
 }
 
 /*!
