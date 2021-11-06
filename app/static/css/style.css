@@ -150,6 +150,35 @@ li {
     padding: 56px 24px;
   }
 }
+.main-button.add-article {
+  min-width: 80px;
+  margin-left: 0px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.main-button {
+  color: #424242;
+  background: #F9F7F4;
+  border-radius: 0;
+  margin: 0 0 0 16px;
+  padding: 8px 16px;
+  border: #8a8989 1px solid;
+}
+.main-button.add-highlight {
+  background-color: #FFF79F;
+}
+
+.main-button:hover {
+  color: white;
+  background: #424242;
+}
+
+.cancel, .edit {
+  background: transparent;
+  margin-right: 0;
+}
+
 .summary {
   margin: 24px 0;
   padding: 1.25rem;
@@ -353,20 +382,6 @@ body, #base-main {
 }
 .tagged:focus, .untagged:focus, .main-button:focus,
 .input[type=checkbox]:focus + label {
-  color: white;
-  background: #424242;
-}
-
-.main-button {
-  color: #424242;
-  background: #F9F7F4;
-  border-radius: 0;
-  margin: 0 0 0 16px;
-  padding: 8px 16px;
-  border: none;
-}
-
-.main-button:hover {
   color: white;
   background: #424242;
 }
@@ -876,7 +891,7 @@ label svg {
 }
 
 .highlighted {
-  background-color: rgba(255, 255, 0, 0.411);
+  background-color: #FFF79F;
   display: inline;
   border: none;
 }
@@ -980,12 +995,6 @@ label svg {
 
 .inline-block {
   display: inline-block;
-}
-
-.cancel, .edit {
-  background: transparent;
-  margin-right: 0;
-  text-decoration: underline;
 }
 
 .heading h6 {
@@ -1253,13 +1262,6 @@ label svg {
 
   #add_from {
     width: 100%;
-  }
-
-  .main-button.add-article {
-    min-width: 80px;
-    margin-left: 0px;
-    margin-right: 8px;
-    margin-bottom: 8px;
   }
 
   .file-input {
@@ -1887,6 +1889,14 @@ ul ul a {
 }
 #content pre {
   white-space: pre-wrap;
+}
+
+#content ::-moz-selection {
+  /* Code for Firefox */
+  background: #FFF79F;
+}
+#content ::selection {
+  background: #FFF79F;
 }
 
 /*!

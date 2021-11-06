@@ -52,3 +52,14 @@
     width: 100%;
     max-width: 1000px;
  }
+
+ #content {
+    
+    ::-moz-selection { /* Code for Firefox */
+        background: $highlight-yellow;
+      }
+      
+      ::selection {
+        background: $highlight-yellow;
+      }
+ }
