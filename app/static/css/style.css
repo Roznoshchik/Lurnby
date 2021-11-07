@@ -8668,6 +8668,9 @@ readers do not read off random characters that represent icons */
   margin-right: 8px;
   border: none;
 }
+.review-item .review-actions .main-button.view_highlight:hover svg {
+  fill: #FFF;
+}
 .review-item .review-actions .review-outcome {
   margin-left: auto;
 }
