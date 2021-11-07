@@ -63,6 +63,9 @@ html {
 .lurnby-subsection {
   margin-bottom: 44px;
 }
+.lurnby-subsection h6 {
+  font-weight: 900;
+}
 
 .lurnby-subsection .lurnby-subsection {
   margin-bottom: 24px;
@@ -233,6 +236,7 @@ li {
 
   #settings_body.card {
     padding: 0;
+    width: auto;
   }
 }
 .menu li {
@@ -250,7 +254,6 @@ li {
 }
 
 #settings_body {
-  flex-grow: 1;
   width: auto;
   margin-bottom: 40px;
 }
@@ -1889,6 +1892,43 @@ ul ul a {
   white-space: pre-wrap;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2.25rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
+h4 {
+  font-size: 1.75rem;
+}
+
+h5 {
+  font-size: 1.5rem;
+}
+
+h6 {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 575px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  h6 {
+    font-size: 1.2rem;
+  }
+}
 /*!
  * Font Awesome Free 5.15.3 by @fontawesome - https://fontawesome.com
  * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
@@ -8423,6 +8463,7 @@ readers do not read off random characters that represent icons */
 #filter_submit {
   background: #FFF79F;
   vertical-align: middle;
+  margin-left: 0;
 }
 #filter_submit:hover, #filter_submit:focus, #filter_submit:active {
   background: #424242;
@@ -8437,6 +8478,7 @@ readers do not read off random characters that represent icons */
 .filter_form input {
   padding-left: 4px;
   padding-bottom: 4px;
+  margin-right: 8px;
   width: 200px;
 }
 
@@ -8595,6 +8637,27 @@ readers do not read off random characters that represent icons */
 }
 #flashMessages .alert ul, #flashMessages .alert-dismissable ul {
   list-style-type: none;
+}
+
+.review-item {
+  max-width: 640px;
+  margin: 16px 0 32px 0;
+}
+.review-item .review-actions {
+  display: flex;
+}
+.review-item .review-actions .main-button {
+  margin-left: 0;
+  margin-right: 8px;
+}
+.review-item .review-actions .review-outcome {
+  margin-left: auto;
+}
+.review-item .review-actions .review-outcome .remember {
+  margin-right: 0px;
+}
+.review-item .review-actions .review-outcome button {
+  width: 88px;
 }
 
 /*# sourceMappingURL=style.css.map */

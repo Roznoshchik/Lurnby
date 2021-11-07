@@ -1,0 +1,25 @@
+.review-item {
+    max-width: 640px;
+    margin: 16px 0 32px 0;
+
+    .review-actions{ 
+        display: flex;
+        .main-button {
+            margin-left: 0;
+            margin-right: 8px;
+        }
+    
+        .review-outcome{
+            margin-left: auto;
+
+            .remember{
+                margin-right: 0px;
+            }
+
+            button{
+                width: 88px;
+            }
+        }
+    }
+
+}

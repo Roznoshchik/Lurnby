@@ -168,6 +168,8 @@
         background: $dark;
         color: white;
     }
+
+    margin-left: 0;
 }
 
 
@@ -180,5 +182,7 @@
 .filter_form input{
     padding-left: 4px;
     padding-bottom: 4px;
+    //margin-bottom: 8px;
+    margin-right: 8px;
     width: 200px;
 }
