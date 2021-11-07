@@ -1,0 +1,37 @@
+
+
+.main-button.add-article{
+    min-width: 80px;
+    margin-left: 0px;
+    margin-right: 8px;
+    margin-bottom: 8px;
+}
+
+
+.main-button {
+    color: $dark;
+    background: #F9F7F4;
+    border-radius:0;
+    margin: 0 0 0 16px;
+    padding: 8px 16px;
+    border: $dark-grey 1px solid;
+
+    &.add-highlight {
+        background-color: $highlight-yellow;
+    }
+
+}
+  
+.main-button:hover{
+    color: white;
+    background: $dark;
+
+}
+
+.cancel, .edit{  
+    background:transparent;
+    margin-right: 0;
+    //text-decoration: underline;
+  
+}  
+

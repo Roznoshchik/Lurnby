@@ -105,20 +105,6 @@ body, #base-main {
   background: #424242;
 }
 
-.main-button {
-  color: #424242;
-  background: #F9F7F4;
-  border-radius:0;
-  margin: 0 0 0 16px;
-  padding: 8px 16px;
-  border: none;
-}
-
-.main-button:hover{
-  color: white;
-  background: #424242;
-
-}
 
 
 .main-col {
@@ -650,7 +636,8 @@ border: #FAB1A0 2px solid;
 }
 
 .highlighted {
-  background-color: rgba(255, 255, 0, 0.411); 
+  background-color: $highlight-yellow; 
+  color: $dark;
   display: inline; 
   border: none;
 }
@@ -779,12 +766,6 @@ border: #FAB1A0 2px solid;
 
 
 
-.cancel, .edit{  
-  background:transparent;
-  margin-right: 0;
-  text-decoration: underline;
-
-}  
 
 .heading h6 {
   display: inline;
@@ -1090,12 +1071,7 @@ border: #FAB1A0 2px solid;
     width: 100%;
   }
   
-  .main-button.add-article{
-    min-width: 80px;
-    margin-left: 0px;
-    margin-right: 8px;
-    margin-bottom: 8px;
-  }
+
   
   .file-input{
     width: 0.1px;
