@@ -8666,6 +8666,7 @@ readers do not read off random characters that represent icons */
 .review-item .review-actions .main-button {
   margin-left: 0;
   margin-right: 8px;
+  border: none;
 }
 .review-item .review-actions .review-outcome {
   margin-left: auto;
