@@ -2,7 +2,10 @@
 
 {% block style %}
 
+
 {% endblock %}
+
+
 
 {% block dash %}
 <div class = "dashboard_content">
@@ -16,19 +19,19 @@
 
 
     {% for user in users %}
-    <div class = "dashboard_item">
+    <div class = " card dashboard_item">
         <div class="">
-            <h4>{{ user['email']}}</h4>
+            <h6>{{ user['email']}}</h6>
         </div>
         <div class="underline"></div>
-        <h6>Articles: {{user['articles']}}</h6>
-        <h6>Highlights: {{user['highlights']}}</h6>
-        <h6>Tags: {{user['tags']}}</h6>
-        <h6>Topics: {{user['topics']}}</h6>
-        <h6>Last Active: {{user['last_active']}}</h6>
-        <h6>Last Action: {{ user['last_action']}}</h6> 
+        <p><strong>Articles</strong>: {{user['articles']}}<br>
+        <strong>Highlights</strong>: {{user['highlights']}}<br>
+        <strong>Tags</strong>: {{user['tags']}}<br>
+        <strong>Topics</strong>: {{user['topics']}}<br>
+        <strong>Last Active</strong>: {{user['last_active'].strftime("%d %B, %Y at %H:%M")}}<br>
+        <strong>Last Action</strong>: {{ user['last_action']}} <br>
         {% if user['suggestion']%}
-        <h6>Added: {{ user['suggestion']}}</h6> 
+        <strong>Added</strong>: {{ user['suggestion']}}</p> 
         {% endif %}
 
     
