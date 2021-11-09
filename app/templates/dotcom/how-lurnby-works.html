@@ -22,16 +22,16 @@
                 <li>Remember more with reviews. Lurnby supports active recall practice and spaced repetition.</li>
                 <li>Write articles, essays, or posts with your highlights to deepen your comprehension. </li>
             </ol>
-            <a class="btn" href="how-much-lurnby-costs.html">Damn. I'm excited - how much do you want for it?</a>
+            <a class="btn" href="{{url_for('dotcom.costs')}}">Damn. I'm excited - how much do you want for it?</a>
 
         </div>
             
             <div class = "app-previews col-1-2">
-                <img class = "desktop-screen" src="images/content_in_a_single_place.png"/>
-                <img class = "mobile-screen" src="images/easy-to-read.png"/>
-                <img class = "mobile-screen" src="images/lurnby-taking-notes.jpg"/>
-                <img src="images/highlights.png"/>
-                <img src="images/topics.png"/>
+                <img class = "desktop-screen" src="{{url_for('static', filename='images/dotcom/content_in_a_single_place.png')}}"/>
+                <img class = "mobile-screen" src="{{url_for('static', filename='images/dotcom/easy-to-read.png')}}"/>
+                <img class = "mobile-screen" src="{{url_for('static', filename='images/dotcom/lurnby-taking-notes.jpg')}}"/>
+                <img src="{{url_for('static', filename='images/dotcom/highlights.png')}}"/>
+                <img src="{{url_for('static', filename='images/dotcom/topics.png')}}"/>
                 
 
             </div>

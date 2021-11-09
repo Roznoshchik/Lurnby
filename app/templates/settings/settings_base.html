@@ -13,11 +13,11 @@
     <div id = "settings_nav">
         <span class="mobile_nav_container"><button class="mobile_nav nav_left"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button></span>
         <ul id ="settings_menu" class = "minimal menu">
-            <li><a class="active disabled" href="#">Email Settings</a></li>
-            <li><a class="disabled" href="#">Account</a></li>
-            <li><a class="disabled" href="#">Payments</a></li>
-            <li><a class="disabled" href="#">Data</a></li>
-            <li><a class="disabled" href="#">Notifications</a></li>
+            <li><a class="{% if settings_nav == 'content' %} active {% endif %} disabled" href="#">Adding content</a></li>
+            <li><a class="{% if settings_nav == 'account' %} active {% endif %} disabled" href="#">Account</a></li>
+            <li><a class="{% if settings_nav == 'payments' %} active {% endif %} disabled" href="#">Payments</a></li>
+            <li><a class="{% if settings_nav == 'Data' %} active {% endif %} disabled" href="#">Data</a></li>
+            <li><a class="{% if settings_nav == 'notifications' %} active {% endif %} disabled" href="#">Notifications</a></li>
         </ul>
         <span class="mobile_nav_container"><button class="mobile_nav nav_right"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button></span>
     </div>

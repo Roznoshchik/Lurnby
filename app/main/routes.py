@@ -9,7 +9,7 @@ import validators
 from app import csrf, db, s3, bucket
 from app.email import send_email
 from app.main.forms import (ContentForm, AddTopicForm,
-                            AddHighlightForm, AddApprovedSenderForm,
+                            AddHighlightForm,
                             SuggestionForm)
 from app.main.pulltext import pull_text
 from app.main.review import order_highlights
@@ -428,53 +428,6 @@ def add_by_email():
         logout_user()
     
     return ''
-
-# ########################### #
-# ##     app settings      ## #
-# ########################### #
-
-@bp.route('/settings', methods=['GET', 'POST'])
-@login_required
-@bp.errorhandler(CSRFError)
-def settings():
-    approved_senders = Approved_Sender.query.filter_by(user_id=current_user.id
-                                                       ).all()
-    form = AddApprovedSenderForm()
-
-    if form.validate_on_submit():
-        email = form.email.data
-        update_user_last_action('added approved sender')
-        print('adding approved sender:')
-        print(email)
-        email = email.lower()
-        print(email)
-        e = Approved_Sender(user_id=current_user.id, email=email)
-        db.session.add(e)
-
-        ev = Event(user_id=current_user.id, name='added approved sender', date=datetime.utcnow())
-        db.session.add(ev)
-
-        db.session.commit()
-
-        return redirect(url_for('main.settings'))
-        
-    # return render_template('settings.html',form=form, senders=approved_senders)
-    return render_template('settings/settings_email.html',form=form, senders=approved_senders)
-
-@bp.route('/enable-add-by-email', methods=['POST'])
-@login_required
-@bp.errorhandler(CSRFError)
-def enable_add_by_email():
-    current_user.set_lurnby_email()
-    update_user_last_action('enabled add by email')
-    e = Approved_Sender(user_id=current_user.id, email=current_user.email)
-    db.session.add(e)
-    ev = Event(user_id=current_user.id, name='enabled add by email', date=datetime.utcnow())
-    db.session.add(ev)
-    
-    db.session.commit()
-
-    return '', 200
 
 # ######################## #
 # ##     dashboard      ## #

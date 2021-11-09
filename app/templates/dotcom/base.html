@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="static/dotcom/styles.css" />
-        <link rel="icon" href="images/lurnby-favicon.png"/>
+        <link rel="stylesheet" href="static/css/dotcom/styles.css" />
+        <link rel="icon" href="{{url_for('static', filename='images/dotcom/lurnby-favicon.png')}}"/>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c14cd94dfdb54809941c2bf62129a5c6"}'></script><!-- End Cloudflare Web Analytics -->
@@ -21,13 +21,13 @@
     <body>
         <nav>
             <ul>
-                <li><a class="{{ 'active' if active == 'index' }}" href= "https://lurnby.com">Lurnby</a></li>
-                <li><a class="{{ 'active' if active == 'who' }}" href= "who-is-lurnby-for.html">Who is it for?</a></li>
-                <li><a class="{{ 'active' if active == 'works'}}" href= "how-lurnby-works.html">How does it work?</a></li>
-                <li><a class="{{ 'active' if active == 'costs'}}" href= "how-much-lurnby-costs.html">How much does it cost?</a></li>
-                <li><a class="{{ 'active' if active == 'start'}}" href= "how-to-start-using-lurnby.html">How can I start using it?</a></li>
-                <li><a class="{{ 'active' if active == 'more'}}" href= "find-out-more-about-lurnby.html">I have questions.</a></li>
-                <li><a class="{{ 'active' if active == 'tutorials'}}" href= "tutorials-and-demos.html">Videos, tutorials, and demos</a></li>
+                <li><a class="{{ 'active' if active == 'index' }}" href= "{{url_for('dotcom.index')}}">Lurnby</a></li>
+                <li><a class="{{ 'active' if active == 'who' }}" href= "{{url_for('dotcom.who')}}">Who is it for?</a></li>
+                <li><a class="{{ 'active' if active == 'works'}}" href= "{{url_for('dotcom.how')}}">How does it work?</a></li>
+                <li><a class="{{ 'active' if active == 'costs'}}" href= "{{url_for('dotcom.costs')}}">How much does it cost?</a></li>
+                <li><a class="{{ 'active' if active == 'start'}}" href= "{{url_for('dotcom.use')}}">How can I start using it?</a></li>
+                <li><a class="{{ 'active' if active == 'more'}}" href= "{{url_for('dotcom.questions')}}">I have questions.</a></li>
+                <li><a class="{{ 'active' if active == 'tutorials'}}" href= "{{url_for('dotcom.tutorials')}}">Videos, tutorials, and demos</a></li>
             </ul>
         </nav>
         

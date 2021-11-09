@@ -1,3 +1,4 @@
+{% set settings_nav = 'payments' %}
 {% extends 'settings/settings_base.html' %}
 {% block sub_css %}
 <style>
@@ -7,34 +8,37 @@
 
 {% block settings_content %}
 <div id = "settings_all" class = "main-section">
-    <div class="heading">
-        <h6>Email Settings</h6>
+    <div class="lurnby-subsection">
+        <h1>Adding Content</h1>
     </div>
 
     {% if current_user.add_by_email %}
-        <p>Add articles by email: <a href ="mailto:{{current_user.add_by_email }}"><strong>{{current_user.add_by_email}}</strong></a></p>
-        <div>
-            <div class="heading">
-                <h6>Instructions</h6>
-            </div>
-            <p>To <strong>add an article by link</strong>, your email subject should say "link" and nothing more. This let's Lurnby know that you are sending over a url. In the body of the email, add your link followed by a linebreak.</p>
+        <div class="lurnby-subsection">
+            <h6>Add articles by email:</h6> 
+            <p>
+                <a href ="mailto:{{current_user.add_by_email }}"><strong>{{current_user.add_by_email}}</strong></a>
+            </p>
+        </div>
+        <div class="lurnby-subsection">
+            <h6>Instructions</h6>
+            <p>To <strong>add an article by link</strong>, your email subject should say <strong>"link"</strong> and nothing more. This let's Lurnby know that you are sending over a url. In the body of the email, add your link followed by a linebreak.</p>
             <p>To <strong>add the full text of your email</strong> you just need to forward the whole email to the email address provided by Lurnby. The email subject will become the article title, and the email body content will become the article text.</p>
         </div>
-        <div class = "heading">
+        <div class="lurnby-subsection">
             <h6>Approved Senders</h6>
+            <p> {% for e in senders %}
+                {{e.email}}{% if not loop.last %},{% endif %} 
+                {% endfor %}</p>
+             <form method="post">
+                {{ form.csrf_token }}
+                {{form.email(class='settings-input', placeholder='add another email')}}
+                {% for error in form.email.errors%}
+                {{ error }}
+                {% endfor %}
+                {{form.submit(class="main-button")}}
+            </form>
+            
         </div>
-        <p> {% for e in senders %}
-            {{e.email}}{% if not loop.last %},{% endif %} 
-            {% endfor %}</p>
-         <form method="post">
-            {{ form.csrf_token }}
-            {{form.email(class='settings-input', placeholder='add another email')}}
-            {% for error in form.email.errors%}
-            {{ error }}
-            {% endfor %}
-            {{form.submit(class="main-button")}}
-        </form>
-        
     {% elif current_user.add_by_email == None %}
     <h6><strong>Add By Email:</strong></h6>
         <p>You can add reading content to Lurnby via email. Lurnby can either process links or full emails. At the moment, processing of attachments is not possible.</p>

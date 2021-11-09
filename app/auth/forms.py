@@ -10,6 +10,24 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
+class UpdateAccountForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    firstname = StringField('First name')
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Sign In')
+
+    def validate_username(self, username):
+        user = User.query.filter_by(username=username.data.lower()).first()
+        if user is not None:
+            raise ValidationError('Username not available. Please use a different username.')
+
+    def validate_email(self, email):
+        user = User.query.filter_by(email=email.data.lower()).first()
+        if user is not None:
+            raise ValidationError('email already used')
+
+
+
 
 class RegisterForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])

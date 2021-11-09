@@ -66,7 +66,7 @@ csp = {
 
 
 def create_app(config_class=Config):
-    app = Flask(__name__)
+    app = Flask(__name__, subdomain_matching=False)
     app.config.from_object(config_class)
     app.redis = Redis.from_url(app.config['REDIS_URL'])
     app.task_queue = rq.Queue('lurnby-tasks', connection=app.redis)
@@ -87,7 +87,8 @@ def create_app(config_class=Config):
         return {'now': datetime.utcnow()}
     cors.init_app(app, resources={r"/api/*": {"origins": "*"}})
     
-   
+  
+
     db.init_app(app)
 
     migrate.init_app(app, db)
@@ -97,23 +98,29 @@ def create_app(config_class=Config):
     csrf.init_app(app)
    
     from app.errors import bp as errors_bp
-    app.register_blueprint(errors_bp)
+    app.register_blueprint(errors_bp, subdomain = "app")
 
     from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/auth')
+    app.register_blueprint(auth_bp, url_prefix='/auth', subdomain = "app")
 
     from app.main import bp as main_bp
-    app.register_blueprint(main_bp)
+    app.register_blueprint(main_bp, subdomain = "app")
+
+    from app.settings import bp as settings_bp
+    app.register_blueprint(settings_bp, subdomain = "app")
 
     from app.api import bp as api_bp
-    app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(api_bp, url_prefix='/api', subdomain = "app")
     csrf.exempt(api_bp)
 
     from app.experiments import bp as experiments_bp
-    app.register_blueprint(experiments_bp)
+    app.register_blueprint(experiments_bp, subdomain = "app")
 
     from app.content import bp as content_bp
-    app.register_blueprint(content_bp)
+    app.register_blueprint(content_bp, subdomain = "app")
+
+    from app.dotcom import bp as dotcom_bp
+    app.register_blueprint(dotcom_bp)
 
     if __name__ == "__main__":
         app.run(ssl_context=('cert.pem', 'key.pem'))

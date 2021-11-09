@@ -1,0 +1,48 @@
+{% set settings_nav = 'account' %}
+{% extends 'settings/settings_base.html' %}
+{% block sub_css %}
+<style>
+  
+</style>
+{% endblock %}
+
+{% block settings_content %}
+<div id = "settings_all" class = "main-section">
+    <div class="lurnby-subsection">
+        <h1>Account</h1>
+    </div>
+
+    <div class="lurnby-subsection">
+        <h6>Approved Senders</h6>
+         <form method="post">
+            {{ form.csrf_token }}
+            <div class="form-label-group">
+                {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
+                {{ form.username.label}}
+            </div>
+            {% for error in form.username.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+            <div class="form-label-group">
+                {{ form.firstname(class="form-control", value="hello old friend" )}}
+                {{ form.firstname.label}}
+            </div>
+            <div class="form-label-group">
+                {{ form.email(class="form-control", placeholder="Email", required=true, autofocus=true)}}
+                {{ form.email.label}}
+            </div>
+            {{form.submit(class="main-button")}}
+        </form>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sub_JS%}
+<script>
+</script>
+
+{% endblock %}
