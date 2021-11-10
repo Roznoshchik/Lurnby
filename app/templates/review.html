@@ -108,7 +108,7 @@ review_count = byId('review_count')
 review_count.value = {{current_user.review_count}} 
 
 review_count.addEventListener('change', function(){
-    url = '/review/settings'
+    url = '/app/review/settings'
     data = {
         'count': this.value
     }
@@ -131,7 +131,7 @@ review_count.addEventListener('change', function(){
 
 
 function ShowViewHighlightModal(id){
-    url = '/view_highlight/' + id
+    url = '/app/view_highlight/' + id
     fetch(url)
     .then(response => response.json())
     .then(data => {
@@ -190,7 +190,7 @@ function RaiseTier(id){
     if (byClass('review-item').length == 0) {
         reviewed_all()
     }
-    url = '/tier/' + id
+    url = '/app/tier/' + id
     data = {
         'tier': 'raise'
     }
@@ -207,7 +207,7 @@ function LowerTier(id){
     if (byClass('review-item').length == 0) {
         reviewed_all()
     }
-    url = '/tier/' + id
+    url = '/app/tier/' + id
     data = {
         'tier': 'lower'
     }
@@ -225,7 +225,7 @@ function KeepTier(id){
         reviewed_all()
     }
 
-    url = '/tier/' + id
+    url = '/app/tier/' + id
     data = {
         'tier': 'keep'
     }
@@ -249,11 +249,11 @@ var topics = [ {% for t in topics %}'{{t.title}}',{%endfor%}]
         var a = byId('review_section');
         a.innerHTML = `<div style = "display: block; text-align:center; float:center; margin:auto; margin-top: 88px; padding:88px; background: white; border:black 2px solid; width: 500px;">
                             <p>Getting your highlights now ...</p>
-                            <img src="static/spinning-circles.svg" width="50" alt="">
+                            <img src="{{url_for('static', filename='spinning-circles.svg')}}" width="50" alt="">
                        </div>`;
 
 
-        $.post('/review', {
+        $.post('/app/review', {
             'data':data
         }).done(function( data ) {
             data = JSON.parse(data)

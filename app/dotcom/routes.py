@@ -10,8 +10,8 @@ from app.dotcom import bp
 from datetime import datetime, timedelta
 
 @bp.route('/')
+@bp.route('/index')
 def index():
-
     return render_template('dotcom/index.html')
 
 

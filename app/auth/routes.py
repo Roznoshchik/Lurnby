@@ -54,7 +54,7 @@ def login():
 @bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.articles'))
+    return redirect(url_for('auth.login'))
 
 
 def get_google_provider_cfg():

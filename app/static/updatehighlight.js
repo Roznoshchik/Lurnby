@@ -43,7 +43,7 @@ function UpdateNewTopic(){
     else 
     {   
             
-        $.post('/topics/add/from_highlight', {
+        $.post('/app/topics/add/from_highlight', {
             title: input.value
         }).done(function(response) {
             add_span.innerHTML ='<button onclick ="UpdateNewTopic()" class="main-button save">Create new topic </button>';
@@ -212,7 +212,7 @@ function initialize_view_topics(){
 
     
 function ViewHighlight(id){
-    url = '/view_highlight/' + id
+    url = '/app/view_highlight/' + id
     fetch(url)
     .then(response => response.json())
     .then(data => {
@@ -252,7 +252,7 @@ function ArchiveHighlight(id){
         byId(`highlight-${id}`).style.display = 'none'
         console.log('highlight hidden')
     
-    url = 'archivehighlight/'+id
+    url = '/app/archivehighlight/'+id
     $.get(url)
     .done(function(){
         alert = create_alert('alert-danger',`
@@ -277,7 +277,7 @@ function ArchiveHighlight(id){
         $.get(url)
 
         var updated_content = byId('article_content').innerHTML
-        $.post('/article/' + article_uuid + '/highlight-storage', {
+        $.post('/app/article/' + article_uuid + '/highlight-storage', {
           'updated_content': updated_content
         });
 
@@ -294,7 +294,7 @@ function UnarchiveHighlight(id){
     byId(`highlight-${id}`).style.display = 'none'
     console.log('highlight hidden')
     
-    url = 'unarchivehighlight/'+id
+    url = '/app/unarchivehighlight/'+id
     $.get(url)
     .done(function(){
         byId(`highlight-${id}`).style.display = 'block'
@@ -351,7 +351,7 @@ function UpdateHighlight(id, review=false){
     data = JSON.stringify(data)
     console.log(data)
        
-    url = '/view_highlight/' + id
+    url = '/app/view_highlight/' + id
     
     $.post(url, {
         'data':data

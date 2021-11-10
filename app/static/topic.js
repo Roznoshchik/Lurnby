@@ -52,7 +52,7 @@ function AddTopicSubmit(){
         `
 
 
-        $.post('/topics/add', {
+        $.post('/app/topics/add', {
             data: JSON.stringify(data)
         }).done(function(response) {
             //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
@@ -144,7 +144,7 @@ function rename_submit(id){
         </div>
         `
 
-        $.post('/topics/rename/'+ id, {
+        $.post('/app/topics/rename/'+ id, {
             data: JSON.stringify(data)
         }).done(function(response) {
             //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
@@ -189,7 +189,7 @@ function archive(id,title){
     </div>
     `
 
-    $.post('archivetopic/'+ id, {
+    $.post('/app/archivetopic/'+ id, {
         data: JSON.stringify(data)
     }).done(function(response) {
         //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
@@ -219,7 +219,7 @@ function unarchive(id){
     </div>
     `
 
-    $.post('unarchivetopic/'+ id, {
+    $.post('/app/unarchivetopic/'+ id, {
         data: JSON.stringify(data)
     }).done(function(response) {
         //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`
@@ -267,7 +267,7 @@ function filter(){
     data = JSON.stringify(data)
     console.log(data)
 
-    $.post('/topics/filter', {
+    $.post('/app/topics/filter', {
        data:data
     }).done(function(response) {
         //destination.innerHTML= `<button class="main-button cancel" onclick="AddTopicStart()">Add new</button>`

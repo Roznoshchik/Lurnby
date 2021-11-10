@@ -47,9 +47,7 @@ from app.main import bp
 # ##     New table layout for articles      ## #
 # ############################################ #
 # @bp.route('/articles2', methods=['GET', 'POST'])
-
-@bp.route("/", methods=['GET', 'POST'])
-@bp.route("/index", methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
 @bp.route('/articles', methods=['GET', 'POST'])
 @login_required
 def articles():

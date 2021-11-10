@@ -107,7 +107,7 @@
             </li>
             {% else %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('settings.settings_account') }}">Settings</a>
+              <a class="nav-link" href="{{ url_for('settings.settings_email') }}">Settings</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
@@ -223,13 +223,13 @@
         const CACHE_NAME = 'static-cache';
 
         const FILES_TO_CACHE = [
-          '/static/offline.html',
+          '{{url_for("static", filename="offline.html")}}',
         ];
         
         /* Progressive Web App Register Service Worker */
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker
-            .register('/service-worker.js')
+            .register('{{url_for("static",filename="service-worker.js")}}')
             .then(function(registration) {
                 console.log('Service Worker Registered!');
                 return registration;
@@ -258,7 +258,7 @@
           'url':url
           }
 
-          $.post('/feedback', {
+          $.post('/app/feedback', {
             'data':JSON.stringify(data)
           }).done(function( data ) {
             feedbacktext.value = '';

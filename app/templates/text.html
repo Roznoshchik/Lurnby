@@ -442,7 +442,7 @@ set_position(read_progress);
     console.log('updating progress');
     byId('overview-progress').innerText = Math.round(progress);
 
-    $.post('/article/' + '{{article_uuid}}' + '/progress', {
+    $.post('/app/article/' + '{{article_uuid}}' + '/progress', {
           'Progress': progress
         });
   }
@@ -451,7 +451,7 @@ set_position(read_progress);
     // var updated_notes = tinymce.get('notes-editor').getContent();
     var updated_notes = tinymce.get('notes-editor').getBody().innerHTML
     
-    $.post('/article/{{article_uuid}}/notes', {
+    $.post('/app/article/{{article_uuid}}/notes', {
         'updated_notes':updated_notes
       });
 
@@ -490,7 +490,7 @@ for(let i=0; i<tables.length; i++){
         update_notes();
         //var serialized = hltr.serializeHighlights();
         var updated_content = byId('article_content').innerHTML
-        $.post('/article/' + article_uuid + '/highlight-storage', {
+        $.post('/app/article/' + article_uuid + '/highlight-storage', {
           'updated_content': updated_content
         }).fail(function() {
           $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
@@ -544,7 +544,7 @@ for(let i=0; i<tables.length; i++){
       data = JSON.stringify(data)
       //console.log(data)
 
-      $.post('/article/addhighlight', {
+      $.post('/app/article/addhighlight', {
         'data':data
       }).done(function( data ) {
         AddedHighlight(data)
@@ -647,7 +647,7 @@ for(let i=0; i<tables.length; i++){
     else 
     {   
             
-        $.post('/topics/add/from_highlight', {
+        $.post('/app/topics/add/from_highlight', {
             title: input.value
         }).done(function(response) {
           $('#topicplaceholder').append(`
@@ -827,7 +827,7 @@ function save_preferences(){
 
 function send_preferences(preferences){
   
-  $.post('/article/preferences', {
+  $.post('/app/article/preferences', {
                 'Preferences': JSON.stringify(preferences)
               });
   

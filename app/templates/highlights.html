@@ -197,7 +197,7 @@
         
         }
 
-        $.post('/export_highlights', {
+        $.post('/app/export_highlights', {
             'data':JSON.stringify(data)
         }).done(function(data){
             data = JSON.parse(data)
@@ -251,7 +251,7 @@
                        </div>`;
 
 
-        $.post('/highlights', {
+        $.post('/app/highlights', {
             'data':data
         }).done(function( data ) {
             data = JSON.parse(data)

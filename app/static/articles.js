@@ -251,7 +251,7 @@ function add_new_article(){
         return response
     }
 
-    url = '/articles/new'
+    url = '/app/articles/new'
     fetch(url, {
         method: 'post',
         headers: {
@@ -297,7 +297,7 @@ function add_new_article(){
                 }
             })
             .then(function(){
-                url = `/articles/bg`
+                url = `/app/articles/bg`
                 fetch(url, {
                     method: 'post',
                     headers: {
@@ -320,7 +320,7 @@ function add_new_article(){
 }
 
 function article_processing(taskID, a_id){
-    url = `/articles/processing/${taskID}/${a_id}`
+    url = `/app/articles/processing/${taskID}/${a_id}`
     fetch(url, {
         method: 'get',
         headers: {
@@ -472,7 +472,7 @@ function edit_article_tiny_init(){
 function ViewArticle(id){
     //$('#edit_article').modal('toggle');
 
-    $.get('/view_article/' + id, function(data) {
+    $.get('/app/view_article/' + id, function(data) {
         var modal = byId('edit_article');
         modal.innerHTML = data;
         initialize();
@@ -483,7 +483,7 @@ function ViewArticle(id){
 
 function ViewAddArticle(){
 
-    $.get('/view_add_article/', function(data) {
+    $.get('/app/view_add_article/', function(data) {
         var modal = byId('add_article');
         modal.innerHTML = data;
         initialize();
@@ -499,7 +499,7 @@ function AddSuggestion(){
     <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
     </div>`;
 
-    destination = `/articles/add_suggestion`
+    destination = `/app/articles/add_suggestion`
     fetch(destination, {
         method: 'get',
         headers: {
@@ -540,7 +540,7 @@ function export_highlights(id, ext){
         'ext': ext
     }
 
-    $.post('/export_highlights', {
+    $.post('/app/export_highlights', {
         'data':JSON.stringify(data)
     }).done(function(data){
         data = JSON.parse(data)
@@ -783,7 +783,7 @@ function filter(){
     }
 
 
-    $.post('/articles/filter', {
+    $.post('/app/articles/filter', {
             'data':JSON.stringify(data)
         }).done(function( data ) {
             article_updated(data)
@@ -844,7 +844,7 @@ function save(article_id){
     }
 
 
-    $.post('/articles/' + article_id + '/update', {
+    $.post('/app/articles/' + article_id + '/update', {
             'data':JSON.stringify(data)
         }).done(function( data ) {
             article_updated(data)

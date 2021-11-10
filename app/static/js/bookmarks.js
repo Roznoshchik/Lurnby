@@ -79,7 +79,7 @@ function save_bookmarks(){
     all_bookmarks['furthest'] = furthest
     let bookmarks = JSON.stringify(all_bookmarks);
     
-    $.post(`/article/${uuid}/bookmarks`, {
+    $.post(`/app/article/${uuid}/bookmarks`, {
         'bookmarks': bookmarks
       });    
 }

@@ -60,7 +60,7 @@ def settings_email():
 
         db.session.commit()
 
-        return redirect(url_for('main.settings'))
+        return redirect(url_for('settings.settings_email'))
         
     # return render_template('settings.html',form=form, senders=approved_senders)
     return render_template('settings/settings_content.html',form=form, senders=approved_senders)
