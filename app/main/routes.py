@@ -341,6 +341,8 @@ def add_by_email():
     
     if process:
         print('processing email')
+        print(request.form)
+
         subject = request.form.get('subject', False)
         html = request.form.get('html', False)
         text = request.form.get('text', False).lstrip()        
