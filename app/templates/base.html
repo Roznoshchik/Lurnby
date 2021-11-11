@@ -7,7 +7,6 @@
     <link href="https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- DO I NEED THESE? -->
-    <link rel="shortcut-icon" href="{{url_for('static', filename='apple-touch-icon.png') }}" sizes="150x150" type="image/png">
     <link rel="icon" href="{{url_for('static', filename='rrbetterface-32.png') }}" sizes="32x32" type="image/png">
     <link rel="icon" href="{{url_for('static', filename='rrbetterface-32.png') }}">
     
@@ -15,11 +14,7 @@
     <link rel="manifest" href="{{ url_for('static', filename='lurnby.webmanifest') }}">
 
     <!-- IOS PWA STUFF  -->
-    <link rel="apple-touch-icon" href="{{url_for('static', filename='images/apple-touch-icon.png') }}" sizes="150x150" type="image/png">
-    <link rel="apple-touch-startup-image" href="images/lurnby.png">
-    <meta name="apple-mobile-web-app-title" content="Lurnby">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    {% include '_ios_splash.html' %}
     
     
     <link rel = "stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}" >
