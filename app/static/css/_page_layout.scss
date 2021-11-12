@@ -7,6 +7,26 @@ html {
     margin-bottom: 48px;
 }
 
+.progressbar{
+    position: fixed;
+    top: 64px;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    height: 4px;
+}
+
+@media(max-width:769px){
+    .progressbar{
+        top: 58px;
+    }
+}
+.progress{
+    background-color: $logo-grey;
+    width: 0%;
+    height: 4px;
+}
+
 .blog-roll {
     
     .post {

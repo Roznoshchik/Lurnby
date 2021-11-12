@@ -5,6 +5,9 @@
 {% endblock %}
 
 {% block content %}
+<div class="progressbar">
+  <div id="progress_percent" class="progress"></div>
+</div>
 <main class = "{{color}}" id="standard">
       <div  class = "{{color}}" id = "sidebar">
         <button type="button" onclick ="show_controls()" id= "sidebar-action-button" class=" {{color}} action-button">Aa</button>
@@ -425,7 +428,11 @@ set_position(read_progress);
         scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
         scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
         scrollPercent = scrollTop / scrollBottom,
-        progress = scrollPercent * 100;
+        progress = scrollPercent * 100,
+        progbar = byId('progress_percent');
+    
+    progbar.style.width = `${scrollPercent * 100}%`;
+
     
     if (progress > furthest){
       furthest = progress;
