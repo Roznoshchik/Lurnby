@@ -7,6 +7,15 @@ html {
     margin-bottom: 48px;
 }
 
+.form-v-center {
+    display: flex;
+    align-content: center;
+    height: 100%;
+    padding: 88px 0px;
+
+}
+
+
 .progressbar{
     position: fixed;
     top: 64px;

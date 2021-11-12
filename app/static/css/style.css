@@ -8,6 +8,13 @@ html {
   margin-bottom: 48px;
 }
 
+.form-v-center {
+  display: flex;
+  align-content: center;
+  height: 100%;
+  padding: 88px 0px;
+}
+
 .progressbar {
   position: fixed;
   top: 64px;
@@ -285,7 +292,7 @@ li {
 
   #settings_body.card {
     padding: 0;
-    width: auto;
+    flex-grow: 1;
   }
 }
 .menu li {
@@ -303,8 +310,11 @@ li {
 }
 
 #settings_body {
-  width: auto;
+  flex-grow: 1;
   margin-bottom: 40px;
+}
+#settings_body * {
+  max-width: 630px;
 }
 
 .settings-input {
@@ -1879,6 +1889,10 @@ ul ul a {
   }
 }
 
+.error {
+  color: #db4928;
+}
+
 @media (max-width: 575px) {
   .mobile-hidden {
     display: none !important;
@@ -1887,6 +1901,10 @@ ul ul a {
 
 .no-bottom {
   padding-bottom: 0;
+}
+
+.ml0 {
+  margin-left: 0;
 }
 
 .main-button {

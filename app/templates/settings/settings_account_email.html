@@ -1,0 +1,42 @@
+{% set settings_nav = 'account' %}
+{% extends 'settings/settings_base.html' %}
+{% block sub_css %}
+<style>
+  
+</style>
+{% endblock %}
+
+{% block settings_content %}
+<div id = "settings_all" class = "main-section">
+    <div class="lurnby-subsection">
+        <h1>Account</h1>
+    </div>
+
+    <div class="lurnby-subsection">
+         <form method="post">
+            {{ form.csrf_token }}
+            
+            <h6>Update email</h6>
+            <div class="form-label-group">
+                {{ form.email(class="form-control", placeholder="New Email")}}
+                {{ form.email.label}}
+            </div>
+            {% for error in form.email.errors %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+            {% endfor %}            
+            <button class="main-button width-100 ml0" id="submit">Update Email</button>
+
+        </form>
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sub_JS%}
+<script>
+</script>
+
+{% endblock %}

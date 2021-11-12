@@ -1,0 +1,17 @@
+
+{% if user.firstname %}
+Dear {{ user.firstname }}, 
+{% elif %}
+Dear {{ user.username }},
+{% else %}
+Hello,
+{% endif %}
+
+To verify your email click on the following link:
+
+{{ url_for('auth.verify_email', token=token, _external=True) }}
+
+If you have not requested an email change simply ignore this message.
+
+Sincerely,
+The Lurnby team

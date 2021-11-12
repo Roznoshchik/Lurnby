@@ -92,7 +92,7 @@
     #settings_body {
       &.card {
           padding: 0;
-          width: auto;
+          flex-grow: 1;
       }
     }
 
@@ -114,9 +114,12 @@
 
 
 #settings_body{
-    //flex-grow: 1;
-    width: auto;
+   
+    flex-grow: 1;
     margin-bottom: 40px;
+    * {
+        max-width: 630px;
+    }
 }
 
 // email page

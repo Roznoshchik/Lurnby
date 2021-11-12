@@ -13,11 +13,18 @@
     </div>
 
     <div class="lurnby-subsection">
-        <h6>Approved Senders</h6>
+        <h6>Info</h6>
          <form method="post">
             {{ form.csrf_token }}
             <div class="form-label-group">
-                {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
+                {{ form.email(class="form-control", value=u.email, disabled=true )}}
+                {{ form.email.label}}
+                <p>
+                    <a class = "small" href="{{ url_for('settings.update_email') }}">Want to change your email address?</a>
+                </p>
+            </div>
+            <div class="form-label-group">
+                {{ form.username(class="form-control", placeholder="Username", value=u.username)}}
                 {{ form.username.label}}
             </div>
             {% for error in form.username.errors %}
@@ -26,14 +33,21 @@
                 </div>
             {% endfor %}
             <div class="form-label-group">
-                {{ form.firstname(class="form-control", value="hello old friend" )}}
+                {{ form.firstname(class="form-control", value=u.name )}}
                 {{ form.firstname.label}}
             </div>
-            <div class="form-label-group">
-                {{ form.email(class="form-control", placeholder="Email", required=true, autofocus=true)}}
-                {{ form.email.label}}
-            </div>
-            {{form.submit(class="main-button")}}
+            {% for error in form.firstname.errors %}
+                <div class="alert alert-danger" role="alert">
+                {{ error }}
+                </div>
+            {% endfor %}
+            <button type = "submit" class="main-button width-100 ml0" id="submit">Update</button>
+            <p>
+                <a class = "small" href="{{ url_for('settings.update_password') }}">Want to change your password?</a>
+            </p>
+            
+
+
         </form>
         
     </div>

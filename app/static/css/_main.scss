@@ -12,6 +12,10 @@
     }
 } 
 
+.error{
+    color: $red;
+}
+
 .mobile-hidden {
     @media(max-width: $mobile-max) {
         display: none !important;    
@@ -21,6 +25,10 @@
 .no-bottom {
     padding-bottom: 0;
 }
+.ml0 {
+    margin-left: 0;
+}
+
 
 .main-button {
     cursor: pointer !important;
