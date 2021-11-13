@@ -1,4 +1,9 @@
+{% if os.environ.get('DEV') %}
+<link rel="apple-touch-icon" href="{{url_for('static', filename='images/lurnby-logo/apple-touch-lurnby.png') }}" sizes="180x180" type="image/png">
+{% else %}
 <link rel="apple-touch-icon" href="{{url_for('static', filename='images/apple-touch-icon.png') }}" sizes="150x150" type="image/png">
+{% endif %}
+
 <!-- <link rel="apple-touch-startup-image" href="static/images/lurnby.png"> -->
 <meta name="apple-mobile-web-app-title" content="Lurnby">
 <meta name="apple-mobile-web-app-capable" content="yes">
