@@ -1,4 +1,4 @@
-{% if os.environ.get('DEV') %}
+{% if staging %}
 <link rel="apple-touch-icon" href="{{url_for('static', filename='images/lurnby-logo/apple-touch-lurnby.png') }}" sizes="180x180" type="image/png">
 {% else %}
 <link rel="apple-touch-icon" href="{{url_for('static', filename='images/apple-touch-icon.png') }}" sizes="150x150" type="image/png">

@@ -81,8 +81,16 @@ def create_app(config_class=Config):
     # Add a variable into the app that can be used in all routes and blueprints
     # This one is so that I can have a now variable that automatically updates the copyright notice at the bottom.
     @app.context_processor
-    def inject_now():
-        return {'now': datetime.utcnow()}
+    def inject():
+        if os.environ.get('DEV'):
+            staging=True
+        else:
+            staging=False
+
+
+        return {'now': datetime.utcnow(),'staging':staging }
+
+
     cors.init_app(app, resources={r"/app/api/*": {"origins": "*"}})
     
   
