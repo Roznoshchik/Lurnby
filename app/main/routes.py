@@ -637,12 +637,16 @@ def add_article():
         if (url != 'none'):
 
             if not validators.url(url):
+                print("can't validate url")
+
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
             
             try:
                 urltext = pull_text(url)
             except:
+                print("can't extact text")
+
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
@@ -650,6 +654,8 @@ def add_article():
             content = urltext["content"]
 
             if not title or not content:
+                print("no title or content")
+
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
@@ -683,8 +689,9 @@ def add_article():
                 new_article.AddToTag(t)
             
     db.session.commit()
-    current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
-    current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
+    if os.environ.get('REDIS_TRUE'):
+        current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
+        current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
 
     db.session.commit()
 
