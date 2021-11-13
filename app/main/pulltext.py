@@ -15,9 +15,10 @@ def pull_text(url):
     response = requests.get(url, headers=headers)
     response.encoding= 'utf-8'
     # article=response.text
+    print(response.ok)
     article = simple_json_from_html_string(response.text,
                                            content_digests=False,
                                            node_indexes=False,
                                            use_readability=True)
-
+    print(article)
     return article

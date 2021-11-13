@@ -645,7 +645,7 @@ def add_article():
             try:
                 urltext = pull_text(url)
             except:
-                print("can't extact text")
+                print("can't extract text")
 
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
