@@ -1,5 +1,5 @@
 from flask import (flash, redirect, url_for, render_template, request,
-                   current_app)
+                   current_app, send_file, json)
 from flask_login import current_user, login_required
 from flask_wtf.csrf import CSRFError
 
@@ -8,6 +8,20 @@ from app.dotcom import bp
 
 
 from datetime import datetime, timedelta
+
+import os
+
+# ##################### #
+# ##     robots      ## #
+# ##################### #
+@bp.route('/robots.txt')
+def robots():
+    if os.environ.get('DEV'):
+        x = send_file('robots-dev.txt')
+    else:
+        x = send_file('robots-prod.txt')
+    return x
+
 
 @bp.route('/')
 @bp.route('/index')
