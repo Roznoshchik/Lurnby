@@ -140,6 +140,10 @@
 }
 
 
+
+
+
+
 #settings_all {
     p  {
         max-width: 630px;
@@ -149,6 +153,30 @@
     }
     .main-button {
         box-sizing: border-box;
+    }
+
+
+    #export{
+        max-width: 200px;
+        margin-right: 8px;
+        margin-top: 0;
+    }
+
+    #export_submit{
+        width: auto;
+    }
+
+    @media(max-width:$mobile-max){
+        #export {
+            max-width: 100%;
+            margin-right: 0;
+            margin-bottom: 8px;
+        }
+
+        #export_submit{
+            width: 100%;
+        }
+        
     }
 
 }

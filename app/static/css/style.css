@@ -347,6 +347,24 @@ li {
 #settings_all .main-button {
   box-sizing: border-box;
 }
+#settings_all #export {
+  max-width: 200px;
+  margin-right: 8px;
+  margin-top: 0;
+}
+#settings_all #export_submit {
+  width: auto;
+}
+@media (max-width: 575px) {
+  #settings_all #export {
+    max-width: 100%;
+    margin-right: 0;
+    margin-bottom: 8px;
+  }
+  #settings_all #export_submit {
+    width: 100%;
+  }
+}
 
 #enable_email {
   margin-left: 0;

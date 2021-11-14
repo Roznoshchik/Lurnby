@@ -44,10 +44,12 @@
             </div>
         </div>
     {% elif current_user.add_by_email == None %}
-    <h6><strong>Add By Email:</strong></h6>
-        <p>You can add reading content to Lurnby via email. Lurnby can either process links or full emails. At the moment, processing of attachments is not possible.</p>
-        <p>After you enable this feature in your account, you will get a unique email address for sending email to. Additionally, you will be able to specify approved senders. Only emails sent from your approved senders will be processed.</p>
-    <button id='enable_email' class="main-button">Enable adding articles by email </button>
+    <div class="lurnby-subsection">
+        <h6><strong>Add By Email:</strong></h6>
+            <p>You can add reading content to Lurnby via email. Lurnby can either process links or full emails. At the moment, processing of attachments is not possible.</p>
+            <p>After you enable this feature in your account, you will get a unique email address for sending email to. Additionally, you will be able to specify approved senders. Only emails sent from your approved senders will be processed.</p>
+        <button id='enable_email' class="main-button">Enable adding articles by email </button>
+    </div>
     {% endif %}
     <div class="lurnby-subsection ">
         <h6>Data Export</h6>
@@ -56,13 +58,13 @@
         <p>
             <strong>Export format</strong>
         </p>
-        <div style="display: flex;">
-            <select id="export" class="settings-input" style = "max-width: 200px;">
+        <div style="display: flex; flex-wrap: wrap;">
+            <select id="export" class="settings-input">
                 <option value='none' disabled>Choose</option>
                 <option value='txt'>TXT</option>
                 <option value='json'>JSON</option>
             </select>
-            <button id="export_submit" class="main-button">Export my data</button>
+            <button id="export_submit" class="main-button ml0 ">Export my data</button>
         </div>
     </div>
 </div>
