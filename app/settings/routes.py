@@ -1,6 +1,6 @@
 from flask import (flash, redirect, url_for, render_template, request,
                    current_app, json)
-from flask_login import current_user, login_required, logout_user
+from flask_login import current_user, login_required, logout_user, login_user
 from flask_wtf.csrf import CSRFError
 
 
@@ -101,10 +101,11 @@ def update_email():
 # ################################## #
 
 @bp.route('/settings/verify_email/<token>/<email>', methods=['GET', 'POST'])
-@login_required
 def verify_email(token, email):
     user = User.verify_reset_password_token(token)
     if user:
+        login_user(user, remember=True)
+
         if user.username == user.email:
             user.username = email.lower()
         user.email = email.lower()
@@ -129,11 +130,10 @@ def delete_verify():
 # ##     Delete Confirm     ## #
 # ############################ #
 @bp.route('/settings/account/delete/<token>', methods=['GET'])
-@login_required
 def delete_confirm(token):
     user = User.verify_delete_account_token(token)
     if user:
-        print('hello')
+        login_user(user, remember=True)
         return redirect(url_for('settings.delete_final'))
 
     else:
