@@ -30,8 +30,11 @@ def epubConverted(filepath, u=None):
     path = os.path.join(
         basedir, 'temp', title
     )
-
-    az_path_base = f'{u.id}/{title}/'
+    if os.environ.get('DEV'):
+        az_path_base = f'staging/{u.id}/{title}/'
+    else:
+        az_path_base = f'{u.id}/{title}/'
+    
     with ZipFile(filepath, 'r') as zip: 
         zip.extractall(path=path)
 

@@ -110,8 +110,10 @@ def html2text(html):
     path = os.path.join(
         basedir, 'temp', title
     )
-
-    az_path = f'{current_user.id}/{title}/'
+    if os.environ.get('DEV'):
+        az_path = f'staging/{current_user.id}/{title}/'
+    else:
+        az_path = f'{current_user.id}/{title}/'
     with ZipFile(epub, 'r') as zip: 
         zip.extractall(path=path)
     

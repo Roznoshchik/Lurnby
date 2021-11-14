@@ -108,10 +108,20 @@ html {
 
 .lurnby-subsection{
     margin-bottom: 44px;
+    
+    .subheading {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
 
     h6{
         font-weight: 900;
     }
+
+    * {
+        box-sizing: border-box;
+    }
+
 }
 
 .lurnby-subsection .lurnby-subsection {

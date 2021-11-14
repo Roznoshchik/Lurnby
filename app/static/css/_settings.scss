@@ -127,7 +127,18 @@
 .settings-input{
     width: 300px;
     padding: 4px 8px;
+    height: 42px;
+    background-color: transparent;
+    box-sizing: border-box;
+    border-radius: 0;
+    border:$dark-grey 0.5px solid;
+    color: $dark;
+
+    &::placeholder{
+        opacity:1;
+    }
 }
+
 
 #settings_all {
     p  {
@@ -135,6 +146,9 @@
     }
     .card {
         padding: 0;
+    }
+    .main-button {
+        box-sizing: border-box;
     }
 
 }

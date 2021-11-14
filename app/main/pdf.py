@@ -66,8 +66,10 @@ def importPDF(filepath, u=None):
     )
     if not os.path.isdir(img_path):
         os.mkdir(img_path)
-
-    az_path_base = f'{u.id}/{title_for_dir}/'
+    if os.environ.get('DEV'):
+        az_path_base = f'staging/{u.id}/{title_for_dir}/'
+    else:
+        az_path_base = f'{u.id}/{title_for_dir}/'
     # count for img title
     j = 0
     for page in doc:

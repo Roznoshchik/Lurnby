@@ -142,24 +142,25 @@ def delete_confirm(token):
     
     return render_template('/settings/settings_delete_verify.html')
         
-            
-
+# ########################## #
+# ##     Delete Final     ## #
+# ########################## #       
 
 @bp.route('/settings/account/delete/final', methods=['GET','POST'])
 @login_required
 def delete_final():
     form = DeleteAccountForm()
     if form.validate_on_submit():
-        current_user.launch_task('delete_account', 'exporting data...', current_user.id, form.export.data)
+        current_user.launch_task('account_export', 'exporting data...', current_user.id, form.export.data, delete=True)
         db.session.commit()
         logout_user()
-        return redirect('auth.register')
+        return redirect(url_for('auth.register'))
 
     return render_template('/settings/settings_delete_confirm.html', form=form)
 
 
 # ############################# #
-# ##     email settings      ## #
+# ##     Content settings      ## #
 # ############################# #
 
 @bp.route('/settings/content', methods=['GET', 'POST'])
@@ -192,6 +193,10 @@ def settings_content():
     # return render_template('settings.html',form=form, senders=approved_senders)
     return render_template('settings/settings_content.html',form=form, senders=approved_senders)
 
+# ########################## #
+# ##     Enable email     ## #
+# ########################## #
+
 @bp.route('/enable-add-by-email', methods=['POST'])
 @login_required
 @bp.errorhandler(CSRFError)
@@ -206,3 +211,16 @@ def enable_add_by_email():
     db.session.commit()
 
     return '', 200
+
+# ######################### #
+# ##     Export Data     ## #
+# ######################### #
+
+@bp.route('/settings/content/export', methods=['POST'])
+@login_required
+def export():
+    data = json.loads(request.data)
+    current_user.launch_task('account_export', 'exporting data...', current_user.id, data['ext'], delete=False)
+    db.session.commit()
+
+    return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
