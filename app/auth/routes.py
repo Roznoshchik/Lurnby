@@ -10,7 +10,7 @@ from app.auth import bp
 from app.auth.forms import (LoginForm, RegisterForm, ResetPasswordRequestForm,
                             ResetPasswordForm)
 from app.auth.email import send_password_reset_email
-from app.models import User
+from app.models import User, Comms
 
 from werkzeug.urls import url_parse
 from oauthlib.oauth2 import WebApplicationClient
@@ -129,6 +129,8 @@ def callback():
     user = User.query.filter_by(email=users_email).first()
     if user is None:
         db.session.add(newuser)
+        comms = Comms(user_id=newuser.id)
+        db.session.add(comms)
         db.session.commit()
         user = User.query.filter_by(goog_id=unique_id).first()
         login_user(user, remember=True)
@@ -155,6 +157,8 @@ def register():
                     email=form.email.data.lower())
         user.set_password(form.password.data)
         db.session.add(user)
+        comms = Comms(user_id=user.id)
+        db.session.add(comms)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('auth.login'))

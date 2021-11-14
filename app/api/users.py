@@ -3,7 +3,7 @@ from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from app.main.pulltext import pull_text
-from app.models import Article, User, Tag
+from app.models import Article, User, Tag, Comms
 
 from flask import jsonify, request, url_for
 
@@ -34,6 +34,9 @@ def create_user():
     user = User()
     user.from_dict(data)
     token = user.get_token()
+    db.session.add(user)
+    comms = Comms(user_id=user.id)
+    db.session.add(comms)
     db.session.commit()
     response = jsonify({'token': token, 'id': user.id})
     response.status_code = 201

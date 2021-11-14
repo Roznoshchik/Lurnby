@@ -2,7 +2,7 @@ from app import db
 from app.api import bp
 from app.api.auth import basic_auth, token_auth
 from app.api.errors import bad_request
-from app.models import User
+from app.models import User, Comms
 
 from flask import jsonify, request, url_for
 
@@ -35,6 +35,9 @@ def google_login():
     user = User(goog_id=data['goog_id'], email=data['email'],
                 firstname=data['first_name'])
     token = user.get_token()
+    db.session.add(user)
+    comms = Comms(user_id=user.id)
+    db.session.add(comms)
     db.session.commit()
     response = jsonify({'token': token, 'id': user.id})
     response.status_code = 201
