@@ -1,0 +1,14 @@
+{% if user.firstname %}
+<p> Dear {{ user.firstname }}, </p>
+{% elif user.username %}
+<p> Dear {{ user.username }}, </p>
+{% else %}
+<p>Hello,</p>
+{% endif %}
+
+<p> <a href="{{ url_for('settings.delete_confirm', token=token, _external=True) }}">Click this link to confirm deleting your Lurnby account.</a></p>
+<p>
+    If you did not request deleting your account, please urgently change your account password as your account may have been compromised.
+</p>
+<p>Sincerely,</p>
+<p>The Lurnby team</p>

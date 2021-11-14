@@ -1,0 +1,42 @@
+{% set settings_nav = 'account' %}
+{% extends 'settings/settings_base.html' %}
+{% block sub_css %}
+<style>
+  
+</style>
+{% endblock %}
+
+{% block settings_content %}
+<div id = "settings_all" class = "main-section">
+    <div class="lurnby-subsection">
+        <h1>Account</h1>
+    </div>
+
+    <div class="lurnby-subsection">
+        
+        <form method="post">
+            {{ form.csrf_token }}
+            
+            <h6>Delete my data</h6>
+            <div class="form-label-group">
+                <p>Clicking the button below will permanently delete your Lurnby account and all of it's associated data.</p>
+                <p>If you wish to receive your Lurnby data by email. Please choose an export method below.</p>
+                <p>Please consider <a href="mailto:research@lurnby.com?subject=Leaving Lurnby Feedback">sharing the reason for your account deletion</a> with our team. It would help us know how we should improve our service.</p>
+                <p>
+                    <strong>Export format</strong>
+                </p>
+                {{ form.export(class="form-control", placeholder="Choose")}}
+            </div>           
+            <button class="main-button width-100 ml0" id="submit">Delete my data</button>
+
+        </form>
+
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sub_JS%}
+
+{% endblock %}

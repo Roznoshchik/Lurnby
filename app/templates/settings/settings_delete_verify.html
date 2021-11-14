@@ -1,0 +1,68 @@
+{% set settings_nav = 'account' %}
+{% extends 'settings/settings_base.html' %}
+{% block sub_css %}
+<style>
+  
+</style>
+{% endblock %}
+
+{% block settings_content %}
+<div id = "settings_all" class = "main-section">
+    <div class="lurnby-subsection">
+        <h1>Account</h1>
+    </div>
+
+    <div class="lurnby-subsection">
+        
+        <div id="delete_info">
+            <h6>Delete my data</h6>
+            <p>
+                You have the right to be <strong>“forgotten”</strong> by us. If you are choosing to exercise that right, be aware that Lurnby takes your data rights seriously.
+            </p>
+            <p>
+                Deleting your personal data from Lurnby is an irreversible process. We will no longer be able to access your account, access any of your stored content or pull any highlights as they will be permanently deleted.
+            </p>
+            <p> 
+                You will be able to export your data before deleting your account.
+            </p>
+            <p>
+                I understand and want to delete my data.
+            </p>
+            <button class="main-button width-100 ml0" id="delete_btn">Verify Your Account To Continue</button>
+        </div>    
+           
+
+        
+    </div>
+</div>
+
+{% endblock %}
+
+{% block sub_JS%}
+<script>
+    delete_btn = byId('delete_btn')
+    delete_btn.addEventListener('click', delete_init)
+
+    info = byId('delete_info')
+
+    function delete_init(){
+        url = '{{ url_for("settings.delete_verify")}}'
+        fetch(url, {
+            method: 'post',
+            headers: {
+                'Content-type': 'application/json',
+                'X-CSRFToken': csrf_token
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            msg = create_alert('alert-success', `<p>Please check your account email to continue.</p><button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                        </button>`)
+            byId('flashMessages').appendChild(msg)
+        });
+    }
+    
+</script>
+
+{% endblock %}

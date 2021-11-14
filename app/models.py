@@ -30,13 +30,13 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     add_by_email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
-    articles = db.relationship('Article', backref='user', lazy='dynamic')
-    highlights = db.relationship('Highlight', backref='user', lazy='dynamic')
+    articles = db.relationship('Article', backref='user', lazy='dynamic', cascade='delete, all')
+    highlights = db.relationship('Highlight', backref='user', lazy='dynamic', cascade='delete, all')
     events = db.relationship('Event', backref="user", lazy='dynamic')
     approved_senders = db.relationship('Approved_Sender', backref='user',
-                                       lazy='dynamic')
-    topics = db.relationship('Topic', backref='user', lazy='dynamic')
-    tags = db.relationship('Tag', backref='user', lazy='dynamic')
+                                       lazy='dynamic', cascade='delete, all')
+    topics = db.relationship('Topic', backref='user', lazy='dynamic', cascade='delete, all')
+    tags = db.relationship('Tag', backref='user', lazy='dynamic', cascade='delete, all')
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     last_action = db.Column(db.String)
@@ -45,9 +45,9 @@ class User(UserMixin, db.Model):
     preferences = db.Column(db.String, index=True, default=preferences)
     admin = db.Column(db.Boolean)
     test_account = db.Column(db.Boolean, default=False)
-    tasks = db.relationship('Task', backref='user', lazy='dynamic')
+    tasks = db.relationship('Task', backref='user', lazy='dynamic', cascade='delete, all')
     notifications = db.relationship('Notification', backref='user',
-                                    lazy='dynamic')
+                                    lazy='dynamic', cascade='delete, all')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
     review_count = db.Column(db.Integer, default=5)
 
@@ -66,11 +66,27 @@ class User(UserMixin, db.Model):
             current_app.config['SECRET_KEY'],
             algorithm='HS256').decode('utf-8')
 
+    def get_delete_account_token(self, expires_in=600):
+        return jwt.encode(
+            {'delete_account': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'],
+            algorithm='HS256').decode('utf-8')
+
     @staticmethod
     def verify_reset_password_token(token):
         try:
             id = jwt.decode(token, current_app.config['SECRET_KEY'],
                             algorithms=['HS256'])['reset_password']
+        except jwt.exceptions.InvalidTokenError:
+            return
+        return User.query.get(id)
+
+    
+    @staticmethod
+    def verify_delete_account_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['delete_account']
         except jwt.exceptions.InvalidTokenError:
             return
         return User.query.get(id)

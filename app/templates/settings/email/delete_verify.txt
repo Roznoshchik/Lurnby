@@ -1,0 +1,17 @@
+
+{% if user.firstname %}
+Dear {{ user.firstname }}, 
+{% elif user.username %}
+Dear {{ user.username }},
+{% else %}
+Hello,
+{% endif %}
+
+To confirm deleting your Lurnby account click on the following link:
+
+{{ url_for('settings.delete_confirm', token=token, _external=True) }}
+
+If you did not request deleting your account, please urgently change your account password as your account may have been compromised.
+
+Sincerely,
+The Lurnby team

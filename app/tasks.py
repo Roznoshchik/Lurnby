@@ -10,10 +10,11 @@ from bs4 import BeautifulSoup
 
 
 from app import create_app, db, s3, bucket
+from app.export import get_zip
 from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
-from app.models import Task, Article, Highlight, Tag
+from app.models import Task, Article, Highlight, Tag, User
 
 
 app = create_app()
@@ -21,6 +22,7 @@ app.app_context().push()
 
 def _set_task_progress(progress):
     job = get_current_job()
+  
     if job:
         job.meta['progress'] = progress
         job.save_meta()
@@ -31,6 +33,48 @@ def _set_task_progress(progress):
         if progress >= 100:
             task.complete = True
         db.session.commit()
+
+
+def delete_account(uid, ext):
+    try:
+        _set_task_progress(0)
+        user = User.query.get(uid)
+        
+        az_path_base = f'{user.id}/exports/'
+        filename = get_zip(user, ext)
+        az_path = f'{az_path_base}lurnby-export.zip'
+        s3.upload_file(
+            Bucket = bucket,
+
+            Filename=filename,
+            Key=az_path
+            )
+        location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
+        #url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+        url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
+
+
+        send_email('[Lurnby] Your exported data',
+                sender=app.config['ADMINS'][0], recipients=[user.email],
+                text_body=render_template('email/export_highlights.txt', url=url, user=user),
+                html_body=render_template('email/export_highlights.html', url=url, user=user),
+                sync=True)
+
+        for tag in user.tags.all():
+            db.session.delete(tag)
+        for highlight in user.highlights.all():
+            db.session.delete(highlight)
+        for topic in user.topics.all():
+            db.session.delete(topic)
+        for article in user.articles.all():
+            db.session.delete(article)
+        _set_task_progress(100)
+        db.session.delete(user)
+        db.session.commit()
+        
+    except:
+        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+  
 
 
 def export_highlights(user, highlights, source, ext):

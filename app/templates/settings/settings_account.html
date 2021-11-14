@@ -45,11 +45,15 @@
             <p>
                 <a class = "small" href="{{ url_for('settings.update_password') }}">Want to change your password?</a>
             </p>
-            
-
 
         </form>
-        
+        <div style="height: 24px;"></div>
+        <div>
+            <h6>Delete Account</h6>
+            <p class="small"><strong>Permanently delete your Lurnby account and all your data.</strong></p>
+            <p>You will be offered an option to export any existing highlights and notes before deletion.</p>
+            <a href = "{{url_for('settings.delete_verify')}}" class="main-button cancel ml0 width-100">Delete Account</a>
+        </div>
     </div>
 </div>
 
