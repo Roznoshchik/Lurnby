@@ -160,6 +160,7 @@ def register():
         comms = Comms(user_id=user.id)
         db.session.add(comms)
         db.session.commit()
+        print(comms)
         flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
