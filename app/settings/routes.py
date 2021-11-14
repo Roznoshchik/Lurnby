@@ -233,7 +233,7 @@ def export():
 def comms():
     form = CommunicationForm()
     comms = current_user.comms.first()
-    # print(comms)
+    print(comms)
     
     # form.highlights.checked = comms.highlights
     # form.reminders.checked = comms.reminders
