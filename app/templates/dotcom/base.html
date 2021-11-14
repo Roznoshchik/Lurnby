@@ -6,6 +6,13 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta content="width=device-width, initial-scale=1" name="viewport" />
         <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "c14cd94dfdb54809941c2bf62129a5c6"}'></script><!-- End Cloudflare Web Analytics -->
+        <!-- PWA STUFF  -->
+        <link rel="manifest" href="{{ url_for('static', filename='lurnby.webmanifest') }}">
+
+        <!-- IOS PWA STUFF  -->
+        {% include '_ios_splash.html' %}
+        
+        
         <script>
             var host = window.location.hostname;
             if(host == "www.lurnby.com")
