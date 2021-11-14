@@ -109,7 +109,8 @@
 .menu a.active {
     padding: 4px 8px;
     margin-left: -8px;
-    background-color: darkgrey;
+    background-color: $dark;
+    color: white;
 }
 
 

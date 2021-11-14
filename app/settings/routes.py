@@ -6,7 +6,7 @@ from flask_wtf.csrf import CSRFError
 
 from app.settings import bp
 from app.models import Approved_Sender, User, update_user_last_action, Event
-from app.settings.forms import AddApprovedSenderForm, DeleteAccountForm
+from app.settings.forms import AddApprovedSenderForm, DeleteAccountForm, CommunicationForm
 from app.auth.forms import UpdateAccountForm, UpdatePasswordForm, UpdateEmailForm
 from app.settings.email import send_email_verification, send_delete_verification
 from app import db
@@ -224,3 +224,40 @@ def export():
     db.session.commit()
 
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
+
+# ############################ #
+# ##     Notifications      ## #
+# ############################ #
+
+@bp.route('/settings/communication', methods=['GET','POST'])
+def comms():
+    form = CommunicationForm()
+    comms = current_user.comms.first()
+    # print(comms)
+    
+    # form.highlights.checked = comms.highlights
+    # form.reminders.checked = comms.reminders
+    # form.educational.checked = comms.educational
+    # form.promotions.checked = comms.promotional
+    # form.reminders.checked = comms.reminders
+    # form.informational.checked = comms.informational
+
+
+    if form.validate_on_submit():
+        comms.highlights = form.data['highlights']
+        comms.reminders = form.data['reminders']
+        comms.promotional = form.data['promotions']
+        comms.educational = form.data['educational']
+        comms.informational = form.data['informational']
+        db.session.commit()
+        
+        flash('Preferences updated', 'success')
+        
+        # form.highlights.checked = comms.highlights
+        # form.reminders.checked = comms.reminders
+        # form.educational.checked = comms.educational
+        # form.promotions.checked = comms.promotional
+        # form.reminders.checked = comms.reminders
+        # form.informational.checked = comms.informational
+
+    return render_template('settings/settings_communication.html', form=form, comms=comms)

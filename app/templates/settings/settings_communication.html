@@ -1,0 +1,72 @@
+{% set settings_nav = 'comms' %}
+{% extends 'settings/settings_base.html' %}
+{% block sub_css %}
+<style>
+  
+</style>
+{% endblock %}
+
+{% block settings_content %}
+<div id = "settings_all" class = "main-section">
+    <div class="lurnby-subsection">
+        <h1>Communication Preferences</h1>
+    </div>
+    <div class="lurnby-subsection">
+        <div class="lurnby-subsection">
+            <h6>Email Notifications</h6>
+            <p>You have control over which emails Lurnby sends to you. Please review the options below and unselect any emails you don't want to receive. Please note that there are some emails that we will always send you such as verification emails and emails with your data exports.</p>
+        </div>
+        <form method="post">
+            {{ form.csrf_token }}
+            <div class="lurnby-subsection">
+                <p>
+                    <strong>Educational emails</strong>
+                    {{form.educational(checked=comms.educational)}}
+                </p>
+                <p>These are emails with information on how to use and get the most out of Lurnby.</p>
+            </div>
+            <div class="lurnby-subsection">
+                <p>
+                    <strong>Informational emails</strong>
+                    {{form.informational(checked=comms.informational)}}
+                </p>
+                <p>These are emails about updates and new features on Lurnby, changes to our terms and conditions, as well as other information meant to keep you aware of what Lurnby is doing.</p>
+            </div>
+            <div class="lurnby-subsection">
+                <p>
+                    <strong>Promotional emails</strong>
+                    {{form.promotions(checked=comms.promotional)}}
+                </p>
+                <p>New offers from Lurnby, promotions, or offers from our affiliates that we feel may be relevant to you.</p>
+            </div>
+            <div class="lurnby-subsection">
+                <p>
+                    <strong>Highlight emails</strong>
+                    {{form.highlights(checked=comms.highlights)}}
+                </p>
+                <p>Emails with a short selection of your highlights delivered to your inbox.</p>
+            </div>
+            <div class="lurnby-subsection">
+                <p>
+                    <strong>Reminder emails</strong>
+                    {{form.reminders(checked=comms.reminders)}}
+                </p>
+                <p>Reminders to visit Lurnby if you've been gone for a while.</p>
+            </div>
+
+            {{form.submit(class="main-button ml0")}}
+        </form>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block sub_JS%}
+<script>
+
+
+
+</script>
+
+{% endblock %}

@@ -21,15 +21,35 @@ from werkzeug.security import generate_password_hash, check_password_hash
 preferences = '{"font": "sans-serif","color": "light-mode", \
               "size": "4","spacing": "line-height-min"}'
 
+class Comms(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True)
+    informational = db.Column(db.Boolean, default=True)
+    educational = db.Column(db.Boolean, default=True)
+    promotional = db.Column(db.Boolean, default=True)
+    highlights = db.Column(db.Boolean, default=True)
+    reminders = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return f'<User {self.user_id}>\n informational: {self.informational}, educational: {self.educational}, promotional: {self.promotional}, highlights: {self.highlights}, reminders: {self.reminders}'
 
 class User(UserMixin, db.Model):
+    #########################
+    ####    Identity    #####
+    #########################
     id = db.Column(db.Integer, primary_key=True)
     goog_id = db.Column(db.String, unique=True, index=True)
     firstname = db.Column(db.String, index=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    add_by_email = db.Column(db.String(120), unique=True)
     password_hash = db.Column(db.String(128))
+    admin = db.Column(db.Boolean)
+    test_account = db.Column(db.Boolean, default=False)
+    
+
+    ##############################
+    ####    Relationships    #####
+    ##############################
     articles = db.relationship('Article', backref='user', lazy='dynamic', cascade='delete, all')
     highlights = db.relationship('Highlight', backref='user', lazy='dynamic', cascade='delete, all')
     events = db.relationship('Event', backref="user", lazy='dynamic')
@@ -37,19 +57,32 @@ class User(UserMixin, db.Model):
                                        lazy='dynamic', cascade='delete, all')
     topics = db.relationship('Topic', backref='user', lazy='dynamic', cascade='delete, all')
     tags = db.relationship('Tag', backref='user', lazy='dynamic', cascade='delete, all')
-    account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    last_active = db.Column(db.DateTime, default=datetime.utcnow)
-    last_action = db.Column(db.String)
-    token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
-    preferences = db.Column(db.String, index=True, default=preferences)
-    admin = db.Column(db.Boolean)
-    test_account = db.Column(db.Boolean, default=False)
     tasks = db.relationship('Task', backref='user', lazy='dynamic', cascade='delete, all')
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic', cascade='delete, all')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
+    comms = db.relationship('Comms', backref='user', lazy='dynamic', cascade='delete, all')
+    
+    #########################
+    ####    Activity    #####
+    ##################3######
+    account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    last_active = db.Column(db.DateTime, default=datetime.utcnow)
+    last_action = db.Column(db.String)
+    
+    ######################
+    ####    API??    #####
+    ######################
+    token = db.Column(db.String(32), index=True, unique=True)
+    token_expiration = db.Column(db.DateTime)
+    
+    ################################
+    ####    custom settings    #####
+    ################################
+    preferences = db.Column(db.String, index=True, default=preferences)
+    add_by_email = db.Column(db.String(120), unique=True)
     review_count = db.Column(db.Integer, default=5)
+    
 
     def __repr__(self):
         return '<User {}>'.format(self.email)

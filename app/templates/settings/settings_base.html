@@ -15,7 +15,7 @@
         <ul id ="settings_menu" class = "minimal menu">
             <li><a class="{% if settings_nav == 'account' %} active {% endif %} " href="{{url_for('settings.settings_account')}}">Account</a></li>
             <li><a class="{% if settings_nav == 'content' %} active {% endif %} " href="{{url_for('settings.settings_content')}}">Content</a></li>
-            <li><a class="{% if settings_nav == 'notifications' %} active {% endif %} disabled" href="#">Notifications</a></li>
+            <li><a class="{% if settings_nav == 'comms' %} active {% endif %}" href="{{url_for('settings.comms')}}">Communication</a></li>
             <li><a class="{% if settings_nav == 'payments' %} active {% endif %} disabled" href="#">Payments</a></li>
         </ul>
         <span class="mobile_nav_container"><button class="mobile_nav nav_right"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></button></span>
