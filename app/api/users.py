@@ -35,9 +35,11 @@ def create_user():
     user.from_dict(data)
     token = user.get_token()
     db.session.add(user)
+    db.session.commit()
     comms = Comms(user_id=user.id)
     db.session.add(comms)
     db.session.commit()
+    
     response = jsonify({'token': token, 'id': user.id})
     response.status_code = 201
     response.headers['location'] = url_for('api.get_user_tags', id=user.id)

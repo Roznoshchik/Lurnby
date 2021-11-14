@@ -36,6 +36,7 @@ def google_login():
                 firstname=data['first_name'])
     token = user.get_token()
     db.session.add(user)
+    db.session.commit()
     comms = Comms(user_id=user.id)
     db.session.add(comms)
     db.session.commit()
