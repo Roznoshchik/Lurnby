@@ -130,7 +130,7 @@ def callback():
     if user is None:
         db.session.add(newuser)
         db.session.commit()
-        comms = Comms(user_id=user.id)
+        comms = Comms(user_id=newuser.id)
         db.session.add(comms)
         db.session.commit()
         user = User.query.filter_by(goog_id=unique_id).first()

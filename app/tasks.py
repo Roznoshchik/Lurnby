@@ -21,6 +21,33 @@ from app.models import Task, Article, Highlight, Tag, User
 app = create_app()
 app.app_context().push()
 
+def delete_user(user):
+    highlights=u.highlights.all()
+    topics = u.topics.all()
+    articles = u.articles.all()
+    tags = u.tags.all()
+    senders = u.approved_senders.all()
+    comms = u.comms
+    for h in highlights:
+        db.session.execute(f'DELETE from highlights_topics where highlight_id={h.id}')
+        db.session.delete(h)
+    for t in topics:
+        db.session.execute(f'DELETE from highlights_topics where topic_id={t.id}')
+        db.session.delete(t)
+    for t in tags:
+        db.session.execute(f'DELETE from tags_articles where tag_id={t.id}')
+        db.session.delete(t)
+    for a in articles:
+        db.session.execute(f'DELETE from tags_articles where article_id={a.id}')
+        db.session.delete(a)
+    for s in senders:
+        db.session.delete(s)
+    db.session.delete(comms)
+    db.session.delete(user)
+    db.session.commit()
+
+
+
 def _set_task_progress(progress):
     job = get_current_job()
   
@@ -73,18 +100,19 @@ def account_export(uid, ext, delete=False):
             az = boto3.resource('s3')
             buck = az.Bucket(bucket)
             buck.objects.filter(Prefix=az_path_base).delete()
+            delete_user(user)
 
-            for tag in user.tags.all():
-                db.session.delete(tag)
-            for highlight in user.highlights.all():
-                db.session.delete(highlight)
-            for topic in user.topics.all():
-                db.session.delete(topic)
-            for article in user.articles.all():
-                db.session.delete(article)
-            _set_task_progress(100)
-            db.session.delete(user)
-            db.session.commit()
+            # for tag in user.tags.all():
+            #     db.session.delete(tag)
+            # for highlight in user.highlights.all():
+            #     db.session.delete(highlight)
+            # for topic in user.topics.all():
+            #     db.session.delete(topic)
+            # for article in user.articles.all():
+            #     db.session.delete(article)
+            # _set_task_progress(100)
+            # db.session.delete(user)
+            # db.session.commit()
         
     except:
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
