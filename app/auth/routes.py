@@ -133,6 +133,7 @@ def callback():
         comms = Comms(user_id=newuser.id)
         db.session.add(comms)
         db.session.commit()
+        print(comms)
         user = User.query.filter_by(goog_id=unique_id).first()
         login_user(user, remember=True)
 
@@ -161,6 +162,7 @@ def register():
         db.session.commit()
         comms = Comms(user_id=user.id)
         db.session.add(comms)
+        print(comms)
         db.session.commit()
         flash('Congratulations, you are now a registered user!', 'message')
         return redirect(url_for('auth.login'))
