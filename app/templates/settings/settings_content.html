@@ -91,11 +91,11 @@
     }
     
 
-    export_type = byId('export').value
+    export_type = byId('export')
     export_submit = byId('export_submit');
     export_submit.addEventListener('click', function(){
         url = "{{url_for('settings.export')}}"
-        data = JSON.stringify({'ext':export_type})
+        data = JSON.stringify({'ext':export_type.value})
         fetch(url, {
             method: 'post',
             headers: {

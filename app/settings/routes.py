@@ -234,14 +234,6 @@ def comms():
     form = CommunicationForm()
     comms = current_user.comms
     print(comms)
-    
-    # form.highlights.checked = comms.highlights
-    # form.reminders.checked = comms.reminders
-    # form.educational.checked = comms.educational
-    # form.promotions.checked = comms.promotional
-    # form.reminders.checked = comms.reminders
-    # form.informational.checked = comms.informational
-
 
     if form.validate_on_submit():
         comms.highlights = form.data['highlights']
@@ -252,12 +244,5 @@ def comms():
         db.session.commit()
         
         flash('Preferences updated', 'success')
-        
-        # form.highlights.checked = comms.highlights
-        # form.reminders.checked = comms.reminders
-        # form.educational.checked = comms.educational
-        # form.promotions.checked = comms.promotional
-        # form.reminders.checked = comms.reminders
-        # form.informational.checked = comms.informational
 
     return render_template('settings/settings_communication.html', form=form, comms=comms)
