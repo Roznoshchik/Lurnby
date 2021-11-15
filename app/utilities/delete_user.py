@@ -1,3 +1,5 @@
+from app import db
+
 def delete_user(u):
     highlights=u.highlights.all()
     topics = u.topics.all()
@@ -20,5 +22,5 @@ def delete_user(u):
     for s in senders:
         db.session.delete(s)
     db.session.delete(comms)
-    db.session.delete(user)
+    db.session.delete(u)
     db.session.commit()

@@ -17,9 +17,9 @@ import os
 @bp.route('/robots.txt')
 def robots():
     if os.environ.get('DEV'):
-        x = send_file(url_for('static', filename='robots/robots-dev.txt'))
+        x = send_file(url_for('robots-dev.txt')
     else:
-        x = send_file(url_for('static',filename='robots/robots-prod.txt'))
+        x = send_file('robots-prod.txt')
     return x
 
 
