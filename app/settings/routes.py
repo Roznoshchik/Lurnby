@@ -232,7 +232,7 @@ def export():
 @bp.route('/settings/communication', methods=['GET','POST'])
 def comms():
     form = CommunicationForm()
-    comms = current_user.comms.first()
+    comms = current_user.comms
     print(comms)
     
     # form.highlights.checked = comms.highlights

@@ -61,7 +61,7 @@ class User(UserMixin, db.Model):
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic', cascade='delete, all')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
-    comms = db.Column(db.Integer, db.ForeignKey('comms.id')
+    comms = db.relationship("Comms", backref='user', uselist=False)
     
     #########################
     ####    Activity    #####
