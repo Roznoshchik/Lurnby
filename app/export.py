@@ -92,7 +92,7 @@ def article_export(user, articles, ext):
     else:
         for a in articles:
             data = {}
-            data['Title'] = a.title
+            data['Title'] = "".join([c for c in a.title if c.isalpha() or c.isdigit()]).rstrip()
             data['Source']= a.source_url if a.source_url else a.source
             data['Notes'] =  a.notes
             data['Tags']= [t.name for t in a.tags.filter_by(archived=False).all()]
@@ -106,7 +106,7 @@ def article_export(user, articles, ext):
                 highlights.append(highlight)
             data['Highlights'] = highlights
 
-            with open(f'{path}/{a.title}_notes.json', 'w', encoding='utf-16') as f:
+            with open(f'{path}/{data["Title"]}_notes.json', 'w', encoding='utf-16') as f:
                 f.write(json.dumps(data, ensure_ascii=False, indent=4))
 
 
