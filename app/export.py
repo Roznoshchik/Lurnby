@@ -43,6 +43,7 @@ def article_export(user, articles, ext):
     if ext == 'txt':
         for a in articles:
             title=a.title
+            title = "".join([c for c in title if c.isalpha() or c.isdigit()]).rstrip()
             notes=''
             if a.notes:
                 notes = Soup(a.notes, features="lxml")
