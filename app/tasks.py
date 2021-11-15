@@ -1,4 +1,5 @@
 from datetime import date
+import glob
 import os
 import sys
 import json
@@ -21,7 +22,7 @@ from app.models import Task, Article, Highlight, Tag, User
 app = create_app()
 app.app_context().push()
 
-def delete_user(user):
+def delete_user(u):
     highlights=u.highlights.all()
     topics = u.topics.all()
     articles = u.articles.all()
@@ -43,7 +44,7 @@ def delete_user(user):
     for s in senders:
         db.session.delete(s)
     db.session.delete(comms)
-    db.session.delete(user)
+    db.session.delete(u)
     db.session.commit()
 
 

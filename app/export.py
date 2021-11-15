@@ -1,5 +1,5 @@
 from app import create_app, db, s3, bucket
-import os, json, zipfile
+import os, json, zipfile, glob
 
 
 
@@ -29,6 +29,20 @@ def get_zip(user, ext):
                 file_path = os.path.join(root, file)
                 zipf.write(file_path, file_path[len_dir_path:])
     
+    files = glob.glob(f'/{basedir}/**/*.txt', recursive=True)
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
+    files = glob.glob(f'/{basedir}/**/*.json', recursive=True)
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
     return path_to_zip
 
 def article_export(user, articles, ext):
