@@ -48,7 +48,6 @@ def delete_user(u):
     db.session.commit()
 
 
-
 def _set_task_progress(progress):
     job = get_current_job()
   
