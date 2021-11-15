@@ -29,14 +29,14 @@ def get_zip(user, ext):
                 file_path = os.path.join(root, file)
                 zipf.write(file_path, file_path[len_dir_path:])
     
-    files = glob.glob(f'/{basedir}/**/*.txt', recursive=True)
+    files = glob.glob(f'/{basedir}/users/**/*.txt', recursive=True)
     for f in files:
         try:
             os.remove(f)
         except OSError as e:
             print("Error: %s : %s" % (f, e.strerror))
 
-    files = glob.glob(f'/{basedir}/**/*.json', recursive=True)
+    files = glob.glob(f'/{basedir}/users/**/*.json', recursive=True)
     for f in files:
         try:
             os.remove(f)
