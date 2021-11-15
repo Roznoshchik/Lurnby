@@ -43,8 +43,10 @@ def article_export(user, articles, ext):
     if ext == 'txt':
         for a in articles:
             title=a.title
-            notes = Soup(a.notes, features="lxml")
-            notes = notes.get_text()
+            notes=''
+            if a.notes:
+                notes = Soup(a.notes, features="lxml")
+                notes = notes.get_text()
             with open(f'{path}/{title}_notes.txt', 'w') as f:
                 f.write(a.title)
                 f.write('\n')
