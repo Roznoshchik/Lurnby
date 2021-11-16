@@ -11,6 +11,17 @@ from datetime import datetime, timedelta
 
 import os
 
+
+# ############################# #
+# ##     service worker      ## #
+# ############################# #
+@bp.route('/service-worker.js')
+def robots():
+    
+    x = send_file('service-worker.js')
+    return x
+
+
 # ##################### #
 # ##     robots      ## #
 # ##################### #
