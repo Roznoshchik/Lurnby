@@ -41,6 +41,7 @@
 
     <!-- Custom styles for this template -->
     <script src="https://cdn.tiny.cloud/1/z3w5itow1aft9ouoq41ln5h5qw1e2tlqfvsi726u6dij5ilu/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <script src="/static/app.js" defer></script>
 
 
     {% block style %}{% endblock%}
@@ -215,24 +216,24 @@
             return document.getElementsByClassName(classname);
         };
 
-        const CACHE_NAME = 'static-cache-v1.1';
+        // const CACHE_NAME = 'static-cache-v1.1';
  
-        const FILES_TO_CACHE = [
-          '{{url_for("static", filename="/static/offline.html")}}',
-        ];
+        // const FILES_TO_CACHE = [
+        //   '{{url_for("static", filename="/static/offline.html")}}',
+        // ];
         
-        /* Progressive Web App Register Service Worker */
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker
-                // .register('{{url_for("static",filename="service-worker.js")}}')
-                .register('/service-worker.js')            .then(function(registration) {
-                console.log('Service Worker Registered!');
-                return registration;
-            })
-            .catch(function(err) {
-                console.error('Unable to register service worker.', err);
-            });
-        }
+        // /* Progressive Web App Register Service Worker */
+        // if ('serviceWorker' in navigator) {
+        //     navigator.serviceWorker
+        //         // .register('{{url_for("static",filename="service-worker.js")}}')
+        //         .register('/service-worker.js')            .then(function(registration) {
+        //         console.log('Service Worker Registered!');
+        //         return registration;
+        //     })
+        //     .catch(function(err) {
+        //         console.error('Unable to register service worker.', err);
+        //     });
+        // }
  
 
         /* feedback form */
