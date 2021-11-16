@@ -16,7 +16,7 @@ import os
 # ##     service worker      ## #
 # ############################# #
 @bp.route('/service-worker.js')
-def robots():
+def serviceworker():
     
     x = send_file('service-worker.js')
     return x
