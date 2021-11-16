@@ -1,8 +1,4 @@
-const CACHE_NAME = 'static-cache-v1.2';
- 
-const FILES_TO_CACHE = [
-'/static/offline.html',
-];
+
 
 /* Progressive Web App Register Service Worker */
 if ('serviceWorker' in navigator) {
