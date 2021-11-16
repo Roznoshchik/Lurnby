@@ -32,6 +32,7 @@
         
     ],
     "start_url": "/app",
+    "id":"/app",
     "display": "standalone",
     "orientation": "portrait"
   }
