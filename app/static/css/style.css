@@ -15,6 +15,10 @@ html {
   padding: 88px 0px;
 }
 
+.progress {
+  border-radius: 0;
+}
+
 .progressbar {
   position: fixed;
   top: 64px;
@@ -22,6 +26,7 @@ html {
   margin: 0;
   padding: 0;
   height: 6px;
+  border-radius: 0;
 }
 
 @media (max-width: 769px) {
@@ -223,6 +228,16 @@ li {
   border-radius: 6px;
   border: none;
   box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+}
+
+#tos_modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #00000080;
+  z-index: 1050;
 }
 
 #settings_page {

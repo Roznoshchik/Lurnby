@@ -15,6 +15,9 @@ html {
 
 }
 
+.progress{
+    border-radius: 0;
+}
 
 .progressbar{
     position: fixed;
@@ -23,6 +26,7 @@ html {
     margin: 0;
     padding: 0;
     height: 6px;
+    border-radius: 0;
 }
 
 @media(max-width:769px){

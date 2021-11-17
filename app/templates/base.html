@@ -47,6 +47,7 @@
     {% block style %}{% endblock%}
 </head>
   <body>
+    
     <div id = "base-main" class="container-fluid">
       <nav id = "navigation" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-between">
       <!-- <nav id = "navigation" class="navbar navbar-expand-md fixed-top justify-content-between"> -->
@@ -205,7 +206,9 @@
       {% endif %}
       <!-- End Feedback Modal   -->
 
-
+      {% if not current_user.tos and terms_modal == True %}
+      {% include "/legal/_tos_modal.html" %}
+      {% endif %}
 
       <script>
         const byId = function(id){
