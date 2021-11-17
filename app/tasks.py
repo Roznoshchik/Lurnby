@@ -47,6 +47,7 @@ def delete_user(u):
     #db.session.delete(u)
     u.email=None
     u.goog_id=None
+    u.firstname = None
     u.username = None
     u.add_by_email=None
     u.token=None

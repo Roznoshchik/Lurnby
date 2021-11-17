@@ -70,6 +70,7 @@ class User(UserMixin, db.Model):
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     last_action = db.Column(db.String)
+    tos = db.Column(db.Boolean, default=False)
     
     ######################
     ####    API??    #####
@@ -231,7 +232,7 @@ class Event(db.Model):
 
     -> visited platform          //    daily
     -> added article             //    all
-    -> added suggested article   //    all
+    -> added suggested a rticle   //    all
     -> opened article            //    all
     -> added highlight           //    all
     -> exported highlights       //    all
@@ -247,7 +248,6 @@ class Event(db.Model):
     -> updated password          //    all
     -> updated account email     //    all
     -> reset password            //    all
-    
     """
     @staticmethod
     def add(kind, daily=False):
