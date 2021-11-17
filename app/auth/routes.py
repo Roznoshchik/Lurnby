@@ -10,7 +10,7 @@ from app.auth import bp
 from app.auth.forms import (LoginForm, RegisterForm, ResetPasswordRequestForm,
                             ResetPasswordForm)
 from app.auth.email import send_password_reset_email
-from app.models import User, Comms
+from app.models import User, Comms, Event
 
 from werkzeug.urls import url_parse
 from oauthlib.oauth2 import WebApplicationClient
@@ -216,8 +216,12 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
+        ev = Event.add('Reset password')
+        if ev:
+            db.session.add(ev)
         db.session.commit()
         flash('Your password has been reset.', 'message')
+        
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 

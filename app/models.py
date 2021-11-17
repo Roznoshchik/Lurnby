@@ -45,6 +45,7 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     admin = db.Column(db.Boolean)
     test_account = db.Column(db.Boolean, default=False)
+    deleted = db.Column(db.Boolean, default=False)
     
 
     ##############################
@@ -234,14 +235,32 @@ class Event(db.Model):
     -> opened article            //    all
     -> added highlight           //    all
     -> exported highlights       //    all
+    -> exported all data         //    all
     -> added topic               //    all
     -> reviewed highlights       //    daily
     -> reviewed a highlight      //    all
     -> enabled add by email      //    all
     -> added approved sender     //    all
     -> submitted feedback        //    all
+    -> deleted account           //    all
+    -> updated user credentials  //    all
+    -> updated password          //    all
+    -> updated account email     //    all
+    -> reset password            //    all
     
     """
+    @staticmethod
+    def add(kind, daily=False):
+        today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
+        today_end = today_start + timedelta(days=1)
+        ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==current_user.id).first()
+        if not ev:
+            ev = Event(user_id=current_user.id, 
+                            name=kind,
+                            date=datetime.utcnow())
+            return ev
+        else:
+            return False
 
     def __repr__(self):
         return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'

@@ -44,7 +44,13 @@ def delete_user(u):
     for s in senders:
         db.session.delete(s)
     db.session.delete(comms)
-    db.session.delete(u)
+    #db.session.delete(u)
+    u.email=None
+    u.goog_id=None
+    u.username = None
+    u.add_by_email=None
+    u.token=None
+    u.deleted=True
     db.session.commit()
 
 

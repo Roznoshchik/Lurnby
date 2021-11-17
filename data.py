@@ -41,7 +41,7 @@ def data_dashboard():
 
         user = {
             'id': u.id,
-            'email': u.email,
+            'email': u.email if u.email else f'deleted-{u.id}',
             'articles': u.articles.count(),
             'highlights': u.highlights.count(),
             'topics': u.topics.count(),

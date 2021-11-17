@@ -17,8 +17,10 @@ class UpdateAccountForm(FlaskForm):
     submit = SubmitField('Sign In')
 
     def validate_username(self, username):
+        print(username)
         user = User.query.filter_by(username=username.data.lower()).first()
-        if user is not None:
+        
+        if user and user.username != username.data.lower():
             raise ValidationError(message='Username not available. Please use a different username.')
 
 

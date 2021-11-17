@@ -24,15 +24,18 @@ from datetime import datetime, timedelta
 def settings_account():
     form = UpdateAccountForm()
     if form.validate_on_submit():
-        print('something')
         flash('Settings updated!', 'success')
         name = form.firstname.data
         username = form.username.data
 
         current_user.firstname = name
         current_user.username = username.lower()
-        db.session.commit()
+        ev = Event.add('updated user credentials')
+        if ev:
+            db.session.add(ev)
 
+        db.session.commit()
+        
 
     u = {
         'username': current_user.username if current_user.username else current_user.email,
@@ -70,6 +73,9 @@ def update_password():
             current_user.set_password(new) 
         
         flash('Password Set!', 'success')
+        ev = Event.add('updated password')
+        if ev:
+            db.session.add(ev)
         db.session.commit() 
 
         return redirect(url_for('settings.settings_account'))
@@ -109,6 +115,9 @@ def verify_email(token, email):
         if user.username == user.email:
             user.username = email.lower()
         user.email = email.lower()
+        ev = Event.add('updated account email')
+        if ev:
+            db.session.add(ev)
         db.session.commit()
         flash('Your email has been updated!', 'success')
         return redirect(url_for('settings.settings_account'))
@@ -131,6 +140,7 @@ def delete_verify():
 # ############################ #
 @bp.route('/settings/account/delete/<token>', methods=['GET'])
 def delete_confirm(token):
+    
     user = User.verify_delete_account_token(token)
     if user:
         login_user(user, remember=True)
@@ -153,6 +163,10 @@ def delete_final():
     if form.validate_on_submit():
         current_user.launch_task('account_export', 'exporting data...', current_user.id, form.export.data, delete=True)
         db.session.commit()
+        ev = Event.add('deleted account')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
         logout_user()
         return redirect(url_for('auth.register'))
 
@@ -181,8 +195,9 @@ def settings_content():
         e = Approved_Sender(user_id=current_user.id, email=email)
         db.session.add(e)
 
-        ev = Event(user_id=current_user.id, name='added approved sender', date=datetime.utcnow())
-        db.session.add(ev)
+        ev = Event.add('added approved sender')
+        if ev:
+            db.session.add(ev)
 
         db.session.commit()
         approved_senders = Approved_Sender.query.filter_by(user_id=current_user.id
@@ -221,6 +236,10 @@ def enable_add_by_email():
 def export():
     data = json.loads(request.data)
     current_user.launch_task('account_export', 'exporting data...', current_user.id, data['ext'], delete=False)
+    ev = Event.add('exported all data')
+    if ev:
+        db.session.add(ev)
+    
     db.session.commit()
 
     return json.dumps({'success': True}), 200, {'ContentType': 'application/json'}
@@ -241,6 +260,10 @@ def comms():
         comms.promotional = form.data['promotions']
         comms.educational = form.data['educational']
         comms.informational = form.data['informational']
+        
+        ev = Event.add('updated comms')
+        if ev:
+            db.session.add(ev)
         db.session.commit()
         
         flash('Preferences updated', 'success')
