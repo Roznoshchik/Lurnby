@@ -10,10 +10,17 @@
 
 .bookmark-section {
     margin-bottom: 32px;
+    display: flex;
+    flex-wrap: auto;
 
     input {
         padding: 8px;
         padding-left: 12px;
+    }
+    @media(max-width: 374px){
+        input {
+            max-width:75%;
+        }
     }
 }
 

@@ -26,6 +26,13 @@
             button{
                 width: 88px;
             }
+
+            @media(max-width: 374px){
+                button{
+                    width: 75px;
+                }
+            }
+
         }
     }
 

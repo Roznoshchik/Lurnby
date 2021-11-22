@@ -135,7 +135,9 @@ def callback():
         db.session.commit()
         print(comms)
         user = User.query.filter_by(goog_id=unique_id).first()
-        login_user(user, remember=True)
+        # login_user(user, remember=True)
+        return redirect(url_for('auth.tos_accept', id=user.id))
+
 
     if user is not None:
         if user.goog_id is None:
@@ -164,8 +166,8 @@ def register():
         db.session.add(comms)
         print(comms)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!', 'message')
-        return redirect(url_for('auth.login'))
+        # flash('Congratulations, you are now a registered user!', 'message')
+        return redirect(url_for('auth.tos_accept', id=user.id))
     return render_template('auth/register.html', title='Register', form=form)
 
 
@@ -216,7 +218,7 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
-        ev = Event.add('Reset password')
+        ev = Event.add('reset password')
         if ev:
             db.session.add(ev)
         db.session.commit()
@@ -226,5 +228,28 @@ def reset_password(token):
     return render_template('auth/reset_password.html', form=form)
 
 
+@bp.route('/tos_accept/<id>', methods=['GET', 'POST'])
+def tos_accept(id):
+    u = User.query.get(id)
+    reply = request.args.get('tos')
+    if reply == 'accept':
+        u.tos = True
+        db.session.commit()
+        login_user(u)
+        ev = Event.add('user registered')
+        if ev:
+            db.session.add(ev)
+        ev = Event.add('tos accepted')
+        if ev:
+            db.session.add(ev)
+        db.session.commit()
+        print('redirecting user who accepted')
+        return redirect(url_for('main.articles'))
+    
+    elif reply == 'decline':
+        db.session.delete(u)
+        db.session.commit()
+        print('deleting user who declined')
+        return redirect(url_for('auth.register'))
 
-
+    return render_template('legal/auth_tos_accept.html', u=u)

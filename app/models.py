@@ -232,7 +232,7 @@ class Event(db.Model):
 
     -> visited platform          //    daily
     -> added article             //    all
-    -> added suggested a rticle   //    all
+    -> added suggested article   //    all
     -> opened article            //    all
     -> added highlight           //    all
     -> exported highlights       //    all
@@ -248,19 +248,27 @@ class Event(db.Model):
     -> updated password          //    all
     -> updated account email     //    all
     -> reset password            //    all
+    -> user registered           //    all
+    -> tos accepted              //    all
     """
     @staticmethod
     def add(kind, daily=False):
-        today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
-        today_end = today_start + timedelta(days=1)
-        ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==current_user.id).first()
-        if not ev:
-            ev = Event(user_id=current_user.id, 
-                            name=kind,
-                            date=datetime.utcnow())
-            return ev
+        if daily:
+            today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
+            today_end = today_start + timedelta(days=1)
+            ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==current_user.id).first()
+            if not ev:
+                ev = Event(user_id=current_user.id, 
+                                name=kind,
+                                date=datetime.utcnow())
+                return ev
+            else:
+                return False
         else:
-            return False
+            ev = Event(user_id=current_user.id, 
+                                name=kind,
+                                date=datetime.utcnow())
+            return ev
 
     def __repr__(self):
         return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'

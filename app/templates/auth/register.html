@@ -3,14 +3,20 @@
 
 {% block style %}
 
-    <link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">   
+    <!-- <link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">    -->
 <style></style>
 {% endblock %}
 
 {% block content %}
     <div  class="lurnby-container main-section">
-        <div style = "margin-top: 150px;" class="mobile-hidden"></div>
+        <!-- <div style = "margin-top: 150px;" class="mobile-hidden"></div> -->
         <form class="form-signin" action="" method="post" novalidate>
+            <div class="text-center mb-4">
+                <p>
+                    <a class="button" href="{{url_for('auth.google_login')}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
+                </p>
+                <p>or</p>
+            </div>
             <div class="text-center mb-4">
                 {{ form.hidden_tag() }}
             </div>
@@ -59,13 +65,7 @@
                 <button class="main-button width-100 ml0" type="submit">Register</button>
             </div>
         </form>
-        <div class="text-center mb-4">
-            <p>or</p>
-    
-            <p>
-                <a class="button" href="{{url_for('auth.google_login')}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
-            </p>
-        </div>
+        
     </div>
 {% endblock %}
 

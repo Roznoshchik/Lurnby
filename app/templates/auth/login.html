@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block style %}
-<link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">   
+<!-- <link href="https://getbootstrap.com/docs/4.4/examples/floating-labels/floating-labels.css" rel="stylesheet">    -->
 {% endblock %}
 
 {% block content %}
 <form class="form-signin" action="" method="post" novalidate>
     <div class="text-center mb-4">
-        <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="50"> 
+        <img class="mb-4" src="{{url_for('static', filename='rrbetterface2.png')}}" alt="" height="80px"> 
         <p>
             <a class="button" href="{{ url_for('auth.google_login' )}}"><img src="{{ url_for('static', filename='btn_google_signin_dark_normal_web.png') }}" /></a>
         </p>
@@ -16,16 +16,16 @@
     </div>
     
     <div class="form-label-group">
-      {{ form.username(class="form-control", placeholder="Username", required=true, autofocus=true)}}
+      {{ form.username(class="form-control", placeholder="Username", autofocus=true)}}
       {{ form.username.label}}
     </div>
     {% for error in form.username.errors %}
     <div class="alert alert-danger" role="alert">
-    {{ error }}
+        {{ error }}
     </div>
     {% endfor %}
     <div class="form-label-group">
-        {{ form.password(class="form-control", placeholder="Password", required=true, autofocus=true)}}
+        {{ form.password(class="form-control", placeholder="Password", required=true)}}
         {{ form.password.label}}
         <p><a class = "small" href="{{ url_for('auth.reset_password_request') }}">Forgot Your Password?</a></p>
     </div>
@@ -39,7 +39,7 @@
         {{ form.remember_me.label }}
     </div>
     <div>     
-        <button class="btn btn-lg btn-primary btn-block" type="submit">Login</button>
+        <button class="main-button ml0 width-100" type="submit">Login</button>
     </div>
     <div class="text-center mb-4">
         <p class="mt-4">

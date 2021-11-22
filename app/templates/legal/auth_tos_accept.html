@@ -1,0 +1,40 @@
+{% set footer = False %}
+{% set topnav = False %}
+{% set padding_bottom = False %}
+{% extends 'base.html' %}
+{% block css %}
+{% endblock %}
+{% block content %}
+<div id="auth_tos_container">
+    <div id="auth_tos_welcome"  class="main-section">
+        <picture>
+            <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.webp')}}" type="image/webp">
+            <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.png')}}" type="image/png">
+            <img class="modal-img" src="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.png')}}">
+        </picture>
+        <div class="message">
+            <h4>Terms of Service</h4>
+            <p>
+                Welcome to Lurnby. We're excited to help you build your personal knowledge library and to read in a way that makes it easier to remember what you think is important. 
+            </p>    
+            <p>
+                First, you need to accept our terms of service. We've tried to make them as clear as possible. They allow us to offer this platform to you and outline the measures we take to protect your content and privacy.          
+            </p>
+                        
+            <p>
+            Sincerely, <br> Lurnby Team
+            </p>
+        </div>
+    </div>
+    <div id="auth_tos">
+        {% include 'legal/_tos.html' %}
+    </div>
+</div>
+<div id="bottom_nav" class="bottom_nav_footer">
+    <button id="auth_terms" type="button" class="main-button save">See the Terms</button>
+    <a href="{{url_for('auth.tos_accept', id=u.id, tos='decline' )}}" id='auth_decline' type="button" class="main-button ">Decline</a>
+    <a href="{{url_for('auth.tos_accept', id=u.id, tos='accept' )}}" id='auth_accept' type="button" class="main-button">Accept</a>
+</div>
+{% endblock %}
+{% block JS %}
+{% endblock %}

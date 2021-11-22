@@ -105,7 +105,8 @@
         flex-wrap: wrap;
         justify-content: space-between;
         min-height: 250px;
-        width: 300px;
+        max-width: 320px;
+        //width: 300px;
         margin: 0 8px 8px 0;
         padding: 1.25rem;
         background-color: #fff;

@@ -1,0 +1,27 @@
+<div id="tos_modal" class="lurnby_modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">A message from Lurnby</h5>
+            </div> 
+            <div id="tos_body" class="modal-body with_bg">
+                
+                <picture>
+                    <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.webp')}}" type="image/webp">
+                    <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.png')}}" type="image/png">
+                    <img class="modal-img" src="{{url_for('static', filename='images/rr-icon/rr_w_sign_cropped.png')}}">
+                </picture>
+                <div class="modal-message">
+                    <h4>Updated Terms of Service</h4>
+                    <p>We've updated our Terms of Service. Please read and accept them to continue to use the platform. We've tried to make them as clear and approachable as possible.</p>
+                    <p>
+                    Sincerely, <br> Lurnby Team
+                    </p>
+                </div>
+            </div>
+            <div id="modal-nav" class="modal-footer">
+                <button id = "see_terms" type="button" class="main-button save">See the Terms</button>
+            </div>
+        </div>
+    </div>
+</div>

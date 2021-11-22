@@ -41,6 +41,7 @@
         input {
             padding: 4px 8px;
             margin-right: 8px;
+            margin-bottom: 8px;
         }
 
         label[for="search"] {
@@ -48,7 +49,7 @@
             width: 100%;
         }
 
-        @media(min-width: $sm){
+        @media(min-width: 320px){
             label[for="search"] {
                 width: auto;
             }
@@ -113,6 +114,9 @@
             
         }
 
+        @media(max-width:374px){
+            .sort-button {margin-right: 8px;}
+        }
 
         #tag_count {
             display: inline-block;
@@ -164,6 +168,7 @@
 #filter_submit {
     background: $highlight-yellow;
     vertical-align: middle ; 
+    margin-bottom: 8px;
     &:hover, &:focus, &:active {
         background: $dark;
         color: white;

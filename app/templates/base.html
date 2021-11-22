@@ -49,8 +49,8 @@
   <body>
     
     <div id = "base-main" class="container-fluid">
+      {% if topnav != False %}
       <nav id = "navigation" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-between">
-      <!-- <nav id = "navigation" class="navbar navbar-expand-md fixed-top justify-content-between"> -->
         {% if current_user.is_authenticated %}
         <a class="navbar-brand" href="{{ url_for('main.articles') }}">Lurnby</a>
         {% else %}
@@ -114,7 +114,11 @@
               
         </div>
       </nav>
-          
+      {% else %}
+      <nav id = "navigation" class="navbar navbar-expand-md navbar-dark fixed-top bg-dark justify-content-between">
+        <span class="navbar-brand">Lurnby</span>          
+      </nav>
+      {% endif %}
       <div id = "flashMessages" class="flash-messages">
 
         {% with messages = get_flashed_messages(category_filter=["message"]) %}
@@ -161,9 +165,11 @@
         {% endwith %}
       </div>
       
-      <div id="base_content">
+      <div id="base_content" {% if padding_bottom == False %} {% else %}style="padding-bottom: 150px;"{% endif %}>
         {% block content %}{% endblock %}
       </div>
+      {% if footer == false %}
+      {% else %}
       <div class="lurnby-footer">
         <div class="terms">
           <a href="{{url_for('content.terms')}}">Terms of Service</a>
@@ -172,6 +178,7 @@
         </div>
         <p>© {{now.year}} Lurnby All rights reserved.</p>
       </div>
+      {% endif %}
       {% if current_user.is_authenticated %}
       <!--  Feedback Modal Code  -->
       <div class="lurnby_modal modal fade" id="FeedbackModal" tabindex="-1" role="dialog" aria-labelledby="FeedbackModalLabel" aria-hidden="true">
@@ -284,6 +291,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js" integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn" crossorigin="anonymous"></script>      
       
+      <script text="javascript" src = "{{url_for('static', filename='js/accept_tos.js') }}"> </script>
+
       {% if not config['DEBUG'] %}
       <!--  Segment tracking code 
       <script>

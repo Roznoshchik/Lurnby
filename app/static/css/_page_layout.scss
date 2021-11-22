@@ -154,12 +154,18 @@ li{
 #base-main {
     position: relative;
     min-height: 100vh;
-    
-    #base_content{
-        padding-top: 58px;
-        padding-bottom: 150px;
+
+    .form-signin {
+        padding: 44px 24px;
     }
-  }
+
+
+    #base_content{
+        padding-top: 56px;
+        // set this in the template under if condition
+        //padding-bottom: 150px;
+    }
+}
 
 .page {
     padding-top: 64px;
@@ -185,12 +191,18 @@ li{
         margin-bottom: 0;
     }
     .terms {
+        padding: 0px 24px;
+        display: flex;
+        flex-wrap: wrap;
         margin-bottom: 24px;
+        justify-content: center;
        
         a {
+            display: block;
             color: $dark;
             font-size: 12px;
             margin-right: 8px;
+            margin-bottom: 8px;
         }
     
     }
