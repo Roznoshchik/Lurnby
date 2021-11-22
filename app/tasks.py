@@ -16,7 +16,7 @@ from app.export import get_zip
 from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
-from app.models import Task, Article, Highlight, Tag, User
+from app.models import Task, Article, Highlight, Tag, User, Event
 
 
 app = create_app()

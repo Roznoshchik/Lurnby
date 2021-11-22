@@ -632,6 +632,10 @@ def add_article():
 
             db.session.add(new_article)
             new_article.estimated_reading()
+            ev = Event.add('added article')
+            if ev:
+                db.session.add(ev)
+                db.session.commit()
             
 
         if (url != 'none'):
@@ -666,6 +670,10 @@ def add_article():
 
             db.session.add(new_article)
             new_article.estimated_reading()
+            ev = Event.add('added article')
+            if ev:
+                db.session.add(ev)
+                db.session.commit()
 
         if pdf == 'true' or epub =='true':
             
@@ -762,7 +770,10 @@ def process_article(task_id, a_id):
             count = query.count()
             showing = f'Showing {count} out of {count} articles.'
             html = render_template('_articles_with_filter.html',user=current_user, showing=showing, articles=articles)
-
+            ev = Event.add('added article')
+            if ev:
+                db.session.add(ev)
+                db.session.commit()
             # delete object from amazon
             s3.delete_object(
                 Bucket = bucket,
