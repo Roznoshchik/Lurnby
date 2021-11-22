@@ -835,10 +835,10 @@ db.event.listen(Tag, 'after_insert', after_insert_listener)
 db.event.listen(Task, 'after_insert', after_insert_listener)
 
 
-# db.event.listen(Article, 'after_update', after_update_listener)
-# db.event.listen(Highlight, 'after_update', after_update_listener)
+db.event.listen(Article, 'after_update', after_update_listener)
+db.event.listen(Highlight, 'after_update', after_update_listener)
 db.event.listen(Topic, 'after_update', after_update_listener)
-# db.event.listen(Tag, 'after_update', after_update_listener)
+db.event.listen(Tag, 'after_update', after_update_listener)
 
 
 def receive_team_users_append(target, value, initiator):
