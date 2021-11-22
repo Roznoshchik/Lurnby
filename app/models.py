@@ -791,7 +791,10 @@ def after_insert_listener(mapper, connection, target):
         update_user_last_action('added article')
     elif isinstance(target, Tag):
         update_user_last_action('added tag')
-        Event.add('added tag')
+        ev = Event.add('added tag')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
     elif isinstance(target, Topic):
         update_user_last_action('added topic')
     
@@ -801,16 +804,28 @@ def after_update_listener(mapper, connection, target):
     # 'target' is the inserted object
     if isinstance(target, Highlight):
         update_user_last_action('updated highlight')
-        Event.add('updated highlight')
+        ev = Event.add('updated highlight')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
     elif isinstance(target, Article):
         update_user_last_action('updated article')
-        Event.add('updated article')
+        ev = Event.add('updated article')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
     elif isinstance(target, Tag):
         update_user_last_action('updated tag')
-        Event.add('updated tag')
+        ev = Event.add('updated tag')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
     elif isinstance(target, Topic):
         update_user_last_action('updated topic')
-        Event.add('updated topic')
+        ev = Event.add('updated topic')
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
 
 
 db.event.listen(Article, 'after_insert', after_insert_listener)
