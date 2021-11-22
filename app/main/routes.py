@@ -1028,7 +1028,6 @@ def updateArticle(uuid):
             if 'content' in data:
                 article.content = data['content']
 
-            has_tags = False
             for tag in data['tags']:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id
                                         ).first()
@@ -1038,7 +1037,6 @@ def updateArticle(uuid):
                     ev = Event.add('added tag')
                     if ev:
                         db.session.add(ev)
-                has_tags = True
                 article.AddToTag(t)
 
             for tag in data['remove_tags']:
@@ -1050,12 +1048,7 @@ def updateArticle(uuid):
                     ev = Event.add('added tag')
                     if ev:
                         db.session.add(ev)
-                has_tags = True
                 article.RemoveFromTag(t)
-
-            if has_tags:
-                ev = Event.add('updated article tags')
-                db.session.add(ev)
             
             ev = Event.add('updated article')
             if ev:
@@ -1233,9 +1226,7 @@ def view_highlight(id):
         highlight.do_not_review = data['do_not_review']
 
         members = data['topics']
-        has_topics = False
         for member in members:
-            has_topics = True
             topic = Topic.query.filter_by(title=member,
                                           user_id=current_user.id).first()
             if topic:
@@ -1252,7 +1243,6 @@ def view_highlight(id):
 
         nonmembers = data['untopics']
         for nonmember in nonmembers:
-            has_topics = True
             topic = Topic.query.filter_by(title=nonmember,
                                           user_id=current_user.id).first()
             if topic:
@@ -1264,11 +1254,6 @@ def view_highlight(id):
             highlight.no_topics = True
         else:
             highlight.no_topics = False
-        
-        if has_topics:
-            ev = Event.add('updated highlight topics')
-            if ev:
-                db.session.add(ev) 
 
         ev = Event.add('updated highlight')
         if ev:
