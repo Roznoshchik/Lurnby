@@ -250,6 +250,11 @@ class Event(db.Model):
     -> reset password            //    all
     -> user registered           //    all
     -> tos accepted              //    all
+    -> added tag                 //    all
+    -> updated article           //    all
+    -> updated topic             //    all
+    -> updated highlight         //    all
+    -> updated tag               //    all 
     """
     @staticmethod
     def add(kind, daily=False):
@@ -786,6 +791,7 @@ def after_insert_listener(mapper, connection, target):
         update_user_last_action('added article')
     elif isinstance(target, Tag):
         update_user_last_action('added tag')
+        Event.add('added tag')
     elif isinstance(target, Topic):
         update_user_last_action('added topic')
     
@@ -795,12 +801,16 @@ def after_update_listener(mapper, connection, target):
     # 'target' is the inserted object
     if isinstance(target, Highlight):
         update_user_last_action('updated highlight')
+        Event.add('updated highlight')
     elif isinstance(target, Article):
         update_user_last_action('updated article')
+        Event.add('updated article')
     elif isinstance(target, Tag):
         update_user_last_action('updated tag')
+        Event.add('updated tag')
     elif isinstance(target, Topic):
         update_user_last_action('updated topic')
+        Event.add('updated topic')
 
 
 db.event.listen(Article, 'after_insert', after_insert_listener)
