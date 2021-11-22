@@ -252,9 +252,11 @@ class Event(db.Model):
     -> tos accepted              //    all
     -> added tag                 //    all
     -> updated article           //    all
-    -> updated topic             //    all
+    -> updated article tags      //    all
+    XX updated topic             //    all
     -> updated highlight         //    all
-    -> updated tag               //    all 
+    -> updatd highlight topics   //    all
+    XX updated tag               //    all 
     """
     @staticmethod
     def add(kind, daily=False):
@@ -791,10 +793,6 @@ def after_insert_listener(mapper, connection, target):
         update_user_last_action('added article')
     elif isinstance(target, Tag):
         update_user_last_action('added tag')
-        ev = Event.add('added tag')
-        if ev:
-            db.session.add(ev)
-            db.session.commit()
     elif isinstance(target, Topic):
         update_user_last_action('added topic')
     
@@ -804,28 +802,16 @@ def after_update_listener(mapper, connection, target):
     # 'target' is the inserted object
     if isinstance(target, Highlight):
         update_user_last_action('updated highlight')
-        ev = Event.add('updated highlight')
-        if ev:
-            db.session.add(ev)
-            db.session.commit()
+        
     elif isinstance(target, Article):
         update_user_last_action('updated article')
-        ev = Event.add('updated article')
-        if ev:
-            db.session.add(ev)
-            db.session.commit()
+       
     elif isinstance(target, Tag):
         update_user_last_action('updated tag')
-        ev = Event.add('updated tag')
-        if ev:
-            db.session.add(ev)
-            db.session.commit()
+        
     elif isinstance(target, Topic):
         update_user_last_action('updated topic')
-        ev = Event.add('updated topic')
-        if ev:
-            db.session.add(ev)
-            db.session.commit()
+        
 
 
 db.event.listen(Article, 'after_insert', after_insert_listener)
