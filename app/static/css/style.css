@@ -2171,6 +2171,11 @@ ul ul a {
 
 .width-100 {
   width: 100%;
+  display: block;
+}
+
+.center {
+  text-align: center;
 }
 
 @media (max-width: 575px) {
@@ -2195,6 +2200,22 @@ ul ul a {
 
 .ml0 {
   margin-left: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.jcenter {
+  justify-content: center;
+}
+
+.acenter {
+  align-items: center;
 }
 
 .main-button {
@@ -9032,6 +9053,70 @@ readers do not read off random characters that represent icons */
   .review-item .review-actions .review-outcome button {
     width: 75px;
   }
+}
+
+#landing *::selection {
+  background-color: #FFF79F;
+}
+#landing .highlighted {
+  display: inline-block;
+  border-radius: 1px;
+  padding: 1px 4px;
+  margin-bottom: 4px;
+}
+#landing .divider {
+  margin: 20px auto;
+  width: 60vw;
+  border-bottom: #dbdbdb 1px solid;
+}
+#landing .item {
+  max-width: 250px;
+  margin-right: 40px;
+}
+#landing #header {
+  height: calc(100vh - 214px);
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background-color: #cbc1bf;
+}
+#landing #header .copy {
+  max-width: 450px;
+}
+#landing #header .copy p {
+  line-height: 1.8em;
+}
+#landing #header .copy .xlarge {
+  font-weight: 900;
+  font-size: 4.5rem;
+}
+#landing #header img {
+  height: 500px;
+}
+#landing .item img {
+  height: 100px;
+  margin-bottom: 32px;
+}
+#landing .item .highlighted {
+  margin-bottom: 16px;
+  display: block;
+}
+#landing .item ul {
+  max-width: 180px;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+#landing .feature {
+  margin-bottom: 80px;
+}
+#landing .feature img {
+  margin: 0 40px;
+}
+#landing #bottom-cta div {
+  min-width: 300px;
 }
 
 /*# sourceMappingURL=style.css.map */

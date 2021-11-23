@@ -6,20 +6,178 @@
 
 {% block content %}
 <div id="landing">
+   
     <div id="header" class ="main-section">
-
+        <picture>
+            <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_hello.webp')}}" type="image/webp">
+            <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_hello.png')}}" type="image/png">
+            <img src="{{url_for('static', filename='images/rr-icon/rr_w_sign_hello.png')}}">
+        </picture>
+        <div class="copy">
+            <h1 class="xlarge">Lurnby</h1>
+            <h3>to learn better</h3>
+            <p>Lurnby helps you <span class="highlighted">&nbspunderstand and remember&nbsp</span> what you read, through neuroscience-validated <span class="highlighted">&nbsplearning techniques.&nbsp</span></p>
+            <div style="height:40px;"></div>
+            <div class="center"><a href = "{{url_for('auth.register') }}" class="main-button ml0 width-100">SIGN UP</a></div>
+        </div>
     </div>
     <div id="how-it-works" class="main-section">
-
+        <div style="height:80px;"></div>
+        <h2 class="center">How it works</h2>
+        <div style="height:40px;"></div>
+        <div class="flex wrap jcenter">
+            <div class="item center">
+                <picture>
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/save.webp')}}" type="image/webp">
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/save.png')}}" type="image/png">
+                    <img src="{{url_for('static', filename='images/dotcom/icons/save.png')}}">
+                </picture>
+                <h6 class="highlighted">Save Content</h6>
+                <p>Bring in content from every source you encounter, including:</p>
+                <ul>
+                    <li>Web articles</li>
+                    <li>eBooks</li>
+                    <li>Emails</li>
+                    <li>Personal notes</li>
+                </ul>
+            </div>
+            <div class="item center">
+                <picture>
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/personalize.webp')}}" type="image/webp">
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/personalize.png')}}" type="image/png">
+                    <img src="{{url_for('static', filename='images/dotcom/icons/personalize.png')}}">
+                </picture>
+                <h6 class="highlighted">Personalize UX</h6>
+                <p>Adjust your reading experience to match your personal preferences:</p>
+                <ul>
+                    <li>Font styles</li>
+                    <li>Font sizes</li>
+                    <li>Line spacing</li>
+                    <li>Dark/light mode</li>
+                </ul>
+            </div>
+            <div class="item center">
+                <picture>
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/highlighter.webp')}}" type="image/webp">
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/highligher.png')}}" type="image/png">
+                    <img class ="icon" src="{{url_for('static', filename='images/dotcom/icons/highlighter.png')}}">
+                </picture>
+                <h6 class="highlighted">Read Actively</h6>
+                <p>Highlight, annotate, and mark up your content while you read:</p>
+                <ul>
+                    <li>Highlights</li>
+                    <li>Notes</li>
+                    <li>Tags & Categorization</li>
+                </ul>
+            </div>
+            <div class="item center">
+                <picture>
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/automate.webp')}}" type="image/webp">
+                    <source srcset="{{url_for('static', filename='images/dotcom/icons/automate.png')}}" type="image/png">
+                    <img class ="icon" src="{{url_for('static', filename='images/dotcom/icons/automate.png')}}">
+                </picture>
+                <h6 class="highlighted">Automate Recall</h6>
+                <p>Learn through validated and automated learning techniques:</p>
+                <ul>
+                    <li>Spaced repetition</li>
+                    <li>Chunking</li>
+                    <li>Recall practice</li>
+                </ul>
+            </div>
+        </div>
     </div>
-    <div id = "who-is-this-for" class="main-section">
-
-    </div>
-    <div id = "features" class="main-section">
-
-    </div>
-    <div id="bottom-cta" class="main-section">
     
+    <div class="divider"></div>
+
+    <div id = "who-is-this-for" class="main-section">
+        <div style="height:40px;"></div>
+        <h2 class="center">Who is this for?</h2>
+        <div style="height:40px;"></div>
+        <div class="flex jcenter wrap">
+            <div class="item center">
+                <h6>I'm studying!</h6>
+                <p>Lurnby's active learning features allow you to understand and remember things better.</p>
+            </div>
+            <div class="item center">
+                <h6>I read with a pen in my hand!</h6>
+                <p>We love marginalia! Reach actively, highlight your content, take notes, and organize everything.</p>
+            </div>
+            <div class="item center">
+                <h6>I am organizing insights!</h6>
+                <p>Bundle metadata, tags, categorization, and inline notes to create a database of insights and references for future projects.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div id = "features" class="main-section">
+        <div style="height:40px;"></div>
+        <h2 class="center">The Lurnby Experience</h2>
+        <div style="height:40px;"></div>
+        <div class="feature flex jcenter acenter wrap">
+            <picture>
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/extension.webp')}}" type="image/webp">
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/extension.png')}}" type="image/png">
+                <img src="{{url_for('static', filename='images/dotcom/inapp/extension.png')}}">
+            </picture>
+            <div class="item center">
+                <h6>Browser-friendly</h6>
+                <p>Download the Lurnby <a href="#">Firefox</a> or <a href="#">Chrome</a> browser extensions to quickly save and annotate content</p>
+            </div>
+        </div>
+        
+        <div class="feature flex acenter jcenter wrap">
+           
+            <div class="item center">
+                <h6>Customizable</h6>
+                <p>Match your reading experience to your preferences</p>
+            </div>
+            <picture>
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/customize.webp')}}" type="image/webp">
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/customize.png')}}" type="image/png">
+                <img src="{{url_for('static', filename='images/dotcom/inapp/customize.png')}}">
+            </picture>
+        </div>
+        <div class="feature flex acenter jcenter wrap">
+            <picture>
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/notes.webp')}}" type="image/webp">
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/notes.png')}}" type="image/png">
+                <img src="{{url_for('static', filename='images/dotcom/inapp/notes.png')}}">
+            </picture>
+            <div class=" item center">
+                <h6>Notes and highlights</h6>
+                <p>Seamlessly highlight, take notes, and share content across mobile and desktop</p>
+            </div>
+            
+        </div>
+        <div class="feature flex acenter jcenter wrap">
+            
+            <div class="item center">
+                <h6>Metadata and organization</h6>
+                <p>Browse, filter, measure, review, and organize through a friendly insights-first UI</p>
+            </div>
+            <picture>
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/metadata.webp')}}" type="image/webp">
+                <source srcset="{{url_for('static', filename='images/dotcom/inapp/metadata.png')}}" type="image/png">
+                <img src="{{url_for('static', filename='images/dotcom/inapp/metadata.png')}}">
+            </picture>
+        </div>
+
+
+    </div>
+
+    <div class="divider"></div>
+
+    <div id="bottom-cta" class="main-section flex jcenter wrap">
+        <div class="center">
+            <h2>Get Started:</h2>
+            <div style="height:20px;"></div>
+            <a class ="main-button ml0 width-100" href="{{url_for('auth.register')}}">SIGN UP</a>
+            <div style="height:40px;"></div>
+
+        </div>
     </div>
 
 </div>
