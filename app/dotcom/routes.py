@@ -37,7 +37,7 @@ def robots():
 @bp.route('/')
 @bp.route('/index')
 def index():
-    return render_template('dotcom/index.html')
+    return render_template('dotcom/landing.html')
 
 
 @bp.route('/who-is-lurnby-for')
