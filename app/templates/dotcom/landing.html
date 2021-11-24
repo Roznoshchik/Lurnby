@@ -8,6 +8,8 @@
 <div id="landing">
    
     <div id="header" class ="main-section">
+        <div class="spacer"></div>
+        <div class="spacer"></div>
         <picture>
             <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_hello.webp')}}" type="image/webp">
             <source srcset="{{url_for('static', filename='images/rr-icon/rr_w_sign_hello.png')}}" type="image/png">
@@ -15,16 +17,20 @@
         </picture>
         <div class="copy">
             <h1 class="xlarge">Lurnby</h1>
-            <h3>to learn better</h3>
-            <p>Lurnby helps you <span class="highlighted">&nbspunderstand and remember&nbsp</span> what you read, through neuroscience-validated <span class="highlighted">&nbsplearning techniques.&nbsp</span></p>
-            <div style="height:40px;"></div>
+            <h3>make memory a choice</h3>
+            <div class="spacer"></div>
+            <p>Lurnby helps you <span class="highlighted">&nbspunderstand and<span class="mobile-only">&nbsp</span><span class="mobile-only">&nbsp</span> <span class="mobile-only">&nbsp</span><span class="mobile-only">&nbsp</span>remember&nbsp</span> what you read, through neuroscience-validated <span class="highlighted">&nbsplearning<span class="mobile-only">&nbsp</span><span class="mobile-only">&nbsp</span> <span class="mobile-only">&nbsp</span><span class="mobile-only">&nbsp</span>techniques.&nbsp</span></p>
+            <div class="spacer"></div>
             <div class="center"><a href = "{{url_for('auth.register') }}" class="main-button ml0 width-100">SIGN UP</a></div>
         </div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
     </div>
     <div id="how-it-works" class="main-section">
-        <div style="height:80px;"></div>
+        <div class="spacer"></div>
+        <div class="spacer"></div>
         <h2 class="center">How it works</h2>
-        <div style="height:40px;"></div>
+        <div class="spacer"></div>
         <div class="flex wrap jcenter">
             <div class="item center">
                 <picture>
@@ -90,9 +96,9 @@
     <div class="divider"></div>
 
     <div id = "who-is-this-for" class="main-section">
-        <div style="height:40px;"></div>
+        <div class="spacer"></div>
         <h2 class="center">Who is this for?</h2>
-        <div style="height:40px;"></div>
+        <div class="spacer"></div>
         <div class="flex jcenter wrap">
             <div class="item center">
                 <h6>I'm studying!</h6>
@@ -113,10 +119,10 @@
     <div class="divider"></div>
 
     <div id = "features" class="main-section">
-        <div style="height:40px;"></div>
+        <div class="spacer"></div>
         <h2 class="center">The Lurnby Experience</h2>
-        <div style="height:40px;"></div>
-        <div class="feature flex jcenter acenter wrap">
+        <div class="spacer"></div>
+        <div class="feature flex jevenly acenter wrap">
             <picture>
                 <source srcset="{{url_for('static', filename='images/dotcom/inapp/extension.webp')}}" type="image/webp">
                 <source srcset="{{url_for('static', filename='images/dotcom/inapp/extension.png')}}" type="image/png">
@@ -124,11 +130,11 @@
             </picture>
             <div class="item center">
                 <h6>Browser-friendly</h6>
-                <p>Download the Lurnby <a href="#">Firefox</a> or <a href="#">Chrome</a> browser extensions to quickly save and annotate content</p>
+                <p>Download the Lurnby <a target="_blank" href="https://addons.mozilla.org/en-US/firefox/addon/lurnby/">Firefox</a> or <a target ="_blank" href="https://chrome.google.com/webstore/detail/lurnby/dpobgbljepcemmnbfflkcplalobfllgn">Chrome</a> browser extensions to quickly save and annotate content</p>
             </div>
         </div>
         
-        <div class="feature flex acenter jcenter wrap">
+        <div class="feature flex acenter jevenly wrap">
            
             <div class="item center">
                 <h6>Customizable</h6>
@@ -140,7 +146,7 @@
                 <img src="{{url_for('static', filename='images/dotcom/inapp/customize.png')}}">
             </picture>
         </div>
-        <div class="feature flex acenter jcenter wrap">
+        <div class="feature flex acenter jevenly wrap">
             <picture>
                 <source srcset="{{url_for('static', filename='images/dotcom/inapp/notes.webp')}}" type="image/webp">
                 <source srcset="{{url_for('static', filename='images/dotcom/inapp/notes.png')}}" type="image/png">
@@ -152,7 +158,7 @@
             </div>
             
         </div>
-        <div class="feature flex acenter jcenter wrap">
+        <div class="feature flex acenter jevenly wrap">
             
             <div class="item center">
                 <h6>Metadata and organization</h6>
@@ -175,7 +181,7 @@
             <h2>Get Started:</h2>
             <div style="height:20px;"></div>
             <a class ="main-button ml0 width-100" href="{{url_for('auth.register')}}">SIGN UP</a>
-            <div style="height:40px;"></div>
+            <div class="spacer"></div>
 
         </div>
     </div>

@@ -5,13 +5,14 @@
         }
     }
 
+    picture{
+        max-width: 100%;
+    }
 
 
-    .highlighted{
-        display: inline-block;
-        border-radius: 1px;
-        padding: 1px 4px;
-        margin-bottom: 4px;
+    .spacer{
+        height: 40px;
+        width: 100%;
     }
 
     .divider {
@@ -20,13 +21,22 @@
         border-bottom: $footer-grey 1px solid;
     }
 
+    .highlighted{
+        display: inline-block;
+        border-radius: 1px;
+        padding: 1px 4px;
+        margin-bottom: 4px;
+    }
+
+   
+
     .item{
         max-width: 250px;
         margin-right: 40px;
     }
 
     #header {
-        height: calc(100vh - 214px);
+        //height: calc(100vh - 214px);
         text-align: center;
         display: flex;
         flex-wrap: wrap;
@@ -34,6 +44,8 @@
         align-items: center;
         background-color: $logo-grey;
         
+        
+
         .copy {
             p{
                 line-height: 1.8em;
@@ -47,9 +59,7 @@
             
         }
     
-        img{
-            height:500px;
-        }
+      
     }
 
     .item {
@@ -87,4 +97,202 @@
             
         }
     }
+
+
+
+    @media(min-width:320px){
+        .spacer{
+            height: 20px;
+        }
+        .divider{
+            margin: 10px auto;
+        }
+    
+        #header{
+            height: auto; 
+            
+            .highlighted{
+                display: inline;
+            }
+    
+            img {
+                height: 300px;
+            }
+    
+            .copy{
+                .xlarge{
+                    font-size: 3rem;
+                }
+    
+                h3{
+                    font-size: 1.6rem;
+                }
+            }
+        }
+        
+        h2{
+            font-size: 1.8rem;
+        }
+        .item {
+            img{
+                height: 64px;
+            }
+            margin: 0 0 40px 0;    
+        }
+        
+        #how-it-works .item:last-of-type,
+        #who-is-this-for .item:last-of-type{
+            margin-bottom: 0;
+        }
+
+        #features{
+            img{
+                max-width: 280px;
+                margin: 20px 0;
+            }
+            .item{
+                margin:0;
+            }
+
+            .feature {
+                margin-bottom: 40px;
+            
+                &:last-of-type{
+                    margin-bottom: 0px;
+                }
+
+                picture{
+                    order: 1;
+                    margin-bottom: 16px;
+                }
+                
+                .item{
+                    order: 2;
+                    margin-bottom: 0;
+                }
+
+            }
+
+        }
+
+        #bottom-cta {
+            div {
+                padding: 0 24px;
+                width: 100%;
+            }
+        }
+    }
+
+    @media(min-width: 375px){
+        #header{
+            img{
+                height: 400px;
+            }
+        }
+    }
+
+    @media(min-width:414px){
+        #header{
+            .mobile-only{
+                display: none;
+            }
+        }
+    }
+
+    @media(min-width: 568px){
+        .item {
+            margin-left: 40px;
+            margin-right: 40px;
+        }
+    }
+    @media(min-width:768px){
+        .item{
+            margin-left: 0px;
+        }
+
+        #header{
+            min-height: 75vh;
+            
+            img {
+                height: 500px;
+            }
+            .copy{
+                .xlarge{
+                    font-size: 4rem;
+                }
+                h3{
+                    font-size: 2rem;
+                }
+            }
+           
+        }
+
+        h2 {
+            font-size: 2.5rem;
+        }
+    
+        #features {
+            .feature {
+
+                picture {
+                    order: unset;
+                    img{
+                        max-width: 350px;
+                    }
+                }
+                .item{
+                    order: unset;
+                }
+            }
+        }
+        #bottom-cta {
+            div{
+                max-width: 450px;
+            }
+        }
+
+    }
+
+    @media(min-width: 992px){
+        .spacer {
+            height: 40px;
+        }
+        .divider{
+            margin: 20px auto;
+        }
+
+        #features{
+            .feature{
+                margin: 0 auto 40px auto;
+                max-width: 800px;
+                picture{
+                    img{
+                        max-width: 500px;
+                    }
+                }
+            }
+        }
+
+    }
+
+    @media(min-width: 1200px){
+        #header {
+            .copy{
+                .xlarge {
+                    font-size: 4.5rem;
+                }
+                h3{
+                    font-size: 2.25rem;
+                }
+            }
+        }
+
+        h2{
+            font-size: 2.75rem;
+        }
+    }
+
 }
+
+
+
