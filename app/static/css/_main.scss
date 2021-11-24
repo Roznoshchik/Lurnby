@@ -4,7 +4,12 @@
 
 .width-100 {
     width: 100%;
+    display: block;
   }
+
+.center{
+    text-align: center;
+}
 
 .mobile-width-100{
     @media(max-width: $mobile-max) {
@@ -28,6 +33,28 @@
 .ml0 {
     margin-left: 0;
 }
+
+//////////////////
+// Flex classes //
+//////////////////
+
+.flex{
+    display: flex;
+}
+.wrap {
+    flex-wrap: wrap;
+}
+.jcenter{
+    justify-content: center;
+}
+.jevenly{
+    justify-content: space-evenly;
+}
+.acenter{
+    align-items: center;
+}
+
+
 
 
 .main-button {

@@ -2171,6 +2171,11 @@ ul ul a {
 
 .width-100 {
   width: 100%;
+  display: block;
+}
+
+.center {
+  text-align: center;
 }
 
 @media (max-width: 575px) {
@@ -2195,6 +2200,26 @@ ul ul a {
 
 .ml0 {
   margin-left: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.wrap {
+  flex-wrap: wrap;
+}
+
+.jcenter {
+  justify-content: center;
+}
+
+.jevenly {
+  justify-content: space-evenly;
+}
+
+.acenter {
+  align-items: center;
 }
 
 .main-button {
@@ -9031,6 +9056,208 @@ readers do not read off random characters that represent icons */
 @media (max-width: 374px) {
   .review-item .review-actions .review-outcome button {
     width: 75px;
+  }
+}
+
+#landing *::selection {
+  background-color: #FFF79F;
+}
+#landing picture {
+  max-width: 100%;
+}
+#landing .spacer {
+  height: 40px;
+  width: 100%;
+}
+#landing .divider {
+  margin: 20px auto;
+  width: 60vw;
+  border-bottom: #dbdbdb 1px solid;
+}
+#landing .highlighted {
+  display: inline-block;
+  border-radius: 1px;
+  padding: 1px 4px;
+  margin-bottom: 4px;
+}
+#landing .item {
+  max-width: 250px;
+  margin-right: 40px;
+}
+#landing #header {
+  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  background-color: #cbc1bf;
+}
+#landing #header .copy {
+  max-width: 450px;
+}
+#landing #header .copy p {
+  line-height: 1.8em;
+}
+#landing #header .copy .xlarge {
+  font-weight: 900;
+  font-size: 4.5rem;
+}
+#landing .item img {
+  height: 100px;
+  margin-bottom: 32px;
+}
+#landing .item .highlighted {
+  margin-bottom: 16px;
+  display: block;
+}
+#landing .item ul {
+  max-width: 180px;
+  text-align: left;
+  margin-left: auto;
+  margin-right: auto;
+}
+#landing .feature {
+  margin-bottom: 80px;
+}
+#landing .feature img {
+  margin: 0 40px;
+}
+#landing #bottom-cta div {
+  min-width: 300px;
+}
+@media (min-width: 320px) {
+  #landing .spacer {
+    height: 20px;
+  }
+  #landing .divider {
+    margin: 10px auto;
+  }
+  #landing #header {
+    height: auto;
+  }
+  #landing #header .highlighted {
+    display: inline;
+  }
+  #landing #header img {
+    height: 300px;
+  }
+  #landing #header .copy .xlarge {
+    font-size: 3rem;
+  }
+  #landing #header .copy h3 {
+    font-size: 1.6rem;
+  }
+  #landing h2 {
+    font-size: 1.8rem;
+  }
+  #landing .item {
+    margin: 0 0 40px 0;
+  }
+  #landing .item img {
+    height: 64px;
+  }
+  #landing #how-it-works .item:last-of-type,
+#landing #who-is-this-for .item:last-of-type {
+    margin-bottom: 0;
+  }
+  #landing #features img {
+    max-width: 280px;
+    margin: 20px 0;
+  }
+  #landing #features .item {
+    margin: 0;
+  }
+  #landing #features .feature {
+    margin-bottom: 40px;
+  }
+  #landing #features .feature:last-of-type {
+    margin-bottom: 0px;
+  }
+  #landing #features .feature picture {
+    order: 1;
+    margin-bottom: 16px;
+  }
+  #landing #features .feature .item {
+    order: 2;
+    margin-bottom: 0;
+  }
+  #landing #bottom-cta div {
+    padding: 0 24px;
+    width: 100%;
+  }
+}
+@media (min-width: 375px) {
+  #landing #header img {
+    height: 400px;
+  }
+}
+@media (min-width: 414px) {
+  #landing #header .mobile-only {
+    display: none;
+  }
+}
+@media (min-width: 568px) {
+  #landing .item {
+    margin-left: 40px;
+    margin-right: 40px;
+  }
+}
+@media (min-width: 768px) {
+  #landing .item {
+    margin-left: 0px;
+  }
+  #landing #header {
+    min-height: 75vh;
+  }
+  #landing #header img {
+    height: 500px;
+  }
+  #landing #header .copy .xlarge {
+    font-size: 4rem;
+  }
+  #landing #header .copy h3 {
+    font-size: 2rem;
+  }
+  #landing h2 {
+    font-size: 2.5rem;
+  }
+  #landing #features .feature picture {
+    order: unset;
+  }
+  #landing #features .feature picture img {
+    max-width: 350px;
+  }
+  #landing #features .feature .item {
+    order: unset;
+  }
+  #landing #bottom-cta div {
+    max-width: 450px;
+  }
+}
+@media (min-width: 992px) {
+  #landing .spacer {
+    height: 40px;
+  }
+  #landing .divider {
+    margin: 20px auto;
+  }
+  #landing #features .feature {
+    margin: 0 auto 40px auto;
+    max-width: 800px;
+  }
+  #landing #features .feature picture img {
+    max-width: 500px;
+  }
+}
+@media (min-width: 1200px) {
+  #landing #header .copy .xlarge {
+    font-size: 4.5rem;
+  }
+  #landing #header .copy h3 {
+    font-size: 2.25rem;
+  }
+  #landing h2 {
+    font-size: 2.75rem;
   }
 }
 
