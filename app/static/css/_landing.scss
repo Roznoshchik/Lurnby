@@ -3,6 +3,8 @@
         &::selection{
             background-color: $highlight-yellow;
         }
+
+        //border: red 2px solid;
     }
 
     picture{
@@ -90,13 +92,13 @@
        }
     }
 
-    #bottom-cta{
-        div{
+    // #bottom-cta{
+    //     div{
         
-           min-width: 300px;
+    //        min-width: 300px;
             
-        }
-    }
+    //     }
+    // }
 
 
 
@@ -179,6 +181,7 @@
             div {
                 padding: 0 24px;
                 width: 100%;
+                max-width: 280px;
             }
         }
     }

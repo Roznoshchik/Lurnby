@@ -9122,9 +9122,6 @@ readers do not read off random characters that represent icons */
 #landing .feature img {
   margin: 0 40px;
 }
-#landing #bottom-cta div {
-  min-width: 300px;
-}
 @media (min-width: 320px) {
   #landing .spacer {
     height: 20px;
@@ -9184,6 +9181,7 @@ readers do not read off random characters that represent icons */
   #landing #bottom-cta div {
     padding: 0 24px;
     width: 100%;
+    max-width: 280px;
   }
 }
 @media (min-width: 375px) {
