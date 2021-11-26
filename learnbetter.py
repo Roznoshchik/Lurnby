@@ -1,10 +1,11 @@
-from app import create_app, db
+from app import create_app, db, cli
 
 from app.models import (User, Article, Highlight, Topic, highlights_topics,
                         Tag, tags_articles, tags_highlights, Approved_Sender,
                         Task, Notification, Suggestion, Event, Comms)
 
 app = create_app()
+cli.register(app)
 
 
 @app.shell_context_processor
