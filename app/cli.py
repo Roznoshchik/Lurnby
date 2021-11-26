@@ -1,10 +1,8 @@
-import os
-import click
-import time
 from datetime import datetime
 
 from app import db
 from app.models import User
+from app.utilities.user_content import get_recent_highlights, highlights_urls
 
 def register(app):
 
@@ -24,4 +22,9 @@ def register(app):
         print('Done!')
         print(datetime.utcnow())
 
+    @app.cli.command()
+    def recent_highlights():
+        """get highlights."""
+        u = User.query.filter_by(email="roznoshchik@gmail.com").first()
 
+        highlights_urls(get_recent_highlights(u))

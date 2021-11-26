@@ -831,12 +831,6 @@ def article(uuid):
 
     highlight_id = request.args.get('highlight_id', None)
     #highlight = request.args.get('highlight', None)
-    """
-    if highlight_id == 'burrito':
-        highlight_id = request.args.get('highlight_id')
-    else:
-        highlight_id = "none"
-    """
     
     article = Article.query.filter_by(uuid=uuid_hash).first()
     if article.user_id == current_user.id:
@@ -1198,8 +1192,7 @@ def view_highlight(id):
     source_url = article.source_url
 
     inappurl = (url_for('main.article', uuid=article.uuid) +
-                '?highlight_id=highlight' + str(highlight.id) +
-                '&highlight=burrito')
+                '?highlight_id=highlight' + str(highlight.id))
 
     article_title = article.title
 

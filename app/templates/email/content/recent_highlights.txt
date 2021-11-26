@@ -1,0 +1,20 @@
+{% if highlights[0].user.firstname%}
+Dear {{highlights[0].user.firstname}},
+{% elif highlights[0].user.username %}
+Dear {{ highlights[0].user.username }},
+{% else %}
+Hi, 
+{% endif %}
+
+Here are some of your recent highlights:
+{% for h in highlights %}
+{% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
+From: {{ h.article.title }}
+
+{{ h.text }}
+
+{{ url }}
+
+{% endfor %}
+Sincerely,
+The Lurnby Team

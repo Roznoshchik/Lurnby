@@ -1,0 +1,21 @@
+{% if highlights[0].user.firstname%}
+<p>Dear {{highlights[0].user.firstname}},</p>
+{% elif highlights[0].user.username %}
+<p>Dear {{ highlights[0].user.username }},</p>
+{% else %}
+<p>Hi,</p>
+{% endif %}
+
+<p>Here are some of your recent highlights:</p>
+{% for h in highlights %}
+{% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
+
+<h6>From: {{ h.article.title }}</h6>
+
+<p>{{ h.text }}</p>
+
+<a href="{{ url }}">See it in context</a>
+
+{% endfor %}
+<p>Sincerely,</p>
+<p>The Lurnby Team</p>

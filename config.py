@@ -28,4 +28,5 @@ class Config(object):
     ADMINS = ['team@lurnby.com']
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     WTF_CSRF_TIME_LIMIT= None
-    
+    SERVER_NAME = os.environ.get('SERVER_NAME')
+    PREFERRED_URL_SCHEME = 'https'

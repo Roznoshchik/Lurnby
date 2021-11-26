@@ -54,6 +54,8 @@ class User(UserMixin, db.Model):
     articles = db.relationship('Article', backref='user', lazy='dynamic', cascade='delete, all')
     highlights = db.relationship('Highlight', backref='user', lazy='dynamic', cascade='delete, all')
     events = db.relationship('Event', backref="user", lazy='dynamic')
+    messages = db.relationship('Message', backref="user", lazy='dynamic')
+
     approved_senders = db.relationship('Approved_Sender', backref='user',
                                        lazy='dynamic', cascade='delete, all')
     topics = db.relationship('Topic', backref='user', lazy='dynamic', cascade='delete, all')
@@ -220,6 +222,24 @@ class User(UserMixin, db.Model):
         n = Notification(name=name, payload_json=json.dumps(data), user=self)
         db.session.add(n)
         return n
+
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.String())
+    date = db.Column(db.DateTime())
+    
+    @staticmethod
+    def add(name, user):
+        msg = Message(user_id=user.id, 
+                      name=name,
+                      date=datetime.utcnow())
+        return msg
+
+    def __repr__(self):
+        return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'
+
+
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
