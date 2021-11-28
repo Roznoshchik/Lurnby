@@ -11,7 +11,7 @@ import os
 import random
 import redis
 import rq
-from sqlalchemy import desc, func
+from sqlalchemy import desc, func, Index
 from sqlalchemy_utils import UUIDType
 import string
 from time import time
@@ -358,6 +358,7 @@ class Article(db.Model):
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime, default=datetime.utcnow)
+    date_read_date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship('Highlight', lazy='dynamic',
                                  backref="article")
@@ -575,6 +576,9 @@ class Article(db.Model):
                                          ).filter_by(user_id=user.id).all()
 
         return q
+
+articles_lower_title_key = Index('articles_lower_title_key', func.lower(Article.title))
+
 
 
 highlights_topics = db.Table(

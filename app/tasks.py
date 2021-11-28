@@ -279,6 +279,7 @@ def bg_add_article(u, a_id, pdf, epub, tags):
                             unread=True, title=pdf['title'],
                             user_id = u.id, filetype='pdf')
             db.session.add(article)
+            article.date_read_date = datetime.utcnow().date()
             article.estimated_reading()
             for tag in tags:
                 t = Tag.query.filter_by(name=tag, user_id=u.id
@@ -310,6 +311,7 @@ def bg_add_article(u, a_id, pdf, epub, tags):
                                 filetype="epub")
 
             db.session.add(new_article)
+            new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
 
             for tag in tags:

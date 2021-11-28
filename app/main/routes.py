@@ -32,7 +32,7 @@ from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date, timedelta
 import time
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, or_, collate, func
 
 from werkzeug.utils import secure_filename
 
@@ -86,6 +86,8 @@ def articles():
         search = data['search']
         tag_ids = data['tags']
 
+        # print(title_sort)
+
         # first make user specific and unarchived
         query = Article.query.filter_by(user_id=current_user.id, archived=False)
         # total_count = query.count()
@@ -121,26 +123,32 @@ def articles():
         order = []
         col = getattr(Article, 'done')
         order.append(col.asc())
-        
-        if opened_sort == 'asc':
-            col = getattr(Article, "date_read")
-            col = col.asc()
-            order.append(col)
-        else:
-            col = getattr(Article, "date_read")
-            col = col.desc()
-            order.append(col)
-
         if title_sort == 'desc':
             col = getattr(Article, "title")
+            col = func.lower(col)
             col = col.desc()
             order.append(col)
         elif title_sort == 'asc':
             col = getattr(Article, "title")
+            col = func.lower(col)
+            col = col.asc()
+            order.append(col) 
+        if opened_sort == 'asc':
+            if title_sort:
+                col = getattr(Article, "date_read_date")
+            else:
+                col = getattr(Article, "date_read")
             col = col.asc()
             order.append(col)
+        else:
+            if title_sort:
+                col = getattr(Article, "date_read_date")
+            else:
+                col = getattr(Article, "date_read")
+            col = col.desc()
+            order.append(col)
         query = query.order_by(*order)
-
+   
         filtered_count = query.count()
         if per_page == 'all':
             per_page = filtered_count
@@ -415,6 +423,7 @@ def add_by_email():
                 return 'No Content', 400
 
         db.session.add(new_article)
+        new_article.date_read_date = datetime.utcnow().date()
         new_article.estimated_reading()
         
         u.launch_task("set_images_lazy", "lazy load images", new_article.id)
@@ -527,6 +536,7 @@ def add_suggested_article():
                                   filetype="url")
 
     db.session.add(new_article)
+    new_article.date_read_date = datetime.utcnow().date()
     new_article.estimated_reading()
     ev = Event(user_id=current_user.id, name='added suggested article', date=datetime.utcnow())
     db.session.add(ev)
@@ -631,6 +641,7 @@ def add_article():
                                   filetype="manual")
 
             db.session.add(new_article)
+            new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
             ev = Event.add('added article')
             if ev:
@@ -669,6 +680,7 @@ def add_article():
                                   filetype="url")
 
             db.session.add(new_article)
+            new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
             ev = Event.add('added article')
             if ev:
@@ -868,6 +880,7 @@ def article(uuid):
         color = preferences['color']
         font = preferences['font']
         article.date_read = datetime.utcnow()
+        article.date_read_date = datetime.utcnow().date()
         update_user_last_action('opened article for reading')
         db.session.commit()
 
@@ -1016,6 +1029,10 @@ def updateArticle(uuid):
                 article.done = False
                 article.progress = 0.0
                 article.unread = True
+
+            if (data['read_status'] == 'keep'):
+                article.done = False
+                article.unread = False
 
             article.title = data['title']
             article.notes = data['notes']

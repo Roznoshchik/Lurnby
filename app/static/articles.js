@@ -25,7 +25,7 @@ function clear_modals(){
         <div class="modal-body">
             <div class ='rendering'>
                 <p>Pulling up the article. Please wait.</p>
-                <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+                <img id="rrface" class="star mb-4" src="../static/rrbetterface2.png" alt="" height="100">
             </div>        
         </div>
         <div class="modal-footer">                
@@ -150,7 +150,7 @@ function add_new_article(){
    
     byId('articles_page').innerHTML = `<div class ='rendering'>
     <p>Articles with a lot of images take some time to process. Please wait.</p>
-    <img id="rrface" class="star mb-4" src="/static/rrbetterface2.png" alt="" height="100">
+    <img id="rrface" class="star mb-4" src="../static/rrbetterface2.png" alt="" height="100">
     </div>`;
 
     data = {}
@@ -496,7 +496,7 @@ function ViewAddArticle(){
 function AddSuggestion(){
     byId('articles_page').innerHTML = `<div class ='rendering'>
     <p>Articles with a lot of images take some time to process. Please wait.</p>
-    <img id="rrface" class="star mb-4" src="static/rrbetterface2.png" alt="" height="100">
+    <img id="rrface" class="star mb-4" src="../static/rrbetterface2.png" alt="" height="100">
     </div>`;
 
     destination = `/app/articles/add_suggestion`

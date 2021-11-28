@@ -67,6 +67,7 @@ def create_fake_articles(n, u):
                           content = s,
                           archived=False,
                           date_read = faker.date_time(),
+                          date_read_date= faker.date_time().date(),
                           article_created_date = faker.date_time(),
                           user_id = u.id
                           )
