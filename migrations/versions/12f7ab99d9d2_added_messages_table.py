@@ -1,7 +1,7 @@
 """added messages table
 
 Revision ID: 12f7ab99d9d2
-Revises: 5c5bf645c104
+Revises: 50e2f2ff2dbd
 Create Date: 2021-11-26 22:08:46.608300
 
 """
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '12f7ab99d9d2'
-down_revision = '5c5bf645c104'
+down_revision = '50e2f2ff2dbd'
 branch_labels = None
 depends_on = None
 
