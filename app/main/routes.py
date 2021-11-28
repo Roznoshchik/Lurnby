@@ -32,7 +32,7 @@ from flask_wtf.csrf import CSRFError
 
 from datetime import datetime, date, timedelta
 import time
-from sqlalchemy import desc, or_
+from sqlalchemy import desc, or_, collate
 
 from werkzeug.utils import secure_filename
 
@@ -86,7 +86,7 @@ def articles():
         search = data['search']
         tag_ids = data['tags']
 
-        print(title_sort)
+        # print(title_sort)
 
         # first make user specific and unarchived
         query = Article.query.filter_by(user_id=current_user.id, archived=False)
@@ -123,29 +123,30 @@ def articles():
         order = []
         col = getattr(Article, 'done')
         order.append(col.asc())
-        print(len(order))
+        if title_sort == 'desc':
+            col = getattr(Article, "title")
+            col = collate(col, 'NOCASE')
+            col = col.desc()
+            order.append(col)
+        elif title_sort == 'asc':
+            col = getattr(Article, "title")
+            col = collate(col, 'NOCASE')
+            col = col.asc()
+            order.append(col) 
         if opened_sort == 'asc':
-            col = getattr(Article, "date_read")
+            if title_sort:
+                col = getattr(Article, "date_read_date")
+            else:
+                col = getattr(Article, "date_read")
             col = col.asc()
             order.append(col)
         else:
-            col = getattr(Article, "date_read")
+            if title_sort:
+                col = getattr(Article, "date_read_date")
+            else:
+                col = getattr(Article, "date_read")
             col = col.desc()
             order.append(col)
-
-        if title_sort == 'desc':
-            print(title_sort)
-            col = getattr(Article, "title")
-            col = col.desc()
-            order.append(col)
-            
-        elif title_sort == 'asc':
-            print(title_sort)
-
-            col = getattr(Article, "title")
-            col = col.asc()
-            order.append(col)
-        print(len(order))
         query = query.order_by(*order)
    
         filtered_count = query.count()
@@ -1034,6 +1035,10 @@ def updateArticle(uuid):
                 article.done = False
                 article.progress = 0.0
                 article.unread = True
+
+            if (data['read_status'] == 'keep'):
+                article.done = False
+                article.unread = False
 
             article.title = data['title']
             article.notes = data['notes']
