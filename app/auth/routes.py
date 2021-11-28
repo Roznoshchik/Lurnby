@@ -2,7 +2,7 @@ import json
 import requests
 
 from flask import (flash, redirect, url_for, render_template, request,
-                   current_app)
+                   current_app, session)
 from flask_login import current_user, login_user, logout_user, login_required
 
 from app import db
@@ -80,6 +80,7 @@ def google_login():
 @bp.route('/google_login/callback')
 def callback():
     code = request.args.get("code")
+    # print(f'from google callback page \n\n{session["ref"]}\n\n')
 
     # Find out what URL to hit to get tokens that allow you to ask for
     # things on behalf of a user
@@ -155,7 +156,11 @@ def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.articles'))
     form = RegisterForm()
+    
+    # session['ref'] = request.args.get('ref')
+
     if form.validate_on_submit():
+        # print(f'from register page \n\n{session["ref"]}\n\n')
         user = User(username=form.username.data.lower(),
                     firstname=form.firstname.data,
                     email=form.email.data.lower())

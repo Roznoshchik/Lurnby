@@ -86,6 +86,8 @@ def articles():
         search = data['search']
         tag_ids = data['tags']
 
+        print(title_sort)
+
         # first make user specific and unarchived
         query = Article.query.filter_by(user_id=current_user.id, archived=False)
         # total_count = query.count()
@@ -121,7 +123,7 @@ def articles():
         order = []
         col = getattr(Article, 'done')
         order.append(col.asc())
-        
+        print(len(order))
         if opened_sort == 'asc':
             col = getattr(Article, "date_read")
             col = col.asc()
@@ -132,15 +134,20 @@ def articles():
             order.append(col)
 
         if title_sort == 'desc':
+            print(title_sort)
             col = getattr(Article, "title")
             col = col.desc()
             order.append(col)
+            
         elif title_sort == 'asc':
+            print(title_sort)
+
             col = getattr(Article, "title")
             col = col.asc()
             order.append(col)
+        print(len(order))
         query = query.order_by(*order)
-
+   
         filtered_count = query.count()
         if per_page == 'all':
             per_page = filtered_count
@@ -415,6 +422,7 @@ def add_by_email():
                 return 'No Content', 400
 
         db.session.add(new_article)
+        new_article.date_read_date = datetime.utcnow().date()
         new_article.estimated_reading()
         
         u.launch_task("set_images_lazy", "lazy load images", new_article.id)
@@ -527,6 +535,7 @@ def add_suggested_article():
                                   filetype="url")
 
     db.session.add(new_article)
+    new_article.date_read_date = datetime.utcnow().date()
     new_article.estimated_reading()
     ev = Event(user_id=current_user.id, name='added suggested article', date=datetime.utcnow())
     db.session.add(ev)
@@ -631,6 +640,7 @@ def add_article():
                                   filetype="manual")
 
             db.session.add(new_article)
+            new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
             ev = Event.add('added article')
             if ev:
@@ -669,6 +679,7 @@ def add_article():
                                   filetype="url")
 
             db.session.add(new_article)
+            new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
             ev = Event.add('added article')
             if ev:
@@ -874,6 +885,7 @@ def article(uuid):
         color = preferences['color']
         font = preferences['font']
         article.date_read = datetime.utcnow()
+        article.date_read_date = datetime.utcnow().date()
         update_user_last_action('opened article for reading')
         db.session.commit()
 

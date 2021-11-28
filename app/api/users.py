@@ -5,6 +5,7 @@ from app.api.errors import bad_request
 from app.main.pulltext import pull_text
 from app.models import Article, User, Tag, Comms
 
+from datetime import datetime
 from flask import jsonify, request, url_for
 
 
@@ -63,6 +64,7 @@ def add_article(id):
                       source_url=data['url'], filetype='url',
                       title=data['title'], content=urltext['content'])
     db.session.add(article)
+    article.date_read_date = datetime.utcnow().date()
     article.estimated_reading()
 
     for tag_name in data['tags']:

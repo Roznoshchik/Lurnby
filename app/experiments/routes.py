@@ -41,6 +41,7 @@ def uploads():
                               unread=True, title=pdf['title'],
                               user_id = current_user.id)
             db.session.add(article)
+            article.date_read_date = datetime.utcnow().date()
             db.session.commit()
 
     return render_template('experiments/uploads.html', msg=msg)
