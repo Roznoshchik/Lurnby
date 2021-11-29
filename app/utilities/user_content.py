@@ -27,12 +27,17 @@ def get_recent_highlights():
             highlights = u.highlights.order_by(Highlight.created_date.desc()).filter(Highlight.review_date < last_week).all()
             recent = []
             if len(highlights) > 1:
-                for i in range(5):
-                    num = random.randint(0, len(highlights) - 1 )
-                    recent.append(highlights[num])
-                    highlights[num].review_date = today   
-                    highlights.remove(highlights[num])
-                
+                if len(highlights) < 6:
+                    for h in highlights:
+                        recent.append(h)
+                        h.review_date = today
+                else:   
+                    for i in range(5):
+                        num = random.randint(0, len(highlights) - 1 )
+                        recent.append(highlights[num])
+                        highlights[num].review_date = today   
+                        highlights.remove(highlights[num])
+                    
                 send_email('[Lurnby] Your recent highlights',
                     sender=current_app.config['ADMINS'][0], recipients=[u.email],
                     text_body=render_template('email/content/recent_highlights.txt', highlights = recent),
