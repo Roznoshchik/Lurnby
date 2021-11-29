@@ -1,21 +1,30 @@
-{% if highlights[0].user.firstname%}
-<p>Dear {{highlights[0].user.firstname}},</p>
-{% elif highlights[0].user.username %}
-<p>Dear {{ highlights[0].user.username }},</p>
-{% else %}
-<p>Hi,</p>
-{% endif %}
+{% extends 'email/email_base.html' %}
+{% block css %}
+{% endblock %}
 
-<p>Here are some of your recent highlights:</p>
-{% for h in highlights %}
-{% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
+{% block content %}
+    {% if highlights[0].user.firstname%}
+    <p>Dear {{highlights[0].user.firstname}},</p>
+    {% elif highlights[0].user.username %}
+    <p>Dear {{ highlights[0].user.username }},</p>
+    {% else %}
+    <p>Hi,</p>
+    {% endif %}
 
-<h6>From: {{ h.article.title }}</h6>
+    <p>Here are some of your recent highlights:</p>
+    {% for h in highlights %}
+    {% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
 
-<p>{{ h.text }}</p>
+    <div class="card">
+        <h6>From: {{ h.article.title }}</h6>
+        
+        <p>{{ h.text }}</p>
+        
+        <a class = "main-button" href="{{ url }}">View</a>
+    </div>
 
-<a href="{{ url }}">See it in context</a>
-
-{% endfor %}
-<p>Sincerely,</p>
-<p>The Lurnby Team</p>
+    {% endfor %}
+    <p>Sincerely,</p>
+    <p>The Lurnby Team</p>
+    
+{% endblock %}

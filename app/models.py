@@ -227,7 +227,7 @@ class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String())
-    date = db.Column(db.DateTime())
+    date = db.Column(db.Date())
     
     @staticmethod
     def add(name, user):

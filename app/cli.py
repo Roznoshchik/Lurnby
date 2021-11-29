@@ -25,6 +25,5 @@ def register(app):
     @app.cli.command()
     def recent_highlights():
         """get highlights."""
-        u = User.query.filter_by(email="roznoshchik@gmail.com").first()
-
-        highlights_urls(get_recent_highlights(u))
+        get_recent_highlights()
+ 
