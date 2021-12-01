@@ -393,10 +393,11 @@ function set_position(progress) {
 
 };
 
-window.addEventListener('resize', function(){
-  console.log('screen resized')
-  set_position(current_progress)
-});
+// removed because safari is resizing the window when the browser bar comes up. 
+// window.addEventListener('resize', function(){
+//   console.log('screen resized')
+//   set_position(current_progress)
+// });
 
 {% if not highlight_id %}
 set_position(read_progress);
