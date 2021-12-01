@@ -22,7 +22,7 @@ def get_recent_highlights():
 
     for u in users:
 
-        msg = u.messages.filter(Message.name == 'recent highlights', Message.date <= last_week).first()
+        msg = u.messages.filter(Message.name == 'recent highlights', Message.date >= last_week).first()
         if not msg:
             highlights = u.highlights.order_by(Highlight.created_date.desc()).filter(Highlight.review_date < last_week).all()
             recent = []
