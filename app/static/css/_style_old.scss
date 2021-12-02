@@ -625,6 +625,14 @@ border: #FAB1A0 2px solid;
   width: 130px;
   height: 32px;
 
+  @media(max-width:576px){
+    width: 80%;
+    height:44px;
+    position: absolute;
+    top :50%;
+    margin: auto;
+  }
+
 }
 
 .topics-group input[type=checkbox]{
