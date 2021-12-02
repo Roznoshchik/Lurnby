@@ -1149,13 +1149,15 @@ label svg {
   width: 130px;
   height: 32px;
 }
-@media (max-width: 576px) {
+@media (max-width: 374px) {
   #infoDiv {
-    width: 80%;
+    width: calc(100vw - 32px);
+  }
+}
+@media (min-width: 375px) and (max-width: 576px) {
+  #infoDiv {
+    width: calc(100vw - 64px);
     height: 44px;
-    position: absolute;
-    top: 50%;
-    margin: auto;
   }
 }
 
