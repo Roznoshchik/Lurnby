@@ -6,6 +6,8 @@ Hi!
 Please click the following link to download your exported highlights:
 {{url}}
 
+This link expires on {{delete_date}}. Your files will no longer be available after that.
+
 Sincerely,
 
 The Lurnby Team

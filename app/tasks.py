@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 import glob
 import os
 import sys
@@ -92,21 +92,21 @@ def account_export(uid, ext, delete=False):
             #url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
             url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
 
-
+            delete_date = (datetime.today()+ timedelta(days=7)).strftime("%B %d, %Y")
             send_email('[Lurnby] Your exported data',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
-                    text_body=render_template('email/export_highlights.txt', url=url, user=user),
-                    html_body=render_template('email/export_highlights.html', url=url, user=user),
+                    text_body=render_template('email/export_highlights.txt', url=url, user=user, delete_date=delete_date),
+                    html_body=render_template('email/export_highlights.html', url=url, user=user, delete_date=delete_date),
                     sync=True)
         if delete:
-            if os.environ.get('DEV'):
-                az_path_base = f'staging/{user.id}/'
-            else:
-                az_path_base = f'{user.id}/'
+            # if os.environ.get('DEV'):
+            #     az_path_base = f'staging/{user.id}/'
+            # else:
+            #     az_path_base = f'{user.id}/'
 
-            az = boto3.resource('s3')
-            buck = az.Bucket(bucket)
-            buck.objects.filter(Prefix=az_path_base).delete()
+            # az = boto3.resource('s3')
+            # buck = az.Bucket(bucket)
+            # buck.objects.filter(Prefix=az_path_base).delete()
             delete_user(user)
 
             # for tag in user.tags.all():

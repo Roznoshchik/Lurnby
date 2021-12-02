@@ -1,8 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app import db
-from app.models import User
-from app.utilities.user_content import get_recent_highlights, highlights_urls
+from app.models import User, Event
+from app.utilities.user_content import get_recent_highlights
+from app.utilities.delete_user import check_for_delete
 
 def register(app):
 
@@ -27,3 +28,8 @@ def register(app):
         """get highlights."""
         get_recent_highlights()
  
+
+    @app.cli.command()
+    def delete_from_az():
+        """ delete from amazon"""
+        check_for_delete()
