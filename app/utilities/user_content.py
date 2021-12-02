@@ -9,6 +9,7 @@ import json
 from flask import url_for, render_template, current_app
 
 def get_recent_highlights():
+    print('checking if highlights email needs to be sent out.')
     users = User.query.join(Comms, (Comms.user_id == User.id)).filter(Comms.highlights == True, User.deleted == False, User.test_account == False).all()
     today = datetime.utcnow()
     last_week = today - timedelta(days=7)
@@ -46,6 +47,7 @@ def get_recent_highlights():
                 msg = Message.add('recent highlights', u)
                 db.session.add(msg)
                 db.session.commit()
+                print(f'sent recent highlights to user {u.id}')
                 #print(render_template('email/content/recent_highlights.html', highlights=recent))
             else: 
                 print('no highlights qualified') 

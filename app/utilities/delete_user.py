@@ -32,11 +32,19 @@ def delete_user(u):
     db.session.commit()
 
 def check_for_delete():
+    print('Checking if anything needs deleting from Amazon.')
     today = datetime.utcnow()
     last_week = today - timedelta(days=8)
     evs = Event.query.filter(Event.name == 'deleted account', Event.date <= last_week).all()
-    for ev in evs:
-        delete_az(ev.user)    
+    if evs:
+        for ev in evs:
+            if ev.user:
+                print(f'deleting files for user {ev.user.id}')
+                delete_az(ev.user)
+            else:
+                print('NoneType User')
+    else:
+        print('nothing needs deletion')    
 
 
 def delete_az(user):
