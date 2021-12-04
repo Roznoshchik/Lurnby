@@ -426,14 +426,14 @@ def add_by_email():
         new_article.date_read_date = datetime.utcnow().date()
         new_article.estimated_reading()
         
-        u.launch_task("set_images_lazy", "lazy load images", new_article.id)
-        u.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
-
         ev = Event(user_id=current_user.id, name='added article', date=datetime.utcnow())
         db.session.add(ev)
         db.session.commit()
 
-        db.session.commit()
+        u.launch_task("set_images_lazy", "lazy load images", new_article.id)
+        u.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
+
+        #db.session.commit()
 
         logout_user()
     
