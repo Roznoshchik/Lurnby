@@ -59,9 +59,12 @@ def _set_task_progress(progress):
     job = get_current_job()
   
     if job:
+        print(f'Job: {job}')
         job.meta['progress'] = progress
         job.save_meta()
+        print(f'task id: {job.get_id()}')
         task = Task.query.get(job.get_id())
+        print(f'Task: {task}')
         task.user.add_notification('task_progress',
                                    {'task_id': job.get_id(),
                                      'progress': progress })
