@@ -433,7 +433,7 @@ def add_by_email():
         u.launch_task("set_images_lazy", "lazy load images", new_article.id)
         u.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
 
-        #db.session.commit()
+        db.session.commit()
 
         logout_user()
     
