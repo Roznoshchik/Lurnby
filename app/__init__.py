@@ -144,7 +144,7 @@ def create_app(config_class=Config):
             mail_handler = SMTPHandler(
                 mailhost=(app.config['MAIL_SERVER'],
                           app.config['MAIL_PORT']),
-                fromaddr='no-reply@' + app.config['MAIL_SERVER'],
+                fromaddr='team@lurnby.com',
                 toaddrs=app.config['ADMINS'], subject='Lurnby Failure',
                 credentials=auth, secure=secure
             )

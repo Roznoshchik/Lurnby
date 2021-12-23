@@ -271,9 +271,9 @@ function ArchiveHighlight(id){
     }
     else{
         highlights = Array.from(byClass(`highlight${id}`))
-        console.log(highlights)
+        //console.log(highlights)
         highlights.forEach(clearHighlight)
-        url = `https://${window.location.host}/archivehighlight/${id}`
+        url = `https://${window.location.host}/app/archivehighlight/${id}`
         $.get(url)
 
         var updated_content = byId('article_content').innerHTML

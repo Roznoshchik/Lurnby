@@ -568,7 +568,7 @@ def add_suggested_article():
 
 @bp.route('/articles/new', methods=['GET', 'POST'])
 @login_required
-@bp.errorhandler(CSRFError)
+#@bp.errorhandler(CSRFError)
 def add_article():
 
     form = ContentForm()
