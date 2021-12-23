@@ -96,6 +96,7 @@ def account_export(uid, ext, delete=False):
             url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
 
             delete_date = (datetime.today()+ timedelta(days=7)).strftime("%B %d, %Y")
+            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
             send_email('[Lurnby] Your exported data',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
                     text_body=render_template('email/export_highlights.txt', url=url, user=user, delete_date=delete_date),
@@ -197,7 +198,7 @@ def export_highlights(user, highlights, source, ext):
             url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
 
 
-
+            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
             send_email('[Lurnby] Your exported highlights',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
                     text_body=render_template('email/export_highlights.txt', url=url, user=user),
@@ -237,7 +238,7 @@ def export_highlights(user, highlights, source, ext):
             # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
             url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
 
-
+            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
             send_email('[Lurnby] Your exported highlights',
                     sender=app.config['ADMINS'][0], recipients=[user.email],
                     text_body=render_template('email/export_highlights.txt', url=url, user=user),

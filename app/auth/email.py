@@ -5,6 +5,7 @@ from flask import render_template, current_app
 
 def send_password_reset_email(user):
     token = user.get_reset_password_token()
+    print(f'sending email - [Lurnby] Reset Your Password for user: {user.id}')
     send_email('Lurnby - Reset Your Password',
                sender=current_app.config['ADMINS'][0],
                recipients=[user.email],

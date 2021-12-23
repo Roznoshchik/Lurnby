@@ -12,14 +12,14 @@ def set_absolute_urls(*articles):
                     if 'http' not in img['src']:
                         img['src'] = f'{a.source_url}{img["src"]}'
                 except:
-                    print(f'error with article: {a.uuid}\n img: \n{img}')
+                    print(f'set_absolute_urls - error with article: {a.uuid}\n img: \n{img}')
             links = soup.find_all('a')
             for l in links:
                 try:
                     if 'http' not in l['href']:
                         l['href'] = f'{a.source_url}{l["href"]}'
                 except:
-                    print(f'error with article: {a.uuid}\n url: \n{l}')
+                    print(f'set_absolute_urls error with article: {a.uuid}\n url: \n{l}')
 
             a.content = str(soup.prettify())
     db.session.commit()
@@ -35,6 +35,6 @@ def fix_article_note_links(a):
                 if '/article/' not in l['href']:
                     l['href'] = f'/article/{l["href"]}'
             except:
-                print(f'error with article: {a.uuid}\n url: \n{l}')
+                print(f'fix_article_note_links -  error with article: {a.uuid}\n url: \n{l}')
         a.notes = str(soup.prettify())
     db.session.commit()

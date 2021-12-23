@@ -70,7 +70,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.redis = Redis.from_url(app.config['REDIS_URL'])
     app.task_queue = rq.Queue('lurnby-tasks', connection=app.redis)
-   
+    app.extensions['mail'].debug = 0
    
     @app.before_request
     def before_request_func():

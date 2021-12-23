@@ -51,55 +51,40 @@ def epubConverted(filepath, u=None):
             for img in images:
                 img["loading"] = "lazy"
                 filename = img['xlink:href']
-                print(filename)
                 filename = filename.replace("../", path+"/")
-                print(f'filename: {filename}')
                 if not os.path.exists(filename):
                     filename = img['xlink:href']
                     filename = filename.replace("../", path+"/OEBPS/")
-                    print(filename)
-                else:
-                    print(f'found at: {filename}')
+                   # print(filename)
 
                 if not os.path.exists(filename):
                     filename = img['xlink:href']
                     filename = filename.replace("../", path+"/OPS/")
-                    print(filename)
-                else:
-                    print(f'found at: {filename}')
-                    
+                   # print(filename)
+                        
                 if not os.path.exists(filename):
                     filename = f'{path}/{img["xlink:href"]}'
-                    print(filename)
-                else:
-                    print(f'found at: {filename}')
+                   # print(filename)            
                     
                 if not os.path.exists(filename):
                     filename = f'{path}/OEBPS/{img["xlink:href"]}' 
-                    print(filename) 
-                else:
-                    print(f'found at: {filename}')
-                
+                   # print(filename) 
+                              
                 if not os.path.exists(filename):
                     filename = f'{path}/oebps/{img["xlink:href"]}' 
-                    print(filename) 
-                else:
-                    print(f'found at: {filename}')
+                   # print(filename)           
                     
                 if not os.path.exists(filename):
                     filename = f'{path}/OPS/{img["xlink:href"]}'
-                    print(filename)
-                else:
-                    print(f'found at: {filename}')
-                
+                   # print(filename)
+                               
                 if not os.path.exists(filename):
                     filename = f'{path}/ops/{img["xlink:href"]}'
-                    print(filename)
-                else:
-                    print(f'found at: {filename}')
+                   # print(filename)            
                     
                 if not os.path.exists(filename):
-                    continue   
+                    continue
+                    print("still can't find image folder")
                 
                 name = os.path.basename(filename)
                 az_path = az_path_base + name
@@ -121,70 +106,52 @@ def epubConverted(filepath, u=None):
                 img["loading"] = "lazy" 
                 filename = img['src']   
                 filename = filename.replace("../", path+"/")
-                print(f'path: {path}')
+               # print(f'path: {path}')
                 if not os.path.exists(filename):
                     filename = f"{path}/{img['src']}"
-                    print(f'filename: {filename}')
-                    # print(filename)
-                else:
-                    print(f'found at: {filename}')
-                    
+                   # print(f'filename: {filename}')
+                    ## print(filename)
+                
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/OEBPS/")
-                    print(f'filename: {filename}')
-                    # print(filename)
-                else:
-                    print(f'found at: {filename}')
+                   # print(f'filename: {filename}')
+                    ## print(filename)
                 
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/oebps/")
-                    print(f'filename: {filename}')
-                    # print(filename)
-                else:
-                    print(f'found at: {filename}')
-                    
+                   # print(f'filename: {filename}')
+                    ## print(filename)
+                
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/OPS/")
-                    print(f'filename: {filename}')
-                    # print(filename)
-                else:
-                    print(f'found at: {filename}')
-                
+                   # print(f'filename: {filename}')
+                    ## print(filename)
+              
                 if not os.path.exists(filename):
                     filename = img['src']
                     filename = filename.replace("../", path+"/ops/")
-                    print(f'filename: {filename}')
-                    # print(filename)
-                else:
-                    print(f'found at: {filename}')
-                    
-                if not os.path.exists(filename):
-                    filename = f"{path}/OEBPS/{img['src']}"
-                    print(f'filename: {filename}')
-                else:
-                    print(f'found at: {filename}')
+                   # print(f'filename: {filename}')
+                    ## print(filename)
                 
                 if not os.path.exists(filename):
+                    filename = f"{path}/OEBPS/{img['src']}"
+                   # print(f'filename: {filename}')
+               
+                if not os.path.exists(filename):
                     filename = f"{path}/oebps/{img['src']}"
-                    print(f'filename: {filename}')
-                else:
-                    print(f'found at: {filename}')
-                    
+                   # print(f'filename: {filename}')
+                
                 if not os.path.exists(filename):
                     filename = f"{path}/OPS/{img['src']}"
-                    print(f'filename: {filename}') 
-                else:
-                    print(f'found at: {filename}')
+                   # print(f'filename: {filename}') 
                 
                 if not os.path.exists(filename):
                     filename = f"{path}/ops/{img['src']}"
-                    print(f'filename: {filename}') 
-                else:
-                    print(f'found at: {filename}')
-                    
+                   # print(f'filename: {filename}') 
+               
                 if not os.path.exists(filename):
                     print('still cant find img folder')
                     continue
@@ -205,12 +172,12 @@ def epubConverted(filepath, u=None):
         
         links = soup.find_all('a', href=True)
         for l in links:
-            # print(l['href'])
+            ## print(l['href'])
             if '#' in l['href']:
                 x = l['href'].split('#')
-                # print(x)
+                ## print(x)
                 l['href'] = f'#{x[1]}'
-                # print(l['href'])
+                ## print(l['href'])
             elif 'http' not in l['href']:
                 l['href'] = ''            
 

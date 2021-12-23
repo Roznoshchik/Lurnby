@@ -188,10 +188,10 @@ def settings_content():
     if form.validate_on_submit():
         email = form.email.data
         update_user_last_action('added approved sender')
-        print('adding approved sender:')
-        print(email)
+        # print('adding approved sender:')
+        # print(email)
         email = email.lower()
-        print(email)
+        # print(email)
         e = Approved_Sender(user_id=current_user.id, email=email)
         db.session.add(e)
 
@@ -252,7 +252,7 @@ def export():
 def comms():
     form = CommunicationForm()
     comms = current_user.comms
-    print(comms)
+    # print(comms)
 
     if form.validate_on_submit():
         comms.highlights = form.data['highlights']

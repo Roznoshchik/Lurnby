@@ -38,7 +38,7 @@ def get_recent_highlights():
                         recent.append(highlights[num])
                         highlights[num].review_date = today   
                         highlights.remove(highlights[num])
-                    
+                  
                 send_email('[Lurnby] Your recent highlights',
                     sender=current_app.config['ADMINS'][0], recipients=[u.email],
                     text_body=render_template('email/content/recent_highlights.txt', highlights = recent),

@@ -81,17 +81,17 @@ def importPDF(filepath, u=None):
                 # then increase count in prep for next image.
                 ext = i['ext']
                 file_name = f'{j}.{ext}'
-                print(file_name)
+                #print(file_name)
                 file_path = f'{img_path}/{file_name}'
-                print(file_path)
+                #print(file_path)
                 j = j + 1
                 # save file to disk.
                 with open(f'{file_path}', 'wb') as pic:
-                    print('opened')
+                    #print('opened')
                     pic.write(i['image'])
-                    print('saved image')
+                    #print('saved image')
                 az_path = az_path_base + file_name
-                print(az_path)
+                #print(az_path)
                 s3.upload_file(
                         Bucket = bucket,
                         Filename=file_path,

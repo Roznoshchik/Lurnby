@@ -326,19 +326,19 @@ def add_by_email():
     recipient = request.form['to']
     if '<' in recipient:
         recipient = recipient.split('<')[1][:-1]
-    print('email to: ')
-    print(recipient)
+    #print('email to: ')
+    #print(recipient)
     u = User.query.filter_by(add_by_email=recipient).first()
-    print('identified user:')
-    print(u)
+    #print('identified user:')
+    #print(u)
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
-    print('approved senders:')
-    print(emails)
+    #print('approved senders:')
+    #print(emails)
     email = request.form['from'].lower()
     if '<' in email:
         email = request.form['from'].split('<')[1][:-1]
-        print('sender: ')
-        print(email)
+        #print('sender: ')
+        #print(email)
     process = False
     if email in emails and u:
         login_user(u)
@@ -347,10 +347,10 @@ def add_by_email():
     if process:
         print('processing email')
 
-        for i in request.form:
-            print(i)
+        # for i in request.form:
+        #     print(i)
             
-        print('\n\n')
+        # print('\n\n')
 
         subject = request.form.get('subject', False)
         html = request.form.get('html', False)
@@ -506,6 +506,7 @@ def feedback():
     html_body = ('<p>' + data['email'] + '</p><p>' + data['url']
                  + '</p><p>' + data['feedback'] + '</p>')
 
+    print(f'sending email - Feedback submit')
     send_email(subject, sender, recipients, text_body, html_body)
     update_user_last_action('submitted feedback')
     ev = Event(user_id=current_user.id, name='submitted feedback', date=datetime.utcnow())
@@ -828,8 +829,8 @@ def download_image(id,resource):
     if id != current_user.id:
         return 'resource not found', 403
 
-    print(id)
-    print(resource)
+    # print(id)
+    # print(resource)
     """ resource: name of the file to download"""
     url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': resource}, ExpiresIn = 30)
     return redirect(url, code=302)
@@ -1135,7 +1136,7 @@ def unarchiveArticle(uuid):
 def addhighlight():
 
     data = json.loads(request.form['data'])
-    print(data)
+   # print(data)
     article = Article.query.filter_by(uuid=data['article_uuid']).first()
 
     newHighlight = Highlight(user_id=current_user.id,
@@ -1443,7 +1444,7 @@ def highlights():
 
         
         all_user_topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
-        print(topics)
+        # print(topics)
         # filter for topics
         if topics != []:
     
@@ -1506,7 +1507,7 @@ def highlights():
 
         highlights = query.paginate(page, per_page, False)
 
-        print(highlights.items)
+        # print(highlights.items)
 
         
         data = {
@@ -1654,7 +1655,7 @@ def tier(id):
                 200, {'ContentType': 'application/json'})
 
     if data['tier'] == 'lower':
-        print('lower tier', highlight)
+        # print('lower tier', highlight)
         highlight.review_schedule = highlight.review_schedule - 1
         highlight.review_date = datetime.utcnow()
         current_user.last_action = 'reviewed highlights'
