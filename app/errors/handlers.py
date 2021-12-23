@@ -1,4 +1,5 @@
 from flask import render_template, request
+from flask_wtf.csrf import CSRFError
 from app import db
 
 from app.errors import bp
@@ -24,3 +25,7 @@ def internal_error(error):
     if wants_json_response():
         return api_error_response(500)
     return render_template('errors/500.html'), 500
+
+# @bp.errorhandler(CSRFError)
+# def handle_csrf_error(e):
+#     return render_template('csrf_error.html', reason=e.description), 400
