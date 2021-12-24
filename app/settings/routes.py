@@ -248,8 +248,11 @@ def export():
 # ##     Notifications      ## #
 # ############################ #
 
+
 @bp.route('/settings/communication', methods=['GET','POST'])
+@login_required
 def comms():
+    
     form = CommunicationForm()
     comms = current_user.comms
     # print(comms)
