@@ -1175,6 +1175,11 @@ def addhighlight():
 
 
     db.session.commit()
+    if newHighlight.topics.count() == 0:
+        newHighlight.no_topics = True
+    else:
+        newHighlight.no_topics = False
+
     newHighlight.position = "#" + str(newHighlight.id)
     db.session.commit()
 
@@ -1260,20 +1265,19 @@ def view_highlight(id):
                                           user_id=current_user.id).first()
             if topic:
                 highlight.RemoveFromTopic(topic)
-                
-            
-
-        if highlight.topics.count() == 0:
-            highlight.no_topics = True
-        else:
-            highlight.no_topics = False
 
         ev = Event.add('updated highlight')
         if ev:
             db.session.add(ev)
 
         db.session.commit()
+        if highlight.topics.count() == 0:
+            highlight.no_topics = True
+        else:
+            highlight.no_topics = False
         
+        db.session.commit()
+
         topics_list = [t.title for t in current_user.topics.order_by(Topic.last_used.desc()).all()]
 
         # checks to see if the update highlight request is on the topics page
