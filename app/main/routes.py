@@ -1609,7 +1609,7 @@ def review():
 
         data = {
             'topics': [topic.title for topic in topics],
-            'html': render_template('filter_review.html', tiers=tiers, 
+            'html': render_template('review/filter_review.html', tiers=tiers, 
                                     days=days, empty=empty)
         }
 
@@ -1617,7 +1617,7 @@ def review():
         
 
 
-    return render_template('review.html', topics=topics, tiers=tiers, days=days, empty=empty)
+    return render_template('review/review.html', topics=topics, tiers=tiers, days=days, empty=empty)
 
 @bp.route('/review/settings', methods=['POST'])
 def update_review_settings():
