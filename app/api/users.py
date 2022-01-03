@@ -74,5 +74,5 @@ def add_article(id):
     db.session.commit()
     response = jsonify(article.to_dict())
     response.status_code = 201
-    response.headers['Location'] = url_for('main.article', id=article.uuid)
+    response.headers['Location'] = url_for('main.article', uuid=article.uuid)
     return response
