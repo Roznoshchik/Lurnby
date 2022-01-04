@@ -369,6 +369,9 @@ class Article(db.Model):
     bookmarks = db.Column(db.String)
     done = db.Column(db.Boolean, default=False)
     notes = db.Column(db.Text, default='')
+    reflections = db.Column(db.Text, default='')
+
+
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     read_time = db.Column(db.String)
 

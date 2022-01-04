@@ -40,7 +40,8 @@
                 </div>
                 <div id = "article_source" class = "lurnby_data_group article_data_group">
                     {% if article.source_url %}
-                    <h6>Source:</h6><a class = "regular" target = "_blank" href="{{article.source_url}}">{{article.source_url}}</a>
+                    <h6>Source:</h6><a id="article_{{article.id}}" class = "regular" target = "_blank" href="{{article.source_url}}">{{article.source_url}}</a>
+                    <button type = "button" class="main-button" onclick="copyHrefToClipboard('article_{{article.id}}')">Copy</button>
                     {% else %}
                     <h6>Source:</h6><p>{{article.source}}</p>
                     {% endif %}
@@ -61,11 +62,20 @@
                     </span>
                 </div>
                 
+                {% if article.done or article.reflections  %}
+                <div class = "lurnby_data_group article_data_group">
+                    <h6>Reflections: </h6>
+                    <p class = "not-editing" id="article_reflections"></p>
+                    <textarea id="reflections_edit" class = "large editing">{% if article.reflections %}{{ article.reflections|safe}}{% endif %}</textarea>
+                </div>
+                {% endif %}
+
                 <div class = "lurnby_data_group article_data_group">
                     <h6>Notes: </h6>
                     <p class = "not-editing" id="article_notes"></p>
                     <textarea id="notes_edit" class = "large editing">{{ article.notes|safe}}</textarea>
                 </div>
+  
                 {% if article.filetype == 'manual' or article.filetype == 'email' %}
                 <div class = "lurnby_data_group article_data_group">
                     <h6>Content: </h6>

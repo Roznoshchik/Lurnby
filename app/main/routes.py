@@ -43,7 +43,6 @@ from app.main import bp
 # ############################################ #
 # ##     New table layout for articles      ## #
 # ############################################ #
-# @bp.route('/articles2', methods=['GET', 'POST'])
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/articles', methods=['GET', 'POST'])
 @login_required
@@ -887,13 +886,16 @@ def article(uuid):
         update_user_last_action('opened article for reading')
         db.session.commit()
 
+
+        notTaggedList = [t.name for t in article.not_in_tags(article.user)]
+
         return render_template('text.html', highlight_id=highlight_id,
                                article=article, user=current_user,
                                progress=progress, size=size, color=color,
                                font=font, spacing=spacing, title=title,
                                article_uuid=uuid, content=content, form=form,
                                addtopicform=addtopicform, topics=topics,
-                               furthest=furthest, bookmarks=bookmarks)
+                               furthest=furthest, bookmarks=bookmarks, notTaggedList=notTaggedList)
     else:
         return render_template('errors/404.html'), 404
 
@@ -941,19 +943,40 @@ def storeHighlights(uuid):
                 200, {'ContentType': 'application/json'})
 
 
-@bp.route('/article/<uuid>/finished', methods=['GET'])
+@bp.route('/article/<uuid>/finished', methods=['POST'])
 @login_required
 def mark_read(uuid):
     uuid_hash = UUID(uuid)
     article = Article.query.filter_by(uuid=uuid_hash).first()
     
     if article.user_id == current_user.id:
+        data = json.loads(request.data)
         article.done = True
+        article.reflections = data['reflections']
+        taggedList = data['taggedList']
+        notTaggedList = data['notTaggedList']
+
+        print(taggedList)
+        print(notTaggedList)
+
+        for t in data['taggedList']:
+            print(t)
+            tag = Tag.query.filter_by(name=t).first()
+            if not tag:
+                tag = Tag(name=t, user_id=current_user.id)
+                db.session.add(tag)
+            article.AddToTag(tag)
+        for t in data['notTaggedList']:
+            tag = Tag.query.filter_by(name=t).first()
+            if tag:
+                article.RemoveFromTag(tag)
         db.session.commit()
-        flash('Another article finished!', 'success')
-        return redirect(url_for('main.articles'))
+
+        return {'message':'success'}, 200
+
     else:
-        return render_template('errors/404.html'), 404
+        response = jsonify({'message':'unauthorized'})
+        return {'message': 'unauthorized'}, 400
 
 
 @bp.route('/article/<uuid>/progress', methods=['GET', 'POST'])
@@ -1027,6 +1050,7 @@ def updateArticle(uuid):
 
             if (data['read_status'] == 'read'):
                 article.done = True
+                article.unread = False
 
             if (data['read_status'] == 'unread'):
                 article.done = False
@@ -1039,6 +1063,8 @@ def updateArticle(uuid):
 
             article.title = data['title']
             article.notes = data['notes']
+            if 'reflections' in data:
+                article.reflections = data['reflections']
             if 'content' in data:
                 article.content = data['content']
 

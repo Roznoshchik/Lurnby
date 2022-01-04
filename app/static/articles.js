@@ -356,15 +356,23 @@ function view_article_tiny_init(){
     var existing_notes = byId('notes_edit').value
 
     // cancels any existing editing tiny editors?
-    console.log('made it here')
     if (byId('content_edit') != null){
         var existing_content = byId('content_edit').value
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'content_edit');
     }
 
+    if(byId('reflections_edit')){
+        var existing_reflections = byId('reflections_edit').value
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'reflections_edit');
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_reflections');
+    }
+
     tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'notes_edit');
+    
+
     tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_content');
     tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_notes');
+    
 
 
 
@@ -388,8 +396,32 @@ function view_article_tiny_init(){
     }
 
   });
-  
-  console.log('notes_initialized')
+  console.log('notes_initialized');
+
+    if(byId('article_reflections')){
+        //reflections preview
+        tinymce.init({
+            selector: '#article_reflections',
+            menubar: false,
+            resize: 'vertical',
+            toolbar: false,
+            skin: "oxide",
+            content_css: "light",
+            mobile: {
+                height: 300
+            },
+            readonly: 1,
+            
+            setup: function (editor) {
+            editor.on('init', function (e) {
+            editor.setContent(`${existing_reflections}`);
+            });
+            }
+
+        });
+        console.log('reflections_initialized');
+    }
+    
     
   if(byId('article_content') != null){
     //content preview
@@ -429,6 +461,11 @@ function edit_article_tiny_init(){
   tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_notes');
    byId('article_notes').style.display = "none"
 
+   tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_reflections');
+   if(byId('article_reflections')){
+        byId('article_reflections').style.display = "none"
+   }
+    
 
  
   
@@ -446,8 +483,26 @@ function edit_article_tiny_init(){
           }
 
     });
-    console.log('notes edit initialized')        
-  if (byId('content_edit') != null){
+    console.log('notes edit initialized')  
+    
+    if(byId('reflections_edit')){
+        //reflections edit
+        tinymce.EditorManager.init({
+            selector: '#reflections_edit',
+            menubar: 'insert format',
+            resize: 'vertical',
+            toolbar: 'styleselect | bold italic underline | hr',
+            skin: "oxide",
+            content_css: "light",  
+            plugins: 'link hr', 
+            mobile: {
+                height:300
+            }
+        });
+        console.log('reflections edit initialized')
+    }
+
+    if (byId('content_edit') != null){
         //content edit
         tinymce.EditorManager.init({
             selector: '#content_edit',
@@ -793,7 +848,7 @@ function filter(){
 
 function save(article_id){
 
-    var doc_tags,doc_remove_tags, tags, title, read_status, notes, content, data;
+    var doc_tags,doc_remove_tags, tags, title, read_status, notes, content, data, reflections;
 
     console.log('saving');
 
@@ -826,7 +881,11 @@ function save(article_id){
     read_status = byId('read_edit').value;
     
     notes = tinymce.get('notes_edit').getContent()
-    console.log(notes)
+    if (byId('reflections_edit')){
+        reflections = tinymce.get('reflections_edit').getContent()
+    }
+
+    //console.log(notes)
     if(byId('content_edit')){
         content = tinymce.get('content_edit').getContent()
     }
@@ -838,6 +897,7 @@ function save(article_id){
         'title': title,
         'read_status': read_status,
         'notes': notes,
+        'reflections':reflections,
         'content': content,
         'tags':tags,
         'remove_tags': remove_tags

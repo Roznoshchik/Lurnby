@@ -63,6 +63,10 @@ function autocomplete(inp, arr, dest, create=false, location) {
                     console.log('loc is filterhighlight')
                     t = make_topic_span(elem.innerHTML, ['topic', 'filter_highlight_member'])
                 }
+                else if(loc == 'FinishArticleModal'){
+                    // console.log('loc is finishArti')
+                    t = make_topic_span(elem.innerHTML, ['topic', 'tagMember'])
+                }
 
                 dest.appendChild(t)
             
@@ -103,6 +107,9 @@ function autocomplete(inp, arr, dest, create=false, location) {
                     }
                     else if(loc == 'addhighlight'){
                         t = make_topic_span(inp.value, ['topic', 'add_highlight_member'])
+                    }
+                    else if(loc == 'FinishArticleModal'){
+                        t = make_topic_span(inp.value, ['topic', 'tagMember'])
                     }
                 
                     dest.appendChild(t)
@@ -184,7 +191,12 @@ function autocomplete(inp, arr, dest, create=false, location) {
         }
         t.innerHTML = topic_title
         if(create){
-            t.id = 'member-topic'+topic_title
+            if (location == 'FinishArticleModal'){
+                t.id = 'member-tag'+topic_title
+            }
+            else{
+                t.id = 'member-topic'+topic_title
+            }
         }
         else{
             t.id = 'topic'+topic_title
@@ -223,9 +235,9 @@ function autocomplete(inp, arr, dest, create=false, location) {
         /*close all autocomplete lists in the document,
         except the one passed as an argument:*/
         var x = document.getElementsByClassName("autocomplete-items");
-        var inp1 = byId('filter_input'), inp2 = byId("topic_input"), inp3 = byId("new_highlight_topic_input")
+        var inp1 = byId('filter_input'), inp2 = byId("topic_input"), inp3 = byId("new_highlight_topic_input"), inp4 = byId('tag_input')
         for (var i = 0; i < x.length; i++) {
-            if (elmnt != inp2 && elmnt != inp1 && elmnt != inp3) {
+            if (elmnt != inp2 && elmnt != inp1 && elmnt != inp3 && elmnt != inp4) {
                 console.log('closing list')
                 x[i].parentNode.removeChild(x[i]);
             }
