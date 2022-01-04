@@ -289,6 +289,14 @@
         </button>
       </div>
       <div class="modal-body">
+        {% if article.source_url %}
+        <div class="lurnby_data_group">
+          <h6>Source</h6>
+          <a id="articleId" href="{{article.source_url}}" target="_blank">{{article.source_url}}</a>
+          <button type="button" class="main-button" onclick="copyHrefToClipboard('articleId')">Copy</button>
+        </div>
+        {% endif %}
+
         <div class="lurnby_data_group">
           <h6>Reflections</h6>
           <textarea id="articleReflections" class="form-control">{% if article.reflections %}{{ article.reflections | safe }}{% endif %}</textarea>
@@ -512,7 +520,7 @@ set_position(read_progress);
   hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
   */
   
-  var timer;
+  var timer, timer2;
 
   function getScrollPercent() {
     
@@ -537,16 +545,20 @@ set_position(read_progress);
     if (progress > furthest){
       furthest = progress;
       byId('furthest-read').onclick = function() {go_to_location(furthest)};
-      save_bookmarks()
+      console.log('will update bookmarks')
+      clearTimeout(timer2)
+      timer2 = setTimeout(save_bookmarks, 5000)
+      
+      //save_bookmarks()
     }
     
+
     clearTimeout(timer)
     timer = setTimeout(update_progress.bind(null, progress), 3000)
   } 
 
   function update_progress(progress, article_uuid){
     current_progress = progress;
-    console.log('updating progress');
     byId('overview-progress').innerText = Math.round(progress);
 
     $.post('/app/article/' + '{{article_uuid}}' + '/progress', {

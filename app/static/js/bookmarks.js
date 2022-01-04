@@ -76,6 +76,7 @@ function get_location(){
 }
 
 function save_bookmarks(){
+    console.log('saving bookmarks')
     all_bookmarks['furthest'] = furthest
     let bookmarks = JSON.stringify(all_bookmarks);
     
