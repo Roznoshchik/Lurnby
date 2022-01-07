@@ -9,10 +9,13 @@
             <p>{{highlight.text}}</p>
             {% if not highlight.no_topics %}
             <div class="highlight-topics">
+                {% set topics = highlight.topics.filter_by(archived=False).all() %}
+                {% if topics %}
                 <h6>Topics:</h6>
-                {% for topic in highlight.topics.filter_by(archived=False).all() %}
+                {% for topic in topics %}
                     <p class = "topic">{{topic.title}}</p>
                 {% endfor %}
+                {% endif %}
             </div>
             {% endif %}
             <div id ="highlight-{{highlight.id}}-actions" class="highlight-actions">
