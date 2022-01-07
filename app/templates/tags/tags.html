@@ -1,0 +1,141 @@
+{% set terms_modal = True %}
+
+{% extends "base.html" %}
+
+<!--------------->
+<!--  styles   -->
+<!--------------->
+{% block style %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<!------------------------------->
+<!--   check for empty state   -->
+<!------------------------------->
+
+{% if tags|length == 0 and topics|length == 0 %}
+<div id = "articles_page">
+    <div class="main-section articles-empty-row">
+        <div class=" articles-empty-col col text-center">
+            <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                src="{{url_for('static', filename='rr-100.png')}}" alt="" height="100"></span>
+            <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">Nothing to show!</h1>
+            <p>This is where you will see all of your tags and topics. At the moment, you haven't created any so there's nothing to show!</p>    
+        </div>    
+    </div>
+</div>
+{% else %}
+<div id = "highlights_page">
+
+    <!---------------------->
+    <!--   main section   -->
+    <!---------------------->
+
+    <div id = "highlights_all" class = "main-section">
+        <div style="margin-top: 44px;"></div>
+        <div>
+            <div class = "heading row">
+                <div class = "">
+                    <h6>Tags</h6>
+                </div>
+            </div>
+            <div class="flex wrap">
+                {% for tag in tags %}
+                <div id="tag-{{tag.id}}" class="card">
+                    <div class="header">
+                        <h6>{{ tag.name}}</h6>
+                        <div class="underline"></div>
+                    </div>
+                    <div class="content">
+                        <p>Articles: {{tag.articles.count()}}</p>
+                
+                        <div id ="tag-{{tag.id}}-actions" class="actions">
+                            <button onclick = "editTag('tag',{{tag.id}})" class="main-button ml0 ">Edit</button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class = "card">
+                    <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                        src="{{url_for('static', filename='rr-100.png')}}" alt="" height="100"></span>
+                    <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">Nothing here!</h1>
+                    <p>You haven't created any tags yet!</p>    
+                </div>    
+                {% endfor %}
+            </div>
+        </div>
+
+        <div style="margin-top: 44px;"></div>
+
+        <div>
+            <div class = "heading row">
+                <div class = "">
+                    <h6>Topics</h6>
+                </div>
+            </div>
+            <div class="flex wrap">
+                {% for topic in topics %}
+                <div id="topic-{{topic.id}}" class="card">
+                    <div class="header">
+                        <h6>{{ topic.title}}</h6>
+                        <div class="underline"></div>
+                    </div>
+                    <div class="content">
+                        <p>Highlights: {{topic.highlights.count()}}</p>
+                
+                        <div id ="topic-{{topic.id}}-actions" class="actions">
+                            <button onclick = "editTag('topic',{{topic.id}})" class="main-button ml0 ">Edit</button>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class = "card">
+                    <span style="cursor: pointer;" onclick="rrtoggle()"><img id="rrface" class="mb-4"
+                        src="{{url_for('static', filename='rr-100.png')}}" alt="" height="100"></span>
+                    <h1 id="rrtitle" class="h3 mb-3 font-weight-normal">Nothing here!</h1>
+                    <p>You haven't created any topics yet!</p>    
+                </div>    
+                {% endfor %}
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+{% endif %}
+{% endblock%}
+
+{% block JS %}
+<script>
+    const tags = {
+        {% for tag in tags %}
+        '{{tag.id}}': {
+            'id':"{{tag.id}}",
+            'type': 'tag',
+            'records': {{tag.articles.filter_by(archived=False).count()}},
+            'name': '{{tag.name}}',
+            'archived': false
+        },
+        {% endfor %}
+    }
+
+    const topics = {
+        {% for topic in topics %}
+        '{{topic.id}}': {
+            'id':"{{topic.id}}",
+            'type': 'topic',
+            'records': {{topic.highlights.filter_by(archived=False).count()}},
+            'name': '{{topic.title}}',
+            'archived': false
+        },
+        {% endfor %}
+    }
+</script>
+
+<script type="text/javascript" src="{{url_for( 'static', filename='tag.js' )}}"></script>
+
+{% endblock %}

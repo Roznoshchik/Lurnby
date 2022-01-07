@@ -142,13 +142,16 @@ li{
     margin-bottom: 8px;
 }
 
+
+
 .card {
     padding: 1.25rem;
     background-color: #fff;
     border-radius: 6px;
     border: none;
     box-shadow:0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
-    
+    margin:0 16px 16px 0;
+    min-width: 300px;
 }
 
 #base-main {

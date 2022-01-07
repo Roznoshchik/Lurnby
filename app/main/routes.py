@@ -2,6 +2,7 @@ import json
 import os
 from threading import Thread
 from uuid import UUID, uuid4
+from sqlalchemy.sql.expression import true
 
 from sqlalchemy.sql.sqltypes import JSON
 import validators
@@ -1429,10 +1430,83 @@ def unarchivehighlight(id):
     return (json.dumps({'success': True}),
         200, {'ContentType': 'application/json'})
 
+##########################
+#                        #
+#  Tags /  functions     #
+#                        #
+##########################
+@bp.route('/tags', methods=['GET', 'POST'])
+@login_required
+def tags():
+    tags = current_user.tags.filter_by(archived=False).all()
+    topics = current_user.topics.filter_by(archived=False).all()
+
+    if request.method == 'POST':
+        data = json.loads(request.data)
+        if data['type'] == 'tag':
+            tag = Tag.query.get(data['id'])
+            if tag.user_id == current_user.id:
+                tag.name = data['name']
+                db.session.commit()
+                return jsonify({
+                    'code': 200,
+                    'name': 'Updated',
+                    'description': 'Resource updated successfully',
+                }), 200
+            else:
+                return {
+                    'code': 401,
+                    'name': 'Unauthorized',
+                    'description': 'User has the wrong permissions',
+                }, 401
+        else:
+            topic = Topic.query.get(data['id'])
+            if topic.user_id == current_user.id:
+                topic.title = data['name']
+                db.session.commit()
+                return {
+                    'code': 200,
+                    'name': 'Updated',
+                    'description': 'Resource updated successfully',
+                }, 200
+            else:
+                return {
+                    'code': 401,
+                    'name': 'Unauthorized',
+                    'description': 'User has the wrong permissions',
+                }, 401
+
+    return render_template('tags/tags.html', tags=tags, topics=topics) 
+
+@bp.route('/tags/archive', methods = ['POST'])
+def archiveTag():
+    data = json.loads(request.data)
+    if data['type'] == 'tag':
+        t = Tag.query.get(data['id'])
+    else:
+        t = Topic.query.get(data['id'])
+        
+    if t.user_id == current_user.id:
+        t.archived = True
+        db.session.commit()
+        return {
+            'code': 200,
+            'name': 'Updated',
+            'description': 'Resource updated successfully',
+        }, 200
+    else:
+        return {
+            'code': 401,
+            'name': 'Unauthorized',
+            'description': 'User has the wrong permissions',
+        }, 401
+
+
+
 
 ##########################
 #                        #
-#  Topics functions      #
+#  Highlights functions  #
 #                        #
 ##########################
 

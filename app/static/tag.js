@@ -181,3 +181,79 @@ function add_tag_finish(string){
     document.getElementById('new_tags').appendChild(new_label);
     
 }
+
+//////////////////////////////////////////
+//                                      //
+//          Tag page functions          //
+//                                      //
+//////////////////////////////////////////
+
+const editTag = (type, id) => {    
+    byId(type+'-'+id).innerHTML = createEditTag(type == 'tag' ?tags[`${id}`]:topics[`${id}`])
+}
+
+const createTag = (tag) => {
+    return ` 
+    <div class="header">
+        <h6>${tag.name}</h6>
+        <div class="underline"></div>
+    </div>
+    <div class="content">
+        <p>${tag.type == 'topic'? 'Highlights':'Articles'}: ${tag.records}</p>
+
+        <div id ="${tag.type}-${tag.id}-actions" class="actions">
+            <button onclick = "editTag('${tag.type}',${tag.id})" class="main-button ml0 ">Edit</button>
+        </div>
+    </div>`
+
+}
+
+const createEditTag = (tag) => {    
+    return ` 
+    <div class="header">
+        <div class="form-label-group">
+            <input  class="form-control" id="${tag.type}-${tag.id}-name" name=tag-name type="text" value="${tag.name}"/>
+            <label for="tag-name">Title</label>
+        </div>
+        <div class="underline"></div>
+    </div>
+    <div class="content">
+        <p>${tag.type == 'topic'? 'Highlights':'Articles'}: ${tag.records}</p>
+
+        <div id ="${tag.type}-${tag.id}-actions" class=" flex actions">
+            <button onclick = "archiveTag('${tag.type}',${tag.id})" class="main-button ml0 ">Archive</button>
+            <button onclick = "updateTag('${tag.type}',${tag.id})" class="main-button mlauto ">Save</button>
+        </div>
+    </div>`
+}
+
+const updateTag = (type, id) => {
+    const newName = byId(`${type}-${id}-name`).value;
+    type == 'tag' ? tags[`${id}`].name = newName : topics[`${id}`].name = newName;
+    byId(`${type}-${id}`).innerHTML = createTag(type == 'tag' ? tags[`${id}`]:topics[`${id}`])
+    const tag = type == 'tag' ? tags[`${id}`] : topics[`${id}`]
+    const url = '/app/tags'
+    fetchTag(url, tag)
+}
+
+const archiveTag = (type, id) => {
+    byId(`${type}-${id}`).remove()
+    const tag = type == 'tag' ? tags[`${id}`] : topics[`${id}`]
+    tag.archived = true
+    const url = '/app/tags/archive'
+    fetchTag(url, tag)
+}
+
+const fetchTag = (url, data) => {
+    return fetch(url,{ 
+        method:'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': csrf_token
+        },
+        body: JSON.stringify(data) 
+    })
+    .catch(error => {
+        setTimeout(fetchTag.bind(null,url, data), 10000)
+    });
+} 

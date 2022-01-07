@@ -78,7 +78,7 @@
               <a class="nav-link" href="{{ url_for('main.review' )}}">Review</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('main.resources' )}}">Guides</a>
+              <a class="nav-link" href="{{ url_for('main.tags' )}}">Tags</a>
             </li>
 
             {% if current_user.admin%}
@@ -94,6 +94,9 @@
             
             <li class="nav-item">
               <a class="nav-link" target = "_blank" href="https://www.patreon.com/lurnby">Donate</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('main.resources' )}}">Guides</a>
             </li>
             {% if current_user.is_anonymous %}
             <li class="nav-item">

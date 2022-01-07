@@ -125,6 +125,8 @@ li {
   border-radius: 6px;
   border: none;
   box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.02);
+  margin: 0 16px 16px 0;
+  min-width: 300px;
 }
 
 #base-main {
@@ -2211,6 +2213,10 @@ ul ul a {
 
 .ml0 {
   margin-left: 0;
+}
+
+.mlauto {
+  margin-left: auto;
 }
 
 .flex {
