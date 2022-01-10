@@ -52,7 +52,7 @@
                                     <div class="dropdown-menu">
                                         <form >
                                             <div class = "tags">
-                                                {% for tag in user.tags.all() %}
+                                                {% for tag in user.tags.filter_by(archived=False).all() %}
                                                 <label for= "tag{{tag.id}}" class = "filter-tag untagged">{{tag.name}}<input type="checkbox" id = "tag{{tag.id}}" name = "tags" checked value="{{tag.id}}"></input></label>
                                                 {% endfor %}
                                             </div>

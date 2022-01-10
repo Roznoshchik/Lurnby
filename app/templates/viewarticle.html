@@ -53,7 +53,7 @@
 
                     <span id="tags">
                         <span id="new_tags"></span>
-                        {% for tag in article.tags %}
+                        {% for tag in article.tags.filter_by(archived=False) %}
                         <label class = "tagged">{{tag.name}}<input type="checkbox" name = "tags" checked value="{{tag.name}}"></input></label>
                         {% endfor %}
                         {% for tag in article.not_in_tags(current_user) %}

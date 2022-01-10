@@ -1438,8 +1438,11 @@ def unarchivehighlight(id):
 @bp.route('/tags', methods=['GET', 'POST'])
 @login_required
 def tags():
-    tags = current_user.tags.filter_by(archived=False).all()
-    topics = current_user.topics.filter_by(archived=False).all()
+    # tags = current_user.tags.filter_by(archived=False).all()
+    # topics = current_user.topics.filter_by(archived=False).all()
+
+    tags = Tag.query_with_count(current_user)
+    topics = Topic.query_with_count(current_user)
 
     if request.method == 'POST':
         data = json.loads(request.data)

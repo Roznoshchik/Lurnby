@@ -1,4 +1,6 @@
 import base64
+
+from sqlalchemy.sql.functions import user
 from app import db, login
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -576,7 +578,7 @@ class Article(db.Model):
                 tags_articles.c.article_id == self.id)
 
         q = db.session.query(Tag).filter(~Tag.id.in_(sub)
-                                         ).filter_by(user_id=user.id).all()
+                                         ).filter_by(user_id=user.id, archived=False).all()
 
         return q
 
@@ -771,6 +773,36 @@ class Topic(db.Model):
             Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
 
         return q
+    
+    @staticmethod
+    def query_with_count(user):
+        q = (
+            db.session.query(Topic, Highlight.archived, func.count('*'))
+            .outerjoin(highlights_topics, highlights_topics.c.topic_id==Topic.id)
+            .outerjoin(Highlight, highlights_topics.c.highlight_id == Highlight.id)
+            .filter(Topic.user_id == user.id, Topic.archived == False)
+            .group_by(Topic.id, Highlight.archived)
+        )
+
+        dedupe = {}
+        for row in q:
+            if row[0].id in dedupe:
+                if row[1] == None or row[1] == True:
+                    continue
+                else:
+                    dedupe[row[0].id]['count'] += row[2]
+            else:
+                dedupe[row[0].id] = {'tag': row[0]}
+                if row[1] == False:
+                    dedupe[row[0].id]['count'] = row[2]
+                else:
+                    dedupe[row[0].id]['count'] = 0
+        
+        res = []
+        for k,v in dedupe.items():
+            res.append(v)
+
+        return res
 
 
 class Tag(db.Model):
@@ -800,6 +832,40 @@ class Tag(db.Model):
     def is_added_article(self, article):
         return self.articles.filter(
             article.id == tags_articles.c.article_id).count() > 0
+
+    def __repr__(self) -> str:
+        return f'{self.id}: {self.name}'
+
+    @staticmethod
+    def query_with_count(user):
+        q = (
+            db.session.query(Tag, Article.archived, func.count('*'))
+            .outerjoin(tags_articles, tags_articles.c.tag_id==Tag.id)
+            .outerjoin(Article, tags_articles.c.article_id == Article.id)
+            .filter(Tag.user_id == user.id, Tag.archived == False)
+            .group_by(Tag.id, Article.archived)
+        )
+
+        dedupe = {}
+        for row in q:
+            if row[0].id in dedupe:
+                if row[1] == None or row[1] == True:
+                    continue
+                else:
+                    dedupe[row[0].id]['count'] += row[2]
+            else:
+                dedupe[row[0].id] = {'tag': row[0]}
+                if row[1] == False:
+                    dedupe[row[0].id]['count'] = row[2]
+                else:
+                    dedupe[row[0].id]['count'] = 0
+        
+        res = []
+        for k,v in dedupe.items():
+            res.append(v)
+
+        return res
+
 
 
 def update_user_last_action(action):

@@ -28,7 +28,7 @@
                     </button>
                     <div id = "active_tags" class="dropdown-menu">
                         <form>
-                            {% for tag in user.tags.all() %}
+                            {% for tag in user.tags.filter_by(archived=False).all() %}
                             <label for= "tag{{tag.id}}" class="lurnby-tag">{{tag.name}}<input type="checkbox" id="tag{{tag.id}}" class="single-tag" name="tags" value="{{tag.id}}"></input></label>
                             {% endfor %}
                         </form>

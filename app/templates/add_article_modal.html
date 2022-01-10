@@ -29,7 +29,7 @@
     
                     <span id="tags">
                         <span id="new_tags"></span>
-                        {% for tag in user.tags.all() %}
+                        {% for tag in user.tags.filter_by(archived=False).all() %}
                         <label class = "article-tag untagged">{{tag.name}}<input type="checkbox" name = "tags" checked value="{{tag.name}}"></input></label>
                         {% endfor %}
                     </span>

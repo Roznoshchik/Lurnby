@@ -215,6 +215,7 @@ const createEditTag = (tag) => {
             <input  class="form-control" id="${tag.type}-${tag.id}-name" name=tag-name type="text" value="${tag.name}"/>
             <label for="tag-name">Title</label>
         </div>
+        <div id="${tag.type}-${tag.id}-error" style="font-size:12px; color:red"></div>
         <div class="underline"></div>
     </div>
     <div class="content">
@@ -229,6 +230,19 @@ const createEditTag = (tag) => {
 
 const updateTag = (type, id) => {
     const newName = byId(`${type}-${id}-name`).value;
+    let invalid = false;
+    for (const [key, value] of Object.entries(type == 'tag' ? tags : topics)) {
+        if (value.name == newName){
+          invalid = true;
+          break
+        }
+    }
+    if (invalid){
+        byId(`${type}-${id}-name`).classList.add('is-invalid')
+        byId(`${type}-${id}-error`).innerText = 'Title already in use'
+        return
+    }
+
     type == 'tag' ? tags[`${id}`].name = newName : topics[`${id}`].name = newName;
     byId(`${type}-${id}`).innerHTML = createTag(type == 'tag' ? tags[`${id}`]:topics[`${id}`])
     const tag = type == 'tag' ? tags[`${id}`] : topics[`${id}`]

@@ -44,16 +44,16 @@
             </div>
             <div class="flex wrap">
                 {% for tag in tags %}
-                <div id="tag-{{tag.id}}" class="card">
+                <div id="tag-{{tag['tag'].id}}" class="card">
                     <div class="header">
-                        <h6>{{ tag.name}}</h6>
+                        <h6>{{ tag['tag'].name}}</h6>
                         <div class="underline"></div>
                     </div>
                     <div class="content">
-                        <p>Articles: {{tag.articles.count()}}</p>
+                        <p>Articles: {{tag['count']}}</p>
                 
                         <div id ="tag-{{tag.id}}-actions" class="actions">
-                            <button onclick = "editTag('tag',{{tag.id}})" class="main-button ml0 ">Edit</button>
+                            <button onclick = "editTag('tag',{{tag['tag'].id}})" class="main-button ml0 ">Edit</button>
                         </div>
                     </div>
                 </div>
@@ -78,16 +78,16 @@
             </div>
             <div class="flex wrap">
                 {% for topic in topics %}
-                <div id="topic-{{topic.id}}" class="card">
+                <div id="topic-{{topic['tag'].id}}" class="card">
                     <div class="header">
-                        <h6>{{ topic.title}}</h6>
+                        <h6>{{ topic['tag'].title}}</h6>
                         <div class="underline"></div>
                     </div>
                     <div class="content">
-                        <p>Highlights: {{topic.highlights.count()}}</p>
+                        <p>Highlights: {{topic['count']}}</p>
                 
-                        <div id ="topic-{{topic.id}}-actions" class="actions">
-                            <button onclick = "editTag('topic',{{topic.id}})" class="main-button ml0 ">Edit</button>
+                        <div id ="topic-{{topic['tag'].id}}-actions" class="actions">
+                            <button onclick = "editTag('topic',{{topic['tag'].id}})" class="main-button ml0 ">Edit</button>
                         </div>
                     </div>
                 </div>
@@ -113,11 +113,11 @@
 <script>
     const tags = {
         {% for tag in tags %}
-        '{{tag.id}}': {
-            'id':"{{tag.id}}",
+        '{{tag['tag'].id}}': {
+            'id':"{{tag['tag'].id}}",
             'type': 'tag',
-            'records': {{tag.articles.filter_by(archived=False).count()}},
-            'name': '{{tag.name}}',
+            'records': {{tag['count']}},
+            'name': '{{tag['tag'].name}}',
             'archived': false
         },
         {% endfor %}
@@ -125,11 +125,11 @@
 
     const topics = {
         {% for topic in topics %}
-        '{{topic.id}}': {
-            'id':"{{topic.id}}",
+        '{{topic['tag'].id}}': {
+            'id':"{{topic['tag'].id}}",
             'type': 'topic',
-            'records': {{topic.highlights.filter_by(archived=False).count()}},
-            'name': '{{topic.title}}',
+            'records': {{topic['count']}},
+            'name': '{{topic['tag'].title}}',
             'archived': false
         },
         {% endfor %}
