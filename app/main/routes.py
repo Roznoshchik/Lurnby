@@ -27,7 +27,7 @@ from readabilipy import simple_json_from_html_string
 from data import data_dashboard
 
 from bs4 import BeautifulSoup
-from flask import flash, redirect, url_for, render_template, request, jsonify, current_app
+from flask import flash, redirect, url_for, render_template, request, jsonify, current_app, session
 from flask_login import current_user, login_required, login_user, logout_user
 from flask_wtf.csrf import CSRFError
 
@@ -174,9 +174,18 @@ def articles():
                            user=current_user,suggestion=suggestion, page=1, 
                            has_next=has_next)
 
-
-
-
+# ######################## #
+# ##      Dark Mode     ## #
+# ######################## #
+@bp.route('/dark-mode')
+@login_required
+def toggleDarkMode():
+    onOrOff = request.args.get('setting')
+    session['darkMode'] = True if onOrOff == 'on' else False
+    if request.args.get('auto') == 'off':
+        session['darkModeAutoOff'] = True
+        
+    return 'success'
 
 # ########################################################### #
 # ##     notifications / not finished needs front end      ## #

@@ -4,7 +4,7 @@ from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 
 from config import Config
-from flask import Flask
+from flask import Flask, session
 from flask_cors import CORS
 from flask_login import LoginManager, current_user
 from flask_mail import Mail
@@ -70,7 +70,7 @@ def create_app(config_class=Config):
     app.config.from_object(config_class)
     app.redis = Redis.from_url(app.config['REDIS_URL'])
     app.task_queue = rq.Queue('lurnby-tasks', connection=app.redis)
-   
+    
     @app.before_request
     def before_request_func():
         if current_user.is_authenticated:
@@ -87,7 +87,7 @@ def create_app(config_class=Config):
             staging=False
 
 
-        return {'now': datetime.utcnow(),'staging':staging }
+        return {'now': datetime.utcnow(),'staging':staging}
 
 
     cors.init_app(app, resources={r"/app/api/*": {"origins": "*"}})
@@ -101,7 +101,7 @@ def create_app(config_class=Config):
     mail.init_app(app)
     talisman.init_app(app, content_security_policy=None)
     csrf.init_app(app)
-   
+    
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp, url_prefix='/app')
 

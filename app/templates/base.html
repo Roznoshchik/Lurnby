@@ -46,7 +46,7 @@
 
     {% block style %}{% endblock%}
 </head>
-  <body class="">
+  <body class="{% if session['darkMode'] %} dark {% endif %} ">
     
     <div id = "base-main" class="container-fluid">
       {% if topnav != False %}
@@ -65,8 +65,12 @@
               <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class=" order-1 feedback">
                   <img src="{{url_for('static', filename='images/rrfeedback-40.png') }}">
               </button>
-              <button role="button" id="darkModeToggle" class="order-2 mr-auto">
-                <img id="darkModeIcon"  src="{{url_for('static', filename='images/darkModeOff.png') }}">
+              <button role="button" id="darkModeToggle" class="{% if session['darkMode'] %} darkModeOn {% endif %}order-2 mr-auto">
+                {% if session['darkMode']%}
+                <img id="darkModeIcon" src="{{url_for('static', filename='images/darkModeOn.png') }}">
+                {% else %}
+                <img id="darkModeIcon" src="{{url_for('static', filename='images/darkModeOff.png') }}">
+                {% endif %}
               </button>
             {% endif %}
              
@@ -232,25 +236,6 @@
             return document.getElementsByClassName(classname);
         };
 
-        // const CACHE_NAME = 'static-cache-v1.1';
- 
-        // const FILES_TO_CACHE = [
-        //   '{{url_for("static", filename="/static/offline.html")}}',
-        // ];
-        
-        // /* Progressive Web App Register Service Worker */
-        // if ('serviceWorker' in navigator) {
-        //     navigator.serviceWorker
-        //         // .register('{{url_for("static",filename="service-worker.js")}}')
-        //         .register('/service-worker.js')            .then(function(registration) {
-        //         console.log('Service Worker Registered!');
-        //         return registration;
-        //     })
-        //     .catch(function(err) {
-        //         console.error('Unable to register service worker.', err);
-        //     });
-        // }
- 
 
         /* feedback form */
         var feedbacksubmit = byId('FeedbackSubmit');
@@ -310,7 +295,8 @@
                 }
             }
         });
-        
+
+
         function create_alert(type, message){
           var alert = document.createElement('div')
           alert.classList.add('main-alert', 'alert','fade','show','alert-dismissable', type)
@@ -319,7 +305,16 @@
           return alert
         }
 
-        let darkModeOnAuto = true;
+        const setDarkModeCookie = (onOrOff, autoOff='on') =>{
+          url = `dark-mode?setting=${onOrOff}&auto=${autoOff}`
+          fetch(url)
+        }
+        {% if session['darkModeAutoOff'] %}
+        let darkModeOnAuto = false;
+        {% else %}
+        let darkModeOnAuto = false;
+        {% endif %}
+
 
         const turnOnDarkMode = () => {
           darkModeOnAuto = false
@@ -327,12 +322,14 @@
             byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOff.png") }}'
             byId('darkModeToggle').classList.remove('darkModeOn')
             document.body.classList.remove('dark')
+            setDarkModeCookie('off', 'off')
 
           }
           else{
             byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOn.png") }}'
             byId('darkModeToggle').classList.add('darkModeOn')
             document.body.classList.add('dark')
+            setDarkModeCookie('on', 'off')
           }
         }
 
@@ -353,6 +350,8 @@
               byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOn.png") }}'
               byId('darkModeToggle').classList.add('darkModeOn')
               document.body.classList.add('dark')
+              setDarkModeCookie('on')
+
             }
           }
           else{
@@ -360,7 +359,7 @@
               byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOff.png") }}'
               byId('darkModeToggle').classList.remove('darkModeOn')
               document.body.classList.remove('dark')
-
+              setDarkModeCookie('off')
             }
           }
         }
