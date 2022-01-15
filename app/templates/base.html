@@ -46,7 +46,7 @@
 
     {% block style %}{% endblock%}
 </head>
-  <body>
+  <body class="">
     
     <div id = "base-main" class="container-fluid">
       {% if topnav != False %}
@@ -60,13 +60,16 @@
         <button class="navbar-toggler order-3" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-          
+       
           {% if current_user.is_authenticated %}
-              <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class=" order-2 mr-auto feedback">
+              <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class=" order-1 feedback">
                   <img src="{{url_for('static', filename='images/rrfeedback-40.png') }}">
               </button>
+              <button role="button" id="darkModeToggle" class="order-2 mr-auto">
+                <img id="darkModeIcon"  src="{{url_for('static', filename='images/darkModeOff.png') }}">
+              </button>
             {% endif %}
-
+             
         <div class="collapse order-3 navbar-collapse" id="navbarsExampleDefault">
           {% if current_user.is_authenticated %}
           <ul class="navbar-nav mr-auto">
@@ -297,18 +300,6 @@
       <script text="javascript" src = "{{url_for('static', filename='js/accept_tos.js') }}"> </script>
       <script text="javascript" src = "{{url_for('static', filename='js/copyToClipboard.js') }}"> </script>
 
-
-      {% if not config['DEBUG'] %}
-      <!--  Segment tracking code 
-      <script>
-        !function(){var analytics=window.analytics=window.analytics||[];if(!analytics.initialize)if(analytics.invoked)window.console&&console.error&&console.error("Segment snippet included twice.");else{analytics.invoked=!0;analytics.methods=["trackSubmit","trackClick","trackLink","trackForm","pageview","identify","reset","group","track","ready","alias","debug","page","once","off","on","addSourceMiddleware","addIntegrationMiddleware","setAnonymousId","addDestinationMiddleware"];analytics.factory=function(e){return function(){var t=Array.prototype.slice.call(arguments);t.unshift(e);analytics.push(t);return analytics}};for(var e=0;e<analytics.methods.length;e++){var key=analytics.methods[e];analytics[key]=analytics.factory(key)}analytics.load=function(key,e){var t=document.createElement("script");t.type="text/javascript";t.async=!0;t.src="https://cdn.segment.com/analytics.js/v1/" + key + "/analytics.min.js";var n=document.getElementsByTagName("script")[0];n.parentNode.insertBefore(t,n);analytics._loadOptions=e};analytics.SNIPPET_VERSION="4.13.1";
-        analytics.load("AZM1FNRVh4DL2vrHXQrCmNTZ3hMH80dJ");
-        analytics.page();
-        }}();
-      </script>
-      -->
-      {%  endif  %}
-
       <script type="text/javascript">
         var csrf_token = "{{ csrf_token() }}";
     
@@ -328,6 +319,53 @@
           return alert
         }
 
+        let darkModeOnAuto = true;
+
+        const turnOnDarkMode = () => {
+          darkModeOnAuto = false
+          if(darkModeOn()){
+            byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOff.png") }}'
+            byId('darkModeToggle').classList.remove('darkModeOn')
+            document.body.classList.remove('dark')
+
+          }
+          else{
+            byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOn.png") }}'
+            byId('darkModeToggle').classList.add('darkModeOn')
+            document.body.classList.add('dark')
+          }
+        }
+
+        const darkModeOn = () => {
+          return document.body.classList.contains('dark') ? true : false;
+        }
+
+        const shouldEnableDarkMode = () => {
+
+          if (!darkModeOnAuto){
+            return
+          }
+
+          const now = new Date().getHours()
+          const enableDarkMode = now >= 18 || now <= 8 
+          if(enableDarkMode){
+            if(!darkModeOn()){
+              byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOn.png") }}'
+              byId('darkModeToggle').classList.add('darkModeOn')
+              document.body.classList.add('dark')
+            }
+          }
+          else{
+            if(darkModeOn()){
+              byId('darkModeIcon').src = '{{ url_for('static', filename="images/darkModeOff.png") }}'
+              byId('darkModeToggle').classList.remove('darkModeOn')
+              document.body.classList.remove('dark')
+
+            }
+          }
+        }
+        shouldEnableDarkMode()
+        byId('darkModeToggle').addEventListener('click', turnOnDarkMode)
 
         function rrtoggle() {
 

@@ -373,17 +373,14 @@ function view_article_tiny_init(){
     tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_content');
     tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'article_notes');
     
-
-
-
   //notes preview
   tinymce.init({
     selector: '#article_notes',
     menubar: false,
     resize: 'vertical',
     toolbar: false,
-    skin: "oxide",
-    content_css: "light",
+    skin: darkModeOn ? "oxide-dark":"oxide",
+    content_css: darkModeOn ? "dark": "light",
     mobile: {
         height: 300
     },
@@ -405,8 +402,8 @@ function view_article_tiny_init(){
             menubar: false,
             resize: 'vertical',
             toolbar: false,
-            skin: "oxide",
-            content_css: "light",
+            skin: darkModeOn ? "oxide-dark":"oxide",
+            content_css: darkModeOn ? "dark": "light",
             mobile: {
                 height: 300
             },
@@ -430,8 +427,8 @@ function view_article_tiny_init(){
     menubar: false,
     resize: 'vertical',
     toolbar: false,
-    skin: "oxide",
-    content_css: "light",
+    skin: darkModeOn ? "oxide-dark":"oxide",
+    content_css: darkModeOn ? "dark": "light",
     mobile: {
         height: 300
     },
@@ -475,8 +472,8 @@ function edit_article_tiny_init(){
           menubar: 'insert format',
           resize: 'vertical',
           toolbar: 'styleselect | bold italic underline | hr',
-          skin: "oxide",
-          content_css: "light",  
+          skin: darkModeOn ? "oxide-dark":"oxide",
+          content_css: darkModeOn ? "dark": "light",
           plugins: 'link hr', 
           mobile: {
               height:300
@@ -492,8 +489,8 @@ function edit_article_tiny_init(){
             menubar: 'insert format',
             resize: 'vertical',
             toolbar: 'styleselect | bold italic underline | hr',
-            skin: "oxide",
-            content_css: "light",  
+            skin: darkModeOn ? "oxide-dark":"oxide",
+            content_css: darkModeOn ? "dark": "light", 
             plugins: 'link hr', 
             mobile: {
                 height:300
@@ -509,8 +506,8 @@ function edit_article_tiny_init(){
             menubar: 'insert format',
             resize: 'vertical',
             toolbar: 'styleselect | bold italic underline | hr',
-            skin: "oxide",
-            content_css: "light",  
+            skin: darkModeOn ? "oxide-dark":"oxide",
+            content_css: darkModeOn ? "dark": "light", 
             plugins: 'link hr', 
             mobile: {
                 height: 300
@@ -728,7 +725,7 @@ function add_tag_start(string){
             </div>
             <div class="col-auto">
                 <button id = "submit_new_tag" type="button" onclick = "add_tag_finish('${target}')" class="main-button add-new">Add</button>
-                <button type="button" class="btn cancel mb-2" onclick="add_tag_cancel('${target}')">Cancel</button>
+                <button type="button" class="main-button cancel" onclick="add_tag_cancel('${target}')">Cancel</button>
             </div>
         </div>
     </form>

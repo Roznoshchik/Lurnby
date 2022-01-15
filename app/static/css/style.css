@@ -1163,6 +1163,10 @@ label svg {
   }
 }
 
+#navbarsExampleDefault {
+  margin-left: 4px;
+}
+
 .topics-group input[type=checkbox] {
   display: none;
 }
@@ -9274,6 +9278,159 @@ readers do not read off random characters that represent icons */
   #landing h2 {
     font-size: 2.75rem;
   }
+}
+
+#darkModeToggle {
+  background: #cbc1bf;
+  border: none;
+  border-radius: 50%;
+  box-sizing: border-box;
+  height: 40px;
+  width: 40px;
+  margin: 0 8px;
+}
+#darkModeToggle.darkModeOn {
+  background: rgba(0, 0, 0, 0.82);
+}
+#darkModeToggle img {
+  height: 38px;
+}
+
+.dark {
+  background-color: #424242;
+  color: #d3d3d3;
+}
+.dark nav.bg-dark {
+  background-color: #424242 !important;
+}
+.dark nav.bg-dark a {
+  color: #d3d3d3 !important;
+}
+.dark .modal-backdrop {
+  background-color: rgba(0, 0, 0, 0.82);
+}
+.dark .lurnby_modal .modal-content, .dark #edit_article .modal-content, .dark #add_article .modal-content {
+  background-color: #424242;
+}
+.dark .lurnby_modal .modal-content a, .dark #edit_article .modal-content a, .dark #add_article .modal-content a {
+  color: #d3d3d3;
+}
+.dark .lurnby_modal .modal-content .modal-header, .dark #edit_article .modal-content .modal-header, .dark #add_article .modal-content .modal-header {
+  background-color: #424242;
+}
+.dark .lurnby_modal .modal-content .modal-body, .dark #edit_article .modal-content .modal-body, .dark #add_article .modal-content .modal-body {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark .lurnby_modal .modal-content input, .dark .lurnby_modal .modal-content select, .dark .lurnby_modal .modal-content textarea, .dark #edit_article .modal-content input, .dark #edit_article .modal-content select, .dark #edit_article .modal-content textarea, .dark #add_article .modal-content input, .dark #add_article .modal-content select, .dark #add_article .modal-content textarea {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark .lurnby_modal .modal-content input option, .dark .lurnby_modal .modal-content select option, .dark .lurnby_modal .modal-content textarea option, .dark #edit_article .modal-content input option, .dark #edit_article .modal-content select option, .dark #edit_article .modal-content textarea option, .dark #add_article .modal-content input option, .dark #add_article .modal-content select option, .dark #add_article .modal-content textarea option {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.dark .lurnby_modal .modal-content label, .dark #edit_article .modal-content label, .dark #add_article .modal-content label {
+  color: #424242;
+}
+.dark .lurnby_modal .modal-content label.file-label, .dark #edit_article .modal-content label.file-label, .dark #add_article .modal-content label.file-label {
+  color: #d3d3d3;
+}
+.dark .lurnby_modal .modal-content label.untagged, .dark #edit_article .modal-content label.untagged, .dark #add_article .modal-content label.untagged {
+  background-color: #d3d3d3;
+}
+.dark .lurnby_modal .modal-content .skip-review label, .dark #edit_article .modal-content .skip-review label, .dark #add_article .modal-content .skip-review label {
+  color: #d3d3d3;
+}
+.dark .lurnby_modal .modal-content .close span, .dark #edit_article .modal-content .close span, .dark #add_article .modal-content .close span {
+  color: #d3d3d3;
+}
+.dark .heading h6 {
+  border-bottom: #d3d3d3 4px solid;
+}
+.dark #overview {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #d3d3d3;
+}
+.dark #overview a {
+  color: #d3d3d3;
+}
+.dark #overview h6 {
+  border-bottom: #d3d3d3 4px solid;
+}
+.dark .lurnby-footer {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #d3d3d3;
+}
+.dark .lurnby-footer a {
+  color: #d3d3d3;
+}
+.dark #article-items .article_card, .dark .highlight-card, .dark .card {
+  background-color: #242424;
+}
+.dark #article-items .article_card .label, .dark .highlight-card .label, .dark .card .label {
+  color: #242424;
+}
+.dark #article-items .article_card .label.done p, .dark .highlight-card .label.done p, .dark .card .label.done p {
+  background-color: #d3d3d3;
+}
+.dark .main-button.view_highlight svg {
+  fill: #d3d3d3;
+}
+.dark .main-button, .dark #filter_submit, .dark .cancel {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #d3d3d3;
+  border: #d3d3d3 1px solid;
+}
+.dark .main-button:hover, .dark #filter_submit:hover, .dark .cancel:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.dark .reg-select {
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23d3d3d3%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E"), linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 100%, rgba(0, 0, 0, 0.2) 100%);
+}
+.dark .all-filters .lurnby-filter input, .dark .all-filters .lurnby-filter select, .dark .all-filters .lurnby-filter textarea {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark .all-filters .lurnby-filter input option, .dark .all-filters .lurnby-filter select option, .dark .all-filters .lurnby-filter textarea option {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+.dark .all-filters .lurnby-filter #active_tags.dropdown-menu {
+  background-color: #424242;
+}
+.dark .all-filters .lurnby-filter #active_tags.dropdown-menu label.lurnby-tag {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark .topic {
+  color: #424242;
+}
+.dark .autocomplete-items {
+  background-color: #424242;
+  border: rgba(0, 0, 0, 0.2) 1px solid;
+}
+.dark .autocomplete-items div {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: rgba(0, 0, 0, 0.2) 1px solid;
+  color: #d3d3d3;
+}
+.dark .autocomplete-items div:hover {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+.dark .underline {
+  border: #d3d3d3 2px solid;
+}
+.dark input, .dark select, .dark textarea, .dark .settings-input {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark input:focus, .dark input:disabled, .dark select:focus, .dark select:disabled, .dark textarea:focus, .dark textarea:disabled, .dark .settings-input:focus, .dark .settings-input:disabled {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+.dark input option, .dark select option, .dark textarea option, .dark .settings-input option {
+  color: #d3d3d3;
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 /*# sourceMappingURL=style.css.map */
