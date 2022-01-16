@@ -9281,19 +9281,12 @@ readers do not read off random characters that represent icons */
 }
 
 #darkModeToggle {
-  background: #cbc1bf;
+  background-color: transparent;
   border: none;
-  border-radius: 50%;
-  box-sizing: border-box;
+  cursor: pointer;
   height: 40px;
   width: 40px;
   margin: 0 8px;
-}
-#darkModeToggle.darkModeOn {
-  background: rgba(0, 0, 0, 0.82);
-}
-#darkModeToggle img {
-  height: 38px;
 }
 
 .dark {

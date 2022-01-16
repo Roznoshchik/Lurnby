@@ -65,7 +65,7 @@
               <button id = "feedback" data-toggle="modal" data-target="#FeedbackModal" class=" order-1 feedback">
                   <img src="{{url_for('static', filename='images/rrfeedback-40.png') }}">
               </button>
-              <button role="button" id="darkModeToggle" class="{% if session['darkMode'] %} darkModeOn {% endif %}order-2 mr-auto">
+              <button role="button" id="darkModeToggle" class="order-2 mr-auto">
                 {% if session['darkMode']%}
                 <img id="darkModeIcon" src="{{url_for('static', filename='images/darkModeOn.png') }}">
                 {% else %}

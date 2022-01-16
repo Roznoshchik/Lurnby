@@ -1,18 +1,21 @@
 #darkModeToggle{
-    background: $logo-grey;
+    background-color: transparent;
     border: none;
-    border-radius: 50%;
-    box-sizing: border-box;
+    cursor: pointer;
+
+  
+    //border-radius: 50%;
+    //box-sizing: border-box;
     height: 40px;
     width: 40px;
     margin: 0 8px;
     
-    &.darkModeOn{
-        background:rgba(0, 0, 0, 0.82);
-    }
-    img{
-        height: 38px;
-    }
+    // &.darkModeOn{
+    //     background:rgba(0, 0, 0, 0.82);
+    // }
+    // img{
+    //     height: 38px;
+    // }
 }
 
 .dark {
