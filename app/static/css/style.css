@@ -9284,9 +9284,6 @@ readers do not read off random characters that represent icons */
   background-color: transparent;
   border: none;
   cursor: pointer;
-  height: 40px;
-  width: 40px;
-  margin: 0 8px;
 }
 
 .dark {
