@@ -22,6 +22,21 @@
     background-color: $dark;
     color: #d3d3d3;
 
+
+    #auth_tos_welcome {
+        color: $dark;
+    }
+    
+    .summary{
+        background-color: #242424;
+    }
+
+
+    .lurnby-empty-col, .articles-empty-col, .rendering {
+        background-color: #242424;
+        border: #cbcbcb 4px solid;
+    }
+
     nav.bg-dark{
         background-color: $dark !important;
 
@@ -36,6 +51,8 @@
 
     .lurnby_modal, #edit_article, #add_article {
         .modal-content{
+            border: #242424 2px solid;
+
             a{
                 color: #d3d3d3;
             }
@@ -136,11 +153,12 @@
     }
 
 
-    .main-button, #filter_submit, .cancel{
+    .main-button:not(.highlight-button), #filter_submit, .cancel{
         background-color: rgba(0, 0, 0, 0.2);
         color: #d3d3d3;
         border: #d3d3d3 1px solid;
         
+    
 
         &:hover{
             background-color: rgba(0, 0, 0, 0.5);

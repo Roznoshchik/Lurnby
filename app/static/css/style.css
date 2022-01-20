@@ -9290,6 +9290,16 @@ readers do not read off random characters that represent icons */
   background-color: #424242;
   color: #d3d3d3;
 }
+.dark #auth_tos_welcome {
+  color: #424242;
+}
+.dark .summary {
+  background-color: #242424;
+}
+.dark .lurnby-empty-col, .dark .articles-empty-col, .dark .rendering {
+  background-color: #242424;
+  border: #cbcbcb 4px solid;
+}
 .dark nav.bg-dark {
   background-color: #424242 !important;
 }
@@ -9300,6 +9310,7 @@ readers do not read off random characters that represent icons */
   background-color: rgba(0, 0, 0, 0.82);
 }
 .dark .lurnby_modal .modal-content, .dark #edit_article .modal-content, .dark #add_article .modal-content {
+  border: #242424 2px solid;
   background-color: #424242;
 }
 .dark .lurnby_modal .modal-content a, .dark #edit_article .modal-content a, .dark #add_article .modal-content a {
@@ -9366,12 +9377,12 @@ readers do not read off random characters that represent icons */
 .dark .main-button.view_highlight svg {
   fill: #d3d3d3;
 }
-.dark .main-button, .dark #filter_submit, .dark .cancel {
+.dark .main-button:not(.highlight-button), .dark #filter_submit, .dark .cancel {
   background-color: rgba(0, 0, 0, 0.2);
   color: #d3d3d3;
   border: #d3d3d3 1px solid;
 }
-.dark .main-button:hover, .dark #filter_submit:hover, .dark .cancel:hover {
+.dark .main-button:not(.highlight-button):hover, .dark #filter_submit:hover, .dark .cancel:hover {
   background-color: rgba(0, 0, 0, 0.5);
 }
 .dark .reg-select {
