@@ -1675,6 +1675,7 @@ def unarchivetopic(topic_id):
     pass
 
 @bp.route('/review', methods=['GET', 'POST'])
+@login_required
 def review():
 
     col = getattr(Topic, "last_used").desc()
@@ -1732,6 +1733,7 @@ def review():
     return render_template('review/review.html', topics=topics, tiers=tiers, days=days, empty=empty)
 
 @bp.route('/review/settings', methods=['POST'])
+@login_required
 def update_review_settings():
     data = json.loads(request.data)
     count = data['count']
