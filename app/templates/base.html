@@ -306,7 +306,7 @@
         }
 
         const setDarkModeCookie = (onOrOff, autoOff='on') =>{
-          url = `dark-mode?setting=${onOrOff}&auto=${autoOff}`
+          url = `/app/dark-mode?setting=${onOrOff}&auto=${autoOff}`
           fetch(url)
         }
         {% if session['darkModeAutoOff'] %}
