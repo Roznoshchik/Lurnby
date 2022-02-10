@@ -181,10 +181,12 @@ def articles():
 @login_required
 def toggleDarkMode():
     onOrOff = request.args.get('setting')
+    #print(onOrOff)
     session['darkMode'] = True if onOrOff == 'on' else False
+    #print(session['darkMode'])
     if request.args.get('auto') == 'off':
         session['darkModeAutoOff'] = True
-        
+        #print(session['darkModeAutoOff'])
     return 'success'
 
 # ########################################################### #
@@ -1797,7 +1799,7 @@ def tier(id):
                 400, {'ContentType': 'application/json'})
 
 @bp.route('/resources', methods=['GET'])
-@login_required
+# @login_required
 def resources():
 
     return render_template('resources.html')
