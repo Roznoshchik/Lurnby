@@ -1,3 +1,4 @@
+from mimetypes import MimeTypes
 import os
 from zipfile import ZipFile
 
@@ -61,7 +62,12 @@ def epubConverted(filepath, u=None):
                     filename = img['xlink:href']
                     filename = filename.replace("../", path+"/OPS/")
                    # print(filename)
-                        
+                
+                if not os.path.exists(filename):
+                    filename = img['xlink:href']
+                    filename = filename.replace("../", path+"/EPUB/media/")
+                   # print(filename)        
+                
                 if not os.path.exists(filename):
                     filename = f'{path}/{img["xlink:href"]}'
                    # print(filename)            
@@ -88,12 +94,19 @@ def epubConverted(filepath, u=None):
                 
                 name = os.path.basename(filename)
                 az_path = az_path_base + name
-
-                s3.upload_file(
-                        Bucket = bucket,
-                        Filename=filename,
-                        Key=az_path
-                        )
+                if '.svg' in name: 
+                    s3.upload_file(
+                            Bucket = bucket,
+                            ExtraArgs={'ContentType': 'image/svg+xml'},
+                            Filename=filename,
+                            Key=az_path
+                            )
+                else:
+                    s3.upload_file(
+                            Bucket = bucket,
+                            Filename=filename,
+                            Key=az_path
+                            )
                 # location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
                 # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
                 url = f"/download/{u.id}/{az_path}"
@@ -109,6 +122,11 @@ def epubConverted(filepath, u=None):
                # print(f'path: {path}')
                 if not os.path.exists(filename):
                     filename = f"{path}/{img['src']}"
+                   # print(f'filename: {filename}')
+                    ## print(filename)
+
+                if not os.path.exists(filename):
+                    filename = f"{path}/EPUB/media/{img['src']}"
                    # print(f'filename: {filename}')
                     ## print(filename)
                 
@@ -154,18 +172,27 @@ def epubConverted(filepath, u=None):
                
                 if not os.path.exists(filename):
                     print('still cant find img folder')
-                    continue
-
+                    continue    
+                
+                    
                 name = os.path.basename(filename)
                 az_path = az_path_base + name
+                if '.svg' in name: 
+                    s3.upload_file(
+                            Bucket = bucket,
+                            ExtraArgs={'ContentType': 'image/svg+xml'},
+                            Filename=filename,
+                            Key=az_path
+                            )
+                else:
+                    s3.upload_file(
+                            Bucket = bucket,
+                            Filename=filename,
+                            Key=az_path
+                            )
 
-                s3.upload_file(
-                        Bucket = bucket,
-                        Filename=filename,
-                        Key=az_path
-                        )
-                # location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-                # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
+                location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
+                url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
                 url = f"/download/{u.id}/{az_path}"
 
                 img['src'] = url
