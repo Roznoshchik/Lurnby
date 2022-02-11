@@ -26,10 +26,20 @@ PDF parsing works, but is spotty. Notably graphs and tables, and other content d
 Epubs are loaded as a single long file, so optimizations can be done on that front. 
 
 ## Screenshots
-
+### Main page
 ![main page](app/static/images/screenshots/homepage.png)
+
+### add article
 ![add article](app/static/images/screenshots/addarticle.png)
+
+### reading dark mode
 ![reading dark mode](app/static/images/screenshots/readingdark.png)
+
+### reading light mode
 ![reading light mode](app/static/images/screenshots/readinglight.png)
+
+### highlights
 ![highlights](app/static/images/screenshots/highlights.png)
+
+### review
 ![review](app/static/images/screenshots/review.png)
