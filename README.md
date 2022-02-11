@@ -24,3 +24,12 @@ Currently works with epubs, blog posts, and emailed content.
 PDF parsing works, but is spotty. Notably graphs and tables, and other content doesn't load properly. So it isn't that good for medical articles and the like. 
 
 Epubs are loaded as a single long file, so optimizations can be done on that front. 
+
+## Screenshots
+
+![main page](app/static/images/screenshots/homepage.png)
+![add article](app/static/images/screenshots/addarticle.png)
+![reading dark mode](app/static/images/screenshots/readingdark.png)
+![reading light mode](app/static/images/screenshots/readinglight.png)
+![highlights](app/static/images/screenshots/highlights.png)
+![review](app/static/images/screenshots/review.png)
