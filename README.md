@@ -15,10 +15,8 @@ At a very basic level, this process helps you remember more of what you read.
 More advanced functionality will exist too. 
 
 ## status
-basic workflow currently works. You can add articles and epubs to the document. They get parsed and presented in the articles section where you can then highlight and organize the highlights into different topic categories. 
+Currently works with epubs, blog posts, and emailed content. 
 
-## next steps
-adding in and making visible a tag functionality which is this apps version of project management and separation. 
+PDF parsing works, but is spotty. Notably graphs and tables, and other content doesn't load properly. So it isn't that good for medical articles and the like. 
 
-current roadmap status lives here :
-https://www.notion.so/Roadmap-93ff8ee2cfa445e2b0b8353440082537
+Epubs are loaded as a single long file, so optimizations can be done on that front. 
