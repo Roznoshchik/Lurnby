@@ -9,7 +9,7 @@
 
 {% block dash %}
 <div class = "dashboard_content">
-    <div class = "dashboard_item">
+    <div class = "card dashboard_item">
         <p>{{daily_active}} daily active users </p>
         <p>{{monthly_active}} monthly active users </p>
     </div>
@@ -21,7 +21,7 @@
     {% for user in users %}
     <div class = " card dashboard_item">
         <div class="">
-            <h6>{{ user['email']}}</h6>
+            <h6>{{ user['id']}}</h6>
         </div>
         <div class="underline"></div>
         <p><strong>Articles</strong>: {{user['articles']}}<br>
