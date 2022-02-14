@@ -29,12 +29,13 @@
         <strong>Tags</strong>: {{user['tags']}}<br>
         <strong>Topics</strong>: {{user['topics']}}<br>
         <strong>Last Active</strong>: {{user['last_active'].strftime("%d %B at %H:%M")}}<br>
+        <strong>Days Old</strong>: {{user['days_old']}}<br>
         <strong>Last Action</strong>: {{ user['last_action']}} <br>
         {% if user['suggestion']%}
         <strong>Added</strong>: {{ user['suggestion']}}</p> 
         {% endif %}
 
-    
+     
         <div class="underline"></div>   
         <button class="main-button cancel" onclick="mark_test_account({{ user['id']}})">Test Account</button> 
     </div>

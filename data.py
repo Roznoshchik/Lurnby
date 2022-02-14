@@ -1,4 +1,5 @@
 import datetime
+from venv import create
 from sqlalchemy import desc
 
 from app import create_app
@@ -27,6 +28,9 @@ def data_dashboard():
     user_list = []
     for u in users:
         ev = u.events.order_by(Event.date.desc()).limit(1).first()
+        created = u.account_created_date
+        today = datetime.datetime.utcnow()
+        days_old = (today - created).days
         try: 
             last_active = ev.date
         except:
@@ -49,6 +53,7 @@ def data_dashboard():
             'last_active': last_active,
             'test_account': u.test_account,
             'last_action': last_action,
+            'days_old': days_old
         }
         try:
             user['suggestion'] = u.suggestion.title
