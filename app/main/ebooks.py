@@ -74,6 +74,10 @@ def epubConverted(filepath, u=None):
                    # print(filename)        
                 
                 if not os.path.exists(filename):
+                    filename = img['xlink:href']
+                    filename = filename.replace("../", path+"/EPUB/")
+                   # print(filename)
+                if not os.path.exists(filename):
                     filename = f'{path}/{img["xlink:href"]}'
                    # print(filename)            
                     
@@ -133,12 +137,17 @@ def epubConverted(filepath, u=None):
                 if not os.path.exists(filename):
                     filename = f"{path}/EPUB/media/{img['src']}"
                    # print(f'filename: {filename}')
-                    ## print(filename)
+                    #print(filename)
                 
                 if not os.path.exists(filename):
                     filename = f"{path}/EPUB/images/{img['src']}"
                    # print(f'filename: {filename}')
-                    ## print(filename)
+                    print(filename)
+                
+                if not os.path.exists(filename):
+                    filename = f"{path}/EPUB/{img['src']}"
+                   # print(f'filename: {filename}')
+                    print(filename)
                 
                 if not os.path.exists(filename):
                     filename = img['src']
