@@ -223,16 +223,19 @@ const createEditTag = (tag) => {
 
         <div id ="${tag.type}-${tag.id}-actions" class=" flex actions">
             <button onclick = "archiveTag('${tag.type}',${tag.id})" class="main-button ml0 ">Archive</button>
+            <button onclick = "cancelTag('${tag.type}',${tag.id})" class="main-button mlauto ">Cancel</button>
             <button onclick = "updateTag('${tag.type}',${tag.id})" class="main-button mlauto ">Save</button>
         </div>
     </div>`
 }
 
 const updateTag = (type, id) => {
+    const currentName = type == 'tag' ? tags[id].name : topics[id].name
+    console.log(currentName)
     const newName = byId(`${type}-${id}-name`).value;
     let invalid = false;
     for (const [key, value] of Object.entries(type == 'tag' ? tags : topics)) {
-        if (value.name == newName){
+        if (value.name == newName && newName != currentName){
           invalid = true;
           break
         }
@@ -257,6 +260,11 @@ const archiveTag = (type, id) => {
     const url = '/app/tags/archive'
     fetchTag(url, tag)
 }
+
+const cancelTag = (type, id) => {
+    byId(`${type}-${id}`).innerHTML = createTag(type == 'tag' ? tags[`${id}`]:topics[`${id}`])
+}
+
 
 const fetchTag = (url, data) => {
     return fetch(url,{ 
