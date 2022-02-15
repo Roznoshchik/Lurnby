@@ -359,7 +359,7 @@ def add_by_email():
         f = request.form
         for key in f.keys():
             for value in f.getlist(key):
-                print key,":",value
+                print (key,":",value)
             
         # print('\n\n')
         
