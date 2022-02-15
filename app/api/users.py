@@ -7,6 +7,7 @@ from app.models import Article, User, Tag, Comms
 
 from datetime import datetime
 from flask import jsonify, request, url_for
+from flask_login import login_user, logout_user
 
 
 @bp.route('/users/<int:id>/tags', methods=['GET'])
@@ -52,7 +53,8 @@ def create_user():
 def add_article(id):
     data = request.get_json() or {}
     urltext = pull_text(data['url'])
-
+    user = User(id=id).first()
+    login_user(user)
     for tag_name in data['tags']:
         if Tag.query.filter_by(name=tag_name).first():
             continue
@@ -66,6 +68,8 @@ def add_article(id):
     db.session.add(article)
     article.date_read_date = datetime.utcnow().date()
     article.estimated_reading()
+    
+
 
     for tag_name in data['tags']:
         tag = Tag.query.filter_by(name=tag_name).first()
@@ -75,4 +79,5 @@ def add_article(id):
     response = jsonify(article.to_dict())
     response.status_code = 201
     response.headers['Location'] = url_for('main.article', uuid=article.uuid)
+    logout_user(user)
     return response
