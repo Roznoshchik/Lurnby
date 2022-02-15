@@ -356,8 +356,10 @@ def add_by_email():
         process = True
         print(f'processing email for {u.id}')
     if process:
-        for i in request.form:
-             print(i)
+        f = request.form
+        for key in f.keys():
+            for value in f.getlist(key):
+                print key,":",value
             
         # print('\n\n')
         
@@ -366,8 +368,7 @@ def add_by_email():
             html = request.form.get('html', False)
             text = request.form.get('text', False).lstrip()  
         except Exception as e:
-            print(e.message)
-            print(e.args)
+            print(e)
 
         if subject.lower().rstrip() == 'link':
             print('\n\n')
