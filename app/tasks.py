@@ -131,6 +131,8 @@ def account_export(uid, ext, delete=False):
 
 
 def export_highlights(user, highlights, source, ext):
+    if not highlights:
+        return
     try:
         _set_task_progress(0)
         data = []

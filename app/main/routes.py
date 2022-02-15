@@ -354,19 +354,21 @@ def add_by_email():
     if email in emails and u:
         login_user(u)
         process = True
-    
+        print(f'processing email for {u.id}')
     if process:
-        print('processing email')
-
-        # for i in request.form:
-        #     print(i)
+        for i in request.form:
+             print(i)
             
         # print('\n\n')
+        
+        try:
+            subject = request.form.get('subject', False)
+            html = request.form.get('html', False)
+            text = request.form.get('text', False).lstrip()  
+        except Exception as e:
+            print(e.message)
+            print(e.args)
 
-        subject = request.form.get('subject', False)
-        html = request.form.get('html', False)
-        text = request.form.get('text', False).lstrip()        
-      
         if subject.lower().rstrip() == 'link':
             print('\n\n')
             print(subject)
