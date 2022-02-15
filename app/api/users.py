@@ -53,7 +53,7 @@ def create_user():
 def add_article(id):
     data = request.get_json() or {}
     urltext = pull_text(data['url'])
-    user = User(id=id).first()
+    user = User.query.filter_by(id=id).first()
     login_user(user)
     for tag_name in data['tags']:
         if Tag.query.filter_by(name=tag_name).first():
