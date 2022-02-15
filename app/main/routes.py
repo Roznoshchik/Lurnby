@@ -1,4 +1,5 @@
 import json
+import re
 import os
 from threading import Thread
 from uuid import UUID, uuid4
@@ -376,11 +377,12 @@ def add_by_email():
             url = None
             
             if html:
-                print('html')
-                soup = BeautifulSoup(html, 'lxml')
-                links = soup.find_all('a')
-                url = links[0]['href'].rstrip()
-            
+                try:    
+                    regex = r"(https?:\/\/.*)[< ]"
+                    if re.search(regex, html):
+                        url = re.search(regex, html).groups()[0]
+                except Exception as e:
+                    print(e)
             elif text:
                 url = text.split('\n')[0].rstrip()
             else:
