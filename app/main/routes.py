@@ -357,13 +357,7 @@ def add_by_email():
         process = True
         print(f'processing email for {u.id}')
     if process:
-        f = request.form
-        for key in f.keys():
-            for value in f.getlist(key):
-                print (key,":",value)
-            
-        # print('\n\n')
-        
+                
         try:
             subject = request.form.get('subject', False)
             html = request.form.get('html', False)
@@ -372,6 +366,11 @@ def add_by_email():
             print(e)
 
         if subject.lower().rstrip() == 'link':
+            f = request.form
+            for key in f.keys():
+                for value in f.getlist(key):
+                    print (key,":",value)
+            
             print('\n\n')
             print(subject)
             url = None
