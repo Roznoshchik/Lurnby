@@ -5,9 +5,6 @@ from sqlalchemy import desc
 from app import create_app
 from app.models import User, Event
 
-app = create_app()
-
-
 def print_data():
     count = User.query.count()
     users = User.query.all()

@@ -5,6 +5,7 @@ import os
 
 from config import Config
 from flask import Flask, session
+from flask.logging import default_handler
 from flask_cors import CORS
 from flask_login import LoginManager, current_user
 from flask_mail import Mail
@@ -18,7 +19,6 @@ from sqlalchemy import MetaData
 import boto3
 from botocore.client import Config as AZConfig
 
-
 convention = {
     "ix": 'ix_%(column_0_label)s',
     "uq": "uq_%(table_name)s_%(column_0_name)s",
@@ -26,7 +26,6 @@ convention = {
     "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
     "pk": "pk_%(table_name)s"
 }
-
 metadata = MetaData(naming_convention=convention)
 
 db = SQLAlchemy(metadata=metadata)
@@ -156,7 +155,6 @@ def create_app(config_class=Config):
             stream_handler.setLevel(logging.INFO)
             app.logger.addHandler(stream_handler)
         else:
-
             if not os.path.exists('logs'):
                 os.mkdir('logs')
             file_handler = RotatingFileHandler('logs/lurnby.log',
@@ -166,7 +164,9 @@ def create_app(config_class=Config):
 
             app.logger.setLevel(logging.INFO)
             app.logger.info('Lurnby')
-
+        app.logger.removeHandler(default_handler)
+        
+        
     return app
 
 
