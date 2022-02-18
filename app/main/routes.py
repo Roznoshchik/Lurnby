@@ -343,6 +343,10 @@ def add_by_email():
     u = User.query.filter_by(add_by_email=recipient).first()
     #print('identified user:')
     #print(u)
+    if not u: 
+        print(f'email error {recipient} not found')
+        return
+        
     emails = [e.email for e in Approved_Sender.query.filter_by(user_id=u.id).all()]
     #print('approved senders:')
     #print(emails)

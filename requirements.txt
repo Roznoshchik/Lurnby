@@ -47,7 +47,7 @@ py==1.11.0
 pycodestyle==2.6.0
 pyflakes==2.2.0
 PyJWT==1.4.2
-PyMuPDF==1.19.2
+PyMuPDF==1.19.0
 pyngrok==5.1.0
 pyparsing==3.0.6
 pytest==6.2.5
