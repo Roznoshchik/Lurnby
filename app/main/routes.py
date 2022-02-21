@@ -335,6 +335,9 @@ def export_highlights():
 @csrf.exempt
 def add_by_email():
     #print(request.form['from'])
+    if current_app.config['DEV']:
+        print(request.form['to'])
+
     recipient = request.form['to']
     if '<' in recipient:
         recipient = recipient.split('<')[1][:-1]

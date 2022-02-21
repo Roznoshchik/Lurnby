@@ -31,3 +31,4 @@ class Config(object):
     SERVER_NAME = os.environ.get('SERVER_NAME')
     PREFERRED_URL_SCHEME = 'https'
     WTF_CSRF_TIME_LIMIT = None
+    DEV = os.environ.get('DEV')

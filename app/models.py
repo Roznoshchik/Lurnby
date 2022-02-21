@@ -141,6 +141,8 @@ class User(UserMixin, db.Model):
     def create_lurnby_email(self):
         letters = string.ascii_lowercase + string.digits
         extra = ''.join(random.choice(letters) for i in range(7))
+        if current_app.config['DEV']:
+             return f"{self.email.split('@')[0]}-{extra}@add-article-staging.lurnby.com"
 
         return f"{self.email.split('@')[0]}-{extra}@add-article.lurnby.com"
 
