@@ -1,5 +1,0 @@
-beautifulsoup4>=4.7.1
-datetime
-html5lib
-lxml
-regex
