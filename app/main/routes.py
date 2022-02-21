@@ -346,8 +346,7 @@ def add_by_email():
             if '<' in r:
                 recipient = r.split('<')[1][:-1]
             else:
-                recipient = r
-            
+                recipient = r.lstrip()
             break
 
 
