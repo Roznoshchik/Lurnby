@@ -683,7 +683,7 @@ border: #FAB1A0 2px solid;
 /* mobile adjustments */
 
 @media(min-width:576px){
-  #bottombar-action, #bottombar-notes, #bottombar-bookmarks {
+  #bottombar-action, #bottombar-notes, #bottombar-bookmarks, #bottombar-show-original {
     display: none;
   }
 }
