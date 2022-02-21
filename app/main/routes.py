@@ -338,9 +338,22 @@ def add_by_email():
     if current_app.config['DEV']:
         print(request.form['to'])
 
-    recipient = request.form['to']
-    if '<' in recipient:
-        recipient = recipient.split('<')[1][:-1]
+    recipients = request.form['to'].split(',')
+    recipient = None
+
+    for r in recipients:
+        if 'add-article' in r:
+            if '<' in r:
+                recipient = r.split('<')[1][:-1]
+            else:
+                recipient = r
+            
+            break
+
+
+    # recipient = request.form['to']
+    # if '<' in recipient:
+    #     recipient = recipient.split('<')[1][:-1]
     #print('email to: ')
     #print(recipient)
     u = User.query.filter_by(add_by_email=recipient).first()
