@@ -38,6 +38,11 @@ def login():
         else:
             user = User.query \
                    .filter_by(email=form.username.data.lower()).first()
+
+            if user and user.password_hash is None:
+                flash('Your account was created through Google Sign In. Please sign in with google to continue', 'error')
+                return redirect(url_for('auth.login'))
+
             if user is None or not user.check_password(form.password.data):
                 flash('Invalid username or password', 'error')
                 return redirect(url_for('auth.login'))
@@ -221,12 +226,13 @@ def reset_password(token):
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
+        login_user(user)
         ev = Event.add('reset password')
         if ev:
             db.session.add(ev)
+        flash('Your password has been reset.', 'success')
         db.session.commit()
-        flash('Your password has been reset.', 'message')
-        
+
         return redirect(url_for('auth.login'))
     return render_template('auth/reset_password.html', form=form)
 
