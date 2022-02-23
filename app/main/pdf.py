@@ -103,32 +103,54 @@ def importPDF(filepath, u=None):
                 content += f'<img src ={url} loading="lazy">'
             else:
                 lines = i['lines']
+                if lines is None:
+                    print(p)
+                    print(i)
+                    break
                 font_size = None                   
                 for line in lines:
                     spans = line['spans']
                     for span in spans:
                         if font_size is None:
                             font_size = span['size']
+                            # open tag
                             content += '<'
                             content += sizes[font_size]
                             content += '>'
                             content += span['text']
+                            
+                            # close tag
+                            content += '</'
+                            content += sizes[font_size]
+                            content += '>'
                         else:
                             if span['size'] == font_size:
-                                content += ' '
-                                content += span['text']
-                            else:
-                                content += '</'
-                                content += sizes[font_size]
-                                content += '>'
-                                font_size = span['size']
+                                # open tag
                                 content += '<'
                                 content += sizes[font_size]
                                 content += '>'
+                                                                
+                                content += ' '
                                 content += span['text']
-                content += '</'
-                content += sizes[font_size]
-                content += '>'
+                                
+                                # close tag
+                                content += '</'
+                                content += sizes[font_size]
+                                content += '>'
+                            else:
+                                font_size = span['size']
+                                
+                                # open tag
+                                content += '<'
+                                content += sizes[font_size]
+                                content += '>'
+
+                                content += span['text']
+                                
+                                # close tag
+                                content += '</'
+                                content += sizes[font_size]
+                                content += '>'
 
     processed['content'] = content
     processed['title'] = title
