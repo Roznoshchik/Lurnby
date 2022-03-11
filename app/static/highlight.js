@@ -99,6 +99,10 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     //$('#HighlightField').val(rawhighlight);
     byId('HighlightField').value = rawhighlight
+    tinymce.EditorManager.execCommand('mceSetContent',rawhighlight, 'HighlightField');
+
+
+
     byId('highlight_position').value = highlight_position
     //$('#highlight_position').val(highlight_position);
     byId('message-text').value='';
@@ -114,7 +118,37 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
   })
 
 function showaddhighlightmodal(){
-    //initialize_topics();
-    $('#AddHighlightModal').modal('show');
-    
-  }
+  tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'HighlightField');
+  tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'message-text');
+
+  tinymce.EditorManager.init({
+    selector: '#HighlightField',
+    menubar: 'insert format',
+    resize: 'vertical',
+    toolbar: 'styleselect | bold italic underline | hr',
+    skin: darkModeOn() ? "oxide-dark":"oxide",
+    content_css: darkModeOn() ? "dark": "light",
+    plugins: 'link hr', 
+    mobile: {
+        height:300
+    }
+  });
+
+  tinymce.EditorManager.init({
+    selector: '#message-text',
+    menubar: 'insert format',
+    resize: 'vertical',
+    toolbar: 'styleselect | bold italic underline | hr',
+    skin: darkModeOn() ? "oxide-dark":"oxide",
+    content_css: darkModeOn() ? "dark": "light",
+    plugins: 'link hr', 
+    mobile: {
+        height:300
+    }
+  });
+
+
+  //initialize_topics();
+  $('#AddHighlightModal').modal('show');
+  
+}

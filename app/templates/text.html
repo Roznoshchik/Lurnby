@@ -677,8 +677,12 @@ for(let i=0; i<tables.length; i++){
 
       var text, notes, topics, doctopics, article_uuid, position, do_not_review
 
-      text = byId('HighlightField').value
-      notes = byId('message-text').value
+      // text = byId('HighlightField').value
+      text = tinymce.get('HighlightField').getContent();
+
+      // notes = byId('message-text').value
+      notes = tinymce.get('message-text').getContent();
+
       do_not_review = byId('do_not_review').checked
       topics = []
       doctopics = Array.from(byClass('add_highlight_member'))

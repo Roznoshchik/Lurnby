@@ -6,7 +6,7 @@
             <div class="underline"></div>
         </div>
         <div class="highlight-content">
-            <p>{{highlight.text}}</p>
+            <p>{{highlight.text | safe }}</p>
             {% if not highlight.no_topics %}
             <div class="highlight-topics">
                 {% set topics = highlight.topics.filter_by(archived=False).all() %}

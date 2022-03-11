@@ -224,6 +224,53 @@ function ViewHighlight(id){
         initialize();
         initialize_view_topics();
         autocomplete(byId("topic_input"), nonmember_list, byId('Members'), create=true, 'viewhighlight');
+
+        let existingNotes = byId('view_highlight_notes').innerHTML
+        let existingHighlight = byId('view_highlight_text').innerHTML
+
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_notes');
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_text');
+
+        
+        tinymce.EditorManager.init({
+            selector: '#view_highlight_text',
+            menubar: 'insert format',
+            resize: 'vertical',
+            toolbar: 'styleselect | bold italic underline | hr',
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light",
+            plugins: 'link hr', 
+            mobile: {
+                height:300
+            },
+            setup: function (editor) {
+                editor.on('init', function (e) {
+                  editor.setContent(`${existing_highlight}`);
+                });
+             }
+            
+            
+        });
+
+        tinymce.EditorManager.init({
+            selector: '#view_highlight_notes',
+            menubar: 'insert format',
+            resize: 'vertical',
+            toolbar: 'styleselect | bold italic underline | hr',
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light",
+            plugins: 'link hr', 
+            mobile: {
+                height:300
+            },
+            setup: function (editor) {
+                editor.on('init', function (e) {
+                  editor.setContent(`${existing_notes}`);
+                });
+            }
+            
+        });
+
         $('#ViewHighlightModal').modal('toggle')
     });
 
@@ -324,8 +371,12 @@ function UpdateHighlight(id, review=false){
     var doc_tags,tags,untags, doc_topics, activetopics, untopics, notes, highlight, topicspace
     
 
-    notes = byId('view_highlight_notes').value
-    highlight = byId('view_highlight_text').value
+    // notes = byId('view_highlight_notes').value
+    // highlight = byId('view_highlight_text').value
+   
+
+    notes = tinymce.get('view_highlight_notes').getContent()
+    highlight = tinymce.get('view_highlight_text').getContent()
     console.log(highlight)
     untopics = nonmember_list
     activetopics = []
