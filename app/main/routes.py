@@ -666,7 +666,8 @@ def add_article():
                 return (json.dumps({'manual_fail': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
-            content = "<pre>" + content + "</pre>"
+            content =  content 
+            # content = "<pre>" + content + "</pre>"
             if source == '':
                 source = 'manually added ' + today
 

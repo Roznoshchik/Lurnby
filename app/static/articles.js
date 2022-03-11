@@ -41,8 +41,6 @@ function clear_modals(){
 /* add article form functions */
 
 
-
-
 function add_web(){
     byId('add_from').innerHTML = `
     <div class = "article_data_group">
@@ -65,13 +63,13 @@ function add_epub(){
     `
 
     var input = byId('epub_add');
-    console.log('got input')
-    console.log(input)
+    //console.log('got input')
+    //console.log(input)
     var label = input.nextElementSibling, labelVal=label.innerHTML;
 
     input.addEventListener('change', function(e){
-        console.log('added event listener?');
-        console.log(input.value)
+        //console.log('added event listener?');
+        //console.log(input.value)
         var fileName = '';
         if (this.files){
             fileName = e.target.value.split( '\\' ).pop();            
@@ -98,13 +96,13 @@ function add_pdf(){
     `
 
     var input = byId('pdf_add');
-    console.log('got input')
-    console.log(input)
+    //console.log('got input')
+    //console.log(input)
     var label = input.nextElementSibling, labelVal=label.innerHTML;
 
     input.addEventListener('change', function(e){
-        console.log('added event listener?');
-        console.log(input.value)
+        //console.log('added event listener?');
+        //console.log(input.value)
         var fileName = '';
         if (this.files){
             fileName = e.target.value.split( '\\' ).pop();            
@@ -122,6 +120,8 @@ function add_pdf(){
 
 
 function add_manual(){
+    //console.log(darkModeOn())
+    tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'content_add');
     byId('add_from').innerHTML = `
     <div class = "article_data_group manual_add">
         <h6>Title</h6>
@@ -132,8 +132,8 @@ function add_manual(){
         <textarea id = "content_add" placeholder="Paste article text here ..."></textarea>
     </div>
     `
-
-    byId('title_add').focus()
+    addArticleTinyInit();
+    //byId('title_add').focus()
 }
 
 
@@ -199,13 +199,17 @@ function add_new_article(){
         content = byId('content_add').value;
     };
     
-    data['notes'] = notes
+    data['notes'] = tinymce.get('notes_add').getContent()
+
+    // data['notes'] = notes
     data['tags'] = JSON.stringify(tags)
     data['title'] = title
     data['source'] = source
     data['url'] = url
-    data['content'] = content
+    // data['content'] = content
+    data['content'] = tinymce.get('content_add').getContent()
 
+    
     /////////////////////////
     //  failure responses  //
     /////////////////////////
@@ -350,8 +354,40 @@ function article_processing(taskID, a_id){
     });
 }
 
+function addArticleTinyInit () {
+    tinymce.EditorManager.init({
+        selector: '#content_add',
+        menubar: 'insert format',
+        resize: 'vertical',
+        toolbar: 'styleselect | bold italic underline | hr',
+        skin: darkModeOn() ? "oxide-dark":"oxide",
+        content_css: darkModeOn() ? "dark": "light",
+        plugins: 'link hr', 
+        mobile: {
+            height:300
+        }
+        
+    });
+} 
+
+function addArticleNotesInit () {
+    tinymce.EditorManager.init({
+        selector: '#notes_add',
+        menubar: 'insert format',
+        resize: 'vertical',
+        toolbar: 'styleselect | bold italic underline | hr',
+        skin: darkModeOn() ? "oxide-dark":"oxide",
+        content_css: darkModeOn() ? "dark": "light",
+        plugins: 'link hr', 
+        mobile: {
+            height:300
+        }
+        
+    });
+}
+
 function view_article_tiny_init(){
-    console.log('pulling up an article')
+    //console.log('pulling up an article')
 
     var existing_notes = byId('notes_edit').value
 
@@ -379,8 +415,8 @@ function view_article_tiny_init(){
     menubar: false,
     resize: 'vertical',
     toolbar: false,
-    skin: darkModeOn ? "oxide-dark":"oxide",
-    content_css: darkModeOn ? "dark": "light",
+    skin: darkModeOn() ? "oxide-dark":"oxide",
+    content_css: darkModeOn() ? "dark": "light",
     mobile: {
         height: 300
     },
@@ -393,7 +429,7 @@ function view_article_tiny_init(){
     }
 
   });
-  console.log('notes_initialized');
+  //console.log('notes_initialized');
 
     if(byId('article_reflections')){
         //reflections preview
@@ -402,8 +438,8 @@ function view_article_tiny_init(){
             menubar: false,
             resize: 'vertical',
             toolbar: false,
-            skin: darkModeOn ? "oxide-dark":"oxide",
-            content_css: darkModeOn ? "dark": "light",
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light",
             mobile: {
                 height: 300
             },
@@ -416,7 +452,7 @@ function view_article_tiny_init(){
             }
 
         });
-        console.log('reflections_initialized');
+        //console.log('reflections_initialized');
     }
     
     
@@ -427,8 +463,8 @@ function view_article_tiny_init(){
     menubar: false,
     resize: 'vertical',
     toolbar: false,
-    skin: darkModeOn ? "oxide-dark":"oxide",
-    content_css: darkModeOn ? "dark": "light",
+    skin: darkModeOn() ? "oxide-dark":"oxide",
+    content_css: darkModeOn() ? "dark": "light",
     mobile: {
         height: 300
     },
@@ -441,7 +477,6 @@ function view_article_tiny_init(){
     }
 
   });
-  console.log('content initialized')
   }
   
 }
@@ -472,15 +507,15 @@ function edit_article_tiny_init(){
           menubar: 'insert format',
           resize: 'vertical',
           toolbar: 'styleselect | bold italic underline | hr',
-          skin: darkModeOn ? "oxide-dark":"oxide",
-          content_css: darkModeOn ? "dark": "light",
+          skin: darkModeOn() ? "oxide-dark":"oxide",
+          content_css: darkModeOn() ? "dark": "light",
           plugins: 'link hr', 
           mobile: {
               height:300
           }
 
     });
-    console.log('notes edit initialized')  
+    //console.log('notes edit initialized')  
     
     if(byId('reflections_edit')){
         //reflections edit
@@ -489,14 +524,14 @@ function edit_article_tiny_init(){
             menubar: 'insert format',
             resize: 'vertical',
             toolbar: 'styleselect | bold italic underline | hr',
-            skin: darkModeOn ? "oxide-dark":"oxide",
-            content_css: darkModeOn ? "dark": "light", 
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light", 
             plugins: 'link hr', 
             mobile: {
                 height:300
             }
         });
-        console.log('reflections edit initialized')
+        //console.log('reflections edit initialized')
     }
 
     if (byId('content_edit') != null){
@@ -506,16 +541,15 @@ function edit_article_tiny_init(){
             menubar: 'insert format',
             resize: 'vertical',
             toolbar: 'styleselect | bold italic underline | hr',
-            skin: darkModeOn ? "oxide-dark":"oxide",
-            content_css: darkModeOn ? "dark": "light", 
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light", 
             plugins: 'link hr', 
             mobile: {
                 height: 300
             }
             
         });
-        console.log('content edit initialized')
-
+        //console.log('content edit initialized')
     }
    
 }
@@ -540,7 +574,8 @@ function ViewAddArticle(){
         modal.innerHTML = data;
         initialize();
         // initialize tinymce here?
-
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'notes_add');
+        addArticleNotesInit()
         $('#add_article').modal('toggle');
     });
 }
@@ -656,7 +691,7 @@ function initialize(){
 
             
             if (target.tagName === 'LABEL'){
-                console.log("target = label")
+                //console.log("target = label")
 
                 if (target.classList.contains('tagged')){
                     target.classList.remove('tagged');
@@ -680,7 +715,7 @@ function initialize(){
 
             
             if (target.tagName === 'LABEL'){
-                console.log("target = label")
+                //console.log("target = label")
 
                 if (target.classList.contains('tagged')){
                     target.classList.remove('tagged');
@@ -787,7 +822,7 @@ function add_tag_finish(string){
 
         
             if (target.tagName === 'LABEL'){
-                console.log("target = label")
+                //console.log("target = label")
 
                 if (target.classList.contains('tagged')){
                     target.classList.remove('tagged');
@@ -821,9 +856,9 @@ function article_updated(data){
 }
 
 function filter(){
-    console.log('filter()')
+    //console.log('filter()')
     var doc_tags = byClass('tagged');
-    console.log(doc_tags)
+    //console.log(doc_tags)
     var tags = []
     
     for (var i = 0; i <doc_tags.length; i++){
@@ -847,7 +882,7 @@ function save(article_id){
 
     var doc_tags,doc_remove_tags, tags, title, read_status, notes, content, data, reflections;
 
-    console.log('saving');
+    //console.log('saving');
 
     doc_tags = byClass('tagged');
     doc_remove_tags = byClass('untagged');
