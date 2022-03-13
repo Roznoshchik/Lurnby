@@ -206,11 +206,13 @@ function add_new_article() {
     data['title'] = title
     data['source'] = source
     data['url'] = url
-    data['content'] = content
-    if (tinymce.get('content_add').getContent() !== null) {
+    try {
         data['content'] = tinymce.get('content_add').getContent()
     } 
-    
+    catch (error) {
+        data['content'] = content
+
+    }
 
 
     /////////////////////////
