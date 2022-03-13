@@ -2197,7 +2197,12 @@ ul ul a {
 
 .image100 {
   height: auto !important;
-  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.highlight-card img, .highlight-card figure, .modal img, .modal figure {
+  max-width: 100% !important;
+  height: auto !important;
 }
 
 .center {

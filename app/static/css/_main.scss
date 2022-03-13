@@ -9,7 +9,14 @@
 
 .image100 {
     height: auto !important;
-    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.highlight-card, .modal {
+    img, figure {
+        max-width: 100% !important;
+        height: auto !important;
+    }
 }
 
 .center{
