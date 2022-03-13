@@ -2195,6 +2195,11 @@ ul ul a {
   display: block;
 }
 
+.image100 {
+  height: auto !important;
+  width: 100% !important;
+}
+
 .center {
   text-align: center;
 }

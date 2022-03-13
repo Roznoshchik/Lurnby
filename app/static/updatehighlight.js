@@ -236,10 +236,15 @@ function ViewHighlight(id){
             selector: '#view_highlight_text',
             menubar: 'insert format',
             resize: 'vertical',
-            toolbar: 'styleselect | bold italic underline | hr',
+            toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image | code',
             skin: darkModeOn() ? "oxide-dark":"oxide",
             content_css: darkModeOn() ? "dark": "light",
-            plugins: 'link hr', 
+            plugins: 'image imagetools lists code link hr', 
+            // image_dimensions: false,
+            object_resizing : true,
+            image_class_list: [
+              {title: 'Width100', value: 'image100'},
+            ],
             mobile: {
                 height:300
             },
@@ -256,10 +261,15 @@ function ViewHighlight(id){
             selector: '#view_highlight_notes',
             menubar: 'insert format',
             resize: 'vertical',
-            toolbar: 'styleselect | bold italic underline | hr',
+            toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image | code',
             skin: darkModeOn() ? "oxide-dark":"oxide",
             content_css: darkModeOn() ? "dark": "light",
-            plugins: 'link hr', 
+            plugins: 'image imagetools lists code link hr',
+            // image_dimensions: false,
+            object_resizing : true,
+            image_class_list: [
+              {title: 'Width100', value: 'image100'},
+            ], 
             mobile: {
                 height:300
             },

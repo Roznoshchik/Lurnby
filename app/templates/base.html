@@ -286,6 +286,17 @@
       <script text="javascript" src = "{{url_for('static', filename='js/copyToClipboard.js') }}"> </script>
 
       <script type="text/javascript">
+        /**
+         * Code to get tinymce to work with bootstrap
+         */
+        $(document).on('focusin', function(e) {
+          if ($(e.target).closest(".tox-tinymce, .tox-tinymce-aux, .moxman-window, .tam-assetmanager-root").length) {
+            e.stopImmediatePropagation();
+          }
+        });
+
+
+
         var csrf_token = "{{ csrf_token() }}";
     
         $.ajaxSetup({
