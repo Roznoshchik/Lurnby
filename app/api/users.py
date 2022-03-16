@@ -79,5 +79,7 @@ def add_article(id):
     response = jsonify(article.to_dict())
     response.status_code = 201
     response.headers['Location'] = url_for('main.article', uuid=article.uuid)
-    logout_user()
+    
+    # why did I want to log users out? this is logging me out every time I add new code.  
+    # logout_user()
     return response
