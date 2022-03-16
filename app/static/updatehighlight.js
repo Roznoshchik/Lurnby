@@ -225,8 +225,8 @@ function ViewHighlight(id){
         initialize_view_topics();
         autocomplete(byId("topic_input"), nonmember_list, byId('Members'), create=true, 'viewhighlight');
 
-        let existingNotes = byId('view_highlight_notes').innerHTML
-        let existingHighlight = byId('view_highlight_text').innerHTML
+        let existingNotes = byId('view_highlight_notes').value
+        let existingHighlight = byId('view_highlight_text').value
 
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_notes');
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_text');
@@ -250,7 +250,7 @@ function ViewHighlight(id){
             },
             setup: function (editor) {
                 editor.on('init', function (e) {
-                  editor.setContent(`${existing_highlight}`);
+                  editor.setContent(`${existingHighlight}`);
                 });
              }
             
@@ -275,7 +275,7 @@ function ViewHighlight(id){
             },
             setup: function (editor) {
                 editor.on('init', function (e) {
-                  editor.setContent(`${existing_notes}`);
+                  editor.setContent(`${existingNotes}`);
                 });
             }
             
