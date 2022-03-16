@@ -90,7 +90,8 @@ $('#addhighlight').click(function () {
 $('#AddHighlightModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   //var rawhighlight = selectedObj.toString() // selected text
-  var rawhighlight = highlightText;
+  // var rawhighlight = highlightText;
+  var rawhighlight = rangy.getSelection().toHtml();
 
   selectedObj.removeAllRanges();
 

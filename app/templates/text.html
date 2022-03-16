@@ -109,1268 +109,1266 @@
 <!--  bookmark controls  -->
 {% if color == 'light-mode' %}
 <div class="light-control-mode" id="bookmark-controls">
-  {% elif color == 'dark-mode' %}
-  <div class="dark-control-mode" id="bookmark-controls">
-    {% else %}
-    <div class="sepia-control-mode" id="bookmark-controls">
-      {% endif %}
-      <div class="bookmark-section">
+{% elif color == 'dark-mode' %}
+<div class="dark-control-mode" id="bookmark-controls">
+{% else %}
+<div class="sepia-control-mode" id="bookmark-controls">
+{% endif %}
+<div class="bookmark-section">
 
-        <input id="bookmark-name" type="text" placeholder="Bookmark name ...">
-        <button id="bookmark-add" class="main-button">Add Bookmark</button>
-      </div>
+<input id="bookmark-name" type="text" placeholder="Bookmark name ...">
+<button id="bookmark-add" class="main-button">Add Bookmark</button>
+</div>
 
-      <h3>Bookmarks</h3>
-      <div class="underline"></div>
-      <div id="bookmarks">
-        <div class="bookmark-row">
-          <button id="furthest-read" onclick="go_to_location({{furthest}})" class="bookmark-location">Furthest
-            Location</button>
-          <button onclick="clear_furthest()" class="clear-button">clear</button>
-        </div>
-        <div id="user-bookmarks">
-          {% for k,v in bookmarks.items() %}
-          <div class="bookmark-row">
-            <button class="bookmark-location" onclick="go_to_location({{v}})">{{k}}</button>
-            <button class="clear-button" onclick="delete_bookmark(this)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
-                viewBox="0 0 16 16">
-                <path
-                  d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-              </svg></button>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+<h3>Bookmarks</h3>
+<div class="underline"></div>
+<div id="bookmarks">
+<div class="bookmark-row">
+<button id="furthest-read" onclick="go_to_location({{furthest}})" class="bookmark-location">Furthest
+Location</button>
+<button onclick="clear_furthest()" class="clear-button">clear</button>
+</div>
+<div id="user-bookmarks">
+{% for k,v in bookmarks.items() %}
+<div class="bookmark-row">
+<button class="bookmark-location" onclick="go_to_location({{v}})">{{k}}</button>
+<button class="clear-button" onclick="delete_bookmark(this)">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-x"
+  viewBox="0 0 16 16">
+  <path
+    d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+</svg></button>
+</div>
+{% endfor %}
+</div>
+</div>
+</div>
 
-    <!--  type controls  -->
+<!--  type controls  -->
 
-    {% if color == 'light-mode' %}
-    <form class="light-control-mode" id="type-controls">
-      {% elif color == 'dark-mode' %}
-      <form class="dark-control-mode" id="type-controls">
-        {% else %}
-        <form class="sepia-control-mode" id="type-controls">
-          {% endif %}
+{% if color == 'light-mode' %}
+<form class="light-control-mode" id="type-controls">
+{% elif color == 'dark-mode' %}
+<form class="dark-control-mode" id="type-controls">
+{% else %}
+<form class="sepia-control-mode" id="type-controls">
+{% endif %}
 
-          <!-- font selection -->
-          <div class="form-group">
-            {% if font == 'sans-serif' %}
-            <input type="radio" checked name="font-choice" value="sans-serif" id="sans-serif">
-            {% else %}
-            <input type="radio" name="font-choice" value="sans-serif" id="sans-serif">
-            {% endif %}
-            <label class="type-control-button font-selector sans-serif" for="sans-serif">
-              <p>Sans-serif</p>Aa
-            </label>
+<!-- font selection -->
+<div class="form-group">
+{% if font == 'sans-serif' %}
+<input type="radio" checked name="font-choice" value="sans-serif" id="sans-serif">
+{% else %}
+<input type="radio" name="font-choice" value="sans-serif" id="sans-serif">
+{% endif %}
+<label class="type-control-button font-selector sans-serif" for="sans-serif">
+<p>Sans-serif</p>Aa
+</label>
 
-            {% if font == 'serif'%}
-            <input type="radio" name="font-choice" checked value="serif" id="serif">
-            {% else %}
-            <input type="radio" name="font-choice" value="serif" id="serif">
-            {% endif %}
-            <label class="type-control-button font-selector serif" for="serif">
-              <p>Serif</p>Aa
-            </label>
-          </div>
+{% if font == 'serif'%}
+<input type="radio" name="font-choice" checked value="serif" id="serif">
+{% else %}
+<input type="radio" name="font-choice" value="serif" id="serif">
+{% endif %}
+<label class="type-control-button font-selector serif" for="serif">
+<p>Serif</p>Aa
+</label>
+</div>
 
-          <div class="underline"></div>
+<div class="underline"></div>
 
-          <!-- font size  -->
-          <div class="form-group">
-            <div class="font-size" id="decrease-size"> - </div>
-            <input type="range" id="font-size-input" min="1" max="15" value="{{size}}" step="1"></input>
-            <label id="font-size-value" class="num-input" for="font-size-value">{{size}}</label>
-            <div class="font-size" id="increase-size"> + </div>
-          </div>
-          <div class="underline"></div>
+<!-- font size  -->
+<div class="form-group">
+<div class="font-size" id="decrease-size"> - </div>
+<input type="range" id="font-size-input" min="1" max="15" value="{{size}}" step="1"></input>
+<label id="font-size-value" class="num-input" for="font-size-value">{{size}}</label>
+<div class="font-size" id="increase-size"> + </div>
+</div>
+<div class="underline"></div>
 
-          <!-- line height  -->
-          <div class="form-group">
+<!-- line height  -->
+<div class="form-group">
 
-            {% if spacing == 'line-height-min' %}
-            <input type="radio" name="line-height-options" checked value="line-height-min" id="line-height-min">
-            {% else %}
-            <input type="radio" name="line-height-options" value="line-height-min" id="line-height-min">
-            {% endif %}
-            <label for="line-height-min">
-              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
-                <rect x="0" y="0" width="28" height="2" />
-                <rect x="0" y="5" width="38" height="2" />
-                <rect x="0" y="10" width="18" height="2" />
-              </svg>
-            </label>
+{% if spacing == 'line-height-min' %}
+<input type="radio" name="line-height-options" checked value="line-height-min" id="line-height-min">
+{% else %}
+<input type="radio" name="line-height-options" value="line-height-min" id="line-height-min">
+{% endif %}
+<label for="line-height-min">
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
+  <rect x="0" y="0" width="28" height="2" />
+  <rect x="0" y="5" width="38" height="2" />
+  <rect x="0" y="10" width="18" height="2" />
+</svg>
+</label>
 
-            {% if spacing == 'line-height-mid' %}
-            <input type="radio" name="line-height-options" checked value="line-height-mid" id="line-height-mid">
-            {% else %}
-            <input type="radio" name="line-height-options" value="line-height-mid" id="line-height-mid">
-            {% endif %}
-            <label for="line-height-mid">
-              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
+{% if spacing == 'line-height-mid' %}
+<input type="radio" name="line-height-options" checked value="line-height-mid" id="line-height-mid">
+{% else %}
+<input type="radio" name="line-height-options" value="line-height-mid" id="line-height-mid">
+{% endif %}
+<label for="line-height-mid">
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
 
-                <rect x="0" y="0" width="28" height="2" />
-                <rect x="0" y="8" width="38" height="2" />
-                <rect x="0" y="16" width="18" height="2" />
-              </svg>
-            </label>
+  <rect x="0" y="0" width="28" height="2" />
+  <rect x="0" y="8" width="38" height="2" />
+  <rect x="0" y="16" width="18" height="2" />
+</svg>
+</label>
 
-            {% if spacing == 'line-height-max'%}
-            <input type="radio" name="line-height-options" checked value="line-height-max" id="line-height-max">
-            {% else %}
-            <input type="radio" name="line-height-options" value="line-height-max" id="line-height-max">
-            {% endif %}
-            <label for="line-height-max">
-              <svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
+{% if spacing == 'line-height-max'%}
+<input type="radio" name="line-height-options" checked value="line-height-max" id="line-height-max">
+{% else %}
+<input type="radio" name="line-height-options" value="line-height-max" id="line-height-max">
+{% endif %}
+<label for="line-height-max">
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="context-fill">
 
-                <rect x="0" y="0" width="28" height="2" />
-                <rect x="0" y="11" width="38" height="2" />
-                <rect x="0" y="22" width="18" height="2" />
-              </svg>
-            </label>
+  <rect x="0" y="0" width="28" height="2" />
+  <rect x="0" y="11" width="38" height="2" />
+  <rect x="0" y="22" width="18" height="2" />
+</svg>
+</label>
 
-          </div>
-          <div class="underline"></div>
+</div>
+<div class="underline"></div>
 
-          <!--  Color mode -->
-          <div class="form-group">
+<!--  Color mode -->
+<div class="form-group">
 
-            {% if color == 'light-mode' %}
-            <input type="radio" name="color-mode" checked value="light-mode" id="light-mode">
-            {% else %}
-            <input type="radio" name="color-mode" value="light-mode" id="light-mode">
-            {% endif %}
+{% if color == 'light-mode' %}
+<input type="radio" name="color-mode" checked value="light-mode" id="light-mode">
+{% else %}
+<input type="radio" name="color-mode" value="light-mode" id="light-mode">
+{% endif %}
 
-            <label for="light-mode" class="type-controls-button color-selector  light-mode">Light</label>
-            {% if color == 'dark-mode' %}
-            <input type="radio" name="color-mode" checked value="dark-mode" id="dark-mode">
-            {% else %}
-            <input type="radio" name="color-mode" value="dark-mode" id="dark-mode">
-            {% endif %}
+<label for="light-mode" class="type-controls-button color-selector  light-mode">Light</label>
+{% if color == 'dark-mode' %}
+<input type="radio" name="color-mode" checked value="dark-mode" id="dark-mode">
+{% else %}
+<input type="radio" name="color-mode" value="dark-mode" id="dark-mode">
+{% endif %}
 
-            <label for="dark-mode" class="type-controls-button color-selector dark-mode">Dark</label>
-            {% if color == 'sepia-mode' %}
-            <input type="radio" name="color-mode" checked value="sepia-mode" id="sepia-mode">
-            {% else %}
-            <input type="radio" name="color-mode" value="sepia-mode" id="sepia-mode">
-            {% endif %}
-            <label for="sepia-mode" class="type-controls-button color-selector sepia-mode">Sepia</label>
+<label for="dark-mode" class="type-controls-button color-selector dark-mode">Dark</label>
+{% if color == 'sepia-mode' %}
+<input type="radio" name="color-mode" checked value="sepia-mode" id="sepia-mode">
+{% else %}
+<input type="radio" name="color-mode" value="sepia-mode" id="sepia-mode">
+{% endif %}
+<label for="sepia-mode" class="type-controls-button color-selector sepia-mode">Sepia</label>
 
-          </div>
+</div>
 
 
-        </form>
+</form>
 
-        <!--  end type controls  -->
+<!--  end type controls  -->
 
-        <!--  notes editor  -->
+<!--  notes editor  -->
 
-        {% if color == 'light-mode' %}
-        <form class="light-control-mode" id="notes-form">
-          {% elif color == 'dark-mode' %}
-          <form class="dark-control-mode" id="notes-form">
-            {% else %}
-            <form class="sepia-control-mode" id="notes-form">
-              {% endif %}
-              <textarea id="notes-editor">
+{% if color == 'light-mode' %}
+<form class="light-control-mode" id="notes-form">
+{% elif color == 'dark-mode' %}
+<form class="dark-control-mode" id="notes-form">
+{% else %}
+<form class="sepia-control-mode" id="notes-form">
+{% endif %}
+<textarea id="notes-editor">
 
 </textarea>
-              <textarea style="display:none;" id="existing_notes">{{ article.notes|safe }}</textarea>
-            </form>
+<textarea style="display:none;" id="existing_notes">{{ article.notes|safe }}</textarea>
+</form>
 
-            <!--   end notes editor  -->
-            <!-- First time modal -->
-            <div class="lurnby_modal modal fade" id="WelcomeModal" tabindex="-1" role="dialog"
-              aria-labelledby="WelcomeModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="WelcomeModalLabel">Reading in Lurnby</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <p>Hi!</p>
-                    <p>A few quick things to get you started.</p>
-                    <ol>
-                      <li>You can create highlights by selecting text and hitting the <span
-                          class="main-button h-demo highlight-button">Add Highlight</span> button. The 'Highlights'
-                        section in the navigation bar lets you see all your highlights and export them. If you want to
-                        review highlights using our spaced repetition system, go to the 'Review' section. </li>
-                      <li>You can change the look and feel of this page by clicking on the <strong>'Aa'</strong> button.
-                      </li>
-                      <li>Clicking on the <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill"
-                          fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                          <path fill-rule="evenodd"
-                            d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z" />
-                        </svg><strong> pen icon</strong> opens up the article notes. You can write down anything that
-                        comes to mind while reading. Additionally, your highlights will be automatically added to this
-                        notes section.</li>
-                      <li>There's also a <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                          fill="currentColor" class="bi bi-bookmarks-fill" viewBox="0 0 16 16">
-                          <path
-                            d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z" />
-                          <path
-                            d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z" />
-                        </svg> <strong>bookmarks</strong> button. This allows you to create your own bookmarks anywhere
-                        in the article. It also allows you to go to your furthest read location. By default, the article
-                        will load to the last part of the article you were reading.</li>
-                      <li>Lurnby requires a network connection to work properly. If something isn't working as you
-                        expect, please double check that you have a stable internet connection.</li>
+<!--   end notes editor  -->
+<!-- First time modal -->
+<div class="lurnby_modal modal fade" id="WelcomeModal" tabindex="-1" role="dialog"
+aria-labelledby="WelcomeModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="WelcomeModalLabel">Reading in Lurnby</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p>Hi!</p>
+      <p>A few quick things to get you started.</p>
+      <ol>
+        <li>You can create highlights by selecting text and hitting the <span
+            class="main-button h-demo highlight-button">Add Highlight</span> button. The 'Highlights'
+          section in the navigation bar lets you see all your highlights and export them. If you want to
+          review highlights using our spaced repetition system, go to the 'Review' section. </li>
+        <li>You can change the look and feel of this page by clicking on the <strong>'Aa'</strong> button.
+        </li>
+        <li>Clicking on the <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-pen-fill"
+            fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path fill-rule="evenodd"
+              d="M13.498.795l.149-.149a1.207 1.207 0 1 1 1.707 1.708l-.149.148a1.5 1.5 0 0 1-.059 2.059L4.854 14.854a.5.5 0 0 1-.233.131l-4 1a.5.5 0 0 1-.606-.606l1-4a.5.5 0 0 1 .131-.232l9.642-9.642a.5.5 0 0 0-.642.056L6.854 4.854a.5.5 0 1 1-.708-.708L9.44.854A1.5 1.5 0 0 1 11.5.796a1.5 1.5 0 0 1 1.998-.001z" />
+          </svg><strong> pen icon</strong> opens up the article notes. You can write down anything that
+          comes to mind while reading. Additionally, your highlights will be automatically added to this
+          notes section.</li>
+        <li>There's also a <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+            fill="currentColor" class="bi bi-bookmarks-fill" viewBox="0 0 16 16">
+            <path
+              d="M2 4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L7 13.101l-4.223 2.815A.5.5 0 0 1 2 15.5V4z" />
+            <path
+              d="M4.268 1A2 2 0 0 1 6 0h6a2 2 0 0 1 2 2v11.5a.5.5 0 0 1-.777.416L13 13.768V2a1 1 0 0 0-1-1H4.268z" />
+          </svg> <strong>bookmarks</strong> button. This allows you to create your own bookmarks anywhere
+          in the article. It also allows you to go to your furthest read location. By default, the article
+          will load to the last part of the article you were reading.</li>
+        <li>Lurnby requires a network connection to work properly. If something isn't working as you
+          expect, please double check that you have a stable internet connection.</li>
 
-                    </ol>
-                    <img style=" display:block; margin-left: auto;"
-                      src="{{url_for('static', filename='images/smart-cat.gif')}}" />
-                    <button type="button" style="display:block; margin-top: 8px; margin-left: auto;" class="main-button"
-                      data-dismiss="modal" aria-label="Close">Let's Go!</button>
-                  </div>
-                </div>
-              </div>
+      </ol>
+      <img style=" display:block; margin-left: auto;"
+        src="{{url_for('static', filename='images/smart-cat.gif')}}" />
+      <button type="button" style="display:block; margin-top: 8px; margin-left: auto;" class="main-button"
+        data-dismiss="modal" aria-label="Close">Let's Go!</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Finished Reading Modal-->
+<div class="modal lurnby_modal" id="finishArticleModal" tabindex="-1" role="dialog"
+aria-labelledby="finishArticleModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="finishArticleModalLabel">Finished Reading</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      {% if article.source_url %}
+      <div class="lurnby_data_group">
+        <h6>Source</h6>
+        <a id="articleId" href="{{article.source_url}}" target="_blank">{{article.source_url}}</a>
+        <button type="button" class="main-button" onclick="copyHrefToClipboard('articleId')">Copy</button>
+      </div>
+      {% endif %}
+
+      <div class="lurnby_data_group">
+        <h6>Reflections</h6>
+        <textarea id="articleReflections"
+          class="form-control">{% if article.reflections %}{{ article.reflections | safe }}{% endif %}</textarea>
+      </div>
+
+      <div class="lurnby_data_group">
+        <h6 class="inline-block"> Tags:</h6>
+        <div class="inline-block lurnby-filter">
+          <span id="NewTagMembers" class="topics-group">
+            {% for tag in article.tags.all() %}
+            <span id="member-tag{{tag.name}}" class="topic tagMember">{{tag.name}}</span>
+            {% endfor%}
+          </span>
+          <div class="autocomplete">
+            <div class="filter_form">
+              <input id="tag_input" type="text" placeholder="add to tag ...">
             </div>
-
-            <!-- Finished Reading Modal-->
-            <div class="modal lurnby_modal" id="finishArticleModal" tabindex="-1" role="dialog"
-              aria-labelledby="finishArticleModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="finishArticleModalLabel">Finished Reading</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    {% if article.source_url %}
-                    <div class="lurnby_data_group">
-                      <h6>Source</h6>
-                      <a id="articleId" href="{{article.source_url}}" target="_blank">{{article.source_url}}</a>
-                      <button type="button" class="main-button" onclick="copyHrefToClipboard('articleId')">Copy</button>
-                    </div>
-                    {% endif %}
-
-                    <div class="lurnby_data_group">
-                      <h6>Reflections</h6>
-                      <textarea id="articleReflections"
-                        class="form-control">{% if article.reflections %}{{ article.reflections | safe }}{% endif %}</textarea>
-                    </div>
-
-                    <div class="lurnby_data_group">
-                      <h6 class="inline-block"> Tags:</h6>
-                      <div class="inline-block lurnby-filter">
-                        <span id="NewTagMembers" class="topics-group">
-                          {% for tag in article.tags.all() %}
-                          <span id="member-tag{{tag.name}}" class="topic tagMember">{{tag.name}}</span>
-                          {% endfor%}
-                        </span>
-                        <div class="autocomplete">
-                          <div class="filter_form">
-                            <input id="tag_input" type="text" placeholder="add to tag ...">
-                          </div>
-                        </div>
-                      </div>
-                      <br>
-                    </div>
-
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
-                    <button type="button" onclick="finishArticle()" class="main-button add-highlight save">Mark
-                      finished</button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
-
-
-
-            <!-- Add Highlight Modal-->
-            <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog"
-              aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
-              <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="AddHighlightModalLabel">New Highlight</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-                  <div class="modal-body">
-                    <form class="main-form" id="SubmitHighlightForm" action="" method=""> {{
-                      form.position(class="form-control",type="hidden", id="highlight_position") }}
-                      <input id="article_uuid" type="hidden" name="article_uuid" value="{{ article_uuid}}">
-                      <div class=" lurnby_data_group form-group">
-                        <h6>Highlight</h6>
-                        {{ form.text(class="form-control", id="HighlightField") }}
-                      </div>
-                      <br>
-                      <div class="lurnby_data_group form-group">
-                        <h6>Add a note</h6>
-                        {{ form.note(class="form-control", id="message-text") }}
-                      </div>
-                      <div class="lurnby_data_group form-group skip-review">
-                        {{ form.do_not_review(class="form-control", id="do_not_review") }}
-                        {{form.do_not_review.label('This highlight should not be reviewed')}}
-                      </div>
-
-                      <div class="lurnby_data_group">
-                        <h6 class="inline-block"> Topics:</h6>
-                        <div class="inline-block lurnby-filter">
-                          <span id="NewHighlightMembers" class="topics-group">
-                          </span>
-                          <div class="autocomplete">
-                            <div class="filter_form">
-                              <input id="new_highlight_topic_input" type="text" placeholder="add to topic ...">
-                            </div>
-                          </div>
-                        </div>
-
-                        <br>
-                      </div>
-                      <input style="display:none;" type="submit" value="Submit" disabled>
-                    </form>
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
-                    <button type="button" onclick="SubmitHighlight()"
-                      class="main-button add-highlight save">Add</button>
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-            <!-- View Highlight Modal-->
-            <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog"
-              aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
-            </div>
-
-            {% endblock %}
-
-            {% block JS %}
-
-            <!-- Included scripts -->
-            <script type="text/javascript" src="{{url_for('static', filename='js/bookmarks.js')}}"></script>
-            <script type="text/javascript"
-              src="{{url_for('static', filename='texthighlighter/TextHighlighter.js')}}"></script>
-            <script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
-            <script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
-            <script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
-            <script type="text/javascript" src="{{url_for( 'static', filename='js/autocomplete.js' )}}"></script>
-
-
-
-            <script>
-              // get page variables
-              var uuid = "{{ article_uuid }}";
-              var all_bookmarks = {{ bookmarks| safe }};
-              var furthest = {{ furthest }};
-              var read_progress = {{ progress }};
-              var current_progress = read_progress
-              var topics = [{% for t in topics %}'{{t.title}}', {% endfor %}]
-              const notTaggedList = {{ notTaggedList | safe }}
-
-
-
-
-              // show onboarding
-              {% if current_user.highlights.filter_by(archived = False).count() == 0 %}
-              $('#WelcomeModal').modal('show');
-              {% endif %}
-
-
-              //Start finish Article Functions
-
-              // initialize article tags for finish highlight modal
-              var all_tags = Array.from(byClass('tagMember'))
-              all_tags.forEach(tag => tag.addEventListener("click", function (e) {
-                e = e || window.event;
-                var target = e.target || e.srcElement;
-                byId(target.id).remove()
-                notTaggedList.push(tag.innerText)
-              }));
-              autocomplete(byId("tag_input"), notTaggedList, byId('NewTagMembers'), create = true, 'FinishArticleModal');
-
-              const showFinishArticleModal = () => {
-                $('#finishArticleModal').modal('show');
-              }
-
-              const finishArticle = () => {
-                url = '/app/article/{{article.uuid}}/finished'
-                const articleReflections = tinymce.get('articleReflections').getBody().innerHTML
-
-                const taggedArray = Array.from(byClass('tagMember'))
-                const taggedList = []
-                taggedArray.forEach((tag) => taggedList.push(tag.innerText))
-                const data = {
-                  'reflections': articleReflections,
-                  'taggedList': taggedList,
-                  'notTaggedList': notTaggedList
-                }
-
-                fetch(url, {
-                  method: 'post',
-                  headers: {
-                    'Content-type': 'application/json',
-                    'X-CSRFToken': csrf_token
-                  },
-                  body: JSON.stringify(data)
-                })
-                  .then(function (response) {
-                    if (response.ok) {
-                      location.assign('/app/articles')
-                    }
-                    else {
-                      console.log(response)
-                    }
-                  })
-
-
-              }
-
-
-
-              // END finish article functions
-
-
-              // scroll to previous position
-
-              function set_position(progress) {
-                var $window = $(window);
-
-                // var h = document.documentElement, 
-                // b = document.body,
-                // st = 'scrollTop',
-                // sh = 'scrollHeight';
-
-                // var position = (progress / 100) * (h[sh] || b[sh])    
-
-                // $window.scrollTop(position);
-
-                let docElem = document.documentElement,
-                  docBody = document.body,
-                  scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
-                  position = (progress / 100) * scrollBottom;
-                console.log(`\n\n position is: ${position}\n\n`)
-
-                $window.scrollTop(position)
-
-              };
-
-              // removed because safari is resizing the window when the browser bar comes up. 
-              // window.addEventListener('resize', function(){
-              //   console.log('screen resized')
-              //   set_position(current_progress)
-              // });
-
-              {% if not highlight_id %}
-              set_position(read_progress);
-              {% else %}
-              console.log('I should scroll now ')
-              console.log('{{highlight_id }}')
-              var highlight_position = byId('{{highlight_id}}')
-
-              highlight_position.scrollIntoView()
-              {% endif %}
-
-              /* store scroll position 
-                hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
-                */
-
-              var timer, timer2;
-
-              function getScrollPercent() {
-
-                // console.log('getting scroll')
-                // var h = document.documentElement, 
-                // b = document.body,
-                // st = 'scrollTop',
-                // sh = 'scrollHeight';
-
-                // var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
-                let docElem = document.documentElement,
-                  docBody = document.body,
-                  scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
-                  scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
-                  scrollPercent = scrollTop / scrollBottom,
-                  progress = scrollPercent * 100,
-                  progbar = byId('progress_percent');
-
-                progbar.style.width = `${scrollPercent * 100}%`;
-
-
-                if (progress > furthest) {
-                  furthest = progress;
-                  byId('furthest-read').onclick = function () { go_to_location(furthest) };
-                  console.log('will update bookmarks')
-                  clearTimeout(timer2)
-                  timer2 = setTimeout(save_bookmarks, 5000)
-
-                  //save_bookmarks()
-                }
-
-
-                clearTimeout(timer)
-                timer = setTimeout(update_progress.bind(null, progress), 3000)
-              }
-
-              function update_progress(progress, article_uuid) {
-                current_progress = progress;
-                byId('overview-progress').innerText = Math.round(progress);
-
-                $.post('/app/article/' + '{{article_uuid}}' + '/progress', {
-                  'Progress': progress
-                });
-              }
-
-              function update_notes() {
-                // var updated_notes = tinymce.get('notes-editor').getContent();
-                var updated_notes = tinymce.get('notes-editor').getBody().innerHTML
-
-                $.post('/app/article/{{article_uuid}}/notes', {
-                  'updated_notes': updated_notes
-                });
-
-              }
-
-              document.addEventListener("scroll", getScrollPercent());
-
-
-              var tables = document.getElementsByTagName('table');
-
-              for (let i = 0; i < tables.length; i++) {
-
-                var div = document.createElement('div');
-
-                div.classList.add('twrap')
-
-                tables[i].parentNode.insertBefore(div, tables[i]);
-
-                div.appendChild(tables[i]);
-              }
-
-
-            </script>
-
-
-            <script>
-              // enable highlighting      
-              var sandbox = document.getElementById('content');
-              //var article_id = $("#article_id").val()
-              var article_uuid = '{{article_uuid}}'
-
-              hltr = new TextHighlighter(sandbox, {
-                enabled: false,
-                onAfterHighlight: function (range, highlights) {
-
-                  update_notes();
-                  //var serialized = hltr.serializeHighlights();
-                  var updated_content = byId('article_content').innerHTML
-                  $.post('/app/article/' + article_uuid + '/highlight-storage', {
-                    'updated_content': updated_content
-                  }).fail(function () {
-                    $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
-                  });
-
-                  $('[data-toggle="popover"]').popover()
-
-
-                  $('.popover-dismiss').popover({
-                    trigger: 'focus'
-                  });
-
-
-                }
-
-              });
-
-              //load highlights
-              var serialized;
-
-
-              $('[data-toggle="popover"]').popover()
-
-
-              function SubmitHighlight() {
-                $('#AddHighlightModal').modal('hide');
-
-                var text, notes, topics, doctopics, article_uuid, position, do_not_review
-
-                // text = byId('HighlightField').value
-                text = tinymce.get('HighlightField').getContent();
-
-                // notes = byId('message-text').value
-                notes = tinymce.get('message-text').getContent();
-
-                do_not_review = byId('do_not_review').checked
-                topics = []
-                doctopics = Array.from(byClass('add_highlight_member'))
-                article_uuid = byId('article_uuid').value
-                position = byId('highlight_position').value
-
-                doctopics.forEach(t => topics.push(t.innerText))
-                console.log(topics)
-                byId('NewHighlightMembers').innerHTML = ''
-
-                var data = {
-                  text: text,
-                  notes: notes,
-                  topics: topics,
-                  do_not_review,
-                  article_uuid: article_uuid,
-                  position: position
-                }
-
-                data = JSON.stringify(data)
-                //console.log(data)
-
-                $.post('/app/article/addhighlight', {
-                  'data': data
-                }).done(function (data) {
-                  AddedHighlight(data)
-                }).fail(function () {
-                  FailedToAddHighlight()
-                });
-
-              }
-
-              var returnedhighlightid;
-              var returnedhighlightclass;
-
-              function AddedHighlight(data) {
-                byId('do_not_review').checked = false;
-                $('#AddHighlightModal').modal('hide');
-                topics = data['topics']
-                var active = byClass('active')
-                for (var i = active.length - 1; i >= 0; i--) {
-                  active[i].classList.remove('active')
-                }
-
-
-                selectedObj.removeAllRanges();
-                selectedObj.addRange(selectedText);
-                returnedhighlightclass = "highlight" + data['highlight_id'];
-                returnedhighlightid = data['highlight_id'];
-
-                s = `\n<h4><a href="${data['article_url']}?highlight_id=highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><h4>Highlight note:</h4>${data['highlight_notes']}<hr><br>`
-                s2 = `\n<h4><a href="${data['article_url']}?highlight_id=highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><br>`
-
-
-                if (data['highlight_notes'] != '') {
-                  tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s)
-
-                }
-                else {
-                  tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s2)
-
-                }
-
-
-                hltr.enable();
-                hltr.doHighlight();
-                hltr.disable();
-
-              }
-
-              function FailedToAddHighlight() {
-                var node = document.createElement('span');
-                node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
-                document.body.appendChild(node);
-              }
-
-
-
-
-
-              function NewTopic() {
-                $('#CreateTopic').html(`
+          </div>
+        </div>
         <br>
-        <form method="" action="" novalidate> 
-          <div class = "form-row align-items-center">
-            <div class="col-sm-6 my-1">
-              <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
-              </input>
-            </div> 
-            <div class="col-auto my-1"> 
-              <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
-            </div>  
-            <div class="col-auto my-1"> 
-              <button id = "submit_new_topic" onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
-            </div> 
-          </div> 
-      </form>`);
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
+      <button type="button" onclick="finishArticle()" class="main-button add-highlight save">Mark
+        finished</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+
+
+<!-- Add Highlight Modal-->
+<div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog"
+aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title" id="AddHighlightModalLabel">New Highlight</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form class="main-form" id="SubmitHighlightForm" action="" method=""> {{
+        form.position(class="form-control",type="hidden", id="highlight_position") }}
+        <input id="article_uuid" type="hidden" name="article_uuid" value="{{ article_uuid}}">
+        <div class=" lurnby_data_group form-group">
+          <h6>Highlight</h6>
+          {{ form.text(class="form-control", id="HighlightField") }}
+        </div>
+        <br>
+        <div class="lurnby_data_group form-group">
+          <h6>Add a note</h6>
+          {{ form.note(class="form-control", id="message-text") }}
+        </div>
+        <div class="lurnby_data_group form-group skip-review">
+          {{ form.do_not_review(class="form-control", id="do_not_review") }}
+          {{form.do_not_review.label('This highlight should not be reviewed')}}
+        </div>
+
+        <div class="lurnby_data_group">
+          <h6 class="inline-block"> Topics:</h6>
+          <div class="inline-block lurnby-filter">
+            <span id="NewHighlightMembers" class="topics-group">
+            </span>
+            <div class="autocomplete">
+              <div class="filter_form">
+                <input id="new_highlight_topic_input" type="text" placeholder="add to topic ...">
+              </div>
+            </div>
+          </div>
+
+          <br>
+        </div>
+        <input style="display:none;" type="submit" value="Submit" disabled>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
+      <button type="button" onclick="SubmitHighlight()"
+        class="main-button add-highlight save">Add</button>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- View Highlight Modal-->
+<div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog"
+aria-labelledby="ViewHighlightModalLabel" aria-hidden="true">
+</div>
+
+{% endblock %}
+
+{% block JS %}
+
+<!-- Included scripts -->
+<script type="text/javascript" src="{{url_for('static', filename='js/bookmarks.js')}}"></script>
+<script type="text/javascript"
+src="{{url_for('static', filename='texthighlighter/TextHighlighter.js')}}"></script>
+<script type="text/javascript" src="{{url_for('static', filename='tag.js')}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='highlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='updatehighlight.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='js/autocomplete.js' )}}"></script>
+<script type="text/javascript" src="{{url_for( 'static', filename='js/rangy/lib/rangy-core.js' )}}"></script>
+
+
+<script>
+// get page variables
+var uuid = "{{ article_uuid }}";
+var all_bookmarks = {{ bookmarks| safe }};
+var furthest = {{ furthest }};
+var read_progress = {{ progress }};
+var current_progress = read_progress
+var topics = [{% for t in topics %}'{{t.title}}', {% endfor %}]
+const notTaggedList = {{ notTaggedList | safe }}
 
-                input = document.getElementById('addtopicinput')
-                input.addEventListener("keyup", function (event) {
-                  // Number 13 is the "Enter" key on the keyboard
-                  if (event.keyCode === 13) {
-                    // Cancel the default action, if needed
-                    event.preventDefault();
-                    // Trigger the button element with a click
-                    document.getElementById("submit_new_topic").click();
-                  }
-                });
-                $('#addtopicinput').trigger('focus');
 
-              }
 
 
-              function NewTopicSubmit() {
+// show onboarding
+{% if current_user.highlights.filter_by(archived = False).count() == 0 %}
+$('#WelcomeModal').modal('show');
+{% endif %}
 
-                input = byId('addtopicinput')
 
-                if (input.value === '' || input.value === ' ' || input.value === '  ') {
-                  input.classList.add('is-invalid')
-                  input.focus();
-                }
-                else {
-
-                  $.post('/app/topics/add/from_highlight', {
-                    title: input.value
-                  }).done(function (response) {
-                    $('#topicplaceholder').append(`
-            <label id="label${response['id']}" class="topic-label btn">
-              <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
-          `);
-
-                    document.getElementById("label" + response['id']).click();
-
-                    $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
-
-                  }).fail(function () {
-                    byId('CreateTopic').innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
-                  });
-
-                }
-
-
-
-
-              }
-
-
-              function CancelNewTopic() {
-                $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>')
-              }
+//Start finish Article Functions
 
+// initialize article tags for finish highlight modal
+var all_tags = Array.from(byClass('tagMember'))
+all_tags.forEach(tag => tag.addEventListener("click", function (e) {
+  e = e || window.event;
+  var target = e.target || e.srcElement;
+  byId(target.id).remove()
+  notTaggedList.push(tag.innerText)
+}));
+autocomplete(byId("tag_input"), notTaggedList, byId('NewTagMembers'), create = true, 'FinishArticleModal');
 
-              $(function () {
+const showFinishArticleModal = () => {
+  $('#finishArticleModal').modal('show');
+}
 
-                $('[data-toggle="popover"]').popover()
+const finishArticle = () => {
+  url = '/app/article/{{article.uuid}}/finished'
+  const articleReflections = tinymce.get('articleReflections').getBody().innerHTML
 
+  const taggedArray = Array.from(byClass('tagMember'))
+  const taggedList = []
+  taggedArray.forEach((tag) => taggedList.push(tag.innerText))
+  const data = {
+    'reflections': articleReflections,
+    'taggedList': taggedList,
+    'notTaggedList': notTaggedList
+  }
 
-                $('.popover-dismiss').popover({
-                  trigger: 'focus'
-                });
+  fetch(url, {
+    method: 'post',
+    headers: {
+      'Content-type': 'application/json',
+      'X-CSRFToken': csrf_token
+    },
+    body: JSON.stringify(data)
+  })
+    .then(function (response) {
+      if (response.ok) {
+        location.assign('/app/articles')
+      }
+      else {
+        console.log(response)
+      }
+    })
 
-              });
 
+}
 
 
-            </script>
 
-            <!--
-  WYSIWYG Editor
- -->
+// END finish article functions
 
 
-            <script>
-              var existing_notes = byId('existing_notes').value
-              var existing_reflections = byId('articleReflections').value
+// scroll to previous position
 
-              tinymce.init({
-                selector: '#notes-editor',
-                menubar: 'insert format',
-                resize: 'both',
-                toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
-    
-                {% if color == 'dark-mode' %}
-                skin: "oxide-dark",
-                content_css: "dark",
-                {% else %}
-                skin: "oxide",
-                content_css: "light",
-                {% endif %}
-
-                width: 600,
-                height: 400,
-                // image_dimensions: false,
-                object_resizing : true,
-                image_class_list: [
-                  { title: 'Width100', value: 'image100' },
-                ], 
-                mobile: {
-                  width: '100%',
-                  height: 400
-                },
-
-                setup: function (editor) {
-                  editor.on('init', function (e) {
-                      editor.setContent(existing_notes);
-                  });
-                }
-
-              });
-
-              tinymce.init({
-                selector: '#articleReflections',
-                menubar: 'insert format',
-                resize: 'both',
-                toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
-    
-                {% if color == 'dark-mode' %}
-                skin: "oxide-dark",
-                content_css: "dark",
-                {% else %}
-                skin: "oxide",
-                content_css: "light",
-                {% endif %}
-
-                width: "100%",
-                height: 400,
-                plugins: 'image imagetools lists code link hr',
-                // image_dimensions: false,
-                object_resizing : true,
-                image_class_list: [
-                  { title: 'Width100', value: 'image100' },
-                ],
-                mobile: {
-                width: '100%',
-                height: 400
-              },
-
-              setup: function (editor) {
-                editor.on('init', function (e) {
-                  editor.setContent(existing_reflections);
-                });
-              }
-
-              });
-
-
-
-            </script>
-
-
-
-            <!--
-   End WYSIWYG Editor
- -->
-
-
-            <script type="text/javascript">
-
-              /* type controls functions */
+function set_position(progress) {
+  var $window = $(window);
 
-              var size, size_input, increase, decrease, val, content, standard, bookmark_controls, controls, editor, sidebar_button;
-
-              highlight_button = byId('infoDiv')
-              sidebar_button = byId('sidebar-action-button')
-              controls = byId('type-controls')
-              bookmark_controls = byId('bookmark-controls')
-              editor = byId('notes-form')
-              standard = byId('standard')
-              content = byId('content');
-              bottom = byId('bottom-bar')
-              bottom_button = byId('bottombar-action')
-              size = byId('font-size-input');
-              size_input = byId('font-size-value')
-              increase = byId('increase-size')
-              decrease = byId('decrease-size')
+  // var h = document.documentElement, 
+  // b = document.body,
+  // st = 'scrollTop',
+  // sh = 'scrollHeight';
 
-
-              content.addEventListener('click', function () {
-                hide_controls();
-                hide_editor();
-
-              });
-
-              document.addEventListener('DOMContentLoaded', function () {
-                initialize_controls();
-                var sidebar_notes = byId('sidebar-notes');
-                var bottombar_notes = byId('bottombar-notes');
-                sidebar_notes.addEventListener("click", function () {
-                  show_editor();
-                })
-                bottombar_notes.addEventListener("click", function () {
-                  show_editor();
-                })
-
-              })
+  // var position = (progress / 100) * (h[sh] || b[sh])    
 
-              /* Save preferences and Send them  */
-
-              controls.addEventListener('click', save_preferences);
-
-              var time;
-
-              function save_preferences() {
-
-                var font, size, spacing, color;
-
-                font = document.forms['type-controls'].elements['font-choice'];
-                for (var i = 0; i < font.length; i++) {
-                  if (font[i].checked) {
-                    font = font[i].value;
-                    break;
-                  }
-                }
-
-                color = document.forms['type-controls'].elements['color-mode'];
-                for (var i = 0; i < font.length; i++) {
-                  if (color[i].checked) {
-                    color = color[i].value;
-                    break;
-                  }
-                }
-
-                size = byId('font-size-input').value
-
-                spacing = document.forms['type-controls'].elements['line-height-options'];
-                for (var i = 0; i < font.length; i++) {
-                  if (spacing[i].checked) {
-                    spacing = spacing[i].value;
-                    break;
-                  }
-                }
-
-
-                var preferences = {
-                  'font': font,
-                  'color': color,
-                  'size': size,
-                  'spacing': spacing
-                }
-
-                clearTimeout(time)
-                time = setTimeout(send_preferences.bind(null, preferences), 5000)
-
-
-              }
-
-              function send_preferences(preferences) {
-
-                $.post('/app/article/preferences', {
-                  'Preferences': JSON.stringify(preferences)
-                });
-
-
-              }
-
-
-              /* end Save Preferences */
-
-              /* When the user scrolls down, do x. When the user scrolls up, do y */
-              var nav = byId('navigation')
-              var prevScrollpos = window.pageYOffset;
-              window.onscroll = function () {
-                var currentScrollPos = window.pageYOffset;
-                getScrollPercent()
-                if (prevScrollpos > currentScrollPos) {
-                  sidebar_button.style.border = '1px solid';
-
-                } else {
-
-
-                  sidebar_button.style.border = "none";
-                }
-                prevScrollpos = currentScrollPos;
-              }
-
-              function show_bookmarks(event) {
-                console.log('showing bookmarks ???')
-                if (bookmark_controls.style.display === "none") {
-                  bookmark_controls.style.display = "block";
-                  editor.style.display = "none";
-                  controls.style.display = "none"
-
-                }
-                else {
-                  bookmark_controls.style.display = "none"
-                }
-              }
-
-              function showOriginalArticle(url) {
-                window.open(url, "_blank");
-              }
-
-
-              function show_controls(event) {
-
-                if (controls.style.display === "none") {
-                  controls.style.display = "block";
-                  editor.style.display = "none"
-                  bookmark_controls.style.display = "none"
-
-                }
-                else {
-                  controls.style.display = "none"
-                }
-              }
-
-              function show_editor() {
-                if (editor.style.display === "none") {
-                  editor.style.display = "block";
-                  controls.style.display = "none"
-                  bookmark_controls.style.display = "none"
-
-                }
-                else {
-                  editor.style.display = "none"
-                }
-              }
-
-
-              function hide_controls() {
-                console.log('hiding')
-                controls.style.display = "none"
-                bookmark_controls.style.display = "none"
-                save_preferences()
-                //byId('infoDiv').style.display="none"
-              }
-
-              function hide_editor() {
-                editor.style.display = "none";
-
-                clearTimeout(timer)
-                timer = setTimeout(update_notes.bind(), 3000)
-
-                //update_notes();
-              }
-
-              function update_editor(mode) {
-                if (mode == 'dark') {
-                  tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'notes-editor');
-
-                  tinymce.EditorManager.init({
-                    selector: '#notes-editor',
-                    menubar: 'insert format',
-                    resize: 'both',
-                    toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
-                    skin: "oxide-dark",
-                    content_css: "dark",
-                    // image_dimensions: false,
-                    object_resizing: true,
-                    image_class_list: [
-                      { title: 'Width100', value: 'image100' },
-                    ],
-
-                    mobile: {
-                      width: '100%',
-                      height: 400
-                    }
-
-                  });
-
-                  tinymce.EditorManager.execCommand('mceAddEditor', true, 'notes-editor');
-                }
+  // $window.scrollTop(position);
 
-                else {
-                  tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'notes-editor');
+  let docElem = document.documentElement,
+    docBody = document.body,
+    scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+    position = (progress / 100) * scrollBottom;
+  console.log(`\n\n position is: ${position}\n\n`)
 
-                  tinymce.EditorManager.init({
-                    selector: '#notes-editor',
-                    menubar: 'insert format',
-                    resize: 'both',
-                    toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
-                    skin: "oxide",
-                    content_css: "light",
-                    plugins: 'image imagetools lists code link hr',
-                    // image_dimensions: false,
-                    object_resizing: true,
-                    image_class_list: [
-                      { title: 'Width100', value: 'image100' },
-                    ],
-                    mobile: {
-                      width: '100%',
-                      height: 400
-                    }
-                  });
+  $window.scrollTop(position)
 
-                  tinymce.EditorManager.execCommand('mceAddEditor', true, 'notes-editor');
-                }
-              }
+};
 
+// removed because safari is resizing the window when the browser bar comes up. 
+// window.addEventListener('resize', function(){
+//   console.log('screen resized')
+//   set_position(current_progress)
+// });
 
+{% if not highlight_id %}
+set_position(read_progress);
+{% else %}
+console.log('I should scroll now ')
+console.log('{{highlight_id }}')
+var highlight_position = byId('{{highlight_id}}')
 
-              function initialize_controls() {
+highlight_position.scrollIntoView()
+{% endif %}
 
-                // font-size
-                increase.addEventListener('click', function () {
+/* store scroll position 
+  hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
+  */
 
-                  size.value++;
-                  size_input.innerHTML = size.value
-                  val = size.value
+var timer, timer2;
 
-                  content.classList.add(`size-${val}`)
-                  val--
-                  content.classList.remove(`size-${val}`)
-                  disable_buttons();
+function getScrollPercent() {
 
-                });
+  // console.log('getting scroll')
+  // var h = document.documentElement, 
+  // b = document.body,
+  // st = 'scrollTop',
+  // sh = 'scrollHeight';
 
-                decrease.addEventListener('click', function () {
+  // var progress =  (h[st] || b[st]) / (h[sh] || b[sh]) * 100;
+  let docElem = document.documentElement,
+    docBody = document.body,
+    scrollTop = docElem['scrollTop'] || docBody['scrollTop'],
+    scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
+    scrollPercent = scrollTop / scrollBottom,
+    progress = scrollPercent * 100,
+    progbar = byId('progress_percent');
 
-                  size.value--;
-                  size_input.innerHTML = size.value
-                  val = size.value
+  progbar.style.width = `${scrollPercent * 100}%`;
 
-                  content.classList.add(`size-${val}`)
-                  val++
-                  content.classList.remove(`size-${val}`)
 
-                  disable_buttons();
+  if (progress > furthest) {
+    furthest = progress;
+    byId('furthest-read').onclick = function () { go_to_location(furthest) };
+    console.log('will update bookmarks')
+    clearTimeout(timer2)
+    timer2 = setTimeout(save_bookmarks, 5000)
 
-                });
+    //save_bookmarks()
+  }
 
-                function disable_buttons() {
-                  val = size.value
 
-                  if (val == 1) {
-                    decrease.classList.add('disabled')
-                  }
-                  if (val > 1) {
-                    decrease.classList.remove('disabled')
-                  }
-                  if (val < 15) {
-                    increase.classList.remove('disabled')
-                  }
-                  if (val == 15) {
-                    increase.classList.add('disabled')
-                  }
+  clearTimeout(timer)
+  timer = setTimeout(update_progress.bind(null, progress), 3000)
+}
 
+function update_progress(progress, article_uuid) {
+  current_progress = progress;
+  byId('overview-progress').innerText = Math.round(progress);
 
-                }
+  $.post('/app/article/' + '{{article_uuid}}' + '/progress', {
+    'Progress': progress
+  });
+}
 
+function update_notes() {
+  // var updated_notes = tinymce.get('notes-editor').getContent();
+  var updated_notes = tinymce.get('notes-editor').getBody().innerHTML
 
-                // font choice
+  $.post('/app/article/{{article_uuid}}/notes', {
+    'updated_notes': updated_notes
+  });
 
-                var font = document.forms['type-controls'].elements['font-choice'];
+}
 
-                for (var i = 0; i < font.length; i++) {
-                  font[i].onclick = function () {
+document.addEventListener("scroll", getScrollPercent());
 
-                    var content = byId('content');
 
-                    if (this.id == 'serif') {
-                      content.classList.remove('sans-serif');
-                      content.classList.add('serif')
-
-                    }
-                    else if (this.id == 'sans-serif') {
-                      content.classList.remove('serif');
-                      content.classList.add('sans-serif')
+var tables = document.getElementsByTagName('table');
 
-                    }
+for (let i = 0; i < tables.length; i++) {
 
+  var div = document.createElement('div');
 
-                  };
-                }
+  div.classList.add('twrap')
 
+  tables[i].parentNode.insertBefore(div, tables[i]);
 
-                // color mode
-                var color = document.forms['type-controls'].elements['color-mode'];
+  div.appendChild(tables[i]);
+}
 
-                for (var i = 0; i < color.length; i++) {
-                  color[i].onclick = function () {
 
-                    var content = byId('content');
-                    var controls = byId('type-controls');
-                    var sidebar_notes = byId('notes-form')
-                    var sidebar_notes_button = byId('sidebar-notes')
-                    var bottombar_notes_button = byId('bottombar-notes')
+</script>
 
-                    var sidebar_bookmarks = byId('sidebar-bookmarks')
-                    var bottombar_bookmarks = byId('bottombar-bookmarks')
 
-                    var editor = byId('notes-form')
-                    var sidebar = byId('sidebar')
+<script>
+// enable highlighting      
+var sandbox = document.getElementById('content');
+//var article_id = $("#article_id").val()
+var article_uuid = '{{article_uuid}}'
 
-                    var elements_to_edit = new Array(
-                      content, sidebar, sidebar_notes_button,
-                      bottombar_notes_button, sidebar_bookmarks, bottombar_bookmarks, bottom, standard, sidebar_button, bottom_button)
+hltr = new TextHighlighter(sandbox, {
+  enabled: false,
+  onAfterHighlight: function (range, highlights) {
 
-                    var second_group_to_edit = new Array(sidebar_notes, controls, bookmark_controls)
+    update_notes();
+    //var serialized = hltr.serializeHighlights();
+    var updated_content = byId('article_content').innerHTML
+    $.post('/app/article/' + article_uuid + '/highlight-storage', {
+      'updated_content': updated_content
+    }).fail(function () {
+      $('flashMessages').html('<div class="alert alert-danger alert-dismissible fade show" role="alert">Failure!!!!<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>')
+    });
 
-                    if (this.id == 'light-mode') {
+    $('[data-toggle="popover"]').popover()
 
-                      update_editor('light')
-                      elements_to_edit.forEach(function (item) {
-                        item.classList.remove('dark-mode', 'sepia-mode');
-                        item.classList.add('light-mode')
-                      });
 
-                      second_group_to_edit.forEach(function (item) {
-                        item.classList.remove('dark-control-mode', 'sepia-control-mode');
-                        item.classList.add('light-control-mode');
-                      });
+    $('.popover-dismiss').popover({
+      trigger: 'focus'
+    });
 
-                    }
-                    else if (this.id == 'dark-mode') {
 
-                      update_editor('dark')
-                      elements_to_edit.forEach(function (item) {
-                        item.classList.remove('light-mode', 'sepia-mode');
-                        item.classList.add('dark-mode')
-                      });
+  }
 
-                      second_group_to_edit.forEach(function (item) {
-                        item.classList.remove('light-control-mode', 'sepia-control-mode');
-                        item.classList.add('dark-control-mode');
-                      });
-                    }
-                    else if (this.id == 'sepia-mode') {
+});
 
-                      update_editor('sepia')
-                      elements_to_edit.forEach(function (item) {
-                        item.classList.remove('light-mode', 'dark-mode');
-                        item.classList.add('sepia-mode')
-                      });
+//load highlights
+var serialized;
 
-                      second_group_to_edit.forEach(function (item) {
-                        item.classList.remove('dark-control-mode', 'light-control-mode');
-                        item.classList.add('sepia-control-mode');
-                      });
 
-                    }
+$('[data-toggle="popover"]').popover()
 
-                  };
-                }
 
+function SubmitHighlight() {
+  $('#AddHighlightModal').modal('hide');
 
-                var lineheight = document.forms['type-controls'].elements['line-height-options'];
+  var text, notes, topics, doctopics, article_uuid, position, do_not_review
 
-                for (var i = 0; i < lineheight.length; i++) {
-                  lineheight[i].onclick = function () {
+  // text = byId('HighlightField').value
+  text = tinymce.get('HighlightField').getContent();
 
-                    if (this.id == 'line-height-min') {
-                      content.classList.remove('line-height-mid', 'line-height-max')
-                      content.classList.add('line-height-min')
-                    }
-                    else if (this.id == 'line-height-mid') {
-                      content.classList.remove('line-height-min', 'line-height-max')
-                      content.classList.add('line-height-mid')
-                    }
-                    else if (this.id == 'line-height-max') {
-                      content.classList.remove('line-height-min', 'line-height-mid')
-                      content.classList.add('line-height-max')
-                    }
+  // notes = byId('message-text').value
+  notes = tinymce.get('message-text').getContent();
 
-                  };
-                }
+  do_not_review = byId('do_not_review').checked
+  topics = []
+  doctopics = Array.from(byClass('add_highlight_member'))
+  article_uuid = byId('article_uuid').value
+  position = byId('highlight_position').value
 
-                // end type controls
+  doctopics.forEach(t => topics.push(t.innerText))
+  console.log(topics)
+  byId('NewHighlightMembers').innerHTML = ''
 
-              };
+  var data = {
+    text: text,
+    notes: notes,
+    topics: topics,
+    do_not_review,
+    article_uuid: article_uuid,
+    position: position
+  }
 
+  data = JSON.stringify(data)
+  //console.log(data)
 
-            </script>
+  $.post('/app/article/addhighlight', {
+    'data': data
+  }).done(function (data) {
+    AddedHighlight(data)
+  }).fail(function () {
+    FailedToAddHighlight()
+  });
 
+}
 
+var returnedhighlightid;
+var returnedhighlightclass;
 
+function AddedHighlight(data) {
+  byId('do_not_review').checked = false;
+  $('#AddHighlightModal').modal('hide');
+  topics = data['topics']
+  var active = byClass('active')
+  for (var i = active.length - 1; i >= 0; i--) {
+    active[i].classList.remove('active')
+  }
 
 
-            {% endblock %}
+  selectedObj.removeAllRanges();
+  selectedObj.addRange(selectedText);
+  returnedhighlightclass = "highlight" + data['highlight_id'];
+  returnedhighlightid = data['highlight_id'];
+
+  s = `\n<h4><a href="${data['article_url']}?highlight_id=highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><h4>Highlight note:</h4>${data['highlight_notes']}<hr><br>`
+  s2 = `\n<h4><a href="${data['article_url']}?highlight_id=highlight${data['highlight_id']}">Highlight:</a></h4>${data['highlight_text']}<hr><br>`
+
+
+  if (data['highlight_notes'] != '') {
+    tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s)
+
+  }
+  else {
+    tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s2)
+
+  }
+
+
+  hltr.enable();
+  hltr.doHighlight();
+  hltr.disable();
+
+}
+
+function FailedToAddHighlight() {
+  var node = document.createElement('span');
+  node.html('<div class="alert alert-danger alert-dismissible fade show" role="alert">FAIL!!!</div>')
+  document.body.appendChild(node);
+}
+
+
+
+function NewTopic() {
+  $('#CreateTopic').html(`
+    <br>
+    <form method="" action="" novalidate> 
+      <div class = "form-row align-items-center">
+        <div class="col-sm-6 my-1">
+          <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
+          </input>
+        </div> 
+        <div class="col-auto my-1"> 
+          <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
+        </div>  
+        <div class="col-auto my-1"> 
+          <button id = "submit_new_topic" onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
+        </div> 
+      </div> 
+    </form>`);
+
+  input = document.getElementById('addtopicinput')
+  input.addEventListener("keyup", function (event) {
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      // Cancel the default action, if needed
+      event.preventDefault();
+      // Trigger the button element with a click
+      document.getElementById("submit_new_topic").click();
+    }
+  });
+  $('#addtopicinput').trigger('focus');
+
+}
+
+
+function NewTopicSubmit() {
+
+  input = byId('addtopicinput')
+
+  if (input.value === '' || input.value === ' ' || input.value === '  ') {
+    input.classList.add('is-invalid')
+    input.focus();
+  }
+  else {
+
+    $.post('/app/topics/add/from_highlight', {
+      title: input.value
+    }).done(function (response) {
+      $('#topicplaceholder').append(`
+        <label id="label${response['id']}" class="topic-label btn">
+        <input name = "topics" value = "${response["title"]}" type="checkbox">${response["title"]}</label>
+        `);
+
+      document.getElementById("label" + response['id']).click();
+
+      $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>');
+
+    }).fail(function () {
+      byId('CreateTopic').innerHTML = '<div class="alert alert-danger alert-dismissible fade show" role="alert">There is already a topic with that title.<button onclick = "UpdateNewTopic()" type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>'
+    });
+
+  }
+
+
+
+
+}
+
+
+function CancelNewTopic() {
+  $('#CreateTopic').html('<button onclick ="NewTopic()" class="main-button save">Create new topic </button>')
+}
+
+
+$(function () {
+
+  $('[data-toggle="popover"]').popover()
+
+
+  $('.popover-dismiss').popover({
+    trigger: 'focus'
+  });
+
+});
+
+
+
+</script>
+
+<!--
+WYSIWYG Editor
+-->
+
+
+<script>
+var existing_notes = byId('existing_notes').value
+var existing_reflections = byId('articleReflections').value
+
+tinymce.init({
+  selector: '#notes-editor',
+  menubar: 'insert format',
+  resize: 'both',
+  toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
+
+  {% if color == 'dark-mode' %}
+  skin: "oxide-dark",
+  content_css: "dark",
+  {% else %}
+  skin: "oxide",
+  content_css: "light",
+  {% endif %}
+
+  width: 600,
+  height: 400,
+  // image_dimensions: false,
+  object_resizing : true,
+  image_class_list: [
+    { title: 'Width100', value: 'image100' },
+  ],
+  mobile: {
+    width: '100%',
+    height: 400
+  },
+
+  setup: function (editor) {
+    editor.on('init', function (e) {
+      editor.setContent(existing_notes);
+    });
+  }
+
+});
+
+tinymce.init({
+  selector: '#articleReflections',
+  menubar: 'insert format',
+  resize: 'both',
+  toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
+
+  {% if color == 'dark-mode' %}
+  skin: "oxide-dark",
+  content_css: "dark",
+  {% else %}
+  skin: "oxide",
+  content_css: "light",
+  {% endif %}
+
+width: "100%",
+  height: 400,
+    plugins: 'image imagetools lists code link hr',
+      // image_dimensions: false,
+      object_resizing : true,
+        image_class_list: [
+          { title: 'Width100', value: 'image100' },
+        ],
+          mobile: {
+  width: '100%',
+    height: 400
+},
+
+setup: function (editor) {
+  editor.on('init', function (e) {
+    editor.setContent(existing_reflections);
+  });
+}
+
+});
+
+
+
+</script>
+
+
+
+<!--
+End WYSIWYG Editor
+-->
+
+
+<script type="text/javascript">
+
+/* type controls functions */
+
+var size, size_input, increase, decrease, val, content, standard, bookmark_controls, controls, editor, sidebar_button;
+
+highlight_button = byId('infoDiv')
+sidebar_button = byId('sidebar-action-button')
+controls = byId('type-controls')
+bookmark_controls = byId('bookmark-controls')
+editor = byId('notes-form')
+standard = byId('standard')
+content = byId('content');
+bottom = byId('bottom-bar')
+bottom_button = byId('bottombar-action')
+size = byId('font-size-input');
+size_input = byId('font-size-value')
+increase = byId('increase-size')
+decrease = byId('decrease-size')
+
+
+content.addEventListener('click', function () {
+  hide_controls();
+  hide_editor();
+
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+  initialize_controls();
+  var sidebar_notes = byId('sidebar-notes');
+  var bottombar_notes = byId('bottombar-notes');
+  sidebar_notes.addEventListener("click", function () {
+    show_editor();
+  })
+  bottombar_notes.addEventListener("click", function () {
+    show_editor();
+  })
+
+})
+
+/* Save preferences and Send them  */
+
+controls.addEventListener('click', save_preferences);
+
+var time;
+
+function save_preferences() {
+
+  var font, size, spacing, color;
+
+  font = document.forms['type-controls'].elements['font-choice'];
+  for (var i = 0; i < font.length; i++) {
+    if (font[i].checked) {
+      font = font[i].value;
+      break;
+    }
+  }
+
+  color = document.forms['type-controls'].elements['color-mode'];
+  for (var i = 0; i < font.length; i++) {
+    if (color[i].checked) {
+      color = color[i].value;
+      break;
+    }
+  }
+
+  size = byId('font-size-input').value
+
+  spacing = document.forms['type-controls'].elements['line-height-options'];
+  for (var i = 0; i < font.length; i++) {
+    if (spacing[i].checked) {
+      spacing = spacing[i].value;
+      break;
+    }
+  }
+
+
+  var preferences = {
+    'font': font,
+    'color': color,
+    'size': size,
+    'spacing': spacing
+  }
+
+  clearTimeout(time)
+  time = setTimeout(send_preferences.bind(null, preferences), 5000)
+
+
+}
+
+function send_preferences(preferences) {
+
+  $.post('/app/article/preferences', {
+    'Preferences': JSON.stringify(preferences)
+  });
+
+
+}
+
+
+/* end Save Preferences */
+
+/* When the user scrolls down, do x. When the user scrolls up, do y */
+var nav = byId('navigation')
+var prevScrollpos = window.pageYOffset;
+window.onscroll = function () {
+  var currentScrollPos = window.pageYOffset;
+  getScrollPercent()
+  if (prevScrollpos > currentScrollPos) {
+    sidebar_button.style.border = '1px solid';
+
+  } else {
+
+
+    sidebar_button.style.border = "none";
+  }
+  prevScrollpos = currentScrollPos;
+}
+
+function show_bookmarks(event) {
+  console.log('showing bookmarks ???')
+  if (bookmark_controls.style.display === "none") {
+    bookmark_controls.style.display = "block";
+    editor.style.display = "none";
+    controls.style.display = "none"
+
+  }
+  else {
+    bookmark_controls.style.display = "none"
+  }
+}
+
+function showOriginalArticle(url) {
+  window.open(url, "_blank");
+}
+
+
+function show_controls(event) {
+
+  if (controls.style.display === "none") {
+    controls.style.display = "block";
+    editor.style.display = "none"
+    bookmark_controls.style.display = "none"
+
+  }
+  else {
+    controls.style.display = "none"
+  }
+}
+
+function show_editor() {
+  if (editor.style.display === "none") {
+    editor.style.display = "block";
+    controls.style.display = "none"
+    bookmark_controls.style.display = "none"
+
+  }
+  else {
+    editor.style.display = "none"
+  }
+}
+
+
+function hide_controls() {
+  console.log('hiding')
+  controls.style.display = "none"
+  bookmark_controls.style.display = "none"
+  save_preferences()
+  //byId('infoDiv').style.display="none"
+}
+
+function hide_editor() {
+  editor.style.display = "none";
+
+  clearTimeout(timer)
+  timer = setTimeout(update_notes.bind(), 3000)
+
+  //update_notes();
+}
+
+function update_editor(mode) {
+  if (mode == 'dark') {
+    tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'notes-editor');
+
+    tinymce.EditorManager.init({
+      selector: '#notes-editor',
+      menubar: 'insert format',
+      resize: 'both',
+      toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
+      skin: "oxide-dark",
+      content_css: "dark",
+      // image_dimensions: false,
+      object_resizing: true,
+      image_class_list: [
+        { title: 'Width100', value: 'image100' },
+      ],
+
+      mobile: {
+        width: '100%',
+        height: 400
+      }
+
+    });
+
+    tinymce.EditorManager.execCommand('mceAddEditor', true, 'notes-editor');
+  }
+
+  else {
+    tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'notes-editor');
+
+    tinymce.EditorManager.init({
+      selector: '#notes-editor',
+      menubar: 'insert format',
+      resize: 'both',
+      toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image |code',
+      skin: "oxide",
+      content_css: "light",
+      plugins: 'image imagetools lists code link hr',
+      // image_dimensions: false,
+      object_resizing: true,
+      image_class_list: [
+        { title: 'Width100', value: 'image100' },
+      ],
+      mobile: {
+        width: '100%',
+        height: 400
+      }
+    });
+
+    tinymce.EditorManager.execCommand('mceAddEditor', true, 'notes-editor');
+  }
+}
+
+
+
+function initialize_controls() {
+
+  // font-size
+  increase.addEventListener('click', function () {
+
+    size.value++;
+    size_input.innerHTML = size.value
+    val = size.value
+
+    content.classList.add(`size-${val}`)
+    val--
+    content.classList.remove(`size-${val}`)
+    disable_buttons();
+
+  });
+
+  decrease.addEventListener('click', function () {
+
+    size.value--;
+    size_input.innerHTML = size.value
+    val = size.value
+
+    content.classList.add(`size-${val}`)
+    val++
+    content.classList.remove(`size-${val}`)
+
+    disable_buttons();
+
+  });
+
+  function disable_buttons() {
+    val = size.value
+
+    if (val == 1) {
+      decrease.classList.add('disabled')
+    }
+    if (val > 1) {
+      decrease.classList.remove('disabled')
+    }
+    if (val < 15) {
+      increase.classList.remove('disabled')
+    }
+    if (val == 15) {
+      increase.classList.add('disabled')
+    }
+
+
+  }
+
+
+  // font choice
+
+  var font = document.forms['type-controls'].elements['font-choice'];
+
+  for (var i = 0; i < font.length; i++) {
+    font[i].onclick = function () {
+
+      var content = byId('content');
+
+      if (this.id == 'serif') {
+        content.classList.remove('sans-serif');
+        content.classList.add('serif')
+
+      }
+      else if (this.id == 'sans-serif') {
+        content.classList.remove('serif');
+        content.classList.add('sans-serif')
+
+      }
+
+
+    };
+  }
+
+
+  // color mode
+  var color = document.forms['type-controls'].elements['color-mode'];
+
+  for (var i = 0; i < color.length; i++) {
+    color[i].onclick = function () {
+
+      var content = byId('content');
+      var controls = byId('type-controls');
+      var sidebar_notes = byId('notes-form')
+      var sidebar_notes_button = byId('sidebar-notes')
+      var bottombar_notes_button = byId('bottombar-notes')
+
+      var sidebar_bookmarks = byId('sidebar-bookmarks')
+      var bottombar_bookmarks = byId('bottombar-bookmarks')
+
+      var editor = byId('notes-form')
+      var sidebar = byId('sidebar')
+
+      var elements_to_edit = new Array(
+        content, sidebar, sidebar_notes_button,
+        bottombar_notes_button, sidebar_bookmarks, bottombar_bookmarks, bottom, standard, sidebar_button, bottom_button)
+
+      var second_group_to_edit = new Array(sidebar_notes, controls, bookmark_controls)
+
+      if (this.id == 'light-mode') {
+
+        update_editor('light')
+        elements_to_edit.forEach(function (item) {
+          item.classList.remove('dark-mode', 'sepia-mode');
+          item.classList.add('light-mode')
+        });
+
+        second_group_to_edit.forEach(function (item) {
+          item.classList.remove('dark-control-mode', 'sepia-control-mode');
+          item.classList.add('light-control-mode');
+        });
+
+      }
+      else if (this.id == 'dark-mode') {
+
+        update_editor('dark')
+        elements_to_edit.forEach(function (item) {
+          item.classList.remove('light-mode', 'sepia-mode');
+          item.classList.add('dark-mode')
+        });
+
+        second_group_to_edit.forEach(function (item) {
+          item.classList.remove('light-control-mode', 'sepia-control-mode');
+          item.classList.add('dark-control-mode');
+        });
+      }
+      else if (this.id == 'sepia-mode') {
+
+        update_editor('sepia')
+        elements_to_edit.forEach(function (item) {
+          item.classList.remove('light-mode', 'dark-mode');
+          item.classList.add('sepia-mode')
+        });
+
+        second_group_to_edit.forEach(function (item) {
+          item.classList.remove('dark-control-mode', 'light-control-mode');
+          item.classList.add('sepia-control-mode');
+        });
+
+      }
+
+    };
+  }
+
+
+  var lineheight = document.forms['type-controls'].elements['line-height-options'];
+
+  for (var i = 0; i < lineheight.length; i++) {
+    lineheight[i].onclick = function () {
+
+      if (this.id == 'line-height-min') {
+        content.classList.remove('line-height-mid', 'line-height-max')
+        content.classList.add('line-height-min')
+      }
+      else if (this.id == 'line-height-mid') {
+        content.classList.remove('line-height-min', 'line-height-max')
+        content.classList.add('line-height-mid')
+      }
+      else if (this.id == 'line-height-max') {
+        content.classList.remove('line-height-min', 'line-height-mid')
+        content.classList.add('line-height-max')
+      }
+
+    };
+  }
+
+  // end type controls
+
+};
+
+
+</script>
+
+
+
+
+
+{% endblock %}
