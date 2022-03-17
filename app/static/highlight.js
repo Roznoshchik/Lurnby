@@ -1,11 +1,13 @@
 
-var infodiv = document.getElementById('infoDiv');
-var selectedText;
-var content = document.getElementById('content');
+let infodiv = document.getElementById('infoDiv');
+let selectedText;
+let content = document.getElementById('content');
 
-var activeRange;
-var selectedObj;
-var position;
+let activeRange;
+let selectedObj;
+let position;
+let rangyHighlight;
+
 
 
 function textActions(event) {
@@ -26,7 +28,7 @@ function textActions(event) {
   position = scrollPercent * 100;
 
 
-
+  rangyHighlight = rangy.getSelection().toHtml();
 
   selectedObj = window.getSelection();
   highlightText = window.getSelection().toString();
@@ -90,8 +92,8 @@ $('#addhighlight').click(function () {
 $('#AddHighlightModal').on('show.bs.modal', function (event) {
   var button = $(event.relatedTarget) // Button that triggered the modal
   //var rawhighlight = selectedObj.toString() // selected text
-  // var rawhighlight = highlightText;
-  var rawhighlight = rangy.getSelection().toHtml();
+  var rawhighlight = highlightText;
+  //var rawhighlight = rangy.getSelection().toHtml();
 
   selectedObj.removeAllRanges();
 
@@ -100,7 +102,11 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
   // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
   //$('#HighlightField').val(rawhighlight);
   byId('HighlightField').value = rawhighlight
-  tinymce.EditorManager.execCommand('mceSetContent', rawhighlight, 'HighlightField');
+
+  // tinymce.EditorManager.execCommand('mceSetContent', 'youre a rockstar', 'HighlightField');
+  // tinymce.get('HighlightField').setContent( 'rockstar');
+  // tinymce.EditorManager.execCommand('mceSetContent', rangyHighlight, 'HighlightField');
+  // tinymce.EditorManager.execCommand('mceSetContent', rawhighlight, 'HighlightField');
 
 
 
@@ -137,6 +143,11 @@ function showaddhighlightmodal() {
     ],
     mobile: {
       height: 300
+    },
+    setup: function (editor) {
+      editor.on('init', function (e) {
+        editor.setContent(rangyHighlight);
+      });
     }
   });
 

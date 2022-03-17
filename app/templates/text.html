@@ -473,6 +473,9 @@ var current_progress = read_progress
 var topics = [{% for t in topics %}'{{t.title}}', {% endfor %}]
 const notTaggedList = {{ notTaggedList | safe }}
 
+window.onload = function() {
+  rangy.init();
+};
 
 
 
