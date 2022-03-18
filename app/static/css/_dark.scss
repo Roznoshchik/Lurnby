@@ -22,6 +22,22 @@
     background-color: $dark;
     color: #d3d3d3;
 
+    #landing {
+        .copy {
+            color:black;
+        }
+
+        .main-button {
+            background-color: #F9F7F4;
+            color: $dark;
+            border: #9c9894 1px solid;
+
+            &:hover {
+                background-color: $dark;
+                color: #F9F7F4;
+            }
+        }
+    }
 
     #auth_tos_welcome {
         color: $dark;

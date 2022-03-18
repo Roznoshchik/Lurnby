@@ -9304,6 +9304,18 @@ readers do not read off random characters that represent icons */
   background-color: #424242;
   color: #d3d3d3;
 }
+.dark #landing .copy {
+  color: black;
+}
+.dark #landing .main-button {
+  background-color: #F9F7F4;
+  color: #424242;
+  border: #9c9894 1px solid;
+}
+.dark #landing .main-button:hover {
+  background-color: #424242;
+  color: #F9F7F4;
+}
 .dark #auth_tos_welcome {
   color: #424242;
 }
