@@ -557,7 +557,7 @@ function set_position(progress) {
     docBody = document.body,
     scrollBottom = (docElem['scrollHeight'] || docBody['scrollHeight']) - window.innerHeight,
     position = (progress / 100) * scrollBottom;
-  console.log(`\n\n position is: ${position}\n\n`)
+  // console.log(`\n\n position is: ${position}\n\n`)
 
   $window.scrollTop(position)
 
@@ -572,8 +572,8 @@ function set_position(progress) {
 {% if not highlight_id %}
 set_position(read_progress);
 {% else %}
-console.log('I should scroll now ')
-console.log('{{highlight_id }}')
+// console.log('I should scroll now ')
+// console.log('{{highlight_id }}')
 var highlight_position = byId('{{highlight_id}}')
 
 highlight_position.scrollIntoView()
@@ -608,7 +608,7 @@ function getScrollPercent() {
   if (progress > furthest) {
     furthest = progress;
     byId('furthest-read').onclick = function () { go_to_location(furthest) };
-    console.log('will update bookmarks')
+    // console.log('will update bookmarks')
     clearTimeout(timer2)
     timer2 = setTimeout(save_bookmarks, 5000)
 
@@ -715,7 +715,7 @@ function SubmitHighlight() {
   position = byId('highlight_position').value
 
   doctopics.forEach(t => topics.push(t.innerText))
-  console.log(topics)
+  // console.log(topics)
   byId('NewHighlightMembers').innerHTML = ''
 
   var data = {
@@ -1082,7 +1082,7 @@ window.onscroll = function () {
 }
 
 function show_bookmarks(event) {
-  console.log('showing bookmarks ???')
+  // console.log('showing bookmarks ???')
   if (bookmark_controls.style.display === "none") {
     bookmark_controls.style.display = "block";
     editor.style.display = "none";
@@ -1126,7 +1126,7 @@ function show_editor() {
 
 
 function hide_controls() {
-  console.log('hiding')
+  // console.log('hiding')
   controls.style.display = "none"
   bookmark_controls.style.display = "none"
   save_preferences()

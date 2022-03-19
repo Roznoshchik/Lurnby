@@ -23,7 +23,6 @@ function add_bookmark(){
         </svg></button>
     </div>`;
     all_bookmarks[byId('bookmark-name').value] = x
-    console.log(all_bookmarks)
     save_bookmarks();
     byId('bookmark-name').value = '';
 }
@@ -76,7 +75,6 @@ function get_location(){
 }
 
 function save_bookmarks(){
-    console.log('saving bookmarks')
     all_bookmarks['furthest'] = furthest
     let bookmarks = JSON.stringify(all_bookmarks);
     

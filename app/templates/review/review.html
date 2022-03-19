@@ -125,7 +125,6 @@ let highlights = {
 function showNote (id) {
    const highlight = highlights[id];
    const inView = document.getElementById(`highlight-${id}-content`);
-   console.log(inView.innerHTML);
 
    if (highlight.seeing === 'text') {
     inView.innerHTML = highlight.note;

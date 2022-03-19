@@ -2,7 +2,7 @@ var add;
 
 
 function initialize(){
-    console.log('initializing')
+    // console.log('initializing')
     var tagged =  byClass('tagged');
     var untagged = byClass('untagged');
     add = byId('add_new_tag');
@@ -231,7 +231,7 @@ const createEditTag = (tag) => {
 
 const updateTag = (type, id) => {
     const currentName = type == 'tag' ? tags[id].name : topics[id].name
-    console.log(currentName)
+    // console.log(currentName)
     const newName = byId(`${type}-${id}-name`).value;
     let invalid = false;
     for (const [key, value] of Object.entries(type == 'tag' ? tags : topics)) {

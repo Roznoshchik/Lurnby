@@ -86,10 +86,10 @@ function AddToTopic(id, title){
         
         if (target.tagName === "LABEL"){
 
-            console.log(target.firstElementChild.value)
-            console.log(target.classList)
+            // console.log(target.firstElementChild.value)
+            // console.log(target.classList)
             target.classList.toggle('active')
-            console.log(target.classList)
+            // console.log(target.classList)
 
             /*
             var target = e.target
@@ -137,11 +137,11 @@ function initialize_topics(){
                         target.classList.add("active");
                         console.log(target.classList)
                     }
-                    */
-                    console.log(target.firstElementChild.value)
-                    console.log(target.classList)
+                    // */
+                    // console.log(target.firstElementChild.value)
+                    // console.log(target.classList)
                     target.classList.toggle('active')
-                    console.log(target.classList)
+                    // console.log(target.classList)
                 }
             });
         }   
@@ -153,7 +153,7 @@ function initialize_view_topics(){
 
     var all_topics = Array.from(byClass('member'))
 
-    console.log(all_topics)
+    // console.log(all_topics)
     all_topics.forEach( topic => topic.addEventListener("click", function(e){
         e=e || window.event;
         var target = e.target || e.srcElement;
@@ -218,7 +218,7 @@ function ViewHighlight(id){
     .then(data => {
         $('#ViewHighlightModal').html(data['html']);
         nonmember_list = data['nonmember_list'];
-        console.log(nonmember_list)
+        // console.log(nonmember_list)
         add_span = byId('new-topic');
         add = byId('add_new_tag');
         initialize();
@@ -288,7 +288,7 @@ function ViewHighlight(id){
 }
 
 function clearHighlight(item){
-    console.log('removing attributes!')  	
+    // console.log('removing attributes!')  	
     item.removeAttribute('data-highlighted')
     item.removeAttribute('data-toggle')
     item.removeAttribute('data-html')
@@ -307,7 +307,7 @@ function clearHighlight(item){
 function ArchiveHighlight(id){
     if(byId(`highlight-${id}`)){
         byId(`highlight-${id}`).style.display = 'none'
-        console.log('highlight hidden')
+        // console.log('highlight hidden')
     
     url = '/app/archivehighlight/'+id
     $.get(url)
@@ -349,7 +349,7 @@ function ArchiveHighlight(id){
 
 function UnarchiveHighlight(id){
     byId(`highlight-${id}`).style.display = 'none'
-    console.log('highlight hidden')
+    // console.log('highlight hidden')
     
     url = '/app/unarchivehighlight/'+id
     $.get(url)
@@ -387,11 +387,11 @@ function UpdateHighlight(id, review=false){
 
     notes = tinymce.get('view_highlight_notes').getContent()
     highlight = tinymce.get('view_highlight_text').getContent()
-    console.log(highlight)
+    // console.log(highlight)
     untopics = nonmember_list
     activetopics = []
     Array.from(byClass('member')).forEach(t => activetopics.push(t.innerText));
-    console.log(activetopics)
+    // console.log(activetopics)
 
     
     
@@ -410,7 +410,7 @@ function UpdateHighlight(id, review=false){
     
     
     data = JSON.stringify(data)
-    console.log(data)
+    // console.log(data)
        
     url = '/app/view_highlight/' + id
     
@@ -419,7 +419,7 @@ function UpdateHighlight(id, review=false){
     }).done(function( data ) {
         data = JSON.parse(data)
         topics = data['topics']
-        console.log(topics)
+        // console.log(topics)
         // if (typeof apply_filters === "function") { 
         //     console.log('apply filters exists')
         //     apply_filters()

@@ -265,7 +265,7 @@ function filter(){
     }
 
     data = JSON.stringify(data)
-    console.log(data)
+    // console.log(data)
 
     $.post('/app/topics/filter', {
        data:data

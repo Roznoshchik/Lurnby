@@ -49,22 +49,17 @@ function autocomplete(inp, arr, dest, create=false, location) {
                 e=e || window.event;
                 var elem = e.target || e.srcElement;
                 
-                console.log(loc)
 
                 if (loc == 'viewhighlight'){
-                    console.log('loc is viewhighlight')
                     t = make_topic_span(elem.innerHTML, ['topic', 'member'])
                 }
                 else if(loc == 'addhighlight'){
-                    console.log('loc is addhighlight')
                     t = make_topic_span(elem.innerHTML, ['topic', 'add_highlight_member'])
                 }
                 else if(loc == 'filterhighlight'){
-                    console.log('loc is filterhighlight')
                     t = make_topic_span(elem.innerHTML, ['topic', 'filter_highlight_member'])
                 }
                 else if(loc == 'FinishArticleModal'){
-                    // console.log('loc is finishArti')
                     t = make_topic_span(elem.innerHTML, ['topic', 'tagMember'])
                 }
 
@@ -238,7 +233,6 @@ function autocomplete(inp, arr, dest, create=false, location) {
         var inp1 = byId('filter_input'), inp2 = byId("topic_input"), inp3 = byId("new_highlight_topic_input"), inp4 = byId('tag_input')
         for (var i = 0; i < x.length; i++) {
             if (elmnt != inp2 && elmnt != inp1 && elmnt != inp3 && elmnt != inp4) {
-                console.log('closing list')
                 x[i].parentNode.removeChild(x[i]);
             }
             else if(elmnt == null){

@@ -65,7 +65,6 @@ if (see_terms){
 
 if(auth_terms){
     auth_terms.addEventListener('click', function(){
-        console.log('clickedd auth terms button')
         auth_welcome.style.display = "none"
         auth_tos.style.display = "block"
         auth_terms.style.display="none"

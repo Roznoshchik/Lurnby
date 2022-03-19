@@ -467,7 +467,7 @@
             wrapper.setAttribute(DATA_ATTR, "true");
             wrapper.setAttribute('id', returnedhighlightclass);
             wrapper.classList.add(returnedhighlightclass);
-            console.log("\n\n\n adding class \n\n\n\n")
+            // console.log("\n\n\n adding class \n\n\n\n")
             wrapper.setAttribute('tabindex', '0');
             
             wrapper.setAttribute('data-toggle','popover' );
