@@ -2200,7 +2200,7 @@ ul ul a {
   max-width: 100% !important;
 }
 
-.highlight-card img, .highlight-card figure, .modal img, .modal figure {
+.highlight-card img, .highlight-card figure, .modal img, .modal figure, .review-item img, .review-item figure {
   max-width: 100% !important;
   height: auto !important;
 }
@@ -9067,6 +9067,9 @@ readers do not read off random characters that represent icons */
 .review-item {
   max-width: 640px;
   margin: 16px 0 32px 0;
+}
+.review-item .highlight-content {
+  min-height: 150px;
 }
 .review-item .review-actions {
   display: flex;

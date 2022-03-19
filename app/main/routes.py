@@ -1745,9 +1745,13 @@ def review():
                 if len(tiers[i]) > 0:
                     empty = False
                     break
-
+        filtered = {}
+        for highlight in highlights:
+            filtered[highlight.id] = {"text":highlight.text, "note":highlight.note, "seeing":"text"}
+            
         data = {
             'topics': [topic.title for topic in topics],
+            'highlights': filtered,
             'html': render_template('review/filter_review.html', tiers=tiers, 
                                     days=days, empty=empty)
         }
