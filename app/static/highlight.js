@@ -1,7 +1,7 @@
 
 let infodiv = document.getElementById('infoDiv');
 let selectedText;
-let content = document.getElementById('content');
+// let content = document.getElementById('content');
 
 let activeRange;
 let selectedObj;
