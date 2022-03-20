@@ -11,7 +11,7 @@ Here are some of your recent highlights:
 {% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
 From: {{ h.article.title }}
 
-{{ h.text }}
+{{ h.text | safe}}
 
 {{ url }}
 

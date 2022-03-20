@@ -18,7 +18,7 @@
     <div class="card">
         <h6>From: {{ h.article.title }}</h6>
         
-        <p>{{ h.text }}</p>
+        <p>{{ h.text | safe}}</p>
         
         <a class = "main-button" href="{{ url }}">View</a>
     </div>
