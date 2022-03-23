@@ -624,6 +624,7 @@ class Suggestion(db.Model):
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String)  # should I set a max length?
+    sideA = db.Column(db.String) 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),index=True)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), index=True)
     topics = db.relationship(

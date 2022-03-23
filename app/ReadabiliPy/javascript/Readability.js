@@ -1743,7 +1743,7 @@ Readability.prototype = {
 
     var linkLength = 0;
 
-    // XXX implement _reduceNodeList?
+    // implement _reduceNodeList?
     this._forEachNode(element.getElementsByTagName("a"), function(linkNode) {
       linkLength += this._getInnerText(linkNode).length;
     });
@@ -2013,7 +2013,7 @@ Readability.prototype = {
     // Traverse backwards so we can remove nodes at the same time
     // without effecting the traversal.
     //
-    // TODO: Consider taking into account original contentScore here.
+    //  Consider taking into account original contentScore here.
     this._removeNodes(this._getAllNodesWithTag(e, [tag]), function(node) {
       // First check if this node IS data table, in which case don't remove it.
       var isDataTable = function(t) {

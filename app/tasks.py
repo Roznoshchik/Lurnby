@@ -1,14 +1,12 @@
 from datetime import date, datetime, timedelta
-import glob
 import os
+from random import randint
 import sys
 import json
-import boto3
 from rq import get_current_job
 from flask import render_template, url_for
-from flask_login import current_user
-from werkzeug.utils import secure_filename
 from bs4 import BeautifulSoup
+import re
 
 
 from app import create_app, db, s3, bucket
@@ -381,3 +379,28 @@ def set_absolute_urls(aid):
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
+
+
+def create_recall_text(highlightId):
+    highlight = Highlight.query.filter_by(id=highlightId).first()
+    soup = BeautifulSoup(highlight.text, features='lxml')
+    for text in soup.find_all(text=True):
+        words = text.split(' ')
+        if (len(words) > 3):
+            for i in range(0,len(words) // 3):
+                num = randint(0, len(words) -1)
+                words[num] = re.sub('[\w\d]+','_____', words[num])
+        text.replace_with(' '.join(words))
+        
+    highlight.note = soup.prettify()
+    db.session.commit()
+    # text = highlight.text
+    # FIXME
+# for string in soup.strings:
+#     words = string.split(' ')
+#     if (len(words) > 3):
+#         for i in range(0,len(words) // 3):
+#             num = randint(0, len(words) -1)
+#             words[num] = re.sub(r'[\w\d]+','_____', words[num])
+#     string.replace_with(' '.join(words))
+

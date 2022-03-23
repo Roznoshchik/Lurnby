@@ -309,40 +309,37 @@ function ArchiveHighlight(id){
         byId(`highlight-${id}`).style.display = 'none'
         // console.log('highlight hidden')
     
-    url = '/app/archivehighlight/'+id
-    $.get(url)
-    .done(function(){
-        alert = create_alert('alert-danger',`
-        <ul>
-        <li>
-            Highlight has been deleted. <button type="button" data-dismiss="alert" onclick="UnarchiveHighlight(${id})"class="main-button ">UNDO</button>
-        </li>
-        </ul>
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      `)
-        byId('flashMessages').appendChild(alert)
-    });
-
-    }
-    else{
-        highlights = Array.from(byClass(`highlight${id}`))
-        //console.log(highlights)
-        highlights.forEach(clearHighlight)
-        url = `https://${window.location.host}/app/archivehighlight/${id}`
+        url = '/app/archivehighlight/'+id
         $.get(url)
-
-        var updated_content = byId('article_content').innerHTML
-        $.post('/app/article/' + article_uuid + '/highlight-storage', {
-          'updated_content': updated_content
+        .done(function(){
+            alert = create_alert('alert-danger',`
+            <ul>
+            <li>
+                Highlight has been deleted. <button type="button" data-dismiss="alert" onclick="UnarchiveHighlight(${id})"class="main-button ">UNDO</button>
+            </li>
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        `)
+            byId('flashMessages').appendChild(alert)
         });
-
-
-
 
     }
     
+    
+    highlights = Array.from(byClass(`highlight${id}`))
+    console.log(highlights)
+    if (highlights.length > 0) {
+        highlights.forEach(clearHighlight)
+        url = `https://${window.location.host}/app/archivehighlight/${id}`
+        $.get(url)
+    
+        var updated_content = byId('article_content').innerHTML
+        $.post('/app/article/' + article_uuid + '/highlight-storage', {
+            'updated_content': updated_content
+        });
+    }    
     
     
 }

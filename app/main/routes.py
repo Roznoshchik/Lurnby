@@ -1198,6 +1198,7 @@ def unarchiveArticle(uuid):
 def addhighlight():
 
     data = json.loads(request.form['data'])
+   
    # print(data)
     article = Article.query.filter_by(uuid=data['article_uuid']).first()
 
@@ -1237,6 +1238,9 @@ def addhighlight():
 
 
     db.session.commit()
+    # TODO finish creating user task. 
+    current_user.launch_task('create_recall_text', 'Creating highlight recall text', newHighlight.id)
+
     if newHighlight.topics.count() == 0:
         newHighlight.no_topics = True
     else:
