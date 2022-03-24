@@ -124,9 +124,11 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
 
 })
 
+
 function showaddhighlightmodal() {
   tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'HighlightField');
   tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'message-text');
+  tinymce.EditorManager.execCommand('mceRemoveEditor', true, 'highlightPrompt');
 
   tinymce.EditorManager.init({
     selector: '#HighlightField',
@@ -149,6 +151,25 @@ function showaddhighlightmodal() {
         editor.setContent(rangyHighlight);
       });
     }
+  });
+
+  tinymce.EditorManager.init({
+    selector: '#highlightPrompt',
+    menubar: 'insert format',
+    resize: 'vertical',
+    toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image | code',
+    skin: darkModeOn() ? "oxide-dark" : "oxide",
+    content_css: darkModeOn() ? "dark" : "light",
+    plugins: 'image imagetools lists code link hr',
+    // image_dimensions: false,
+    object_resizing: true,
+    image_class_list: [
+      { title: 'Width100', value: 'image100' },
+    ],
+    mobile: {
+      height: 300
+    }
+    
   });
 
   tinymce.EditorManager.init({

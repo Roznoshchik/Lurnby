@@ -385,8 +385,6 @@ aria-labelledby="finishArticleModalLabel" aria-hidden="true">
 </div>
 
 
-
-
 <!-- Add Highlight Modal-->
 <div class="lurnby_modal modal fade" id="AddHighlightModal" tabindex="-1" role="dialog"
 aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
@@ -415,6 +413,10 @@ aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
           {{ form.do_not_review(class="form-control", id="do_not_review") }}
           {{form.do_not_review.label('This highlight should not be reviewed')}}
         </div>
+        <div class="lurnby_data_group form-group">
+          <h6>Add a prompt for review</h6>
+          {{ form.prompt(class="form-control", id="highlightPrompt") }}
+        </div>
 
         <div class="lurnby_data_group">
           <h6 class="inline-block"> Topics:</h6>
@@ -435,13 +437,13 @@ aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
     </div>
     <div class="modal-footer">
       <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
-      <button type="button" onclick="SubmitHighlight()"
+      <button type="button" onclick="SubmitHighlight()" 
         class="main-button add-highlight save">Add</button>
     </div>
-
   </div>
 </div>
 </div>
+
 
 <!-- View Highlight Modal-->
 <div class="modal" id="ViewHighlightModal" tabindex="-1" role="dialog"
@@ -708,6 +710,8 @@ function SubmitHighlight() {
   // notes = byId('message-text').value
   notes = tinymce.get('message-text').getContent();
 
+  highlightPrompt = tinymce.get('highlightPrompt').getContent();
+
   do_not_review = byId('do_not_review').checked
   topics = []
   doctopics = Array.from(byClass('add_highlight_member'))
@@ -722,6 +726,7 @@ function SubmitHighlight() {
     text: text,
     notes: notes,
     topics: topics,
+    prompt:highlightPrompt,
     do_not_review,
     article_uuid: article_uuid,
     position: position
@@ -764,14 +769,10 @@ function AddedHighlight(data) {
 
   if (data['highlight_notes'] != '') {
     tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s)
-
   }
   else {
     tinymce.get('notes-editor').setContent(tinymce.get('notes-editor').getBody().innerHTML + s2)
-
   }
-
-
   hltr.enable();
   hltr.doHighlight();
   hltr.disable();

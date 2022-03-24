@@ -210,7 +210,6 @@ function initialize_view_topics(){
     // }
 }
 
-    
 function ViewHighlight(id){
     url = '/app/view_highlight/' + id
     fetch(url)
@@ -227,9 +226,11 @@ function ViewHighlight(id){
 
         let existingNotes = byId('view_highlight_notes').value
         let existingHighlight = byId('view_highlight_text').value
+        let existingPrompt = byId('view_highlight_prompt').value
 
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_notes');
         tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_text');
+        tinymce.EditorManager.execCommand('mceRemoveEditor',true, 'view_highlight_prompt');
 
         
         tinymce.EditorManager.init({
@@ -252,9 +253,7 @@ function ViewHighlight(id){
                 editor.on('init', function (e) {
                   editor.setContent(`${existingHighlight}`);
                 });
-             }
-            
-            
+             } 
         });
 
         tinymce.EditorManager.init({
@@ -278,7 +277,29 @@ function ViewHighlight(id){
                   editor.setContent(`${existingNotes}`);
                 });
             }
-            
+        });
+
+        tinymce.EditorManager.init({
+            selector: '#view_highlight_prompt',
+            menubar: 'insert format',
+            resize: 'vertical',
+            toolbar: 'styleselect | bold italic underline | numlist bullist | hr | image | code',
+            skin: darkModeOn() ? "oxide-dark":"oxide",
+            content_css: darkModeOn() ? "dark": "light",
+            plugins: 'image imagetools lists code link hr',
+            // image_dimensions: false,
+            object_resizing : true,
+            image_class_list: [
+              {title: 'Width100', value: 'image100'},
+            ], 
+            mobile: {
+                height:300
+            },
+            setup: function (editor) {
+                editor.on('init', function (e) {
+                  editor.setContent(`${existingPrompt}`);
+                });
+            }
         });
 
         $('#ViewHighlightModal').modal('toggle')
@@ -371,30 +392,28 @@ function UnarchiveHighlight(id){
 
 
 
-    
+
 function UpdateHighlight(id, review=false){
     $('#ViewHighlightModal').modal('hide')
     
     var doc_tags,tags,untags, doc_topics, activetopics, untopics, notes, highlight, topicspace
     
-
     // notes = byId('view_highlight_notes').value
     // highlight = byId('view_highlight_text').value
-   
 
     notes = tinymce.get('view_highlight_notes').getContent()
     highlight = tinymce.get('view_highlight_text').getContent()
+    highlightPrompt = tinymce.get('view_highlight_prompt').getContent()
     // console.log(highlight)
     untopics = nonmember_list
     activetopics = []
     Array.from(byClass('member')).forEach(t => activetopics.push(t.innerText));
     // console.log(activetopics)
-
-    
     
     data = {
         'notes': notes,
         'highlight':highlight,
+        'prompt': highlightPrompt,
         'topics':activetopics,
         'untopics':untopics,
         // 'tags':tags,

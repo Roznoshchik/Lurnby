@@ -2,7 +2,6 @@
 {% block style %}
 <style>
    
-
 </style>
 {% endblock %}
 
@@ -68,7 +67,7 @@
                 <div class="underline"></div>
 
                 <div class="review-content">
-                    <div id = "highlight-{{highlight.id}}-content" class="highlight-content">{{highlight.text | safe}}</div>
+                    <div id = "highlight-{{highlight.id}}-content" class="highlight-content">{{highlight.prompt | safe}}</div>
                     <div id ="highlight-{{highlight.id}}-actions" class="review-actions">
                         <button class="main-button view_highlight" onclick="ViewHighlight({{ highlight.id }})">
                             <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#424242"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 5.83L15.17 9l1.41-1.41L12 3 7.41 7.59 8.83 9 12 5.83zm0 12.34L8.83 15l-1.41 1.41L12 21l4.59-4.59L15.17 15 12 18.17z"/></svg>                        
@@ -115,8 +114,8 @@ let highlights = {
             {% set highlight = tiers[tier][number] %}
             {{highlight.id}} :{ 
             text: `{{highlight.text | safe }}`, 
-            note: `{{ highlight.note | safe}}`, 
-            seeing: 'text'
+            prompt: `{{ highlight.prompt | safe}}`, 
+            seeing: 'prompt'
             },
         {% endfor %}
     {% endfor %}
@@ -127,8 +126,8 @@ function showNote (id) {
    const inView = document.getElementById(`highlight-${id}-content`);
 
    if (highlight.seeing === 'text') {
-    inView.innerHTML = highlight.note;
-    highlight.seeing = 'note';
+    inView.innerHTML = highlight.prompt;
+    highlight.seeing = 'prompt';
    } else {
     inView.innerHTML = highlight.text;
     highlight.seeing = 'text';

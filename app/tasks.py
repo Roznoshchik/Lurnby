@@ -379,8 +379,9 @@ def set_absolute_urls(aid):
         app.logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
-
-
+  
+# Also consider changing the algorithm for finding the spaces
+# to be a bit more sophisticated.
 def create_recall_text(highlightId):
     highlight = Highlight.query.filter_by(id=highlightId).first()
     soup = BeautifulSoup(highlight.text, features='lxml')
@@ -392,15 +393,7 @@ def create_recall_text(highlightId):
                 words[num] = re.sub('[\w\d]+','_____', words[num])
         text.replace_with(' '.join(words))
         
-    highlight.note = soup.prettify()
+    highlight.prompt = soup.prettify()
     db.session.commit()
-    # text = highlight.text
-    # FIXME
-# for string in soup.strings:
-#     words = string.split(' ')
-#     if (len(words) > 3):
-#         for i in range(0,len(words) // 3):
-#             num = randint(0, len(words) -1)
-#             words[num] = re.sub(r'[\w\d]+','_____', words[num])
-#     string.replace_with(' '.join(words))
+
 

@@ -42,6 +42,7 @@ class AddTopicForm(FlaskForm):
 class AddHighlightForm(FlaskForm):
     text = TextAreaField('Highlight')
     note = TextAreaField('Add a note or description')
+    prompt = TextAreaField('Add a prompt for reviewing')
     position = DecimalField(places=3, rounding=None, use_locale=False)
     do_not_review = BooleanField()
 

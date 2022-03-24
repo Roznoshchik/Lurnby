@@ -1201,13 +1201,13 @@ def addhighlight():
    
    # print(data)
     article = Article.query.filter_by(uuid=data['article_uuid']).first()
-
     newHighlight = Highlight(user_id=current_user.id,
                              article_id=article.id,
                              position=data['position'],
                              text=data['text'],
                              do_not_review=data['do_not_review'],
-                             note=data['notes'], archived=False)
+                             note=data['notes'],prompt=data['prompt'],
+                             archived=False)
 
     db.session.add(newHighlight)
     
@@ -1238,8 +1238,8 @@ def addhighlight():
 
 
     db.session.commit()
-    # TODO finish creating user task. 
-    current_user.launch_task('create_recall_text', 'Creating highlight recall text', newHighlight.id)
+    if newHighlight.prompt == '':
+        current_user.launch_task('create_recall_text', 'Creating highlight recall text', newHighlight.id)
 
     if newHighlight.topics.count() == 0:
         newHighlight.no_topics = True
@@ -1255,6 +1255,7 @@ def addhighlight():
         'highlight_id': newHighlight.id,
         'highlight_text': newHighlight.text,
         'highlight_notes': newHighlight.note,
+        'highlight_prompt': newHighlight.prompt,
         'article_url': article_url,
         'topics': [t.title for t in Topic.query.filter_by(user_id=current_user.id, archived=False).order_by(Topic.last_used.desc()).all()]
     })
@@ -1290,6 +1291,7 @@ def view_highlight(id):
     if request.method == 'GET':
         form.text.data = highlight.text
         form.note.data = highlight.note
+        form.prompt.data = highlight.prompt
         topics_list = [t.title for t in Topic.query.filter_by(archived=False, user_id=current_user.id).all()]
         nonmember_list = [t.title for t in nonmember]
         html = render_template('highlight.html', user=current_user,
@@ -1304,9 +1306,9 @@ def view_highlight(id):
     if request.method == 'POST':
 
         data = json.loads(request.form['data'])
-
         highlight.text = data['highlight']
         highlight.note = data['notes']
+        highlight.prompt = data['prompt']
         highlight.do_not_review = data['do_not_review']
 
         members = data['topics']
@@ -1346,96 +1348,7 @@ def view_highlight(id):
 
         topics_list = [t.title for t in current_user.topics.order_by(Topic.last_used.desc()).all()]
 
-        # checks to see if the update highlight request is on the topics page
-        if (data['topics-page'] == 'true'):
-
-            # checks to see if the view was filtered
-            if (
-                    (data['atags'] and data['atags'] != [])
-                    or (data['atopics'] and data['atopics'] != [])
-                    ):
-
-                # tag_ids = data['atags']
-                topic_ids = data['atopics']
-                active_tags = []
-                active_topics = []
-
-                # if tag_ids != [] and tag_ids:
-                #     active_tags = Tag.query.filter(Tag.id.in_(tag_ids)).all()
-                #     t_hid = tags_highlights.c.highlight_id
-
-                #     h = Highlight.query \
-                #         .filter_by(user_id=current_user.id,
-                #                    archived=False
-                #                    ).join(tags_highlights,
-                #                           (t_hid == Highlight.id))
-
-                #     highlights = h.filter(tags_highlights.c.tag_id.in_(tag_ids)
-                #                           ).all()
-                # else:
-                #     highlights = Highlight.query \
-                #                  .filter_by(user_id=current_user.id,
-                #                             archived=False).all()
-
-                if topic_ids != [] and topic_ids:
-                    active_topics = Topic.query.filter(Topic.id.in_(topic_ids)
-                                                       ).all()
-
-                    topics = Topic.query.filter_by(archived=False,
-                                                   user_id=current_user.id)
-
-                    topics = topics.filter(Topic.id.in_(topic_ids)).all()
-                else:
-                    topics = Topic.query.filter_by(archived=False,
-                                                   user_id=current_user.id
-                                                   ).order_by(Topic.last_used.desc()).all()
-
-                notopics = []
-
-                for highlight in highlights:
-                    if highlight.not_added_topic():
-                        notopics.append(highlight)
-
-                filter_topics = Topic.query.filter_by(archived=False,
-                                                      user_id=current_user.id
-                                                      ).all()
-
-                return render_template('topics_all.html',
-                                       active_tags=active_tags,
-                                       active_topics=active_topics,
-                                       user=current_user,
-                                       filter_topics=filter_topics,
-                                       topics=topics, highlights=highlights,
-                                       notopics=notopics)
-
-            # if no filters active
-            topics = Topic.query.filter_by(archived=False,
-                                           user_id=current_user.id).all()
-
-            highlights = Highlight.query.filter_by(user_id=current_user.id,
-                                                   archived=False).all()
-
-            notopics = []
-
-            for highlight in highlights:
-                if highlight.not_added_topic():
-                    notopics.append(highlight)
-
-            active_topics = []
-            active_tags = []
-
-            filter_topics = Topic.query.filter_by(archived=False,
-                                                  user_id=current_user.id
-                                                  ).all()
-
-            return render_template('topics_all.html', active_tags=active_tags,
-                                   active_topics=active_topics,
-                                   user=current_user,
-                                   filter_topics=filter_topics,
-                                   topics=topics, highlights=highlights,
-                                   notopics=notopics)
-
-        return (json.dumps({'success': True, 'topics':topics_list}),
+        return (json.dumps({'success': True}),
                 200, {'ContentType': 'application/json'})
 
 
@@ -1449,8 +1362,6 @@ def archivehighlight(id):
 
     highlight.archived = True
     db.session.commit()
-
-    
 
     return (json.dumps({'success': True}),
             200, {'ContentType': 'application/json'})
@@ -1468,6 +1379,7 @@ def unarchivehighlight(id):
 
     return (json.dumps({'success': True}),
         200, {'ContentType': 'application/json'})
+
 
 ##########################
 #                        #
@@ -1673,37 +1585,6 @@ def highlights():
                            review_streak=review_streak, 
                            filtered_count=filtered_count)
 
-
-@bp.route('/topics', methods=['GET', 'POST'])
-@login_required
-def topics():
-
-    pass
-
-
-@bp.route('/topics/add', methods=['POST'])
-@login_required
-def add_new_topic():
-
-    pass
-
-
-@bp.route('/topics/rename/<id>', methods=['POST'])
-@login_required
-def rename_topic(id):
-    pass
-
-@bp.route('/archivetopic/<topic_id>', methods=['POST'])
-@login_required
-def archivetopic(topic_id):
-
-    pass
-
-@bp.route('/unarchivetopic/<topic_id>', methods=['POST'])
-@login_required
-def unarchivetopic(topic_id):
-    pass
-
 @bp.route('/review', methods=['GET', 'POST'])
 @login_required
 def review():
@@ -1751,7 +1632,7 @@ def review():
                     break
         filtered = {}
         for highlight in highlights:
-            filtered[highlight.id] = {"text":highlight.text, "note":highlight.note, "seeing":"text"}
+            filtered[highlight.id] = {"text":highlight.text, "prompt":highlight.prompt, "seeing":"text"}
             
         data = {
             'topics': [topic.title for topic in topics],
@@ -1762,7 +1643,6 @@ def review():
 
         return json.dumps(data)
         
-
 
     return render_template('review/review.html', topics=topics, tiers=tiers, days=days, empty=empty)
 
