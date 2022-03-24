@@ -1,5 +1,4 @@
 from app import db
-from app.tasks import create_recall_text
 from app.models import Highlight, Topic
 
 
