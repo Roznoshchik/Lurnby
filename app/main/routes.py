@@ -1632,7 +1632,7 @@ def review():
                     break
         filtered = {}
         for highlight in highlights:
-            filtered[highlight.id] = {"text":highlight.text, "prompt":highlight.prompt, "seeing":"text"}
+            filtered[highlight.id] = {"text":highlight.text, "prompt":highlight.prompt, "seeing":"prompt"}
             
         data = {
             'topics': [topic.title for topic in topics],
