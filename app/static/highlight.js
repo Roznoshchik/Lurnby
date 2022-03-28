@@ -113,6 +113,7 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
   byId('highlight_position').value = highlight_position
   //$('#highlight_position').val(highlight_position);
   byId('message-text').value = '';
+  byId('highlightPrompt').value = '';
   var add_highlight_nonmember_list = Array.from(topics)
   autocomplete(byId("new_highlight_topic_input"), add_highlight_nonmember_list, byId('NewHighlightMembers'), create = true, 'addhighlight');
 
