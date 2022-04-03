@@ -15,12 +15,16 @@ def delete_user(u):
     comms = u.comms
     for h in highlights:
         db.session.execute(f'DELETE from highlights_topics where highlight_id={h.id}')
+        db.session.execute(f'DELETE from tags_highlights where highlight_id={h.id}')
         db.session.delete(h)
     for t in topics:
         db.session.execute(f'DELETE from highlights_topics where topic_id={t.id}')
+        db.session.execute(f'DELETE from tags_topics where topic_id={t.id}')
         db.session.delete(t)
     for t in tags:
         db.session.execute(f'DELETE from tags_articles where tag_id={t.id}')
+        db.session.execute(f'DELETE from tags_highlights where tag_id={t.id}')
+        db.session.execute(f'DELETE from tags_topics where tag_id={t.id}')
         db.session.delete(t)
     for a in articles:
         db.session.execute(f'DELETE from tags_articles where article_id={a.id}')
