@@ -9069,7 +9069,7 @@ readers do not read off random characters that represent icons */
   margin: 16px 0 32px 0;
 }
 .review-item .highlight-content {
-  min-height: 150px;
+  margin-bottom: 48px;
 }
 .review-item .review-actions {
   display: flex;
