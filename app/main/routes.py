@@ -742,6 +742,8 @@ def add_article():
                 db.session.add(t)
                 new_article.AddToTag(t)
             else:
+                if (t.archived):
+                    t.archived = False
                 new_article.AddToTag(t)
             
     db.session.commit()
@@ -1001,10 +1003,14 @@ def mark_read(uuid):
             if not tag:
                 tag = Tag(name=t, user_id=current_user.id)
                 db.session.add(tag)
+            if t.archived:
+                t.archived = False
             article.AddToTag(tag)
         for t in data['notTaggedList']:
             tag = Tag.query.filter_by(name=t).first()
             if tag:
+                if t.archived:
+                    t.archived = False
                 article.RemoveFromTag(tag)
         db.session.commit()
 
@@ -1113,6 +1119,8 @@ def updateArticle(uuid):
                     ev = Event.add('added tag')
                     if ev:
                         db.session.add(ev)
+                if t.archived:
+                    t.archived = False
                 article.AddToTag(t)
 
             for tag in data['remove_tags']:
