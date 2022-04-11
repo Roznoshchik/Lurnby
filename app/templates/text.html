@@ -89,6 +89,9 @@
 
         </button></p>
       {% endif %}
+      {% if not progress %}
+        {% set progress = 0 %}
+      {% endif %}
       <p class="ml-auto small"><span id="overview-progress">{{progress|round|int}}</span>%</p>
     </div>
 

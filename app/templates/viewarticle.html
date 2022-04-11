@@ -19,7 +19,11 @@
             <div class="modal-body">
                 <div class = "lurnby_data_group article_data_group form-group">
                     <h6>Read: </h6>
-                    <p class = "not-editing" id="article_progress">{{ article.progress|round|int}}%</p>
+                    {% if not article.progress %}
+                        <p class = "not-editing" id="article_progress">0%</p>
+                    {% else %}
+                        <p class = "not-editing" id="article_progress">{{ article.progress|round|int}}%</p>
+                    {% endif %}
                 
                     <select class="reg-select editing " id="read_edit">
                         {%if article.done == true %}
@@ -31,8 +35,12 @@
                         <option value="read"  >Mark read</option>
                         <option value="unread" selected>Mark unread</option>
                         {% else %}
-                        <option value="keep" selected>{{ article.progress|round|int}}%</option>
-                        <option value="read"  >Mark read</option>
+                        {% if not article.progress %}
+                            <option value="keep" selected>0%</option>
+                        {% else %}
+                            <option value="keep" selected>{{ article.progress|round|int}}%</option>
+                        {% endif %}
+                            <option value="read"  >Mark read</option>
                         <option value="unread">Mark unread</option>
                         {% endif %}
                     </select>
