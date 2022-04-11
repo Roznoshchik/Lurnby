@@ -11,6 +11,8 @@ def verify_password(username, password):
 
     if username and password:
         user = User.query.filter_by(username=username).first()
+        if not user:
+            user = User.query.filter_by(email=username).first()
         if user and user.check_password(password):
             return user
 
