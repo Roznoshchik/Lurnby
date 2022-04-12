@@ -999,7 +999,7 @@ def mark_read(uuid):
 
         for t in data['taggedList']:
             print(t)
-            tag = Tag.query.filter_by(name=t).first()
+            tag = Tag.query.filter_by(name=t, user_id=current_user.id).first()
             if not tag:
                 tag = Tag(name=t, user_id=current_user.id)
                 db.session.add(tag)
@@ -1007,7 +1007,7 @@ def mark_read(uuid):
                 t.archived = False
             article.AddToTag(tag)
         for t in data['notTaggedList']:
-            tag = Tag.query.filter_by(name=t).first()
+            tag = Tag.query.filter_by(name=t, user_id=current_user.id).first()
             if tag:
                 if t.archived:
                     t.archived = False
