@@ -73,6 +73,8 @@ def add_article(id):
 
     for tag_name in data['tags']:
         tag = Tag.query.filter_by(name=tag_name).first()
+        if tag.archived:
+            tag.archived = False
         article.AddToTag(tag)
 
     db.session.commit()

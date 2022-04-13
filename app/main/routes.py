@@ -1003,14 +1003,14 @@ def mark_read(uuid):
             if not tag:
                 tag = Tag(name=t, user_id=current_user.id)
                 db.session.add(tag)
-            if t.archived:
-                t.archived = False
+            if tag.archived:
+                tag.archived = False
             article.AddToTag(tag)
         for t in data['notTaggedList']:
             tag = Tag.query.filter_by(name=t, user_id=current_user.id).first()
             if tag:
-                if t.archived:
-                    t.archived = False
+                if tag.archived:
+                    tag.archived = False
                 article.RemoveFromTag(tag)
         db.session.commit()
 

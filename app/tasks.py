@@ -295,6 +295,8 @@ def bg_add_article(u, a_id, pdf, epub, tags):
                     article.AddToTag(t)
 
                 else:
+                    if t.archived:
+                        t.archived = False
                     article.AddToTag(t)
 
             db.session.commit()
@@ -328,6 +330,8 @@ def bg_add_article(u, a_id, pdf, epub, tags):
                     new_article.AddToTag(t)
 
                 else:
+                    if t.archived:
+                        t.archived = False
                     new_article.AddToTag(t)
 
             db.session.commit()
