@@ -151,6 +151,12 @@ function showaddhighlightmodal() {
       editor.on('init', function (e) {
         editor.setContent(rangyHighlight);
       });
+      editor.on('keydown', function (e) {
+        if (e.altKey && e.keyCode === 13 && e.shiftKey) {
+          document.getElementById('newHighlightSubmit').click()
+        }
+      });
+
     }
   });
 
@@ -169,8 +175,14 @@ function showaddhighlightmodal() {
     ],
     mobile: {
       height: 300
+    },
+    setup: function (editor) {
+      editor.on('keydown', function (e) {
+        if (e.altKey && e.keyCode === 13 && e.shiftKey) {
+          document.getElementById('newHighlightSubmit').click()
+        }
+      });
     }
-    
   });
 
   tinymce.EditorManager.init({
@@ -188,6 +200,13 @@ function showaddhighlightmodal() {
     ],
     mobile: {
       height: 300
+    },
+    setup: function (editor) {
+      editor.on('keydown', function (e) {
+        if (e.altKey && e.keyCode === 13 && e.shiftKey) {
+          document.getElementById('newHighlightSubmit').click()
+        }
+      });
     }
   });
 

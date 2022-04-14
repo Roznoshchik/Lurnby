@@ -439,8 +439,9 @@ aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
       </form>
     </div>
     <div class="modal-footer">
-      <button type="button" class="main-button cancel" data-dismiss="modal">Cancel</button>
-      <button type="button" onclick="SubmitHighlight()" 
+      <button type="button" class="main-button cancel" onclick="resetHighlightForm()" data-dismiss="modal">Cancel</button>
+      <button 
+        id="newHighlightSubmit" type="button" onclick="SubmitHighlight()" 
         class="main-button add-highlight save">Add</button>
     </div>
   </div>
@@ -482,7 +483,16 @@ window.onload = function() {
   rangy.init();
 };
 
+document.getElementById('AddHighlightModal').addEventListener('keydown', (e)=> {
+  if (e.altKey && e.keyCode === 13 && e.shiftKey) {
+    console.log('click happening.')
+    document.getElementById('newHighlightSubmit').click()
+  }
+})
 
+function resetHighlightForm() {
+  document.getElementById('SubmitHighlightForm').reset()
+}
 
 // show onboarding
 {% if current_user.highlights.filter_by(archived = False).count() == 0 %}
