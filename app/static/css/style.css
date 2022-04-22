@@ -9089,11 +9089,11 @@ readers do not read off random characters that represent icons */
   margin-right: 0px;
 }
 .review-item .review-actions .review-outcome button {
-  width: 88px;
+  width: auto;
 }
-@media (max-width: 374px) {
+@media (min-width: 376px) {
   .review-item .review-actions .review-outcome button {
-    width: 75px;
+    width: 88px;
   }
 }
 

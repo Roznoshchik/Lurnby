@@ -27,12 +27,12 @@
             }
 
             button{
-                width: 88px;
+                width: auto;
             }
-
-            @media(max-width: 374px){
+        
+            @media(min-width: 376px){
                 button{
-                    width: 75px;
+                    width: 88px;
                 }
             }
 
