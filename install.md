@@ -1,5 +1,4 @@
 # Installing locally
-
 To run the following things should be installed on the system. 
 
 - Python
@@ -26,9 +25,4 @@ The app also uses some apis to do what it needs to do.
 - google for auth
 - sendgrid for sending emails.
 
-These need to be set in a .env file. 
-
-## local only
-This setup above is really made for hosting on the web. If running locally then redis and and the background workers aren't really necessary. 
-
-Also images from epubs are stored in s3, so if meant to be run locally, then that code would need to change to remove the url rewrite for where to get the images and change it to pull from a local storage. 
+These need to be set in a .env file, see the .env.example file. 

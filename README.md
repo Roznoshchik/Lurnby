@@ -1,45 +1,26 @@
 # Lurnby
+A tool for building a personal knowledge practice. Lurnby helps you read and remember more. It works with web articles and epubs, allowing you to highlight, categorize, and review your content with active recall and spaced reptition tools. 
 
-A tool aimed at helping people learn better by allowing for more streamlined ways to interact with the material. 
+## Backend
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
+![Postgres](https://img.shields.io/badge/postgres-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
+![Redis](https://img.shields.io/badge/redis-%23DD0031.svg?style=for-the-badge&logo=redis&logoColor=white)
+<img style="background-color:white" src="https://www.sqlalchemy.org/img/sqla_logo.png" height="28px">
 
-At a basic level the tool is able to pull in content from the web and cleans it up to remove ads, scripts, and distracting materials. 
+## Frontend
 
-Then the tool helps you interact with the content by allowing you to create notes and highlights.
-
-Highlights can be tagged for sorting, filtering, and review.  
-
-Each note or highlight can then be filed away into a relational database with other such material. 
-
-This allows you to start building themes and connections between the material you are reading, ultimately helping you create a latticework and structure on which new information can be added. 
-
-At a very basic level, this process helps you remember more of what you read. 
-
-The application has a built in review feature with a primitive spaced repetition algorithm.
-
-
-
-## status
-Currently works with epubs, blog posts, and emailed content. 
-
-PDF parsing works, but is spotty. Notably graphs and tables, and other content doesn't load properly. So it isn't that good for medical articles and the like. 
-
-Epubs are loaded as a single long file, so optimizations can be done on that front. 
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+![SASS](https://img.shields.io/badge/SASS-hotpink.svg?style=for-the-badge&logo=SASS&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+<img style="background-color:white" src="https://jinja.palletsprojects.com/en/3.1.x/_images/jinja-logo.png" height="28px">
 
 ## Screenshots
-### Main page
-![main page](app/static/images/screenshots/homepage.png)
+![Mobile](./app/static/images/lurnbyMobileScreens.png)
+![Desktop](./app/static/images/lurnby%20desktop.png)
 
-### add article
-![add article](app/static/images/screenshots/addarticle.png)
+## Getting Started
+Instructions for getting the app up and running are documented in the [Install.md](./install.md) script. 
 
-### reading dark mode
-![reading dark mode](app/static/images/screenshots/readingdark.png)
-
-### reading light mode
-![reading light mode](app/static/images/screenshots/readinglight.png)
-
-### highlights
-![highlights](app/static/images/screenshots/highlights.png)
-
-### review
-![review](app/static/images/screenshots/review.png)
+## Contributing
+Contributions are welcome. Features and issues are documented in the [github issues](https://github.com/Roznoshchik/Lurnby/issues) tab. Fork the repo and submit a pull request for review. 
