@@ -17,7 +17,7 @@ A tool for building a personal knowledge practice. Lurnby helps you read and rem
 
 ## Screenshots
 ![Mobile](./app/static/images/lurnbyMobileScreens.png)
-![Desktop](./app/static/images/lurnby%20desktop.png)
+![Desktop](./app/static/images/lurnbyDesktop.png)
 
 ## Getting Started
 Instructions for getting the app up and running are documented in the [Install.md](./install.md) script. 
