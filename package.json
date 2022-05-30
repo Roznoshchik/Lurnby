@@ -19,6 +19,6 @@
   "homepage": "https://github.com/alan-turing-institute/ReadabiliPy",
   "dependencies": {
     "jsdom": ">=12.2.0",
-    "minimist": "^1.2.5"
+    "minimist": "^1.2.6"
   }
 }
