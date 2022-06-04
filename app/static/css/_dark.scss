@@ -21,6 +21,10 @@
 .dark {
     background-color: $dark;
     color: #d3d3d3;
+    
+    pre {
+        color: #d3d3d3;
+    }
 
     #landing {
         .copy {
