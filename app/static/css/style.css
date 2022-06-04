@@ -9307,6 +9307,9 @@ readers do not read off random characters that represent icons */
   background-color: #424242;
   color: #d3d3d3;
 }
+.dark pre {
+  color: #d3d3d3;
+}
 .dark #landing .copy {
   color: black;
 }
