@@ -445,7 +445,7 @@ def add_by_email():
 
             if subject:
                 # Strip "Fwd: " from subject lines
-                stripped_subject = re.sub("Fwd: ", "", subject)
+                stripped_subject = re.sub("Fwd: ", "", subject, flags=re.IGNORECASE))
                 title = stripped_subject
                 
             else:
