@@ -26,7 +26,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     MAIL_DEBUG = False
-    ADMINS = ['team@lurnby.com']
+    ADMINS = ['Lurnby <team@lurnby.com>']
     REDIS_URL = os.environ.get('REDIS_URL') or 'redis://'
     SERVER_NAME = os.environ.get('SERVER_NAME')
     PREFERRED_URL_SCHEME = 'https'
