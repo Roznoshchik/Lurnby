@@ -15,8 +15,8 @@
     {% for h in highlights %}
     {% set url = url_for('main.article', uuid=h.article.uuid, _external=True) + '?highlight_id=highlight' + h.id|string %}
 
-    <div class="card">
-        <h6>From: {{ h.article.title }}</h6>
+    <div class="card" style="border-bottom: 1px solid black;padding-bottom: 15px;">
+        <h4><span style="background-color: yellow;">From: {{ h.article.title }}</span></h4>
         
         <p>{{ h.text | safe}}</p>
         
