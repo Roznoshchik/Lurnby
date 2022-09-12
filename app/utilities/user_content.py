@@ -3,29 +3,21 @@ from app.email import send_email
 from app.models import Highlight, User, Message, Comms
 import random
 from datetime import datetime, timedelta
-from calendar import timegm
 
-import json
-from flask import url_for, render_template, current_app
+from flask import  render_template, current_app
 
 def get_recent_highlights():
     print('checking if highlights email needs to be sent out.')
     users = User.query.join(Comms, (Comms.user_id == User.id)).filter(Comms.highlights == True, User.deleted == False, User.test_account == False).all()
     today = datetime.utcnow()
     last_week = today - timedelta(days=7)
-    #nine_am = datetime(today.year, today.month, today.day, 8, 53, 0, 0)
-    # nine_am = datetime(today.year, today.month, today.day, 21, 7, 0, 0)
-    # if today > nine_am:
-    #     print('tomorrow')
-    #     nine_am = nine_am + timedelta(days=1)
-    # send_at = timegm(nine_am.utctimetuple())
-    # headers = {'send_at': send_at}
 
     for u in users:
 
         msg = u.messages.filter(Message.name == 'recent highlights', Message.date > last_week).first()
         if not msg:
             highlights = u.highlights.order_by(Highlight.created_date.desc()).filter(Highlight.review_date < last_week, Highlight.archived==False, Highlight.do_not_review == False).all()
+            highlights = u.highlights.all()
             recent = []
             if len(highlights) > 1:
                 if len(highlights) < 6:
@@ -48,7 +40,6 @@ def get_recent_highlights():
                 db.session.add(msg)
                 db.session.commit()
                 print(f'sent recent highlights to user {u.id}')
-                #print(render_template('email/content/recent_highlights.html', highlights=recent))
             else: 
                 print('no highlights qualified') 
             
