@@ -17,7 +17,6 @@ def get_recent_highlights():
         msg = u.messages.filter(Message.name == 'recent highlights', Message.date > last_week).first()
         if not msg:
             highlights = u.highlights.order_by(Highlight.created_date.desc()).filter(Highlight.review_date < last_week, Highlight.archived==False, Highlight.do_not_review == False).all()
-            highlights = u.highlights.all()
             recent = []
             if len(highlights) > 1:
                 if len(highlights) < 6:
