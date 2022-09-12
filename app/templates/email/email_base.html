@@ -1,77 +1,84 @@
-<style>
-    body {
-        background-color: #F9F7F4;
-    }
-    
-    h6{
-        color:#424242;
-        font-size: 1.2rem;
-        font-weight: 700;
-        margin: 8px 0;
-    }
-    
-    p {
-        color: #424242;
-        font-size: 1rem;
-    }
-    
-    .card {
-        max-width: 650px;
-        padding: 1.25rem;
-        background-color: #fff;
-        border-radius: 6px;
-        border: none;
-        box-shadow:0 .5em 1em -.125em rgba(10,10,10,.1),0 0 0 1px rgba(10,10,10,.02);
-        margin-bottom:24px;
-    }
-    
-    .main-button {
-        color: #424242;
-        background: #F9F7F4;
-        border-radius:0;
-        margin: 16px 0;
-        padding: 8px 16px;
-        border: #424242 1px solid;
-        text-decoration: none;
-    
-    }
-    .main-button:hover{
-        color: white;
-        background: #424242;
-    
-    }
-    
-    a{
-        display: inline-block;
-    }
+<head>
+    <style>
+        body {
+            background-color: #F9F7F4;
+        }
 
-    .footer{
-        padding: 44px 0px;
-        display: block;
-        text-align: center;
-        width: 100%;
-        background-color: #dbdbdb;
-    }
+        h6 {
+            color: #424242;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin: 8px 0;
+        }
 
-    .footer a, .footer p{
-        font-size: 12px;
-    }
-    .logo {
-        display: flex;
-        justify-content: center;
-    }
-    .main {
-        padding: 8px;
-    }
+        p {
+            color: #424242;
+            font-size: 1rem;
+        }
 
-        
-    {% block css %} {%endblock %}
+        .card {
+            max-width: 650px;
+            padding: 1.25rem;
+            background-color: #fff;
+            border-radius: 6px;
+            border: none;
+            box-shadow: 0 .5em 1em -.125em rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .02);
+            margin-bottom: 24px;
+        }
+
+        .main-button {
+            color: #424242;
+            background: #F9F7F4;
+            border-radius: 0;
+            margin: 16px 0;
+            padding: 8px 16px;
+            border: #424242 1px solid;
+            text-decoration: none;
+
+        }
+
+        .main-button:hover {
+            color: white;
+            background: #424242;
+
+        }
+
+        a {
+            display: inline-block;
+        }
+
+        .footer {
+            padding: 44px 0px;
+            display: block;
+            text-align: center;
+            width: 100%;
+            background-color: #dbdbdb;
+        }
+
+        .footer a,
+        .footer p {
+            font-size: 12px;
+            color: #424242;
+        }
+
+        .logo {
+            display: flex;
+            justify-content: center;
+        }
+
+        .main {
+            padding: 32px;
+            background-color: #F9F7F4;
+        }
+
     </style>
-        <div class="main">
-            <div class="logo"><img src="https://www.lurnby.com/static/images/lurnby-logo/lurnby_logo@0,25x.png"></div>
-            {% block content%}
-            {% endblock %}
-        </div>
-    <div class="footer"> 
-        <p>Manage your <a href="{{url_for('settings.comms', _external=True)}}">Notification settings</a>.</p>
-    </div>
+</head>
+
+<div class="main">
+    <div class="logo"><img src="https://www.lurnby.com/static/images/lurnby-logo/lurnby_logo@0,25x.png"></div>
+    {% block content%}
+    {% endblock %}
+</div>
+<div class="footer">
+    <p>Manage your <a href="{{url_for('settings.comms', _external=True)}}">Notification settings</a>.</p>
+</div>

@@ -42,12 +42,12 @@ oauthlib==3.1.0
 packaging==21.3
 pipdeptree==2.2.0
 pluggy==1.0.0
-psycopg2==2.8.5
+psycopg2==2.9.3
 py==1.11.0
 pycodestyle==2.6.0
 pyflakes==2.2.0
 PyJWT==1.4.2
-PyMuPDF==1.19.0
+PyMuPDF==1.20.2
 pyngrok==5.1.0
 pyparsing==3.0.6
 pytest==6.2.5
