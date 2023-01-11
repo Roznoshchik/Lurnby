@@ -1,6 +1,5 @@
 import base64
 
-from sqlalchemy.sql.functions import user
 from app import db, login
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
@@ -159,7 +158,7 @@ class User(UserMixin, db.Model):
     #     api methods     #
     #######################
 
-    def to_dict(self):
+    def get_tags_dict(self):
         tags = self.tags.filter_by(archived=False).all()
         tag_names = []
         for tag in tags:
@@ -174,6 +173,21 @@ class User(UserMixin, db.Model):
             }
         }
         return data
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'email': self.email,
+            'firstname': self.firstname,
+            'articles_count': self.articles.count(),
+            'highlights_count': self.highlights.count(),
+            'admin': self.admin,
+            'review_count': self.review_count,
+            'add_by_email': self.add_by_email,
+            'preferences': self.preferences,
+            'tos': self.tos
+        }
 
     def from_dict(self, data):
         for field in ['username', 'email']:
