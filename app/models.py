@@ -34,7 +34,19 @@ class Comms(db.Model):
     def __repr__(self):
         return f'<User {self.user_id}>\n informational: {self.informational}, educational: {self.educational}, promotional: {self.promotional}, highlights: {self.highlights}, reminders: {self.reminders}'
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "informational": self.informational,
+            "educational" : self.educational,
+            "promotional": self.promotional,
+            "highlights": self.highlights,
+            "reminders": self.reminders
+        }
+
 class User(UserMixin, db.Model):
+    
     #########################
     ####    Identity    #####
     #########################
@@ -47,7 +59,6 @@ class User(UserMixin, db.Model):
     admin = db.Column(db.Boolean)
     test_account = db.Column(db.Boolean, default=False)
     deleted = db.Column(db.Boolean, default=False)
-    
 
     ##############################
     ####    Relationships    #####
