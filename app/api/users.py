@@ -3,19 +3,18 @@ from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from app.main.pulltext import pull_text
-from app.models import (Article, User, Tag, Comms, 
-                        update_user_last_action, Approved_Sender,
-                        Event )
+from app.models import (Article, User, Tag, Comms,
+                        Approved_Sender, Event)
 
 from datetime import datetime
 from flask import jsonify, request, url_for
 from flask_login import login_user
 
 
-
 """ ############################# """
 """ ##     Create new user     ## """
 """ ############################# """
+
 
 @bp.route('/users', methods=['POST'])
 def create_user():
@@ -38,10 +37,10 @@ def create_user():
     user.from_dict(data)
     token = user.get_token()
     db.session.add(user)
-    db.session.commit()
+    db.session.commit()  # The user id doesn't get set until after commit.
     comms = Comms(user_id=user.id)
-    db.session.add(comms)
-    update_user_last_action('Created account')
+    ev = Event.add('created account')
+    db.session.add_all([comms, ev])
     db.session.commit()
 
     response = jsonify({'token': token, 'id': user.id})
@@ -49,9 +48,11 @@ def create_user():
     response.headers['location'] = url_for('api.get_user_tags', id=user.id)
     return response
 
+
 """ ########################### """
 """ ##     Get user info     ## """
 """ ########################### """
+
 
 @bp.route('users/<int:id>', methods=['GET'])
 @token_auth.login_required
@@ -64,9 +65,11 @@ def get_user(id):
     else:
         return bad_request('Not found')
 
+
 """ ############################## """
 """ ##     Update user info     ## """
 """ ############################## """
+
 
 @bp.route('users/<int:id>', methods=['PUT'])
 @token_auth.login_required
@@ -79,15 +82,19 @@ def update_user(id):
             return bad_request('empty payload')
 
         for key in data:
-            # this should probably ensure that no protected values get updated, 
+            if key == 'id':
+                continue
+            # this should probably ensure that no protected values get updated,
             # just not sure what those are
             if hasattr(user, key):
                 setattr(user, key, data[key])
-
-        update_user_last_action('Updated user info')
+        ev = Event.add('updated user info')
+        db.session.add(ev)
         db.session.commit()
-        
-        return ("", 200)
+        response = jsonify(user.to_dict())
+        response.status_code = 200
+
+        return response
     else:
         return bad_request('Not found')
 
@@ -95,6 +102,7 @@ def update_user(id):
 """ ######################### """
 """ ##     Delete user     ## """
 """ ######################### """
+
 
 @bp.route('users/<int:id>', methods=['DELETE'])
 @token_auth.login_required
@@ -105,10 +113,10 @@ def delete_user(id):
         ev = Event.add('deleted account')
         db.session.add(ev)
         user.launch_task('account_export', 'exporting data...',
-                          user.id, file_extension, delete=True)
+                         user.id, file_extension, delete=True)
         token_auth.current_user().revoke_token()
         db.session.commit()
-        
+
         return ("", 204)
     else:
         return bad_request('Not found')
@@ -117,6 +125,7 @@ def delete_user(id):
 """ ######################### """
 """ ##     Export data     ## """
 """ ######################### """
+
 
 @bp.route('users/<int:id>/export', methods=['GET'])
 @token_auth.login_required
@@ -127,9 +136,9 @@ def export_data(id):
         ev = Event.add('exported all data')
         db.session.add(ev)
         user.launch_task('account_export', 'exporting data...',
-                          user.id, file_extension, delete=False)
+                         user.id, file_extension, delete=False)
         db.session.commit()
-        
+
         return ("", 200)
     else:
         return bad_request('Not found')
@@ -139,38 +148,44 @@ def export_data(id):
 """ ##     Enable add by email     ## """
 """ ################################# """
 
+
 @bp.route('users/<int:id>/enable_email', methods=['GET'])
 @token_auth.login_required
 def enable_add_by_email(id):
     user = User.query.get(id)
     if user and user.id == token_auth.current_user().id:
         user.set_lurnby_email()
+        ev = Event.add('enabled add by email')
+        db.session.add(ev)
         db.session.commit()
-        update_user_last_action()
-        response = jsonify(email = user.add_by_email)
+        response = jsonify(email=user.add_by_email)
         response.status_code = 200
         return response
     else:
         return bad_request('Not found')
 
+
 """ ################################## """
 """ ##     Get approved senders     ## """
 """ ################################## """
+
 
 @bp.route('users/<int:id>/senders', methods=['GET'])
 @token_auth.login_required
 def get_approved_senders(id):
     user = User.query.get(id)
-    if user and user.id == token_auth.current_user().id:        
+    if user and user.id == token_auth.current_user().id:
         response = jsonify(senders=user.approved_senders.all())
         response.status_code = 200
         return response
     else:
         return bad_request('Not found')
 
+
 """ ################################# """
 """ ##     Add approved sender     ## """
 """ ################################# """
+
 
 @bp.route('users/<int:id>/senders', methods=['POST'])
 @token_auth.login_required
@@ -181,13 +196,11 @@ def add_approved_senders(id):
         email = data.get('email')
         if email:
             email = email.lower()
-            update_user_last_action('added approved sender')
             sender = Approved_Sender(user_id=user.id, email=email)
             event = Event.add('added aproved sender')
-            db.session.add(sender)
-            db.session.add(event)
+            db.session.add_all([sender, event])
             db.session.commit()
-            response = jsonify( email=email)
+            response = jsonify(email=email)
             response.status_code = 201
             return response
         else:
@@ -200,11 +213,12 @@ def add_approved_senders(id):
 """ ##     Get user comms     ## """
 """ ############################ """
 
+
 @bp.route('users/<int:id>/comms', methods=['GET'])
 @token_auth.login_required
 def get_user_comms(id):
     user = User.query.get(id)
-    if user and user.id == token_auth.current_user().id:        
+    if user and user.id == token_auth.current_user().id:
         response = jsonify(user.comms.to_dict())
         response.status_code = 200
         return response
@@ -216,26 +230,28 @@ def get_user_comms(id):
 """ ##     Update user comms     ## """
 """ ############################### """
 
+
 @bp.route('users/<int:id>/comms', methods=['PUT'])
 @token_auth.login_required
 def update_user_comms(id):
     user = User.query.get(id)
     data = request.get_json() or {}
     VALID_KEYS = ["informational", "educational", "promotional", "highlights", "reminders"]
-    
-    if user and user.id == token_auth.current_user().id:   
+
+    if user and user.id == token_auth.current_user().id:
         if data and data['user_id'] == user.id:
             comms = user.comms
             for key in VALID_KEYS:
                 if key in data:
-                    setattr(comms, key, data[key])  
-        db.session.commit() 
+                    setattr(comms, key, data[key])
+        ev = Event.add('updated comms')
+        db.session.add(ev)
+        db.session.commit()
         response = jsonify(user.comms.to_dict())
         response.status_code = 200
         return response
     else:
         return bad_request('Not found')
-
 
 
 """ ############################################### """
@@ -279,9 +295,11 @@ def add_article(id):
     # logout_user()
     return response
 
+
 """ ############################################# """
 """ ##     LEGACY Extension, get user tags     ## """
 """ ############################################# """
+
 
 @bp.route('/users/<int:id>/tags', methods=['GET'])
 @token_auth.login_required

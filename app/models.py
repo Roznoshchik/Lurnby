@@ -279,33 +279,37 @@ class Event(db.Model):
     """
     Tracked Events
 
-    -> visited platform          //    daily
+    -> added approved sender     //    all
     -> added article             //    all
-    -> added suggested article   //    all
-    -> opened article            //    all
     -> added highlight           //    all
-    -> exported highlights       //    all
-    -> exported all data         //    all
+    -> added suggested article   //    all
+    -> added tag                 //    all
     -> added topic               //    all
+    -> created account           //    one time
+    -> deleted account           //    one time
+    -> enabled add by email      //    one time
+    -> exported all data         //    all
+    -> exported highlights       //    all
+    -> opened article            //    all
+    -> reset password            //    all
     -> reviewed highlights       //    daily
     -> reviewed a highlight      //    all
-    -> enabled add by email      //    all
-    -> added approved sender     //    all
     -> submitted feedback        //    all
-    -> deleted account           //    all
-    -> updated user credentials  //    all
-    -> updated password          //    all
+    -> tos accepted              //    one time
     -> updated account email     //    all
-    -> reset password            //    all
-    -> user registered           //    all
-    -> tos accepted              //    all
-    -> added tag                 //    all
     -> updated article           //    all
     -> updated article tags      //    all
-    XX updated topic             //    all
+    -> updated comms             //    all
     -> updated highlight         //    all
-    -> updatd highlight topics   //    all
+    -> updated highlight topics  //    all
+    -> updated password          //    all
     XX updated tag               //    all 
+    XX updated topic             //    all
+    -> updated user credentials  //    all
+    -> updated user info         //    all
+    -> user registered           //    all
+    -> visited platform          //    daily
+    
     """
     @staticmethod
     def add(kind, daily=False):
@@ -317,6 +321,7 @@ class Event(db.Model):
                 ev = Event(user_id=current_user.id, 
                                 name=kind,
                                 date=datetime.utcnow())
+                update_user_last_action(kind)
                 return ev
             else:
                 return False
@@ -324,6 +329,7 @@ class Event(db.Model):
             ev = Event(user_id=current_user.id, 
                                 name=kind,
                                 date=datetime.utcnow())
+            update_user_last_action(kind)
             return ev
 
     def __repr__(self):
@@ -904,51 +910,44 @@ def update_user_last_action(action):
             where(User.id == current_user.id))
 
 
-def after_insert_listener(mapper, connection, target):
-    # 'target' is the inserted object
-    if isinstance(target, Highlight):
-        update_user_last_action('added highlight')
-    elif isinstance(target, Article):
-        update_user_last_action('added article')
-    elif isinstance(target, Tag):
-        update_user_last_action('added tag')
-    elif isinstance(target, Topic):
-        update_user_last_action('added topic')
+# def after_insert_listener(mapper, connection, target):
+#     # 'target' is the inserted object
+#     if isinstance(target, Highlight):
+#         update_user_last_action('added highlight')
+#     elif isinstance(target, Article):
+#         update_user_last_action('added article')
+#     elif isinstance(target, Tag):
+#         update_user_last_action('added tag')
+#     elif isinstance(target, Topic):
+#         update_user_last_action('added topic')
     
 
 
-def after_update_listener(mapper, connection, target):
-    # 'target' is the inserted object
-    if isinstance(target, Highlight):
-        update_user_last_action('updated highlight')
+# def after_update_listener(mapper, connection, target):
+#     # 'target' is the inserted object
+#     if isinstance(target, Highlight):
+#         update_user_last_action('updated highlight')
         
-    elif isinstance(target, Article):
-        update_user_last_action('updated article')
+#     elif isinstance(target, Article):
+#         update_user_last_action('updated article')
        
-    elif isinstance(target, Tag):
-        update_user_last_action('updated tag')
+#     elif isinstance(target, Tag):
+#         update_user_last_action('updated tag')
         
-    elif isinstance(target, Topic):
-        update_user_last_action('updated topic')
-        
+#     elif isinstance(target, Topic):
+#         update_user_last_action('updated topic')
 
 
-db.event.listen(Article, 'after_insert', after_insert_listener)
-db.event.listen(Highlight, 'after_insert', after_insert_listener)
-db.event.listen(Topic, 'after_insert', after_insert_listener)
-db.event.listen(Tag, 'after_insert', after_insert_listener)
-db.event.listen(Task, 'after_insert', after_insert_listener)
+# db.event.listen(Article, 'after_insert', after_insert_listener)
+# db.event.listen(Highlight, 'after_insert', after_insert_listener)
+# db.event.listen(Topic, 'after_insert', after_insert_listener)
+# db.event.listen(Tag, 'after_insert', after_insert_listener)
+# db.event.listen(Task, 'after_insert', after_insert_listener)
 
 
-# db.event.listen(Article, 'after_update', after_update_listener)
-# db.event.listen(Highlight, 'after_update', after_update_listener)
-# db.event.listen(Topic, 'after_update', after_update_listener)
-# db.event.listen(Tag, 'after_update', after_update_listener)
+# def receive_team_users_append(target, value, initiator):
+#     update_user_last_action('added/removed highlight from topic')
 
 
-def receive_team_users_append(target, value, initiator):
-    update_user_last_action('added/removed highlight from topic')
-
-
-db.event.listen(Highlight.topics, 'append', receive_team_users_append)
-db.event.listen(Highlight.topics, 'remove', receive_team_users_append)
+# db.event.listen(Highlight.topics, 'append', receive_team_users_append)
+# db.event.listen(Highlight.topics, 'remove', receive_team_users_append)
