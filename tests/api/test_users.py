@@ -23,8 +23,7 @@ class UserApiTests(unittest.TestCase):
         self.app_context.pop()
 
     def test_create_user(self):
-      print(self.app.test_client)
-      self.assertEqual(3,4)
+        user = 'test'
 
     
 

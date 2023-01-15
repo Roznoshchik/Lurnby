@@ -113,13 +113,13 @@ class User(UserMixin, db.Model):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'],
-            algorithm='HS256').decode('utf-8')
+            algorithm='HS256')
 
     def get_delete_account_token(self, expires_in=600):
         return jwt.encode(
             {'delete_account': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'],
-            algorithm='HS256').decode('utf-8')
+            algorithm='HS256')
 
     @staticmethod
     def verify_reset_password_token(token):

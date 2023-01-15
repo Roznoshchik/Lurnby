@@ -70,7 +70,7 @@ def articles():
     col = col.desc()
     order.append(col)
   
-    articles = query.order_by(*order).paginate(1, 15, False)
+    articles = query.order_by(*order).paginate(page=1, per_page=15, error_out=False)
     has_next = articles.has_next if articles.has_next else None 
     count = query.count()
     suggestion = Suggestion.get_random()
@@ -161,7 +161,7 @@ def articles():
         else:
             visible_count = f'{(per_page * page) - per_page } to {per_page * page}'
 
-        query = query.paginate(page, per_page, False)
+        query = query.paginate(page=page, per_page=per_page, error_out=False)
         has_next = query.has_next if query.has_next else None
 
         return json.dumps({'html': render_template('_all_articles.html', page=page, articles = query.items),
@@ -316,7 +316,7 @@ def export_highlights():
             if not page:
                 page = 1
 
-            highlights = query.paginate(page, per_page, False).items
+            highlights = query.paginate(page=page, per_page=per_page, error_out=False).items
 
             current_user.launch_task('export_highlights', 'Exporting highlights...', u, highlights, 'topics', data['ext'])
             update_user_last_action('requested export')
@@ -1489,7 +1489,7 @@ def highlights():
     col = getattr(Highlight, "created_date")
     topic_sort = getattr(Topic, "last_used").desc()
 
-    highlights = query.order_by(col.desc()).paginate(1, 15, False).items
+    highlights = query.order_by(col.desc()).paginate(page=1, per_page=15, error_out=False).items
 
     topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
 
@@ -1574,7 +1574,7 @@ def highlights():
         if not page:
             page = 1
 
-        highlights = query.paginate(page, per_page, False)
+        highlights = query.paginate(page=page, per_page=per_page, error_out=False)
 
         # print(highlights.items)
 
