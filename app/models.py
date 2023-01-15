@@ -312,24 +312,24 @@ class Event(db.Model):
     
     """
     @staticmethod
-    def add(kind, daily=False):
+    def add(kind, daily=False, user=current_user):
         if daily:
             today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
             today_end = today_start + timedelta(days=1)
-            ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==current_user.id).first()
+            ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==user.id).first()
             if not ev:
-                ev = Event(user_id=current_user.id, 
+                ev = Event(user_id=user.id, 
                                 name=kind,
                                 date=datetime.utcnow())
-                update_user_last_action(kind)
+                update_user_last_action(kind, user=user)
                 return ev
             else:
                 return False
         else:
-            ev = Event(user_id=current_user.id, 
+            ev = Event(user_id=user.id, 
                                 name=kind,
                                 date=datetime.utcnow())
-            update_user_last_action(kind)
+            update_user_last_action(kind, user=user)
             return ev
 
     def __repr__(self):
@@ -900,14 +900,14 @@ class Tag(db.Model):
 
 
 
-def update_user_last_action(action):
+def update_user_last_action(action,  user=current_user):
     if current_user:
         print(f'last action = {action}')
         db.session.execute(
             User.__table__.
             update().
             values(last_action=action).
-            where(User.id == current_user.id))
+            where(User.id == user.id))
 
 
 # def after_insert_listener(mapper, connection, target):

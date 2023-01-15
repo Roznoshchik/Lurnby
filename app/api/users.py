@@ -1,4 +1,4 @@
-from app import db
+from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
@@ -9,6 +9,9 @@ from app.models import (Article, User, Tag, Comms,
 from datetime import datetime
 from flask import jsonify, request, url_for
 from flask_login import login_user
+
+
+logger = CustomLogger('API')
 
 
 """ ############################# """
@@ -39,7 +42,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()  # The user id doesn't get set until after commit.
     comms = Comms(user_id=user.id)
-    ev = Event.add('created account')
+    ev = Event.add('created account', user=token_auth.current_user())
     db.session.add_all([comms, ev])
     db.session.commit()
 
@@ -71,13 +74,12 @@ def get_user(id):
 """ ############################## """
 
 
-@bp.route('users/<int:id>', methods=['PUT'])
+@bp.route('users/<int:id>', methods=['PATCH'])
 @token_auth.login_required
 def update_user(id):
     user = User.query.get(id)
     if user and user.id == token_auth.current_user().id:
         data = request.get_json() or {}
-
         if not data:
             return bad_request('empty payload')
 
@@ -88,7 +90,7 @@ def update_user(id):
             # just not sure what those are
             if hasattr(user, key):
                 setattr(user, key, data[key])
-        ev = Event.add('updated user info')
+        ev = Event.add('updated user info', user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.to_dict())
@@ -110,7 +112,7 @@ def delete_user(id):
     user = User.query.get(id)
     file_extension = request.args.get('fileExtension', "json")
     if user and user.id == token_auth.current_user().id:
-        ev = Event.add('deleted account')
+        ev = Event.add('deleted account', user=token_auth.current_user())
         db.session.add(ev)
         user.launch_task('account_export', 'exporting data...',
                          user.id, file_extension, delete=True)
@@ -133,7 +135,7 @@ def export_data(id):
     user = User.query.get(id)
     file_extension = request.args.get('fileExtension', "json")
     if user and user.id == token_auth.current_user().id:
-        ev = Event.add('exported all data')
+        ev = Event.add('exported all data', user=token_auth.current_user())
         db.session.add(ev)
         user.launch_task('account_export', 'exporting data...',
                          user.id, file_extension, delete=False)
@@ -155,7 +157,7 @@ def enable_add_by_email(id):
     user = User.query.get(id)
     if user and user.id == token_auth.current_user().id:
         user.set_lurnby_email()
-        ev = Event.add('enabled add by email')
+        ev = Event.add('enabled add by email', user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
         response = jsonify(email=user.add_by_email)
@@ -175,7 +177,7 @@ def enable_add_by_email(id):
 def get_approved_senders(id):
     user = User.query.get(id)
     if user and user.id == token_auth.current_user().id:
-        response = jsonify(senders=user.approved_senders.all())
+        response = jsonify(senders=[user.email for user in user.approved_senders.all()])
         response.status_code = 200
         return response
     else:
@@ -197,7 +199,7 @@ def add_approved_senders(id):
         if email:
             email = email.lower()
             sender = Approved_Sender(user_id=user.id, email=email)
-            event = Event.add('added aproved sender')
+            event = Event.add('added aproved sender', user=token_auth.current_user())
             db.session.add_all([sender, event])
             db.session.commit()
             response = jsonify(email=email)
@@ -231,7 +233,7 @@ def get_user_comms(id):
 """ ############################### """
 
 
-@bp.route('users/<int:id>/comms', methods=['PUT'])
+@bp.route('users/<int:id>/comms', methods=['PATCH'])
 @token_auth.login_required
 def update_user_comms(id):
     user = User.query.get(id)
@@ -239,12 +241,12 @@ def update_user_comms(id):
     VALID_KEYS = ["informational", "educational", "promotional", "highlights", "reminders"]
 
     if user and user.id == token_auth.current_user().id:
-        if data and data['user_id'] == user.id:
+        if data:
             comms = user.comms
             for key in VALID_KEYS:
                 if key in data:
                     setattr(comms, key, data[key])
-        ev = Event.add('updated comms')
+        ev = Event.add('updated comms', user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.comms.to_dict())

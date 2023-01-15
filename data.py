@@ -1,9 +1,8 @@
 import datetime
-from venv import create
 from sqlalchemy import desc
 
-from app import create_app
 from app.models import User, Event
+
 
 def print_data():
     count = User.query.count()
