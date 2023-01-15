@@ -399,7 +399,7 @@ class Article(db.Model):
                                  backref="article")
     archived = db.Column(db.Boolean, index=True)
     highlightedText = db.Column(db.String, default='')
-    tags = db.relationship('Tag', secondary=tags_articles, lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_articles, back_populates="articles", lazy='dynamic')
     progress = db.Column(db.Float, index=True, default=0.0)
     bookmarks = db.Column(db.String)
     done = db.Column(db.Boolean, default=False)
@@ -657,12 +657,12 @@ class Highlight(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'),index=True)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), index=True)
     topics = db.relationship(
-        'Topic', secondary=highlights_topics, lazy='dynamic')
+        'Topic', secondary=highlights_topics, back_populates='highlights', lazy='dynamic')
     
     archived = db.Column(db.Boolean, index=True)
     no_topics = db.Column(db.Boolean, default=True, index=True)
     note = db.Column(db.String, index=True)
-    tags = db.relationship('Tag', secondary=tags_highlights, lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_highlights, back_populates='highlights', lazy='dynamic')
     position = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -759,9 +759,9 @@ class Topic(db.Model):
     title = db.Column(db.String(512), index=True)  # how long should it be?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship(
-        'Highlight', secondary=highlights_topics, lazy='dynamic')
+        'Highlight', secondary=highlights_topics, back_populates="topics", lazy='dynamic')
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship('Tag', secondary=tags_topics, lazy='dynamic')
+    tags = db.relationship('Tag', secondary=tags_topics, back_populates="topics", lazy='dynamic')
     last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
     # this checks if a specific highlight is in this topic
@@ -845,12 +845,13 @@ class Tag(db.Model):
     goal = db.Column(db.String(512))
 
     articles = db.relationship(
-        'Article', secondary=tags_articles,  lazy='dynamic')
+        'Article', secondary=tags_articles, back_populates='tags', lazy='dynamic')
 
     highlights = db.relationship(
-        'Highlight', secondary=tags_highlights,  lazy='dynamic')
+        'Highlight', secondary=tags_highlights, back_populates='tags', lazy='dynamic')
 
-    topics = db.relationship('Topic', secondary=tags_topics,  lazy='dynamic')
+    topics = db.relationship(
+        'Topic', secondary=tags_topics, back_populates='tags', lazy='dynamic')
 
     # checks if a specific highlight is tagged
     def is_added_highlight(self, highlight):

@@ -27,9 +27,8 @@ def create_user():
             'email' not in data or
             'password' not in data
             ):
-        return bad_request('must include username. \
-                           email, and password fields')
-
+        return bad_request('must include username ' +
+                           'email, and password fields')
     if User.query.filter_by(username=data['username']).first():
         return bad_request('please use a different username')
 
@@ -42,7 +41,7 @@ def create_user():
     db.session.add(user)
     db.session.commit()  # The user id doesn't get set until after commit.
     comms = Comms(user_id=user.id)
-    ev = Event.add('created account', user=token_auth.current_user())
+    ev = Event.add('created account', user=user)
     db.session.add_all([comms, ev])
     db.session.commit()
 
