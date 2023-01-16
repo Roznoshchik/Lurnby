@@ -31,7 +31,7 @@ class UserApiTests(unittest.TestCase):
         res = self.client.post('/api/users', json={"a": "b"})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(data['message'], 'must include username email, and password fields')
+        self.assertEqual(data['message'], 'must include username, email, and password fields')
 
     def test_create_user(self):
         res = self.client.post('/api/users', json={
