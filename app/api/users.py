@@ -22,13 +22,8 @@ logger = CustomLogger('API')
 @bp.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json() or {}
-    if (
-            'username' not in data or
-            'email' not in data or
-            'password' not in data
-            ):
-        return bad_request('must include username ' +
-                           'email, and password fields')
+    if ('username' not in data or 'email' not in data or 'password' not in data):
+        return bad_request('must include username email, and password fields')
     if User.query.filter_by(username=data['username']).first():
         return bad_request('please use a different username')
 
@@ -59,7 +54,7 @@ def create_user():
 @bp.route('users/<int:id>', methods=['GET'])
 @token_auth.login_required
 def get_user(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(user.to_dict())
         response.status_code = 200
@@ -76,7 +71,7 @@ def get_user(id):
 @bp.route('users/<int:id>', methods=['PATCH'])
 @token_auth.login_required
 def update_user(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         data = request.get_json() or {}
         if not data:
@@ -108,14 +103,20 @@ def update_user(id):
 @bp.route('users/<int:id>', methods=['DELETE'])
 @token_auth.login_required
 def delete_user(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     file_extension = request.args.get('fileExtension', "json")
+    export = request.args.get('export', False)
     if user and user.id == token_auth.current_user().id:
         ev = Event.add('deleted account', user=token_auth.current_user())
         db.session.add(ev)
-        user.launch_task('account_export', 'exporting data...',
-                         user.id, file_extension, delete=True)
-        token_auth.current_user().revoke_token()
+        user.revoke_token()
+        if export is True:
+            user.launch_task('account_export', 'exporting data...',
+                             user.id, file_extension, delete=True)
+        else:
+            user.launch_task('delete_user', 'deleting user',
+                             id=user.id)
+
         db.session.commit()
 
         return ("", 204)
@@ -131,7 +132,7 @@ def delete_user(id):
 @bp.route('users/<int:id>/export', methods=['GET'])
 @token_auth.login_required
 def export_data(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     file_extension = request.args.get('fileExtension', "json")
     if user and user.id == token_auth.current_user().id:
         ev = Event.add('exported all data', user=token_auth.current_user())
@@ -153,7 +154,7 @@ def export_data(id):
 @bp.route('users/<int:id>/enable_email', methods=['GET'])
 @token_auth.login_required
 def enable_add_by_email(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         user.set_lurnby_email()
         ev = Event.add('enabled add by email', user=token_auth.current_user())
@@ -174,7 +175,7 @@ def enable_add_by_email(id):
 @bp.route('users/<int:id>/senders', methods=['GET'])
 @token_auth.login_required
 def get_approved_senders(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(senders=[user.email for user in user.approved_senders.all()])
         response.status_code = 200
@@ -191,7 +192,7 @@ def get_approved_senders(id):
 @bp.route('users/<int:id>/senders', methods=['POST'])
 @token_auth.login_required
 def add_approved_senders(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         data = request.get_json() or {}
         email = data.get('email')
@@ -218,7 +219,7 @@ def add_approved_senders(id):
 @bp.route('users/<int:id>/comms', methods=['GET'])
 @token_auth.login_required
 def get_user_comms(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(user.comms.to_dict())
         response.status_code = 200
@@ -235,7 +236,7 @@ def get_user_comms(id):
 @bp.route('users/<int:id>/comms', methods=['PATCH'])
 @token_auth.login_required
 def update_user_comms(id):
-    user = User.query.get(id)
+    user = User.query.filter_by(id=id).first()
     data = request.get_json() or {}
     VALID_KEYS = ["informational", "educational", "promotional", "highlights", "reminders"]
 

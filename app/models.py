@@ -1,6 +1,6 @@
 import base64
 
-from app import db, login
+from app import db, login, CustomLogger
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 from flask import current_app, url_for
@@ -19,8 +19,10 @@ from time import time
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+logger = CustomLogger('MODELS')
 preferences = '{"font": "sans-serif","color": "light-mode", \
               "size": "4","spacing": "line-height-min"}'
+
 
 class Comms(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -32,21 +34,25 @@ class Comms(db.Model):
     reminders = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
-        return f'<User {self.user_id}>\n informational: {self.informational}, educational: {self.educational}, promotional: {self.promotional}, highlights: {self.highlights}, reminders: {self.reminders}'
+        return (f'<User {self.user_id}>\n',
+                f'informational: {self.informational}, educational: {self.educational}, '
+                f'promotional: {self.promotional}, highlights: {self.highlights}, '
+                f'reminders: {self.reminders}')
 
     def to_dict(self):
         return {
             "id": self.id,
             "user_id": self.user_id,
             "informational": self.informational,
-            "educational" : self.educational,
+            "educational": self.educational,
             "promotional": self.promotional,
             "highlights": self.highlights,
             "reminders": self.reminders
         }
 
+
 class User(UserMixin, db.Model):
-    
+
     #########################
     ####    Identity    #####
     #########################
@@ -77,28 +83,27 @@ class User(UserMixin, db.Model):
                                     lazy='dynamic', cascade='delete, all')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
     comms = db.relationship("Comms", backref='user', uselist=False)
-    
+
     #########################
     ####    Activity    #####
-    ##################3######
+    #########################
     account_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     last_active = db.Column(db.DateTime, default=datetime.utcnow)
     last_action = db.Column(db.String)
     tos = db.Column(db.Boolean, default=False)
-    
+
     ######################
     ####    API??    #####
     ######################
     token = db.Column(db.String(32), index=True, unique=True)
     token_expiration = db.Column(db.DateTime)
-    
+
     ################################
     ####    custom settings    #####
     ################################
     preferences = db.Column(db.String, index=True, default=preferences)
     add_by_email = db.Column(db.String(120), unique=True)
     review_count = db.Column(db.Integer, default=5)
-    
 
     def __repr__(self):
         return '<User {}>'.format(self.email)
@@ -130,7 +135,6 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
-    
     @staticmethod
     def verify_delete_account_token(token):
         try:
@@ -152,7 +156,7 @@ class User(UserMixin, db.Model):
         letters = string.ascii_lowercase + string.digits
         extra = ''.join(random.choice(letters) for i in range(7))
         if current_app.config['DEV']:
-             return f"{self.email.split('@')[0]}-{extra}@add-article-staging.lurnby.com"
+            return f"{self.email.split('@')[0]}-{extra}@add-article-staging.lurnby.com"
 
         return f"{self.email.split('@')[0]}-{extra}@add-article.lurnby.com"
 
@@ -184,7 +188,7 @@ class User(UserMixin, db.Model):
             }
         }
         return data
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -229,12 +233,20 @@ class User(UserMixin, db.Model):
     #############################
 
     def launch_task(self, name, description, *args, **kwargs):
-        rq_job = current_app.task_queue.enqueue('app.tasks.' + name,
-                                                *args, **kwargs, job_timeout=500)
-        task = Task(id=rq_job.get_id(), name=name, description=description,
-                    user=self)
-        db.session.add(task)
-        return task
+        try:
+            if not os.environ.get('testing'):
+                rq_job = current_app.task_queue.enqueue('app.tasks.' + name,
+                                                        *args, **kwargs, job_timeout=500)
+                task = Task(id=rq_job.get_id(), name=name, description=description,
+                            user=self)
+                db.session.add(task)
+                return task
+            else:
+                raise redis.exceptions.ConnectionError
+        except redis.exceptions.ConnectionError:
+            import app.tasks as app_tasks
+            func = getattr(app_tasks, name)
+            func(*args, **kwargs)
 
     def get_tasks_in_progress(self):
         return Task.query.filter_by(user=self, complete=False).all()
@@ -242,6 +254,7 @@ class User(UserMixin, db.Model):
     def get_task_in_progress(self, name):
         return Task.query.filter_by(name=name, user=self,
                                     complete=False).first()
+
     #################
     # Notifications #
     #################
@@ -252,22 +265,22 @@ class User(UserMixin, db.Model):
         db.session.add(n)
         return n
 
+
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     name = db.Column(db.String())
     date = db.Column(db.Date())
-    
+
     @staticmethod
     def add(name, user):
-        msg = Message(user_id=user.id, 
+        msg = Message(user_id=user.id,
                       name=name,
                       date=datetime.utcnow())
         return msg
 
     def __repr__(self):
         return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'
-
 
 
 class Event(db.Model):
@@ -303,32 +316,35 @@ class Event(db.Model):
     -> updated highlight         //    all
     -> updated highlight topics  //    all
     -> updated password          //    all
-    XX updated tag               //    all 
+    XX updated tag               //    all
     XX updated topic             //    all
     -> updated user credentials  //    all
     -> updated user info         //    all
     -> user registered           //    all
     -> visited platform          //    daily
-    
+
     """
     @staticmethod
     def add(kind, daily=False, user=current_user):
         if daily:
             today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
             today_end = today_start + timedelta(days=1)
-            ev = Event.query.filter(Event.name == kind, Event.date >= today_start, Event.date < today_end, Event.user_id==user.id).first()
+            ev = Event.query.filter(Event.name == kind,
+                                    Event.date >= today_start,
+                                    Event.date < today_end,
+                                    Event.user_id == user.id).first()
             if not ev:
-                ev = Event(user_id=user.id, 
-                                name=kind,
-                                date=datetime.utcnow())
+                ev = Event(user_id=user.id,
+                           name=kind,
+                           date=datetime.utcnow())
                 update_user_last_action(kind, user=user)
                 return ev
             else:
                 return False
         else:
-            ev = Event(user_id=user.id, 
-                                name=kind,
-                                date=datetime.utcnow())
+            ev = Event(user_id=user.id,
+                       name=kind,
+                       date=datetime.utcnow())
             update_user_last_action(kind, user=user)
             return ev
 
@@ -406,7 +422,6 @@ class Article(db.Model):
     notes = db.Column(db.Text, default='')
     reflections = db.Column(db.Text, default='')
 
-
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     read_time = db.Column(db.String)
 
@@ -416,19 +431,18 @@ class Article(db.Model):
                                         Article.uuid, Article.title,
                                         Article.progress,
                                         func.count(Highlight.article_id), Article.read_time
-                                        ).outerjoin(Article.highlights)\
-                                        .group_by(Article.id)\
-                                        .filter(Article.user_id == current_user.id,
-                                                Article.archived == False)\
-                                        .order_by(desc(Article.date_read))
+                                        )\
+                                 .outerjoin(Article.highlights)\
+                                 .group_by(Article.id)\
+                                 .filter(Article.user_id == current_user.id,
+                                         Article.archived is False)\
+                                 .order_by(desc(Article.date_read))
         q_tags = db.session.query(Article.id,
-                                  func.count(tags_articles.c.article_id)
-                                  ).outerjoin(tags_articles,
-                                              tags_articles.c.article_id == Article.id)\
-                                  .group_by(Article.id)\
-                                  .filter(Article.user_id==current_user.id,
-                                          Article.archived==False)\
-                                  .order_by(desc(Article.date_read))
+                                  func.count(tags_articles.c.article_id))\
+                           .outerjoin(tags_articles, tags_articles.c.article_id == Article.id)\
+                           .group_by(Article.id)\
+                           .filter(Article.user_id == current_user.id, Article.archived is False)\
+                           .order_by(desc(Article.date_read))
 
         l1 = q_highlights.all()
         l2 = q_tags.all()
@@ -447,7 +461,7 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 try:
                     y['progress'] = round(l1[i][4])
-                except:
+                except Exception:
                     y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
                 y['read_time'] = l1[i][6]
@@ -459,7 +473,7 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 try:
                     y['progress'] = round(l1[i][4])
-                except:
+                except Exception:
                     y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
                 y['read_time'] = l1[i][6]
@@ -471,10 +485,10 @@ class Article(db.Model):
                 y['title'] = l1[i][3]
                 try:
                     y['progress'] = round(l1[i][4])
-                except:
+                except Exception:
                     y['progress'] = 0.0
                 y['highlight_count'] = l1[i][5]
-                y['read_time'] = l1[i][6]                
+                y['read_time'] = l1[i][6]
                 y['tag_count'] = l2[i][1]
                 articles['read'].append(y)
 
@@ -495,8 +509,7 @@ class Article(db.Model):
             'done': self.done,
             'date_read': self.date_read,
             'read_time': self.read_time
-        } 
-
+        }
 
     # api return article resource
     def to_dict(self):
@@ -508,7 +521,7 @@ class Article(db.Model):
             }
         }
         return data
-    
+
     def estimated_reading(self):
         soup = BeautifulSoup(self.content, 'html.parser')
         text = soup.find_all(text=True)
@@ -519,7 +532,7 @@ class Article(db.Model):
             'header',
             'html',
             'meta',
-            'head', 
+            'head',
             'input',
             'script',
             'style',
@@ -531,7 +544,7 @@ class Article(db.Model):
 
         word_count = len(output) / 5
         # English wpm read speed https://iovs.arvojournals.org/article.aspx?articleid=2166061#90715174
-        slow = 198 
+        slow = 198
         fast = 258
 
         low = int(round(word_count / slow))
@@ -541,13 +554,13 @@ class Article(db.Model):
         if high >= 60:
             if high % 60 == 0:
                 high = f'{high / 60}'
-            
+
             else:
                 hrs = high // 60
                 minutes = high % 60
                 if minutes > 30:
                     hrs += 1
-              
+
                 high = f'{hrs}'
         else:
             high = f'{high}'
@@ -559,13 +572,13 @@ class Article(db.Model):
         if low > 60:
             if low % 60 == 0:
                 low = f'{low / 60}h'
-            
+
             else:
                 hrs = low // 60
                 minutes = low % 60
                 if minutes > 30:
                     hrs += 1
-              
+
                 low = f'{hrs}h'
         else:
             low = f'{low}min'
@@ -615,9 +628,8 @@ class Article(db.Model):
 
         return q
 
+
 articles_lower_title_key = Index('articles_lower_title_key', func.lower(Article.title))
-
-
 
 highlights_topics = db.Table(
     'highlights_topics',
@@ -626,7 +638,6 @@ highlights_topics = db.Table(
     db.Column('topic_id', db.Integer, db.ForeignKey('topic.id'),
               nullable=False, primary_key=True, index=True)
 )
-
 
 tags_highlights = db.Table(
     'tags_highlights',
@@ -649,16 +660,17 @@ class Suggestion(db.Model):
     @classmethod
     def get_random(cls):
         return Suggestion.query.order_by(func.random()).first()
-        
+
+
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String)  # should I set a max length?
-    prompt = db.Column(db.String) 
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),index=True)
+    prompt = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     article_id = db.Column(db.Integer, db.ForeignKey('article.id'), index=True)
     topics = db.relationship(
         'Topic', secondary=highlights_topics, back_populates='highlights', lazy='dynamic')
-    
+
     archived = db.Column(db.Boolean, index=True)
     no_topics = db.Column(db.Boolean, default=True, index=True)
     note = db.Column(db.String, index=True)
@@ -805,33 +817,33 @@ class Topic(db.Model):
             Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
 
         return q
-    
+
     @staticmethod
     def query_with_count(user):
         q = (
             db.session.query(Topic, Highlight.archived, func.count('*'))
-            .outerjoin(highlights_topics, highlights_topics.c.topic_id==Topic.id)
+            .outerjoin(highlights_topics, highlights_topics.c.topic_id == Topic.id)
             .outerjoin(Highlight, highlights_topics.c.highlight_id == Highlight.id)
-            .filter(Topic.user_id == user.id, Topic.archived == False)
+            .filter(Topic.user_id == user.id, Topic.archived is False)
             .group_by(Topic.id, Highlight.archived)
         )
 
         dedupe = {}
         for row in q:
             if row[0].id in dedupe:
-                if row[1] == None or row[1] == True:
+                if row[1] is None or row[1] is True:
                     continue
                 else:
                     dedupe[row[0].id]['count'] += row[2]
             else:
                 dedupe[row[0].id] = {'tag': row[0]}
-                if row[1] == False:
+                if row[1] is False:
                     dedupe[row[0].id]['count'] = row[2]
                 else:
                     dedupe[row[0].id]['count'] = 0
-        
+
         res = []
-        for k,v in dedupe.items():
+        for k, v in dedupe.items():
             res.append(v)
 
         return res
@@ -873,37 +885,36 @@ class Tag(db.Model):
     def query_with_count(user):
         q = (
             db.session.query(Tag, Article.archived, func.count('*'))
-            .outerjoin(tags_articles, tags_articles.c.tag_id==Tag.id)
+            .outerjoin(tags_articles, tags_articles.c.tag_id == Tag.id)
             .outerjoin(Article, tags_articles.c.article_id == Article.id)
-            .filter(Tag.user_id == user.id, Tag.archived == False)
+            .filter(Tag.user_id == user.id, Tag.archived is False)
             .group_by(Tag.id, Article.archived)
         )
 
         dedupe = {}
         for row in q:
             if row[0].id in dedupe:
-                if row[1] == None or row[1] == True:
+                if row[1] is None or row[1] is True:
                     continue
                 else:
                     dedupe[row[0].id]['count'] += row[2]
             else:
                 dedupe[row[0].id] = {'tag': row[0]}
-                if row[1] == False:
+                if row[1] is False:
                     dedupe[row[0].id]['count'] = row[2]
                 else:
                     dedupe[row[0].id]['count'] = 0
-        
+
         res = []
-        for k,v in dedupe.items():
+        for k, v in dedupe.items():
             res.append(v)
 
         return res
 
 
-
-def update_user_last_action(action,  user=current_user):
+def update_user_last_action(action, user=current_user):
     if current_user:
-        print(f'last action = {action}')
+        logger.info(f'last action = {action}')
         db.session.execute(
             User.__table__.
             update().
@@ -921,20 +932,19 @@ def update_user_last_action(action,  user=current_user):
 #         update_user_last_action('added tag')
 #     elif isinstance(target, Topic):
 #         update_user_last_action('added topic')
-    
 
 
 # def after_update_listener(mapper, connection, target):
 #     # 'target' is the inserted object
 #     if isinstance(target, Highlight):
 #         update_user_last_action('updated highlight')
-        
+
 #     elif isinstance(target, Article):
 #         update_user_last_action('updated article')
-       
+
 #     elif isinstance(target, Tag):
 #         update_user_last_action('updated tag')
-        
+
 #     elif isinstance(target, Topic):
 #         update_user_last_action('updated topic')
 
