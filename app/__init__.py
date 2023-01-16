@@ -131,9 +131,6 @@ def create_app(config_class=Config):
     app.register_blueprint(api_bp, url_prefix='/api')
     csrf.exempt(api_bp)
 
-    from app.experiments import bp as experiments_bp
-    app.register_blueprint(experiments_bp, url_prefix='/app')
-
     from app.content import bp as content_bp
     app.register_blueprint(content_bp, url_prefix='/app')
 
