@@ -1,3 +1,5 @@
+from app.models import Article
+u = None
 # Finding duplicate articles
 
 # this will print out articles that have 

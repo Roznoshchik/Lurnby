@@ -1,4 +1,4 @@
 [flake8]
-exclude = .git,__pycache__,.github,.aws-sam,.vscode,aws-dist,frontend,.pytest_cache,venv
+exclude = .git,__pycache__,.github,.aws-sam,.vscode,aws-dist,frontend,.pytest_cache,venv,./app/ReadabiliPy,./migrations
 max-line-length = 119
 ignore = E266
