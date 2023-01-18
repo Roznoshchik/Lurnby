@@ -22,6 +22,17 @@ class UserApiTests(unittest.TestCase):
         self.client = self.app.test_client()
         db.create_all()
 
+        user = User(email='foo@baz.com')
+        db.session.add(user)
+        db.session.commit()
+
+        comms = Comms(user_id=user.id)
+        db.session.add(comms)
+        db.session.commit()
+
+        self.user = user
+        self.comms = comms
+
     def tearDown(self):
         db.session.remove()
         db.drop_all()
@@ -45,32 +56,23 @@ class UserApiTests(unittest.TestCase):
 
     @patch('app.models.User.check_token')
     def test_get_user(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
         res = self.client.get('/api/users/1', headers={'Authorization': 'Bearer abc123'})
         data = json.loads(res.data)
-        self.assertEqual(data, user.to_dict())
+        self.assertEqual(data, self.user.to_dict())
 
     @patch('app.models.User.check_token')
     def test_update_user(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
         res = self.client.patch('/api/users/1',
                                 json={"email": 'foo@bar.com'},
                                 headers={'Authorization': 'Bearer abc123'})
         data = json.loads(res.data)
         self.assertEqual(data['email'], 'foo@bar.com')
-        self.assertEqual(user.email, 'foo@bar.com')
+        self.assertEqual(self.user.email, 'foo@bar.com')
 
     @patch('app.models.User.check_token')
     def test_delete_user(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
         res = self.client.delete('/api/users/1',
                                  query_string={"export": False},
@@ -80,35 +82,29 @@ class UserApiTests(unittest.TestCase):
 
     @patch('app.models.User.check_token')
     def test_enable_add_by_email(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
 
-        self.assertIsNone(user.add_by_email)
+        self.assertIsNone(self.user.add_by_email)
 
         res = self.client.get('/api/users/1/enable_email',
                               headers={'Authorization': 'Bearer abc123'})
         self.assertEqual(res.status_code, 200)
-        self.assertIsNotNone(user.add_by_email)
+        self.assertIsNotNone(self.user.add_by_email)
 
     @patch('app.models.User.check_token')
     def test_approved_senders(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
 
-        self.assertIsNone(user.add_by_email)
+        self.assertIsNone(self.user.add_by_email)
 
         res = self.client.get('/api/users/1/senders',
                               headers={'Authorization': 'Bearer abc123'})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual([], user.approved_senders.all())
+        self.assertEqual([], self.user.approved_senders.all())
         res = self.client.get('/api/users/1/senders',
                               headers={'Authorization': 'Bearer abc123'})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual([], user.approved_senders.all())
+        self.assertEqual([], self.user.approved_senders.all())
 
         res = self.client.post('api/users/1/senders',
                                json={"email": "john@smith.com"},
@@ -119,40 +115,28 @@ class UserApiTests(unittest.TestCase):
         res = self.client.get('/api/users/1/senders',
                               headers={'Authorization': 'Bearer abc123'})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(['john@smith.com'], [str(sender) for sender in user.approved_senders.all()])
+        self.assertEqual(['john@smith.com'], [str(sender) for sender in self.user.approved_senders.all()])
 
     @patch('app.models.User.check_token')
     def test_get_user_comms(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
-        comms = Comms(user_id=user.id)
-        db.session.add(comms)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
 
         res = self.client.get('/api/users/1/comms',
                               headers={'Authorization': 'Bearer abc123'})
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(json.loads(res.data), comms.to_dict())
+        self.assertEqual(json.loads(res.data), self.comms.to_dict())
 
     @patch('app.models.User.check_token')
     def test_update_user_comms(self, mock_check_token):
-        user = User(email='test@test.com')
-        db.session.add(user)
-        db.session.commit()
-        comms = Comms(user_id=user.id)
-        db.session.add(comms)
-        db.session.commit()
         mock_check_token.return_value = User.query.first()
 
-        self.assertEqual(comms.educational, True)
+        self.assertEqual(self.comms.educational, True)
         res = self.client.patch('/api/users/1/comms',
                                 json={'educational': False},
                                 headers={'Authorization': 'Bearer abc123'})
 
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(comms.educational, False)
+        self.assertEqual(self.comms.educational, False)
 
 
 if __name__ == "__main__":

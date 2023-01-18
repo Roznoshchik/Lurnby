@@ -20,8 +20,7 @@ def google_login():
     data = request.get_json() or {}
     if (
             'goog_id' not in data or 'email' not in data or 'first_name'
-            not in data
-            ):
+            not in data):
         return bad_request('must include goog_id, \
                            email, and first_name fields')
 

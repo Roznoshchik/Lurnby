@@ -409,7 +409,7 @@ class Article(db.Model):
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime, default=datetime.utcnow)
-    date_read_date = db.Column(db.Date)
+    date_read_date = db.Column(db.Date)  # why do I need this?
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship('Highlight', lazy='dynamic',
                                  backref="article")
@@ -424,6 +424,9 @@ class Article(db.Model):
 
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     read_time = db.Column(db.String)
+
+    def __repr__(self):
+        return f'<{self.id}: {self.title}>'
 
     @classmethod
     def return_articles_with_count(cls):
@@ -512,7 +515,7 @@ class Article(db.Model):
         }
 
     # api return article resource
-    def to_dict(self):
+    def to_legacy_dict(self): # for chrome extension
         data = {
             'article_id': self.id,
             '_links': {
@@ -521,6 +524,29 @@ class Article(db.Model):
             }
         }
         return data
+
+    def to_dict(self, preview=True):
+        data = {
+            "id": str(self.uuid),
+            "user_id": self.user_id,
+            "source": self.source,
+            "source_url": self.source_url,
+            "title": self.title,
+            "content": self.content if not preview else None,
+            "unread": self.unread,
+            "archived": self.archived,
+            "done": self.done,
+            "date_read": self.date_read,
+            "notes": self.notes if not preview else None,
+            "reflections": self.reflections,
+            "read_time": self.read_time,
+            "progress": self.progress,
+            "created_at": self.article_created_date,
+            "highlights_count": self.highlights.count(),
+            "tags": [tag.to_dict() for tag in self.tags.all()]
+        }    
+        return data
+
 
     def estimated_reading(self):
         soup = BeautifulSoup(self.content, 'html.parser')
@@ -540,7 +566,7 @@ class Article(db.Model):
 
         for t in text:
             if t.parent.name not in blacklist and t.string != '\n':
-                output += '{} '.format(t)
+                output += f'{t} '
 
         word_count = len(output) / 5
         # English wpm read speed https://iovs.arvojournals.org/article.aspx?articleid=2166061#90715174
@@ -880,6 +906,14 @@ class Tag(db.Model):
 
     def __repr__(self) -> str:
         return f'{self.id}: {self.name}'
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "name": self.name,
+            "archived": self.archived
+        }
 
     @staticmethod
     def query_with_count(user):
