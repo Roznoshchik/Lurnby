@@ -43,7 +43,7 @@ def create_user():
 
     response = jsonify({'token': token, 'id': user.id})
     response.status_code = 201
-    response.headers['location'] = url_for('api.get_user_tags', id=user.id)
+    # response.headers['location'] = url_for('api.legacy_get_user_tags', id=user.id)
     return response
 
 
@@ -264,7 +264,7 @@ def update_user_comms(id):
 
 @bp.route('users/<int:id>/articles', methods=['POST'])
 @token_auth.login_required
-def add_article(id):
+def legacy_add_article(id):
     data = request.get_json() or {}
     urltext = pull_text(data['url'])
     user = User.query.filter_by(id=id).first()
@@ -306,5 +306,5 @@ def add_article(id):
 
 @bp.route('/users/<int:id>/tags', methods=['GET'])
 @token_auth.login_required
-def get_user_tags(id):
+def legacy_get_user_tags(id):
     return jsonify(User.query.get_or_404(id).get_tags_dict())

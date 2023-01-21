@@ -657,29 +657,30 @@ def add_article():
         today = date.today()
         today = today.strftime("%B %d, %Y")
 
-        if (title == 'none' and url == 'none' 
-            and epub == 'none' and pdf == 'none'):
+        new_article = Article(unread=True, notes=notes, progress=0.0,
+                              user_id=current_user.id, archived=False)
+
+        if not title  and not url and not epub and not pdf:
             
             return (json.dumps({'no_article': True, 'html': rendered_articles}),
                     400, {'ContentType': 'application/json'})
 
-        if (title != 'none'):
+        elif (title):
 
             if content == '':
                 return (json.dumps({'manual_fail': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
             content =  content 
-            # content = "<pre>" + content + "</pre>"
             if source == '':
                 source = 'manually added ' + today
 
-            new_article = Article(unread=True, notes=notes, progress=0.0,
-                                  title=title, source=source, content=content,
-                                  user_id=current_user.id, archived=False,
-                                  filetype="manual")
-
+            new_article.content=content
+            new_article.source = source
+            new_article.filetype = 'manual' 
+            new_article.title = title
             db.session.add(new_article)
+            
             new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
             ev = Event.add('added article')
@@ -687,8 +688,7 @@ def add_article():
                 db.session.add(ev)
                 db.session.commit()
             
-
-        if (url != 'none'):
+        elif (url):
 
             if not validators.url(url):
                 print("can't validate url")
@@ -713,10 +713,10 @@ def add_article():
                 return (json.dumps({'bad_url': True, 'html': rendered_articles}),
                         400, {'ContentType': 'application/json'})
 
-            new_article = Article(unread=True, notes=notes, progress=0.0,
-                                  title=title, source_url=url, content=content,
-                                  user_id=current_user.id, archived=False,
-                                  filetype="url")
+            new_article.title = title
+            new_article.content = content
+            new_article.source_url = url
+            new_article.filetype = url
 
             db.session.add(new_article)
             new_article.date_read_date = datetime.utcnow().date()
@@ -725,18 +725,11 @@ def add_article():
             if ev:
                 db.session.add(ev)
                 db.session.commit()
-
-        if pdf == 'true' or epub =='true':
-            
-            a_id = str(uuid4())
-            url = s3.generate_presigned_url(
-                ClientMethod='put_object', 
-                Params={'Bucket': bucket, 'Key': a_id},
-                ExpiresIn=3600)
-
-            return (json.dumps({'processing': True, 'url':url, 'a_id': a_id}), 200, {'ContentType': 'application/json'})
-
+      
         for tag in tags:
+            if new_article not in db.session:
+                db.session.add(new_article)
+            
             t = Tag.query.filter_by(name=tag, user_id=current_user.id
                                     ).first()
 
@@ -748,26 +741,29 @@ def add_article():
                 if (t.archived):
                     t.archived = False
                 new_article.AddToTag(t)
-            
+    
+    if new_article not in db.session:
+        db.session.add(new_article)
+
     db.session.commit()
+    
+    if pdf or epub:
+        new_article.processing=True
+        db.session.commit()
+        url = s3.generate_presigned_url(
+            ClientMethod='put_object', 
+            Params={'Bucket': bucket, 'Key': str(new_article.id)},
+            ExpiresIn=3600)
+
+        return (json.dumps({'processing': True, 'url':url, 'a_id': new_article.id}), 200, {'ContentType': 'application/json'})
+        
+
     current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
     current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
 
     db.session.commit()
-
-    articles = Article.return_articles_with_count()
-    recent = articles['recent']
-    done_articles = articles['done']
-    unread_articles = articles['unread']
-    read_articles = articles['read']
     
     html = render_articles()
-
-    # html = render_template('articles_all.html', form=form,
-    #                        recent=recent, 
-    #                        done_articles=done_articles,
-    #                        unread_articles=unread_articles,
-    #                        read_articles=read_articles, user=current_user)
 
     res = json.dumps({'processing':False, 'html': html})
     return (res, 200, {'ContentType': 'application/json'})
@@ -786,20 +782,17 @@ def handle_csrf_error(e):
 def bg_add_article():
     data = json.loads(request.data)
     a_id = data['a_id']
-    tags = json.loads(data['tags'])
     pdf = data['pdf']
     epub = data['epub']
 
-    u = User.query.get(current_user.id)
-    processing = current_user.launch_task('bg_add_article', 'adding article...',u, a_id, pdf, epub, tags)
+    file_ext = '.pdf' if pdf else '.epub'
+
+    new_task = current_user.launch_task('bg_add_article', 'adding article...', article_id=a_id, file_ext=file_ext, file=None)
     update_user_last_action('added article')
-    
     ev = Event(user_id=current_user.id, name='added article', date=datetime.utcnow())
     db.session.add(ev)
-    
     db.session.commit()
-
-    res = json.dumps({'taskID': processing.id})
+    res = json.dumps({'taskID': new_task.id})
     return (res, 200, {'ContentType': 'application/json'})
 
 
@@ -809,13 +802,19 @@ def bg_add_article():
 
 @bp.route('/articles/processing/<task_id>/<a_id>')
 def process_article(task_id, a_id):
-    process = Task.query.get(task_id)
-
+    process = Task.query.filter_by(id=task_id).first()
+    try:
+        current_app.redis.ping()
+    except:
+        # no Redis instance. Local setup
+        print('No Redis Instance')
+        process.complete = True
 
     # return (json.dumps({'html': 'success'}), 200, {'ContentType': 'application/json'})
     for i in range(25):
         time.sleep(1)
         if process.complete:
+            print('Process is complete. Returning articles.')
             query = current_user.articles.filter_by(archived=False)
             col = getattr(Article, "date_read")
             col = col.desc()

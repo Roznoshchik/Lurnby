@@ -1,11 +1,12 @@
 import json
 import os
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 from app import create_app, db
 from app.models import Article, Tag, User
 from config import Config
-from ..mocks import mock_articles, mock_tags
+from ..mocks.mocks import mock_articles, mock_tags
 
 
 class TestConfig(Config):
@@ -176,3 +177,99 @@ class UserApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(1, len(data['articles']))
         self.assertIsNotNone(data['has_next'])
+
+    
+    @patch('app.models.User.check_token')
+    def test_add_supplied_epub_article(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+        mock_file = open(f'{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub', 'rb')
+        payload = {'tags': ["pikachu"]}
+        
+        res = self.client.post(
+            '/api/articles', 
+            data={"file": mock_file, "data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        article = Article.query.filter_by(id=6).first()
+        tag = article.tags.all()[0]
+        
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(6, data['article_id'])
+        self.assertTrue('task_id' in data)
+        self.assertTrue(data['processing'])
+        self.assertEqual(tag.name, 'pikachu')
+
+    
+    @patch('app.models.User.check_token')
+    def test_bad_data_returns_400(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+        
+        # empty payload
+        payload = {'tags': ["pikachu", "bulbasaur", "charmander"]}
+
+        res = self.client.post(
+            '/api/articles', 
+            data={"data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual('No article to create. Check data and try again', data['message'])
+        
+        # bad url
+        payload = {'url': 'foo.bar'}
+
+        res = self.client.post(
+            '/api/articles', 
+            data={"data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual("Can't validate url. Please check the data and try again", data['message'])
+        
+        # bad url that passes validators check
+        payload = {'url': 'https://www.lurnby.com/static/images/rrfeedback-40.png'}
+
+        res = self.client.post(
+            '/api/articles', 
+            data={"data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual("Something went wrong. Please check the url", data['message'])
+        
+        # manual submission missing data
+        payload = {'manual_entry': {"pikachu": "was here"}}
+
+        res = self.client.post(
+            '/api/articles', 
+            data={"data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual("Missing Title or Content", data['message'])
+        
+
+        # non pdf or no epub file
+        mock_file = open(f'{Path(os.path.dirname(__file__)).parent}/mocks/mocks.py', 'rb')
+        
+        payload = {'tags': ["pikachu", "bulbasaur", "charmander"]}
+        
+        res = self.client.post(
+            '/api/articles', 
+            data={"file": mock_file, "data": json.dumps(payload)}, 
+            headers={'Authorization': 'Bearer abc123'})
+        
+        data = res.json
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual('File must be pdf or epub', data['message'])
+
+     
+        
+        
+    
+    

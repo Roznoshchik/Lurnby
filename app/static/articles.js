@@ -140,7 +140,7 @@ function add_manual() {
 
 function add_new_article() {
 
-    var title = 'none', source = 'none', tags = [], notes = '', content = 'none', url = 'none', epub = 'none', pdf = 'none', doc_tags;
+    var title = null, source = null, tags = [], notes = '', content = null, url = null, epub = null, pdf = null, doc_tags;
     doc_tags = byClass('article-tag');
     Array.prototype.forEach.call(doc_tags, function (tag) {
         if (tag.classList.contains('tagged')) {
@@ -173,7 +173,7 @@ function add_new_article() {
 
 
     if (byId('epub_add')) {
-        epub = 'true'
+        epub = true
         file = byId('epub_add').files[0];
         var filename = file.name;
         ext = filename.split('.').pop();
@@ -185,7 +185,7 @@ function add_new_article() {
     data['epub'] = epub
 
     if (byId('pdf_add')) {
-        pdf = 'true'
+        pdf = true
         file = byId('pdf_add').files[0];
         var filename = file.name;
         ext = filename.split('.').pop();
@@ -285,7 +285,7 @@ function add_new_article() {
 
             }
             else {
-
+                console.log('PROCESSING')
                 az_url = data['url']
                 a_id = data['a_id']
 

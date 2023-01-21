@@ -18,9 +18,12 @@ from app.models import Task, Article, Highlight, Tag, User, Event
 
 logger = CustomLogger('Tasks')
 
-if not os.environ.get('testing'):
+try:
+    app.redis.ping()
     app = create_app()
     app.app_context().push()
+except:
+    pass
 
 def delete_user(id):
     u = User.query.filter_by(id=id).first()
@@ -236,96 +239,71 @@ def export_highlights(user, highlights, source, ext):
         _set_task_progress(100)
 
     
-def bg_add_article(u, a_id, pdf, epub, tags):
+def bg_add_article(article_id=None, file_ext=None, file=None):
     try:
         _set_task_progress(0)
+        article = Article.query.filter_by(id=article_id).first()
+        
         today = date.today()
         today = today.strftime("%B %d, %Y")
-        
-        basedir = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(
-            basedir, 'temp'
-        )
 
-        if not os.path.isdir(path):
-            os.mkdir(path)
+        if not file:
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            path = os.path.join(
+                basedir, 'temp'
+            )
 
-        path = f'{path}/{a_id}'
+            if not os.path.isdir(path):
+                os.mkdir(path)
 
-        if pdf == 'true':
-            path = f'{path}.pdf'
-            with open(path, "w") as f:
-                pass
-            s3.download_file(bucket, a_id, path)
+            path = f'{path}/{article_id}'
+
+        if file_ext == '.pdf':
+            if not file:
+                file = f'{path}.pdf'
+                s3.download_file(bucket, str(article_id), file)
 
             _set_task_progress(10)
-            pdf = importPDF(path, u)
+            pdf = importPDF(file, article.user)
             _set_task_progress(90)
             source = 'PDF File: added ' + today
+            article.content = pdf['content']
+            article.source = source
+            article.title = pdf['title']
+            article.filetype = 'pdf'
 
-            article = Article(content=pdf['content'], archived=False,
-                            source=source, progress = 0.0,
-                            unread=True, title=pdf['title'],
-                            user_id = u.id, filetype='pdf')
-            db.session.add(article)
-            article.date_read_date = datetime.utcnow().date()
+            article.date_read_date = datetime.utcnow().date() # why is this needed?
+            article.date_read = datetime.utcnow()
             article.estimated_reading()
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=u.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=u.id)
-                    db.session.add(t)
-                    article.AddToTag(t)
-
-                else:
-                    if t.archived:
-                        t.archived = False
-                    article.AddToTag(t)
-
+            article.processing=False
+           
             db.session.commit()
         else:
-            path = f'{path}.epub'
-            s3.download_file(bucket, a_id, path)
+            if not file:
+                file = f'{path}.epub'
+                s3.download_file(bucket, str(article_id), file)
 
-            content = epubConverted(path, u)
-            title = epubTitle(path)
+            content = epubConverted(file, article.user)
+            title = epubTitle(file)
             title = title[0][0]
             epubtext = content
 
             source = 'Epub File: added ' + today
+            article.title = title
+            article.content = epubtext
+            article.source = source
+            article.filetype = 'epub'
 
-            new_article = Article(unread=True, title=title, content=epubtext,
-                                source=source, user_id=u.id,
-                                archived=False, progress=0.0,
-                                filetype="epub")
-
-            db.session.add(new_article)
-            new_article.date_read_date = datetime.utcnow().date()
-            new_article.estimated_reading()
-
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=u.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=u.id)
-                    db.session.add(t)
-                    new_article.AddToTag(t)
-
-                else:
-                    if t.archived:
-                        t.archived = False
-                    new_article.AddToTag(t)
-
-            db.session.commit()
-            os.remove(path)
-            
+            article.date_read_date = datetime.utcnow().date()
+            article.date_read = datetime.utcnow()
+            article.estimated_reading()
+            article.processing = False
+            db.session.commit()            
     except:
         logger.error('Unhandled exception', exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
+        return
 
 def set_images_lazy(aid):
     try:

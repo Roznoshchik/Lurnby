@@ -78,7 +78,7 @@ class User(UserMixin, db.Model):
                                        lazy='dynamic', cascade='delete, all')
     topics = db.relationship('Topic', backref='user', lazy='dynamic', cascade='delete, all')
     tags = db.relationship('Tag', backref='user', lazy='dynamic', cascade='delete, all')
-    tasks = db.relationship('Task', backref='user', lazy='dynamic', cascade='delete, all')
+    tasks = db.relationship('Task', backref='user', cascade_backrefs=False, lazy='dynamic', cascade='delete, all')
     notifications = db.relationship('Notification', backref='user',
                                     lazy='dynamic', cascade='delete, all')
     suggestion_id = db.Column(db.Integer, db.ForeignKey('suggestion.id'))
@@ -232,14 +232,16 @@ class User(UserMixin, db.Model):
     # Task Queue helper methods #
     #############################
 
-    def launch_task(self, name, description, *args, **kwargs):
+    def launch_task(self, name, description="", *args, **kwargs):
         try:
             if not os.environ.get('testing'):
                 rq_job = current_app.task_queue.enqueue('app.tasks.' + name,
                                                         *args, **kwargs, job_timeout=500)
-                task = Task(id=rq_job.get_id(), name=name, description=description,
+                id = rq_job.get_id()
+                task = Task(id=id, name=name, description=description,
                             user=self)
-                db.session.add(task)
+                if task not in db.session:
+                    db._make_scoped_session.add(task)
                 return task
             else:
                 raise redis.exceptions.ConnectionError
@@ -247,6 +249,17 @@ class User(UserMixin, db.Model):
             import app.tasks as app_tasks
             func = getattr(app_tasks, name)
             func(*args, **kwargs)
+            
+            try:
+                print(task)
+            except:
+                pass
+            
+            task = Task(id=str(uuid.uuid4()), name=name, description=description, user=self)
+            
+            if task not in db.session:
+                db.session.add(task)
+            return task
 
     def get_tasks_in_progress(self):
         return Task.query.filter_by(user=self, complete=False).all()
@@ -400,6 +413,10 @@ tags_articles = db.Table('tags_articles',
 
 
 class Article(db.Model):
+    __mapper_args__ = {
+        "confirm_deleted_rows": False
+    }
+
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True)
     unread = db.Column(db.Boolean, index=True, default=True)
@@ -413,7 +430,7 @@ class Article(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), index=True)
     highlights = db.relationship('Highlight', lazy='dynamic',
                                  backref="article")
-    archived = db.Column(db.Boolean, index=True)
+    archived = db.Column(db.Boolean, index=True, default=False)
     highlightedText = db.Column(db.String, default='')
     tags = db.relationship('Tag', secondary=tags_articles, back_populates="articles", lazy='dynamic')
     progress = db.Column(db.Float, index=True, default=0.0)
@@ -424,6 +441,7 @@ class Article(db.Model):
 
     article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
     read_time = db.Column(db.String)
+    processing = db.Column(db.Boolean, default=False)
 
     def __repr__(self):
         return f'<{self.id}: {self.title}>'
