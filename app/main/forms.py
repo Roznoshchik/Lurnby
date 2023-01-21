@@ -7,45 +7,41 @@ from app.models import Topic
 
 
 class ContentForm(FlaskForm):
-    url = URLField('URL', validators=[
-        URL(),
-        Optional()
-    ])
-    epub = FileField('Choose an epub file', validators=[
-        FileAllowed(['epub'], 'Epub only.')
-    ])
+    url = URLField("URL", validators=[URL(), Optional()])
+    epub = FileField(
+        "Choose an epub file", validators=[FileAllowed(["epub"], "Epub only.")]
+    )
 
-    title = StringField('Title')
-    source = StringField('Source')
-    text = TextAreaField('Copy and paste text')
-    submit = SubmitField('Get Content')
+    title = StringField("Title")
+    source = StringField("Source")
+    text = TextAreaField("Copy and paste text")
+    submit = SubmitField("Get Content")
 
 
 class SuggestionForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
-    url = URLField('URL', validators=[
-        URL()
-    ])   
-    summary = TextAreaField('Summary')
-    submit = SubmitField('Add')
+    title = StringField("Title", validators=[DataRequired()])
+    url = URLField("URL", validators=[URL()])
+    summary = TextAreaField("Summary")
+    submit = SubmitField("Add")
 
 
 class AddTopicForm(FlaskForm):
-    title = StringField('Topic title ...', validators=[DataRequired()])
+    title = StringField("Topic title ...", validators=[DataRequired()])
 
     def validate_title(self, title):
         title = Topic.query.filter_by(title=title.data.lower()).first()
         if title is not None:
-            raise ValidationError('Topic with this name already exists.')
+            raise ValidationError("Topic with this name already exists.")
 
 
 class AddHighlightForm(FlaskForm):
-    text = TextAreaField('Highlight')
-    note = TextAreaField('Add a note or description')
-    prompt = TextAreaField('Add a prompt for reviewing')
+    text = TextAreaField("Highlight")
+    note = TextAreaField("Add a note or description")
+    prompt = TextAreaField("Add a prompt for reviewing")
     position = DecimalField(places=3, rounding=None, use_locale=False)
     do_not_review = BooleanField()
 
+
 class AddApprovedSenderForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    submit = SubmitField('Approve email')
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    submit = SubmitField("Approve email")

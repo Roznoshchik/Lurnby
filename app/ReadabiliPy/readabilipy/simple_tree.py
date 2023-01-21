@@ -1,12 +1,21 @@
 """Turn input HTML into a cleaned parsed tree."""
 from bs4 import BeautifulSoup
 from .simplifiers.html import (
-    consolidate_text, insert_paragraph_breaks,
-    normalise_strings, process_special_elements,
-    process_unknown_elements, recursively_prune_elements,
-    remove_blacklist, remove_empty_strings_and_elements,
-    remove_metadata, strip_attributes, structural_elements,
-    unnest_paragraphs, unwrap_elements, wrap_bare_text)
+    consolidate_text,
+    insert_paragraph_breaks,
+    normalise_strings,
+    process_special_elements,
+    process_unknown_elements,
+    recursively_prune_elements,
+    remove_blacklist,
+    remove_empty_strings_and_elements,
+    remove_metadata,
+    strip_attributes,
+    structural_elements,
+    unnest_paragraphs,
+    unwrap_elements,
+    wrap_bare_text,
+)
 
 
 def simple_tree_from_html_string(html):

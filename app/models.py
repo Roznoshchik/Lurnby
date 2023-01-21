@@ -275,13 +275,8 @@ class User(UserMixin, db.Model):
             func = getattr(app_tasks, name)
             func(*args, **kwargs)
 
-            try:
-                print(task)
-            except:
-                pass
-
             task = Task(
-                id=str(uuid.uuid4()), name=name, description=description, user=self
+                id=generate_str_id(), name=name, description=description, user=self
             )
 
             if task not in db.session:
@@ -903,12 +898,8 @@ class Topic(db.Model):
 
     # this checks if a specific highlight is in this topic
     def is_added_highlight(self, highlight):
-        return (
-            self.highlights.filter(
-                highlight.id == highlights_topics.c.highlight_id
-            ).count()
-            > 0
-        )
+        h_id = highlights_topics.c.highlight_id
+        return self.highlights.filter(highlight.id == h_id).count() > 0
 
     # add topic to tag
     def AddToTag(self, tag):
@@ -1007,12 +998,8 @@ class Tag(db.Model):
 
     # checks if a specific highlight is tagged
     def is_added_highlight(self, highlight):
-        return (
-            self.highlights.filter(
-                highlight.id == tags_highlights.c.highlight_id
-            ).count()
-            > 0
-        )
+        h_id = tags_highlights.c.highlight_id
+        return self.highlights.filter(highlight.id == h_id).count() > 0
 
     def is_added_topic(self, topic):
         return self.topics.filter(topic.id == tags_topics.c.topic_id).count() > 0
