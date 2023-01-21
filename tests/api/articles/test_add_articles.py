@@ -17,12 +17,6 @@ class MockResponse:
     def __init__(self, text) -> None:
         self.text = text
 
-class MockS3:
-    def __init__(self) -> None:
-        pass
-
-    def generate_presigned_url():
-        return 'foo.com'
 
 class AddArticleApiTests(unittest.TestCase):
     def setUp(self):
@@ -89,11 +83,11 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertTrue("task_id" in data)
         self.assertTrue(data["processing"])
 
-    @patch("boto3.client")
+    @patch("app.api.helpers.add_article_methods.s3.generate_presigned_url")
     @patch("app.models.User.check_token")
     def test_add_upload_article(self, mock_check_token, mock_s3):
         mock_check_token.return_value = User.query.first()
-        mock_s3.return_value = MockS3
+        mock_s3.return_value = "foo.com"
         payload = {"upload_file_ext": "pdf"}
 
         res = self.client.post(
@@ -108,6 +102,7 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertEqual(res.status_code, 201)
         self.assertEqual(str(article.uuid), data["article_id"])
         self.assertTrue("upload_url" in data)
+        self.assertEqual(data["upload_url"], "foo.com")
         self.assertEqual(".pdf", data["upload_file_ext"])
         self.assertTrue("location" in data)
         self.assertTrue(data["processing"])
@@ -142,7 +137,7 @@ class AddArticleApiTests(unittest.TestCase):
         for tag in payload["tags"]:
             self.assertTrue(tag in tags)
 
-    @patch("requests.get")
+    @patch("app.main.pulltext.requests.get")
     @patch("app.models.User.check_token")
     def test_add_url_entry(self, mock_check_token, mock_get):
         mock_check_token.return_value = User.query.first()
