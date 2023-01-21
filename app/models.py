@@ -23,6 +23,8 @@ logger = CustomLogger('MODELS')
 preferences = '{"font": "sans-serif","color": "light-mode", \
               "size": "4","spacing": "line-height-min"}'
 
+def generate_str_id():
+    return str(uuid.uuid4())
 
 class Comms(db.Model):
     id = db.Column(db.Integer, primary_key=True)
