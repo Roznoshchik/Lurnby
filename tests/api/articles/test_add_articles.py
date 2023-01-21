@@ -17,8 +17,14 @@ class MockResponse:
     def __init__(self, text) -> None:
         self.text = text
 
+class MockS3:
+    def __init__(self) -> None:
+        pass
 
-class UserApiTests(unittest.TestCase):
+    def generate_presigned_url():
+        return 'foo.com'
+
+class AddArticleApiTests(unittest.TestCase):
     def setUp(self):
         os.environ["testing"] = "1"
         self.app = create_app(TestConfig)
@@ -83,10 +89,11 @@ class UserApiTests(unittest.TestCase):
         self.assertTrue("task_id" in data)
         self.assertTrue(data["processing"])
 
+    @patch("boto3.client")
     @patch("app.models.User.check_token")
-    def test_add_upload_article(self, mock_check_token):
+    def test_add_upload_article(self, mock_check_token, mock_s3):
         mock_check_token.return_value = User.query.first()
-
+        mock_s3.return_value = MockS3
         payload = {"upload_file_ext": "pdf"}
 
         res = self.client.post(

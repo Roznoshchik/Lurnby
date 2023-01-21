@@ -18,7 +18,7 @@ class MockResponse:
         self.text = text
 
 
-class UserApiTests(unittest.TestCase):
+class GetArticleApiTests(unittest.TestCase):
     def setUp(self):
         os.environ["testing"] = "1"
         self.app = create_app(TestConfig)

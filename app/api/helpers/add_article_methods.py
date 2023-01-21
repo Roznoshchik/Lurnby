@@ -148,10 +148,9 @@ def process_file_upload(article, upload_file_ext):
           processing:bool
           }
     """
-    print(upload_file_ext)
     if upload_file_ext and "." not in upload_file_ext:
         upload_file_ext = f".{upload_file_ext}"
-    print(upload_file_ext)
+
     if not upload_file_ext or (
         upload_file_ext != ".epub" and upload_file_ext != ".pdf"
     ):
