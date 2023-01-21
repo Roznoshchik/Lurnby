@@ -6,17 +6,14 @@
 # it returns the cleaned up html or text.
 
 import app
+import requests
+from app.ReadabiliPy.readabilipy.simple_json import simple_json_from_html_string
 
 def pull_text(url):
-    # import sys
-    # sys.path.insert(1, './app/ReadabiliPy')
-    from app.ReadabiliPy.readabilipy.simple_json import simple_json_from_html_string
-
-    import requests
 
     headers = {'User-Agent': 'Mozilla/5.0'}
     response = requests.get(url, headers=headers)
-    response.encoding= 'utf-8'
+    response.encoding = 'utf-8'
     article = simple_json_from_html_string(response.text,
                                            content_digests=False,
                                            node_indexes=False,

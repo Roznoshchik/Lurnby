@@ -15,7 +15,7 @@ from app.api.helpers.add_article_methods import (
     process_file,
     process_file_upload,
 )
-from app.models import Article
+from app.models import Article, Event
 from app.api.errors import bad_request
 
 from flask import jsonify, request
@@ -86,19 +86,18 @@ def get_articles():
 @token_auth.login_required
 def add_article():
     file = request.files.get("file")
-    data = json.loads(request.form.get("data"))
+    if data := request.form.get("data", {}):
+        data = json.loads(data)
+
     manual_entry = data.get("manual_entry", None)
     url = data.get("url", None)
-    file_ext = data.get("file_ext", None)
+    upload_file_ext = data.get("upload_file_ext", None)
     tags = data.get("tags", [])
-
-    if not manual_entry and not url and not file_ext and not file:
+    if not manual_entry and not url and not upload_file_ext and not file:
         return bad_request("No article to create. Check data and try again")
 
     article = Article(user_id=token_auth.current_user().id, notes=data.get("notes", ""))
-
     db.session.add(article)
-
     try:
         if manual_entry:
             article = process_manual_entry(article, manual_entry)
@@ -117,16 +116,17 @@ def add_article():
             response = process_file(article, file, token_auth.current_user())
             return response
 
-        elif file_ext:
-            response = process_file_upload(article, file_ext)
+        elif upload_file_ext:
+            response = process_file_upload(article, upload_file_ext)
             return response
 
         article.processing = False
         token_auth.current_user().launch_task("set_images_lazy", aid=article.id)
         token_auth.current_user().launch_task("set_absolute_urls", aid=article.id)
+        Event.add("added article", user=token_auth.current_user())
         db.session.commit()
 
-        response = jsonify(processing=False, article_id=article.id)
+        response = jsonify(processing=False, article=article.to_dict())
         response.status_code = 201
         return response
 
@@ -146,17 +146,18 @@ def add_article():
 """ ################################## """
 
 
-@bp.route("/articles/<int:article_id>/uploaded", methods=["GET"])
+@bp.route("/articles/<article_uuid>/uploaded", methods=["GET"])
 @token_auth.login_required
-def file_uploaded(article_id):
-    file_ext = request.args.get("file_ext", None)
-
-    if not file_ext or file_ext != ".epub" or file_ext != ".pdf":
-        return bad_request('file_ext query arg should be ".epub" or ".pdf"')
+def file_uploaded(article_uuid):
+    upload_file_ext = request.args.get("upload_file_ext", None)
+    if upload_file_ext and "." not in upload_file_ext:
+        upload_file_ext = f".{upload_file_ext}"
+    if not upload_file_ext or upload_file_ext != ".epub" or upload_file_ext != ".pdf":
+        return bad_request('upload_file_ext query arg should be ".epub" or ".pdf"')
 
     task = token_auth.current_user().launch_task(
-        "bg_add_article", article_id=article_id, file_ext=file_ext, file=None
+        "bg_add_article", article_uuid=article_uuid, file_ext=upload_file_ext, file=None
     )
-    response = jsonify(processing=True, task_id=task.id, article_id=article_id)
+    response = jsonify(processing=True, task_id=task.id, article_id=article_uuid)
     response.status_code = 200
     return response

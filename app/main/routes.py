@@ -752,22 +752,21 @@ def add_article():
         db.session.commit()
         url = s3.generate_presigned_url(
             ClientMethod='put_object', 
-            Params={'Bucket': bucket, 'Key': str(new_article.id)},
+            Params={'Bucket': bucket, 'Key': str(new_article.uuid)},
             ExpiresIn=3600)
 
-        return (json.dumps({'processing': True, 'url':url, 'a_id': new_article.id}), 200, {'ContentType': 'application/json'})
-        
+        return (json.dumps({'processing': True, 'url':url, 'a_id': str(new_article.uuid)}), 200, {'ContentType': 'application/json'})
+
 
     current_user.launch_task("set_images_lazy", "lazy load images", new_article.id)
     current_user.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
 
     db.session.commit()
-    
+
     html = render_articles()
 
     res = json.dumps({'processing':False, 'html': html})
     return (res, 200, {'ContentType': 'application/json'})
-    
 
 
 def handle_csrf_error(e):
@@ -781,13 +780,13 @@ def handle_csrf_error(e):
 @bp.route('/articles/bg', methods=['POST'])
 def bg_add_article():
     data = json.loads(request.data)
-    a_id = data['a_id']
+    a_uuid = data['a_id']
     pdf = data['pdf']
     epub = data['epub']
 
     file_ext = '.pdf' if pdf else '.epub'
 
-    new_task = current_user.launch_task('bg_add_article', 'adding article...', article_id=a_id, file_ext=file_ext, file=None)
+    new_task = current_user.launch_task('bg_add_article', 'adding article...', article_uuid=a_uuid, file_ext=file_ext, file=None)
     update_user_last_action('added article')
     ev = Event(user_id=current_user.id, name='added article', date=datetime.utcnow())
     db.session.add(ev)
@@ -800,8 +799,8 @@ def bg_add_article():
 # ##     epub + pdf processing status      ## #
 # ########################################### #
 
-@bp.route('/articles/processing/<task_id>/<a_id>')
-def process_article(task_id, a_id):
+@bp.route('/articles/processing/<task_id>/<a_uuid>')
+def process_article(task_id, a_uuid):
     process = Task.query.filter_by(id=task_id).first()
     try:
         current_app.redis.ping()
@@ -829,7 +828,7 @@ def process_article(task_id, a_id):
             # delete object from amazon
             s3.delete_object(
                 Bucket = bucket,
-                Key = a_id
+                Key = a_uuid
             )
             return (json.dumps({'html': html}), 200, {'ContentType': 'application/json'})
 

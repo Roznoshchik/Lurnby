@@ -21,6 +21,7 @@ def process_manual_entry(article, manual_entry):
     Returns:
         article (class 'app.models.Article'): Updated with manual entry data
     """
+
     title = manual_entry.get("title")
     content = manual_entry.get("content")
     source = manual_entry.get("source")
@@ -46,6 +47,7 @@ def process_url_entry(article, url):
     Returns:
         article (class 'app.models.Article'): Updated with url content
     """
+
     if not validators.url(url):
         raise SuppliedDataException(
             "Can't validate url. Please check the data and try again"
@@ -80,6 +82,7 @@ def add_to_tags(article, user_id, tags=[]):
     Returns:
         article (class 'app.models.Article'): Updated with tags
     """
+
     for tag_name in tags:
         tag = Tag.query.filter_by(name=tag_name).first()
         if not tag:
@@ -112,45 +115,60 @@ def process_file(article=None, file=None, user=None):
         db.session.commit()
         raise SuppliedDataException("File must be pdf or epub")
     else:
+        print("starting", file_ext)
         task = user.launch_task(
-            "bg_add_article", article_id=article.id, file_ext=file_ext, file=file
+            "bg_add_article",
+            article_uuid=str(article.uuid),
+            file_ext=file_ext,
+            file=file,
         )
-        response = jsonify(processing=True, task_id=task.id, article_id=article.id)
+        response = jsonify(
+            processing=True, task_id=task.id, article_id=str(article.uuid)
+        )
         response.status_code = 201
         return response
 
 
-def process_file_upload(article, file_ext):
+def process_file_upload(article, upload_file_ext):
     """generates a presigned url for uploading a file to s3
     returns the presigned url to the client for uploading and
     also returns the url to ping when the upload is complete
 
     Args:
         article (class 'app.models.Article'): instantiated article
-        file_ext (str): .epub or .pdf
+        upload_file_ext (str): .epub or .pdf
 
     Returns:
         response object: status_code = 201,
         json={
           upload_url:str,
           location: str,
-          file_ext:str,
+          upload_file_ext:str,
           article_id: int,
           processing:bool
           }
     """
+    print(upload_file_ext)
+    if upload_file_ext and "." not in upload_file_ext:
+        upload_file_ext = f".{upload_file_ext}"
+    print(upload_file_ext)
+    if not upload_file_ext or (
+        upload_file_ext != ".epub" and upload_file_ext != ".pdf"
+    ):
+        raise SuppliedDataException('upload_file_ext should be ".epub" or ".pdf"')
+
     upload_url = s3.generate_presigned_url(
         ClientMethod="put_object",
-        Params={"Bucket": bucket, "Key": str(article.id)},
+        Params={"Bucket": bucket, "Key": str(article.uuid)},
         ExpiresIn=3600,
     )
 
     response = jsonify(
         processing=True,
         upload_url=upload_url,
-        article_id=article.id,
-        file_ext=file_ext,
-        location=url_for("app.api.file_uploaded"),
+        article_id=str(article.uuid),
+        upload_file_ext=upload_file_ext,
+        location=url_for("api.file_uploaded", article_uuid=str(article.uuid)),
     )
 
     response.status_code = 201

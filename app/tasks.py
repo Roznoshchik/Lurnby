@@ -7,7 +7,7 @@ from rq import get_current_job
 from flask import render_template, url_for
 from bs4 import BeautifulSoup
 import re
-
+import traceback
 import app
 from app import create_app, db, s3, bucket, CustomLogger
 from app.export import get_zip
@@ -22,8 +22,29 @@ try:
     app.redis.ping()
     app = create_app()
     app.app_context().push()
-except:
+except Exception:
     pass
+
+def _set_task_progress(progress):
+    try:
+        app.redis.ping()
+        job = get_current_job()
+        if job:
+            logger.info(f'Job: {job}')
+            job.meta['progress'] = progress
+            job.save_meta()
+            logger.info(f'task id: {job.get_id()}')
+            task = Task.query.get(job.get_id())
+            logger.info(f'Task: {task}')
+            task.user.add_notification('task_progress',
+                                    {'task_id': job.get_id(),
+                                        'progress': progress })
+            if progress >= 100:
+                task.complete = True
+            db.session.commit()
+    except Exception:    
+        pass
+
 
 def delete_user(id):
     u = User.query.filter_by(id=id).first()
@@ -61,24 +82,6 @@ def delete_user(id):
     u.token=None
     u.deleted=True
     db.session.commit()
-
-
-def _set_task_progress(progress):
-    job = get_current_job()
-  
-    if job:
-        logger.info(f'Job: {job}')
-        job.meta['progress'] = progress
-        job.save_meta()
-        logger.info(f'task id: {job.get_id()}')
-        task = Task.query.get(job.get_id())
-        logger.info(f'Task: {task}')
-        task.user.add_notification('task_progress',
-                                   {'task_id': job.get_id(),
-                                     'progress': progress })
-        if progress >= 100:
-            task.complete = True
-        db.session.commit()
 
 
 def account_export(uid, ext, delete=False):
@@ -239,10 +242,10 @@ def export_highlights(user, highlights, source, ext):
         _set_task_progress(100)
 
     
-def bg_add_article(article_id=None, file_ext=None, file=None):
+def bg_add_article(article_uuid=None, file_ext=None, file=None):
     try:
         _set_task_progress(0)
-        article = Article.query.filter_by(id=article_id).first()
+        article = Article.query.filter_by(uuid=article_uuid).first()
         
         today = date.today()
         today = today.strftime("%B %d, %Y")
@@ -256,12 +259,12 @@ def bg_add_article(article_id=None, file_ext=None, file=None):
             if not os.path.isdir(path):
                 os.mkdir(path)
 
-            path = f'{path}/{article_id}'
+            path = f'{path}/{article_uuid}'
 
         if file_ext == '.pdf':
             if not file:
                 file = f'{path}.pdf'
-                s3.download_file(bucket, str(article_id), file)
+                s3.download_file(bucket, article_uuid, file)
 
             _set_task_progress(10)
             pdf = importPDF(file, article.user)
@@ -281,7 +284,7 @@ def bg_add_article(article_id=None, file_ext=None, file=None):
         else:
             if not file:
                 file = f'{path}.epub'
-                s3.download_file(bucket, str(article_id), file)
+                s3.download_file(bucket, article_uuid, file)
 
             content = epubConverted(file, article.user)
             title = epubTitle(file)
@@ -308,7 +311,7 @@ def bg_add_article(article_id=None, file_ext=None, file=None):
 def set_images_lazy(aid):
     try:
         _set_task_progress(0)
-        a = Article.query.get(aid)
+        a = Article.query.filter_by(id=aid).first()
         soup = BeautifulSoup(a.content, "html5lib")
         images = soup.find_all("img")
         for img in images:
@@ -323,7 +326,7 @@ def set_images_lazy(aid):
 def set_absolute_urls(aid):
     try:
         _set_task_progress(0)
-        a = Article.query.get(aid)
+        a = Article.query.filter_by(id=aid).first()
         if a.source_url:
             soup = BeautifulSoup(a.content, "html5lib")
             images = soup.find_all("img")
