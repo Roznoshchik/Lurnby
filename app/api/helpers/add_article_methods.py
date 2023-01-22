@@ -122,9 +122,7 @@ def process_file(article=None, file=None, user=None):
             file_ext=file_ext,
             file=file,
         )
-        response = jsonify(
-            processing=True, task_id=task.id, article_id=str(article.uuid)
-        )
+        response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
         response.status_code = 201
         return response
 
@@ -165,7 +163,7 @@ def process_file_upload(article, upload_file_ext):
     response = jsonify(
         processing=True,
         upload_url=upload_url,
-        article_id=str(article.uuid),
+        article=article.to_dict(),
         upload_file_ext=upload_file_ext,
         location=url_for("api.file_uploaded", article_uuid=str(article.uuid)),
     )

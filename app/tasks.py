@@ -332,6 +332,8 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
             article.processing = False
 
             db.session.commit()
+            os.remove(f"{path}.pdf")
+
         else:
             if not file:
                 file = f"{path}.epub"
@@ -353,6 +355,8 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
             article.estimated_reading()
             article.processing = False
             db.session.commit()
+            os.remove(f"{path}.epub")
+
     except Exception as e:
         logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
     finally:

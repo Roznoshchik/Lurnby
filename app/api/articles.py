@@ -20,7 +20,7 @@ from app.api.errors import bad_request
 
 from flask import jsonify, request
 import json
-
+from uuid import UUID
 
 logger = CustomLogger("API")
 
@@ -152,12 +152,15 @@ def file_uploaded(article_uuid):
     upload_file_ext = request.args.get("upload_file_ext", None)
     if upload_file_ext and "." not in upload_file_ext:
         upload_file_ext = f".{upload_file_ext}"
-    if not upload_file_ext or upload_file_ext != ".epub" or upload_file_ext != ".pdf":
+    if not upload_file_ext or (
+        upload_file_ext != ".epub" and upload_file_ext != ".pdf"
+    ):
         return bad_request('upload_file_ext query arg should be ".epub" or ".pdf"')
 
     task = token_auth.current_user().launch_task(
         "bg_add_article", article_uuid=article_uuid, file_ext=upload_file_ext, file=None
     )
-    response = jsonify(processing=True, task_id=task.id, article_id=article_uuid)
+    article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+    response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
     response.status_code = 200
     return response
