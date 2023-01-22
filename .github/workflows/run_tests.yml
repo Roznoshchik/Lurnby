@@ -31,9 +31,9 @@ jobs:
     
     - name: Install npm dependencies
       run: |
-        cd ReadabiliPy
+        cd app/ReadabiliPy
         npm i
-        cd ..
+        cd ../..
     
     - name: Lint with flake8
       run: |
