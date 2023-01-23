@@ -336,6 +336,7 @@ class Event(db.Model):
     -> exported all data         //    all
     -> exported highlights       //    all
     -> opened article            //    all
+    -> deleted article           //    all
     -> reset password            //    all
     -> reviewed highlights       //    daily
     -> reviewed a highlight      //    all
@@ -467,6 +468,26 @@ class Article(db.Model):
 
     def __repr__(self):
         return f"<{self.id}: {self.title}>"
+
+    @property
+    def fields_that_can_be_updated(self):
+        return [
+            "done",
+            "unread",
+            "archived",
+            "date_read",
+            "progress",
+            "bookmarks",
+            "source",
+            "title",
+            "content",
+            "notes",
+            "reflections",
+        ]
+
+    @property
+    def tag_list(self):
+        return [tag.name for tag in self.tags.all()]
 
     @classmethod
     def return_articles_with_count(cls):
@@ -661,17 +682,23 @@ class Article(db.Model):
 
     # add article to tag
     def AddToTag(self, tag):
+        self.add_to_tag(tag)
+
+    def add_to_tag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
             for h in self.highlights:
                 h.AddToTag(tag)
 
     # remove article from tag
-    def RemoveFromTag(self, tag):
+    def remove_from_tag(self, tag):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
             for h in self.highlights:
                 h.RemoveFromTag(tag)
+
+    def RemoveFromTag(self, tag):
+        self.remove_from_tag(tag)
 
     # checks if an article is in a tag
     def is_added_tag(self, tag):

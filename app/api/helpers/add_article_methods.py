@@ -6,7 +6,7 @@ from app import db, CustomLogger, s3, bucket
 from app.main.pulltext import pull_text
 from app.models import Tag
 
-from .exceptions import SuppliedDataException
+from ..exceptions import SuppliedDataException
 
 logger = CustomLogger("API")
 

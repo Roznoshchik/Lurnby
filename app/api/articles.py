@@ -17,6 +17,7 @@ from app.api.helpers.add_article_methods import (
 )
 from app.models import Article, Event
 from app.api.errors import bad_request
+from app.api.helpers.update_article_methods import update_tags
 
 from flask import jsonify, request
 import json
@@ -123,7 +124,8 @@ def add_article():
         article.processing = False
         token_auth.current_user().launch_task("set_images_lazy", aid=article.id)
         token_auth.current_user().launch_task("set_absolute_urls", aid=article.id)
-        Event.add("added article", user=token_auth.current_user())
+        ev = Event.add("added article", user=token_auth.current_user())
+        db.session.add(ev)
         db.session.commit()
 
         response = jsonify(processing=False, article=article.to_dict())
@@ -134,6 +136,109 @@ def add_article():
         if article.id:
             db.session.delete(article)
             db.session.commit()
+        if hasattr(e, "msg"):
+            return bad_request(e.msg)
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ######################### """
+""" ##     get article     ## """
+""" ######################### """
+
+
+@bp.route("/articles/<article_uuid>", methods=["GET"])
+@token_auth.login_required
+def get_article(article_uuid):
+    try:
+        article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+
+        if not article or article.user_id != token_auth.current_user().id:
+            return bad_request("The resource can't be found")
+
+        response = jsonify(article=article.to_dict(preview=False))
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        if hasattr(e, "msg"):
+            return bad_request(e.msg)
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ############################ """
+""" ##     update article     ## """
+""" ############################ """
+
+
+@bp.route("/articles/<article_uuid>", methods=["PATCH"])
+@token_auth.login_required
+def update_article(article_uuid):
+    try:
+        article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+
+        if not article or article.user_id != token_auth.current_user().id:
+            return bad_request("The resource can't be found")
+
+        data = json.loads(request.data)
+        valid_fields = article.fields_that_can_be_updated
+
+        for key, value in data.items():
+            if key in valid_fields:
+                setattr(article, key, value)
+
+        if "tags" in data:
+            article = update_tags(
+                tags=data["tags"], article=article, user=token_auth.current_user()
+            )
+
+        ev = Event.add("updated article")
+        db.session.add(ev)
+        db.session.commit()
+
+        response = jsonify(article=article.to_dict())
+        response.status_code = 200
+        return response
+
+    except TypeError as e:
+        if e == "the JSON object must be str, bytes or bytearray, not int":
+            return bad_request("No Data")
+        raise e
+    except Exception as e:
+        if hasattr(e, "msg"):
+            return bad_request(e.msg)
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ############################ """
+""" ##     delete article     ## """
+""" ############################ """
+
+
+@bp.route("/articles/<article_uuid>", methods=["DELETE"])
+@token_auth.login_required
+def delete_article(article_uuid):
+    try:
+        article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+
+        if not article or article.user_id != token_auth.current_user().id:
+            return bad_request("The resource can't be found")
+
+        db.session.delete(article)
+        ev = Event.add("deleted article", user=token_auth.current_user())
+        db.session.add(ev)
+        db.session.commit()
+
+        response = jsonify()
+        response.status_code = 200
+        return response
+
+    except Exception as e:
         if hasattr(e, "msg"):
             return bad_request(e.msg)
         else:
