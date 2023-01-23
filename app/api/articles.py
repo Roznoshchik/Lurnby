@@ -269,3 +269,8 @@ def file_uploaded(article_uuid):
     response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
     response.status_code = 200
     return response
+
+
+""" ####################################### """
+""" ##     get article notification?     ## """
+""" ####################################### """

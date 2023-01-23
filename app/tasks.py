@@ -333,6 +333,7 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
 
             db.session.commit()
             os.remove(f"{path}.pdf")
+            s3.delete_object(Bucket=bucket, Key=article_uuid)
 
         else:
             if not file:
@@ -356,6 +357,7 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
             article.processing = False
             db.session.commit()
             os.remove(f"{path}.epub")
+            s3.delete_object(Bucket=bucket, Key=article_uuid)
 
     except Exception as e:
         logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
