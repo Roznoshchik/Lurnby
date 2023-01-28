@@ -1,8 +1,11 @@
+from datetime import datetime, timedelta
 import json
 import os
 from pathlib import Path
+from uuid import uuid4, UUID
 import unittest
 from unittest.mock import patch
+
 from app import create_app, db
 from app.models import Article, User, Tag
 from config import Config
@@ -542,3 +545,149 @@ class GetArticleApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
         self.assertIsNotNone(data["has_next"])
+
+
+class UpdateArticleApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_no_article_returns_error(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        id = str(uuid4())
+        body = {}
+        res = self.client.patch(
+            "/api/articles/" + id,
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(400, res.status_code)
+        self.assertEqual("The resource can't be found", data["message"])
+
+    @patch("app.models.User.check_token")
+    def test_article_updates_only_allowed_fields(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        article = Article(user_id=User.query.first().id, title="Hello World")
+        db.session.add(article)
+        db.session.commit()
+
+        new_date = datetime.utcnow() + timedelta(days=1)
+
+        body = {
+            "article_created_date": new_date,
+            "title": "Goodbye Cruel World",
+            "notes": "This is a note",
+        }
+
+        res = self.client.patch(
+            "/api/articles/" + str(article.uuid),
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+
+        data = json.loads(res.data)
+
+        self.assertEqual(article.notes, "This is a note")
+        self.assertEqual(article.title, "Goodbye Cruel World")
+        self.assertNotEqual(article.article_created_date, new_date)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data["article"]["title"], article.title)
+
+    @patch("app.models.User.check_token")
+    def test_article_updates_tags(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        article = Article(user_id=User.query.first().id, title="Hello World")
+        db.session.add(article)
+        db.session.commit()
+
+        tags = ["pikachu", "bulbasaur", "charmander"]
+        for tag in tags:
+            new_tag = Tag(name=tag, user_id=User.query.first().id)
+            db.session.add(new_tag)
+            article.add_to_tag(new_tag)
+
+        db.session.commit()
+
+        self.assertEqual(article.tag_list, tags)
+
+        body = {"tags": ["charmander", "bulbasaur", "squirtle"]}
+
+        res = self.client.patch(
+            "/api/articles/" + str(article.uuid),
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+
+        self.assertEqual(res.status_code, 200)
+        self.assertCountEqual(article.tag_list, body["tags"])
+
+
+class DeleteArticleApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_no_article_returns_error(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        id = str(uuid4())
+        body = {}
+        res = self.client.delete(
+            "/api/articles/" + id,
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(400, res.status_code)
+        self.assertEqual("The resource can't be found", data["message"])
+
+    @patch("app.models.User.check_token")
+    def test_article_deletes(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        article = Article(user_id=User.query.first().id, title="Hello World")
+        db.session.add(article)
+        db.session.commit()
+
+        id = str(article.uuid)
+        res = self.client.delete(
+            "/api/articles/" + id, headers={"Authorization": "Bearer abc123"}
+        )
+        self.assertEqual(res.status_code, 200)
+
+        article = Article.query.filter_by(uuid=UUID(id)).first()
+        self.assertIsNone(article)

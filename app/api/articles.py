@@ -21,7 +21,9 @@ from app.api.helpers.update_article_methods import update_tags
 
 from flask import jsonify, request
 import json
+import traceback
 from uuid import UUID
+
 
 logger = CustomLogger("API")
 
@@ -195,11 +197,11 @@ def update_article(article_uuid):
                 tags=data["tags"], article=article, user=token_auth.current_user()
             )
 
-        ev = Event.add("updated article")
+        ev = Event.add("updated article", user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
 
-        response = jsonify(article=article.to_dict())
+        response = jsonify(article=article.to_dict(preview=False))
         response.status_code = 200
         return response
 
@@ -211,7 +213,7 @@ def update_article(article_uuid):
         if hasattr(e, "msg"):
             return bad_request(e.msg)
         else:
-            logger.error(e)
+            logger.error(traceback.print_exc())
             return bad_request("Something went wrong.")
 
 
@@ -269,8 +271,3 @@ def file_uploaded(article_uuid):
     response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
     response.status_code = 200
     return response
-
-
-""" ####################################### """
-""" ##     get article notification?     ## """
-""" ####################################### """
