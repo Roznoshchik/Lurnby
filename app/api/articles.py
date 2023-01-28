@@ -267,6 +267,8 @@ def file_uploaded(article_uuid):
     task = token_auth.current_user().launch_task(
         "bg_add_article", article_uuid=article_uuid, file_ext=upload_file_ext, file=None
     )
+    db.session.commit()
+
     article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
     response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
     response.status_code = 200

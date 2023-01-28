@@ -24,7 +24,7 @@ def epubConverted(filepath, u=None):
         os.mkdir(path)
 
     title = epubTitle(filepath)
-    title = secure_filename(title[0][0])
+    title = secure_filename(title)
     path = os.path.join(basedir, "temp", title)
     if os.environ.get("DEV"):
         az_path_base = f"staging/{u.id}/{title}/"
@@ -237,7 +237,9 @@ def epub2html(filepath):
 
 def epubTitle(filepath):
     book = epub.read_epub(filepath)
-    title = book.get_metadata("DC", "title")
+    title = book.get_metadata("DC", "title")[0][
+        0
+    ]  # always returns a list with a tuple [('title', {})]
 
     return title
 
@@ -297,7 +299,7 @@ def html2text(html):
         os.mkdir(path)
 
     title = epubTitle(epub)
-    title = secure_filename(title[0][0])
+    title = secure_filename(title)
     path = os.path.join(basedir, "temp", title)
 
     with ZipFile(epub, "r") as zip:

@@ -218,7 +218,7 @@ class AddArticleApiTests(unittest.TestCase):
             query_string=args,
             headers={"Authorization": "Bearer abc123"},
         )
-        print(res.json)
+
         self.assertEqual(res.json["article"]["id"], str(article.uuid))
         self.assertTrue("task_id" in res.json)
         self.assertTrue(res.json["processing"])

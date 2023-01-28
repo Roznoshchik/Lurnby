@@ -342,12 +342,10 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
 
             content = epubConverted(file, article.user)
             title = epubTitle(file)
-            title = title[0][0]
-            epubtext = content
 
             source = "Epub File: added " + today
             article.title = title
-            article.content = epubtext
+            article.content = content
             article.source = source
             article.filetype = "epub"
 

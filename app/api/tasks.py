@@ -14,7 +14,7 @@ logger = CustomLogger("API")
 def get_task_status(task_id):
     try:
         task = Task.query.filter_by(id=task_id).first()
-        if task.user_id != token_auth.current_user.id:
+        if task.user_id != token_auth.current_user().id:
             return error_response(404, "resource not found")
 
         article_id = request.args.get("article_id", None)
