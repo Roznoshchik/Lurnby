@@ -3,6 +3,17 @@ from app.models import Tag
 
 
 def update_tags(tags, article, user):
+    """updates an articles tags and returns the article
+    fully replaces the tags on the article to match the tags list that is passed in.
+
+    Args:
+        tags (string[]): list of tag names
+        article (article object): article object
+        user (current user object): user object
+
+    Returns:
+        article: updated with tags
+    """
     article_tags = article.tag_list
     for tag_name in article_tags:
         if tag_name not in tags:

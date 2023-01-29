@@ -132,12 +132,12 @@ def epubConverted(filepath, u=None):
                 if not os.path.exists(filename):
                     filename = f"{path}/EPUB/images/{img['src']}"
                     # print(f'filename: {filename}')
-                    print(filename)
+                    # print(filename)
 
                 if not os.path.exists(filename):
                     filename = f"{path}/EPUB/{img['src']}"
                     # print(f'filename: {filename}')
-                    print(filename)
+                    # print(filename)
 
                 if not os.path.exists(filename):
                     filename = img["src"]
@@ -263,7 +263,6 @@ def chap2text(chapters, path, az_path):
     images = soup.find_all("img")
     if images:
         for img in images:
-
             img["src"] = img["src"].replace("../", path + "/")
             filename = img["src"]
             if not os.path.exists(filename):

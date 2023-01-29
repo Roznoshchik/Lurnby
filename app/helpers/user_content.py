@@ -1,4 +1,4 @@
-from app import db
+from app import db, CustomLogger
 from app.email import send_email
 from app.models import Highlight, User, Message, Comms
 import random
@@ -6,9 +6,11 @@ from datetime import datetime, timedelta
 
 from flask import render_template, current_app
 
+logger = CustomLogger("Helpers")
+
 
 def get_recent_highlights():
-    print("checking if highlights email needs to be sent out.")
+    logger.info("checking if highlights email needs to be sent out.")
     users = (
         User.query.join(Comms, (Comms.user_id == User.id))
         .filter(
@@ -62,9 +64,9 @@ def get_recent_highlights():
                 msg = Message.add("recent highlights", u)
                 db.session.add(msg)
                 db.session.commit()
-                print(f"sent recent highlights to user {u.id}")
+                logger.info(f"sent recent highlights to user {u.id}")
             else:
-                print("no highlights qualified")
+                logger.info("no highlights qualified")
 
 
 def highlights_urls(highlights):

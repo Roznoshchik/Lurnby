@@ -597,7 +597,7 @@ class Article(db.Model):
             "_id": self.id,
             "id": str(self.uuid),
             "user_id": self.user_id,
-            "source": self.source,
+            "source": self.source or self.source_url,
             "source_url": self.source_url,
             "title": self.title,
             "content": self.content if not preview else None,

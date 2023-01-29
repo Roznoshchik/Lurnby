@@ -2,8 +2,8 @@ from datetime import datetime
 
 from app import db
 from app.models import User
-from app.utilities.user_content import get_recent_highlights
-from app.utilities.delete_user import check_for_delete
+from app.helpers.user_content import get_recent_highlights
+from app.helpers.delete_user import check_for_delete
 
 
 def register(app):

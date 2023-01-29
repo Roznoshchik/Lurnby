@@ -3,8 +3,11 @@ from datetime import datetime, timedelta
 
 import boto3
 
-from app import db, bucket
+from app import db, bucket, CustomLogger
 from app.models import Event
+
+
+logger = CustomLogger("Helpers")
 
 
 def delete_user(u):
@@ -38,7 +41,7 @@ def delete_user(u):
 
 
 def check_for_delete():
-    print("Checking if anything needs deleting from Amazon.")
+    logger.info("Checking if anything needs deleting from Amazon.")
     today = datetime.utcnow()
     last_week = today - timedelta(days=8)
     evs = Event.query.filter(
@@ -47,12 +50,12 @@ def check_for_delete():
     if evs:
         for ev in evs:
             if ev.user:
-                print(f"deleting files for user {ev.user.id}")
+                logger.info(f"deleting files for user {ev.user.id}")
                 delete_az(ev.user)
             else:
-                print("NoneType User")
+                logger.info("NoneType User")
     else:
-        print("nothing needs deletion")
+        logger.info("nothing needs deletion")
 
 
 def delete_az(user):

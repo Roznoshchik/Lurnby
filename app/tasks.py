@@ -7,6 +7,8 @@ from rq import get_current_job
 from flask import render_template
 from bs4 import BeautifulSoup
 import re
+import traceback
+
 import app
 from app import create_app, db, s3, bucket, CustomLogger
 from app.export import get_zip
@@ -14,6 +16,7 @@ from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import Task, Article, Highlight, User
+from app.helpers.export_helpers import create_zip_file_for_article
 
 logger = CustomLogger("Tasks")
 
@@ -295,6 +298,69 @@ def export_highlights(user, highlights, source, ext):
         _set_task_progress(100)
 
 
+def export_article(user, article, ext="csv"):
+    """exports a zip file with two files and sends an email with the download link.
+    The first file contains the article metadata and notes, reflections, and tags.
+    The second contains the highlights, their notes, and their tags.
+
+    Args:
+        user (class User): User requesting the export
+        article (class Article): Article being exported
+        ext (string): desired export format : CSV, JSON, TXT
+    """
+
+    try:
+        if not user or not article:
+            raise ValueError("Both User and Article are required")
+
+        _set_task_progress(0)
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(basedir, "temp")
+        file_title = "_".join(article.title.split())
+
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        if os.environ.get("DEV"):
+            az_path_base = f"staging/{user.id}/exports"
+        else:
+            az_path_base = f"{user.id}/exports"
+
+        zip_path = create_zip_file_for_article(article, path, ext)
+        az_path = f"{az_path_base}/{file_title}.zip"
+
+        s3.upload_file(Bucket=bucket, Filename=zip_path, Key=az_path)
+
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": az_path},
+            ExpiresIn=604800,
+        )
+
+        logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
+
+        send_email(
+            "[Lurnby] Your exported highlights",
+            sender=app.config["ADMINS"][0],
+            recipients=[user.email],
+            text_body=render_template(
+                "email/export_highlights.txt", url=url, user=user
+            ),
+            html_body=render_template(
+                "email/export_highlights.html", url=url, user=user
+            ),
+            sync=True,
+        )
+        os.remove(zip_path)
+
+    except Exception as e:
+        logger.error(e)
+        raise e
+    finally:
+        _set_task_progress(100)
+
+
 def bg_add_article(article_uuid=None, file_ext=None, file=None):
     try:
         _set_task_progress(0)
@@ -303,14 +369,13 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
         today = date.today()
         today = today.strftime("%B %d, %Y")
 
-        if not file:
-            basedir = os.path.abspath(os.path.dirname(__file__))
-            path = os.path.join(basedir, "temp")
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(basedir, "temp")
 
-            if not os.path.isdir(path):
-                os.mkdir(path)
+        if not os.path.isdir(path):
+            os.mkdir(path)
 
-            path = f"{path}/{article_uuid}"
+        path = f"{path}/{article_uuid}"
 
         if file_ext == ".pdf":
             if not file:
@@ -332,8 +397,11 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
             article.processing = False
 
             db.session.commit()
-            os.remove(f"{path}.pdf")
             s3.delete_object(Bucket=bucket, Key=article_uuid)
+            try:
+                os.remove(f"{path}.pdf")
+            except Exception:
+                pass
 
         else:
             if not file:
@@ -354,10 +422,14 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
             article.estimated_reading()
             article.processing = False
             db.session.commit()
-            os.remove(f"{path}.epub")
             s3.delete_object(Bucket=bucket, Key=article_uuid)
+            try:
+                os.remove(f"{path}.epub")
+            except Exception:
+                pass
 
     except Exception as e:
+        logger.error(traceback.print_exc())
         logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)

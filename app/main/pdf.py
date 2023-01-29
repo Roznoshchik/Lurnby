@@ -7,11 +7,14 @@ from werkzeug.utils import secure_filename
 from app import s3, bucket
 
 
-def importPDF(filepath, u=None):
+def importPDF(file, u=None):
+
+    filepath = file.filename if hasattr(file, "filename") else file
+
     if not u:
         u = current_user
-
     doc = fitz.open(filepath)
+
     content = ""
     title = ""
     processed = {}
@@ -92,8 +95,8 @@ def importPDF(filepath, u=None):
             else:
                 lines = i["lines"]
                 if lines is None:
-                    print(p)
-                    print(i)
+                    # print(p)
+                    # print(i)
                     break
                 font_size = None
                 for line in lines:

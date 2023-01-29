@@ -57,7 +57,6 @@ class AddArticleApiTests(unittest.TestCase):
         )
 
         data = res.json
-        print(Article.query.all())
         article = Article.query.filter_by(id=1).first()
         tag = article.tags.all()[0]
 
@@ -66,6 +65,7 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertTrue("task_id" in data)
         self.assertTrue(data["processing"])
         self.assertEqual(tag.name, "pikachu")
+        mock_file.close()
 
     @patch("app.models.User.check_token")
     def test_add_supplied_pdf_article(self, mock_check_token):
@@ -88,13 +88,23 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertEqual(str(article.uuid), data["article"]["id"])
         self.assertTrue("task_id" in data)
         self.assertTrue(data["processing"])
+        mock_file.close()
 
+    @patch("app.tasks.s3.download_file")
     @patch("app.api.helpers.add_article_methods.s3.generate_presigned_url")
     @patch("app.models.User.check_token")
-    def test_add_upload_article(self, mock_check_token, mock_s3):
+    def test_add_upload_article(self, mock_check_token, mock_s3, mock_s3_download):
         mock_check_token.return_value = User.query.first()
         mock_s3.return_value = "foo.com"
         payload = {"upload_file_ext": "pdf"}
+
+        pdf = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb")
+
+        def mock_download_file(bucket, article_uuid, file):
+            with open(file, "wb") as file:
+                file.write(pdf.read())
+
+        mock_s3_download.side_effect = mock_download_file
 
         res = self.client.post(
             "/api/articles",
@@ -112,6 +122,7 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertEqual(".pdf", data["upload_file_ext"])
         self.assertTrue("location" in data)
         self.assertTrue(data["processing"])
+        pdf.close()
 
     @patch("app.models.User.check_token")
     def test_add_manual_entry(self, mock_check_token):
@@ -166,6 +177,8 @@ class AddArticleApiTests(unittest.TestCase):
 
         self.assertEqual(res.status_code, 201)
         self.assertEqual("The coolest Title Ever", res.json["article"]["title"])
+        self.assertEqual("https://www.mock.com", article.source_url)
+        self.assertEqual("https://www.mock.com", res.json["article"]["source"])
         self.assertTrue(
             "Is there anybody going to listen to my story?" in article.content
         )
@@ -222,6 +235,7 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertEqual(res.json["article"]["id"], str(article.uuid))
         self.assertTrue("task_id" in res.json)
         self.assertTrue(res.json["processing"])
+        epub.close()
 
     @patch("app.models.User.check_token")
     def test_bad_data_returns_400(self, mock_check_token):
@@ -338,7 +352,7 @@ class GetArticleApiTests(unittest.TestCase):
 
         # initialize articles
         for article in mock_articles:
-            a = Article()
+            a = Article(user_id=1)
             for key in article:
                 if key != "tags":
                     setattr(a, key, article[key])

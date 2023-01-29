@@ -4,7 +4,9 @@ mock_articles = [
     {
         "user_id": 1,
         "title": "foo",
-        "content": "alabama arkansas, I do love my ma and pa",
+        "content": "<p>alabama arkansas, I do love my ma and pa</p>",
+        "notes": "<p>This is a note</p>",
+        "reflection": "<p>This is a reflection</p>",
         "archived": False,
         "done": True,
         "unread": False,
@@ -14,7 +16,7 @@ mock_articles = [
     {
         "user_id": 1,
         "title": "bar",
-        "content": "At first I was afraid, I was petrified, thinking I could never love again",
+        "content": "<p>At first I was afraid, I was petrified, thinking I could never love again</p>",
         "archived": False,
         "done": False,
         "unread": True,
@@ -24,7 +26,7 @@ mock_articles = [
     {
         "user_id": 1,
         "title": "baz",
-        "content": "I just can't get enough",
+        "content": "<p>I just can't get enough</p>",
         "archived": False,
         "done": False,
         "unread": False,
@@ -54,3 +56,9 @@ mock_articles = [
 ]
 
 mock_tags = ["banana", "peaches", "pears", "strawberries"]
+
+mock_highlight = {
+    "note": "foobarbaz",
+    "text": "alabama arkansaw, I do love my ma and pa",
+    "prompt": "This is a prompt",
+}

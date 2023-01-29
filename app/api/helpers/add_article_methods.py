@@ -67,6 +67,7 @@ def process_url_entry(article, url):
 
     article.title = title
     article.content = content
+    article.source_url = url
 
     return article
 
@@ -115,7 +116,6 @@ def process_file(article=None, file=None, user=None):
         db.session.commit()
         raise SuppliedDataException("File must be pdf or epub")
     else:
-        print("starting", file_ext)
         task = user.launch_task(
             "bg_add_article",
             article_uuid=str(article.uuid),

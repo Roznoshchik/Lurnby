@@ -119,7 +119,7 @@ def delete_user(id):
                 delete=True,
             )
         else:
-            user.launch_task("delete_user", "deleting user", id=user.id)
+            user.launch_task("delete_user", "deleting user", user.id)
 
         db.session.commit()
 
@@ -139,7 +139,7 @@ def export_data(id):
     user = User.query.filter_by(id=id).first()
     file_extension = request.args.get("fileExtension", "json")
     if user and user.id == token_auth.current_user().id:
-        ev = Event.add("exported all data", user=token_auth.current_user())
+        ev = Event.add("exported all data", user=user)
         db.session.add(ev)
         user.launch_task(
             "account_export", "exporting data...", user.id, file_extension, delete=False
@@ -162,7 +162,7 @@ def enable_add_by_email(id):
     user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         user.set_lurnby_email()
-        ev = Event.add("enabled add by email", user=token_auth.current_user())
+        ev = Event.add("enabled add by email", user=user)
         db.session.add(ev)
         db.session.commit()
         response = jsonify(email=user.add_by_email)
@@ -204,7 +204,7 @@ def add_approved_senders(id):
         if email:
             email = email.lower()
             sender = Approved_Sender(user_id=user.id, email=email)
-            event = Event.add("added aproved sender", user=token_auth.current_user())
+            event = Event.add("added aproved sender", user=user)
             db.session.add_all([sender, event])
             db.session.commit()
             response = jsonify(email=email)
@@ -257,7 +257,7 @@ def update_user_comms(id):
             for key in VALID_KEYS:
                 if key in data:
                     setattr(comms, key, data[key])
-        ev = Event.add("updated comms", user=token_auth.current_user())
+        ev = Event.add("updated comms", user=user)
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.comms.to_dict())
