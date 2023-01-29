@@ -5,6 +5,7 @@ import os
 from zipfile import ZipFile
 
 from app import CustomLogger
+from app.api.exceptions import LurnbyValueError
 from app.models import Article
 
 logger = CustomLogger("Export Helpers")
@@ -21,7 +22,7 @@ def create_zip_file_for_article(article: Article, path: str, ext: str):
     try:
         ext = ext.lower()
         if ext not in ["csv", "txt", "json"]:
-            raise ValueError('ext must be one of "csv", "txt", or "json"')
+            raise LurnbyValueError('ext must be one of "csv", "txt", or "json"')
 
         zip_title = "_".join(article.title.split())
         zip_path = os.path.join(path, f"{zip_title}.zip")
@@ -156,6 +157,6 @@ def create_list_of_highlight_dicts(highlights):
 
 def make_plain_text(text):
     if not isinstance(text, str):
-        raise ValueError('Text must be of type "str"')
+        raise LurnbyValueError('Text must be of type "str"')
 
     return Soup(text, features="html5lib").text

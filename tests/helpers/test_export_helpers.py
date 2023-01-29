@@ -5,10 +5,7 @@ from random import randrange
 import unittest
 
 from app import create_app, db
-from app.models import Article, User, Tag, Highlight
-from config import Config
-
-from tests.mocks.mocks import mock_articles, mock_tags, mock_highlight
+from app.api.exceptions import LurnbyValueError
 from app.helpers.export_helpers import (
     create_zip_file_for_article,
     export_to_csv,
@@ -17,6 +14,10 @@ from app.helpers.export_helpers import (
     create_plain_text_article_dict,
     create_list_of_highlight_dicts,
 )
+from app.models import Article, User, Tag, Highlight
+
+from config import Config
+from tests.mocks.mocks import mock_articles, mock_tags, mock_highlight
 
 
 class TestConfig(Config):
@@ -81,7 +82,7 @@ class ExportArticleTests(unittest.TestCase):
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(LurnbyValueError) as cm:
             create_zip_file_for_article(article, path, "pikachu")
 
         self.assertEqual(

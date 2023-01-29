@@ -1,7 +1,3 @@
-class SuppliedDataException(Exception):
-    def __init__(
-        self,
-        msg=None,
-    ) -> None:
-        super().__init__()
-        self.msg = msg
+class LurnbyValueError(ValueError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

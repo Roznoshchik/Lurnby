@@ -1,6 +1,7 @@
 from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
+from app.api.exceptions import LurnbyValueError
 from app.api.helpers.article_query_maker import (
     filter_by_status,
     filter_by_tags,
@@ -19,7 +20,7 @@ from app.models import Article, Event
 from app.api.errors import bad_request
 from app.api.helpers.update_article_methods import update_tags
 
-from flask import jsonify, request
+from flask import jsonify, request, url_for
 import json
 import traceback
 from uuid import UUID
@@ -54,30 +55,38 @@ def get_articles():
     q : search query. This is applied after filtering by status and tags.
         e.g. hello old friend
     """
-    user = token_auth.current_user()
+    try:
 
-    page = request.args.get("page", "1")
-    per_page = request.args.get("per_page", "15")
-    title_sort = request.args.get("title_sort", None)
-    opened_sort = request.args.get("opened_sort", None)
-    status = request.args.get("status", None)
-    search_phrase = request.args.get("q", None)
-    tag_ids = request.args.get("tag_ids", None)
+        user = token_auth.current_user()
 
-    # filter query
-    query = user.articles.filter_by(processing=False)
-    query = filter_by_status(query, status)
-    query = filter_by_tags(query, tag_ids)
-    query = filter_by_search_phrase(query, search_phrase)
-    query = apply_sorting(query, title_sort, opened_sort)
-    query = apply_pagination(query, page, per_page)
+        page = request.args.get("page", "1")
+        per_page = request.args.get("per_page", "15")
+        title_sort = request.args.get("title_sort", None)
+        opened_sort = request.args.get("opened_sort", None)
+        status = request.args.get("status", None)
+        search_phrase = request.args.get("q", None)
+        tag_ids = request.args.get("tag_ids", None)
 
-    has_next = query.has_next if query.has_next else None
-    articles = [article.to_dict() for article in query.items]
+        # filter query
+        query = user.articles.filter_by(processing=False)
+        query = filter_by_status(query, status)
+        query = filter_by_tags(query, tag_ids)
+        query = filter_by_search_phrase(query, search_phrase)
+        query = apply_sorting(query, title_sort, opened_sort)
+        query = apply_pagination(query, page, per_page)
 
-    response = jsonify(has_next=has_next, articles=articles)
-    response.status_code = 200
-    return response
+        has_next = query.has_next if query.has_next else None
+        articles = [article.to_dict() for article in query.items]
+
+        response = jsonify(has_next=has_next, articles=articles)
+        response.status_code = 200
+        return response
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
 
 
 """ ######################### """
@@ -138,8 +147,8 @@ def add_article():
         if article.id:
             db.session.delete(article)
             db.session.commit()
-        if hasattr(e, "msg"):
-            return bad_request(e.msg)
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
         else:
             logger.error(e)
             return bad_request("Something went wrong.")
@@ -164,8 +173,8 @@ def get_article(article_uuid):
         return response
 
     except Exception as e:
-        if hasattr(e, "msg"):
-            return bad_request(e.msg)
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
         else:
             logger.error(e)
             return bad_request("Something went wrong.")
@@ -210,8 +219,8 @@ def update_article(article_uuid):
             return bad_request("No Data")
         raise e
     except Exception as e:
-        if hasattr(e, "msg"):
-            return bad_request(e.msg)
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
         else:
             logger.error(traceback.print_exc())
             return bad_request("Something went wrong.")
@@ -241,8 +250,8 @@ def delete_article(article_uuid):
         return response
 
     except Exception as e:
-        if hasattr(e, "msg"):
-            return bad_request(e.msg)
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
         else:
             logger.error(e)
             return bad_request("Something went wrong.")
@@ -256,20 +265,75 @@ def delete_article(article_uuid):
 @bp.route("/articles/<article_uuid>/uploaded", methods=["GET"])
 @token_auth.login_required
 def file_uploaded(article_uuid):
-    upload_file_ext = request.args.get("upload_file_ext", None)
-    if upload_file_ext and "." not in upload_file_ext:
-        upload_file_ext = f".{upload_file_ext}"
-    if not upload_file_ext or (
-        upload_file_ext != ".epub" and upload_file_ext != ".pdf"
-    ):
-        return bad_request('upload_file_ext query arg should be ".epub" or ".pdf"')
+    try:
+        upload_file_ext = request.args.get("upload_file_ext", None)
+        if upload_file_ext and "." not in upload_file_ext:
+            upload_file_ext = f".{upload_file_ext}"
+        if not upload_file_ext or (
+            upload_file_ext != ".epub" and upload_file_ext != ".pdf"
+        ):
+            return bad_request('upload_file_ext query arg should be ".epub" or ".pdf"')
 
-    task = token_auth.current_user().launch_task(
-        "bg_add_article", article_uuid=article_uuid, file_ext=upload_file_ext, file=None
-    )
-    db.session.commit()
+        task = token_auth.current_user().launch_task(
+            "bg_add_article",
+            article_uuid=article_uuid,
+            file_ext=upload_file_ext,
+            file=None,
+        )
+        db.session.commit()
 
-    article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
-    response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
-    response.status_code = 200
-    return response
+        article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+        response = jsonify(
+            processing=True,
+            task_id=task.id,
+            article=article.to_dict(),
+            location=url_for("api.get_task_status", task_id=task.id),
+        )
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ############################ """
+""" ##     export article     ## """
+""" ############################ """
+
+
+@bp.route("/articles/<article_uuid>/export", methods=["GET"])
+@token_auth.login_required
+def export_article(article_uuid):
+    try:
+        export_file_ext = request.args.get("export_file_ext", "csv")
+        article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
+        user = token_auth.current_user()
+
+        if article.user_id != user.id:
+            return bad_request("The resource can't be found")
+
+        task = token_auth.current_user().launch_task(
+            "export_article", user=user, article=article, ext=export_file_ext
+        )
+        ev = Event.add("exported article", user=user)
+        db.session.add(ev)
+        db.session.commit()
+
+        response = jsonify(
+            processing=True,
+            task_id=task.id,
+            location=url_for("api.get_task_status", task_id=task.id),
+        )
+
+        return response
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(traceback.print_exc())
+            return bad_request("Something went wrong.")

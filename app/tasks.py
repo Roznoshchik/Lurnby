@@ -11,12 +11,14 @@ import traceback
 
 import app
 from app import create_app, db, s3, bucket, CustomLogger
+from app.api.exceptions import LurnbyValueError
 from app.export import get_zip
 from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import Task, Article, Highlight, User
 from app.helpers.export_helpers import create_zip_file_for_article
+
 
 logger = CustomLogger("Tasks")
 
@@ -311,7 +313,7 @@ def export_article(user, article, ext="csv"):
 
     try:
         if not user or not article:
-            raise ValueError("Both User and Article are required")
+            raise LurnbyValueError("Both User and Article are required")
 
         _set_task_progress(0)
 
@@ -342,7 +344,9 @@ def export_article(user, article, ext="csv"):
 
         send_email(
             "[Lurnby] Your exported highlights",
-            sender=app.config["ADMINS"][0],
+            sender=app.config["ADMINS"][0]
+            if hasattr(app, "config")
+            else "Lurnby <team@lurnby.com>",
             recipients=[user.email],
             text_body=render_template(
                 "email/export_highlights.txt", url=url, user=user

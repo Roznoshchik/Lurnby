@@ -705,3 +705,56 @@ class DeleteArticleApiTests(unittest.TestCase):
 
         article = Article.query.filter_by(uuid=UUID(id)).first()
         self.assertIsNone(article)
+
+
+class ExportArticleApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.tasks.send_email")
+    @patch("app.tasks.s3")
+    @patch("app.models.User.check_token")
+    def test_export_article_returns_task(
+        self, mock_check_token, mock_s3, mock_send_email
+    ):
+        mock_check_token.return_value = User.query.first()
+
+        article = Article(
+            user_id=User.query.first().id,
+            title="Alabama Arkansaw I do Love My Ma and Pa",
+        )
+        db.session.add(article)
+        db.session.commit()
+
+        res = self.client.get(
+            f"/api/articles/{str(article.uuid)}/export?export_file_ext=csv",
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+
+        self.assertEqual(200, res.status_code)
+        self.assertTrue("task_id" in data)
+        self.assertIsNotNone(data["task_id"])
+
+        self.assertTrue("location" in data)
+        self.assertIsNotNone(data["location"])
+
+        self.assertTrue(data["processing"])
+        self.assertEqual(mock_s3.upload_file.call_count, 1)
+        self.assertEqual(mock_s3.generate_presigned_url.call_count, 1)
+        self.assertEqual(mock_send_email.call_count, 1)

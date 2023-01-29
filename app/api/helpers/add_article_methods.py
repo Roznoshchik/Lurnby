@@ -3,10 +3,9 @@ from pathlib import Path
 import validators
 
 from app import db, CustomLogger, s3, bucket
+from app.api.exceptions import LurnbyValueError
 from app.main.pulltext import pull_text
 from app.models import Tag
-
-from ..exceptions import SuppliedDataException
 
 logger = CustomLogger("API")
 
@@ -27,7 +26,7 @@ def process_manual_entry(article, manual_entry):
     source = manual_entry.get("source")
 
     if not title or not content:
-        raise SuppliedDataException("Missing Title or Content")
+        raise LurnbyValueError("Missing Title or Content")
 
     article.content = content
     article.title = title
@@ -49,7 +48,7 @@ def process_url_entry(article, url):
     """
 
     if not validators.url(url):
-        raise SuppliedDataException(
+        raise LurnbyValueError(
             "Can't validate url. Please check the data and try again"
         )
 
@@ -63,7 +62,7 @@ def process_url_entry(article, url):
 
     except Exception:
         logger.error(f"Couldn't parse url: {url}")
-        raise SuppliedDataException("Something went wrong. Please check the url")
+        raise LurnbyValueError("Something went wrong. Please check the url")
 
     article.title = title
     article.content = content
@@ -108,13 +107,13 @@ def process_file(article=None, file=None, user=None):
         response object: status_code = 201, json={task_id:str, article_id: int, processing:bool}
     """
     if not article or not file or not user:
-        raise SuppliedDataException("Bad request")
+        raise LurnbyValueError("Bad request")
 
     file_ext = Path(file.filename).suffix
     if file_ext != ".epub" and file_ext != ".pdf":
         db.session.delete(article)
         db.session.commit()
-        raise SuppliedDataException("File must be pdf or epub")
+        raise LurnbyValueError("File must be pdf or epub")
     else:
         task = user.launch_task(
             "bg_add_article",
@@ -152,7 +151,7 @@ def process_file_upload(article, upload_file_ext):
     if not upload_file_ext or (
         upload_file_ext != ".epub" and upload_file_ext != ".pdf"
     ):
-        raise SuppliedDataException('upload_file_ext should be ".epub" or ".pdf"')
+        raise LurnbyValueError('upload_file_ext should be ".epub" or ".pdf"')
 
     upload_url = s3.generate_presigned_url(
         ClientMethod="put_object",
