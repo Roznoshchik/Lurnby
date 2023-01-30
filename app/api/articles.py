@@ -1,14 +1,10 @@
 from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
-from app.api.exceptions import LurnbyValueError
-from app.api.helpers.article_query_maker import (
-    filter_by_status,
-    filter_by_tags,
-    filter_by_search_phrase,
-    apply_sorting,
-    apply_pagination,
-)
+from app.api.errors import LurnbyValueError
+
+import app.api.helpers.article_query_maker as aqm
+from app.api.helpers.query_maker import apply_pagination
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
@@ -69,10 +65,13 @@ def get_articles():
 
         # filter query
         query = user.articles.filter_by(processing=False)
-        query = filter_by_status(query, status)
-        query = filter_by_tags(query, tag_ids)
-        query = filter_by_search_phrase(query, search_phrase)
-        query = apply_sorting(query, title_sort, opened_sort)
+        query = aqm.filter_by_status(
+            query,
+            status,
+        )
+        query = aqm.filter_by_tags(query, tag_ids)
+        query = aqm.filter_by_search_phrase(query, search_phrase)
+        query = aqm.apply_sorting(query, title_sort, opened_sort)
         query = apply_pagination(query, page, per_page)
 
         has_next = query.has_next if query.has_next else None

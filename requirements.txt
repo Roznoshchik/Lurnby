@@ -1,6 +1,7 @@
 alembic==1.7.5
 attrs==21.2.0
 beautifulsoup4==4.9.1
+black==22.12.0
 blinker==1.4
 boto3==1.17.12
 botocore==1.20.112
@@ -40,9 +41,12 @@ lxml==4.6.5
 Mako==1.1.6
 MarkupSafe==2.1.1
 mccabe==0.7.0
+mypy-extensions==0.4.3
 oauthlib==3.1.0
 packaging==21.3
+pathspec==0.10.3
 pipdeptree==2.2.0
+platformdirs==2.6.2
 pluggy==1.0.0
 psycopg2==2.8.5
 py==1.11.0
@@ -69,6 +73,7 @@ SQLAlchemy-Utils==0.39.0
 text-unidecode==1.3
 toml==0.10.2
 tomli==2.0.1
+typing_extensions==4.4.0
 urllib3==1.26.5
 validators==0.15.0
 webencodings==0.5.1

@@ -790,6 +790,7 @@ class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     text = db.Column(db.String)  # should I set a max length?
     prompt = db.Column(db.String)
+    source = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     article_id = db.Column(db.Integer, db.ForeignKey("article.id"), index=True)
     topics = db.relationship(
@@ -801,6 +802,7 @@ class Highlight(db.Model):
 
     archived = db.Column(db.Boolean, index=True)
     no_topics = db.Column(db.Boolean, default=True, index=True)
+    untagged = db.Column(db.Boolean, default=False)
     note = db.Column(db.String, index=True)
     tags = db.relationship(
         "Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic"
@@ -810,6 +812,27 @@ class Highlight(db.Model):
     review_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_schedule = db.Column(db.Integer, default=0)
     do_not_review = db.Column(db.Boolean, default=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "source": self.source or self.article.title,
+            "text": self.text,
+            "note": self.note,
+            "prompt": self.prompt,
+            "article_id": self.article_id,
+            "user_id": self.user_id,
+            "created_date": self.created_date,
+            "review_date": self.review_date,
+            "review_schedule": self.review_schedule,
+            "do_not_review": self.do_not_review,
+            "archived": self.archived,
+            "untagged": self.untagged,
+            "tags": [tag.name for tag in self.tags.all()],
+        }
+    @property
+    def tag_list(self):
+        return [tag.name for tag in self.tags.all()]
 
     # add highlight to topic
     def AddToTopic(self, topic):

@@ -1,9 +1,10 @@
 from app import db
 from app.models import Article, tags_articles
 from sqlalchemy import func
+from flask_sqlalchemy import query
 
 
-def filter_by_status(query, status):
+def filter_by_status(query: query.Query, status: str):
     """
     Args:
         query (flask_sqlalchemy.query.Query): base query object
@@ -32,7 +33,7 @@ def filter_by_status(query, status):
     return query
 
 
-def filter_by_tags(query, tag_ids):
+def filter_by_tags(query: query.Query, tag_ids: str):
     """
     Args:
         query (flask_sqlalchemy.query.Query): base query object
@@ -53,7 +54,7 @@ def filter_by_tags(query, tag_ids):
     return query
 
 
-def filter_by_search_phrase(query, search_phrase):
+def filter_by_search_phrase(query: query.Query, search_phrase: str):
     """filters by user supplied search phrase
 
     Args:
@@ -76,7 +77,7 @@ def filter_by_search_phrase(query, search_phrase):
     return query
 
 
-def apply_sorting(query, title_sort, opened_sort):
+def apply_sorting(query: query.Query, title_sort: str, opened_sort: str):
     """_summary_
 
     Args:
@@ -120,27 +121,5 @@ def apply_sorting(query, title_sort, opened_sort):
 
     # apply the sorting
     query = query.order_by(*order)
-
-    return query
-
-
-def apply_pagination(query, page="1", per_page="15"):
-    """applies pagination
-
-    Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        page (str): an int string for which page of results e.g "1"
-        per_page (str): "all" or int string e.g "15" or "30"
-    Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
-    """
-    # prepare to paginate results
-    result_count = query.count()
-    if per_page == "all":
-        per_page = result_count
-    else:
-        per_page = int(per_page)
-
-    query = query.paginate(page=int(page), per_page=per_page, error_out=False)
 
     return query

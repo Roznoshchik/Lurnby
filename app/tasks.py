@@ -8,10 +8,10 @@ from flask import render_template
 from bs4 import BeautifulSoup
 import re
 import traceback
+from flask import current_app
 
-import app
 from app import create_app, db, s3, bucket, CustomLogger
-from app.api.exceptions import LurnbyValueError
+from app.api.errors import LurnbyValueError
 from app.export import get_zip
 from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
@@ -23,11 +23,11 @@ from app.helpers.export_helpers import create_zip_file_for_article
 logger = CustomLogger("Tasks")
 
 try:
-    app.redis.ping()
+    current_app.redis.ping()
     app = create_app()
     app.app_context().push()
 except Exception:
-    pass
+    app = current_app
 
 
 def _set_task_progress(progress):
@@ -344,9 +344,7 @@ def export_article(user, article, ext="csv"):
 
         send_email(
             "[Lurnby] Your exported highlights",
-            sender=app.config["ADMINS"][0]
-            if hasattr(app, "config")
-            else "Lurnby <team@lurnby.com>",
+            sender=app.config["ADMINS"][0],
             recipients=[user.email],
             text_body=render_template(
                 "email/export_highlights.txt", url=url, user=user

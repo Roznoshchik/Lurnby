@@ -13,3 +13,8 @@ def error_response(status_code, message=None):
 
 def bad_request(message):
     return error_response(400, message)
+
+
+class LurnbyValueError(ValueError):
+    def __init__(self, *args: object) -> None:
+        super().__init__(*args)

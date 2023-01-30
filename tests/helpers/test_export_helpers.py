@@ -5,7 +5,7 @@ from random import randrange
 import unittest
 
 from app import create_app, db
-from app.api.exceptions import LurnbyValueError
+from app.api.errors import LurnbyValueError
 from app.helpers.export_helpers import (
     create_zip_file_for_article,
     export_to_csv,

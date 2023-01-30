@@ -5,7 +5,7 @@ import os
 from zipfile import ZipFile
 
 from app import CustomLogger
-from app.api.exceptions import LurnbyValueError
+from app.api.errors import LurnbyValueError
 from app.models import Article
 
 logger = CustomLogger("Export Helpers")
