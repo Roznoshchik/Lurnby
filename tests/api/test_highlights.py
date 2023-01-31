@@ -38,16 +38,7 @@ class GetHighlightsApiTests(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-
-    @patch("app.models.User.check_token")
-    def test_get_highlights(self, mock_check_token):
-        user = User.query.first()
-        mock_check_token.return_value = user
-
+        # setup articles and tags
         art1 = Article(user_id=user.id, title="Article 1")
         art2 = Article(user_id=user.id, title="Article 2")
         art3 = Article(user_id=user.id, title="Article 2")
@@ -66,6 +57,7 @@ class GetHighlightsApiTests(unittest.TestCase):
         )
         db.session.commit()
 
+        # Setup highlights
         hlght1 = Highlight(article_id=art1.id, user_id=user.id, text="alabama")
         hlght2 = Highlight(article_id=art1.id, user_id=user.id, text="arkansaw")
         hlght3 = Highlight(article_id=art1.id, user_id=user.id, text="I")
@@ -103,6 +95,16 @@ class GetHighlightsApiTests(unittest.TestCase):
 
         db.session.commit()
 
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_get_unarchived_highlights(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
         # first check default which should return 9 unarchived highlights
         params = {}
         res = self.client.get(
@@ -113,6 +115,11 @@ class GetHighlightsApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 9)
 
+    @patch("app.models.User.check_token")
+    def test_get_archived_highlights(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
         # return 1 archived highlight
         params = {"status": "archived"}
         res = self.client.get(
@@ -122,7 +129,12 @@ class GetHighlightsApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 1)
-
+    
+    @patch("app.models.User.check_token")
+    def test_get_all_tagged_highlights(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+        
         # return 6 tagged highlights
         params = {"tag_status": "tagged"}
         res = self.client.get(
@@ -133,6 +145,11 @@ class GetHighlightsApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 6)
 
+    @patch("app.models.User.check_token")
+    def test_get_untagged_highlights(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user    
+        
         # return 3 untagged highlights
         params = {"tag_status": "untagged"}
         res = self.client.get(
@@ -142,9 +159,14 @@ class GetHighlightsApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 3)
-        
+
+    @patch("app.models.User.check_token")
+    def test_get_highlights_with_specific_tags(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
         # return 4 highlights tagged with pikachu
-        params = {"tag_ids": f"{tag1.id}"}
+        params = {"tag_ids": "1"}
         res = self.client.get(
             "/api/highlights",
             query_string=params,
@@ -152,9 +174,9 @@ class GetHighlightsApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 4)
-        
+
         # return 6 highlights tagged with pikachu and bulbasaur
-        params = {"tag_ids": f"{tag1.id}, {tag2.id}"}
+        params = {"tag_ids": f"1,2"}
         res = self.client.get(
             "/api/highlights",
             query_string=params,
