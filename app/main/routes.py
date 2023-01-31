@@ -1436,7 +1436,7 @@ def addhighlight():
     article = Article.query.filter_by(uuid=data["article_uuid"]).first()
 
     for tag in article.tags.all():
-        newHighlight.AddToTag(tag)
+        newHighlight.add_tag(tag)
 
     for t in topics:
         topic = Topic.query.filter_by(title=t, user_id=current_user.id).first()

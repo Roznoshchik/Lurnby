@@ -611,9 +611,7 @@ class Article(db.Model):
             "progress": self.progress,
             "created_at": self.article_created_date,
             "highlights_count": self.highlights.count(),
-            "tags": [
-                tag.to_dict() for tag in self.tags.all()
-            ],  # leaving this in case of client side filtering?
+            "tags": [tag.to_dict() for tag in self.tags.all()],  # leaving this in case of client side filtering?
         }
         return data
 
@@ -800,9 +798,9 @@ class Highlight(db.Model):
         lazy="dynamic",
     )
 
-    archived = db.Column(db.Boolean, index=True)
+    archived = db.Column(db.Boolean, index=True, default=False)
     no_topics = db.Column(db.Boolean, default=True, index=True)
-    untagged = db.Column(db.Boolean, default=False)
+    untagged = db.Column(db.Boolean, default=True)
     note = db.Column(db.String, index=True)
     tags = db.relationship(
         "Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic"
@@ -816,7 +814,7 @@ class Highlight(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
-            "source": self.source or self.article.title,
+            "source": self.source or self.article.title if self.article else "unknown",
             "text": self.text,
             "note": self.note,
             "prompt": self.prompt,
@@ -828,7 +826,7 @@ class Highlight(db.Model):
             "do_not_review": self.do_not_review,
             "archived": self.archived,
             "untagged": self.untagged,
-            "tags": [tag.name for tag in self.tags.all()],
+            "tags": [tag.to_dict() for tag in self.tags.all()],
         }
     @property
     def tag_list(self):
@@ -838,15 +836,32 @@ class Highlight(db.Model):
     def AddToTopic(self, topic):
         if not self.is_added_topic(topic) and topic.user_id == self.user_id:
             self.topics.append(topic)
+            self.no_topics = True
+
+    def add_tag(self, tag):
+        if not self.is_tagged_with(tag) and tag.user_id == self.user_id:
+            self.tags.append(tag)
+            self.untagged = False
+    
+    def remove_tag(self, tag):
+        if self.is_tagged_with(tag):
+            self.tags.remove(tag)
+            if self.tags.count() == 0:
+                self.untagged = True
 
     # remove highlight from topic
     def RemoveFromTopic(self, topic):
         if self.is_added_topic(topic) and topic.user_id == self.user_id:
             self.topics.remove(topic)
+            if self.topics.count() == 0:
+                self.no_topics = True
 
     # checks if a highlight is in a topic
     def is_added_topic(self, topic):
         return self.topics.filter(topic.id == highlights_topics.c.topic_id).count() > 0
+    
+    def is_tagged_with(self, tag):
+        return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
 
     def not_added_topic(self):
 
@@ -877,50 +892,7 @@ class Highlight(db.Model):
 
         return q
 
-    # add highlight to tag
-    def AddToTag(self, tag):
-        if not self.is_added_tag(tag) and tag.user_id == self.user_id:
-            self.tags.append(tag)
-
-    # remove highlight from tag
-    def RemoveFromTag(self, tag):
-        if self.is_added_tag(tag) and tag.user_id == self.user_id:
-            self.tags.remove(tag)
-
-    # checks if an highlight is in a tag
-    def is_added_tag(self, tag):
-        return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
-
-    # returns true if highlight is untagged
-    def not_added_tag(self):
-
-        query = (
-            db.session.query(tags_highlights)
-            .filter(tags_highlights.c.highlight_id == self.id)
-            .count()
-        )
-
-        if query == 0:
-            return True
-        else:
-            return False
-
-    # returns all tags that a highlight is not a part of
-    def not_in_tags(self, user):
-
-        sub = (
-            db.session.query(Tag.id)
-            .outerjoin(tags_highlights, tags_highlights.c.tag_id == Tag.id)
-            .filter(tags_highlights.c.highlight_id == self.id)
-        )
-        q = (
-            db.session.query(Tag)
-            .filter(~Tag.id.in_(sub))
-            .filter_by(user_id=user.id)
-            .all()
-        )
-
-        return q
+    
 
 
 tags_topics = db.Table(

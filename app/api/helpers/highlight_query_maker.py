@@ -22,20 +22,20 @@ def filter_by_status(query: query.Query, status: str):
     return query
 
 
-def filter_by_tag_status(query: query.Query, status: str):
+def filter_by_tag_status(query: query.Query, tag_status: str):
     """
     Args:
         query (flask_sqlalchemy.query.Query): base query object
-        status (string): status to filter by: Tagged || Untagged
+        tag_status (string): status to filter by: Tagged || Untagged
     Returns:
         query (flask_sqlalchemy.query.Query): updated query object
     """
 
-    if not status:
+    if not tag_status:
         pass
-    elif status.lower() == "tagged":
+    elif tag_status.lower() == "tagged":
         query = query.filter_by(untagged=False)
-    elif status.lower() == "untagged":
+    elif tag_status.lower() == "untagged":
         query = query.filter_by(untagged=True)
 
     return query

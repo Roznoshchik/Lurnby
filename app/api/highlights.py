@@ -1,4 +1,5 @@
 from flask import request, jsonify
+import traceback
 from uuid import UUID
 
 from app import db, CustomLogger
@@ -16,7 +17,7 @@ logger = CustomLogger("API")
 
 @bp.route("/highlights", methods=["GET"])
 @token_auth.login_required
-def get_higlights():
+def get_highlights():
     """
     Query args
     ----------
@@ -37,7 +38,6 @@ def get_higlights():
         e.g. hello old friend
     """
     try:
-
         user = token_auth.current_user()
 
         page = request.args.get("page", "1")
@@ -59,6 +59,7 @@ def get_higlights():
             query = Article.highlights
         else:
             query = user.highlights
+        
 
         query = hqm.filter_by_status(query, status)
         query = hqm.filter_by_status(query, status)
@@ -78,5 +79,6 @@ def get_higlights():
         if isinstance(e, LurnbyValueError):
             return bad_request(str(e))
         else:
-            logger.error(e)
+            # logger.error(e)
+            logger.error(traceback.print_exc())
             return bad_request("Something went wrong.")
