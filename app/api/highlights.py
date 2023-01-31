@@ -59,7 +59,6 @@ def get_highlights():
             query = Article.highlights
         else:
             query = user.highlights
-        
 
         query = hqm.filter_by_status(query, status)
         query = hqm.filter_by_status(query, status)

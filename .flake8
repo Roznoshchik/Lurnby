@@ -2,5 +2,9 @@
 exclude = .git,__pycache__,.github,.aws-sam,.vscode,aws-dist,frontend,.pytest_cache,venv,./app/ReadabiliPy,./migrations
 max-line-length = 119
 ignore = E266
-per-file-ignores= app/api/helpers/article_query_maker.py:E712, app/main/routes.py:E712, app/helpers/user_content.py:E712
+per-file-ignores = \
+    app/api/helpers/article_query_maker.py:E712, \
+    app/main/routes.py:E712, \
+    app/helpers/user_content.py:E712 \
+    app/api/__init__.py:E402,F401
 

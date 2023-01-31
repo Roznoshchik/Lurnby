@@ -611,7 +611,9 @@ class Article(db.Model):
             "progress": self.progress,
             "created_at": self.article_created_date,
             "highlights_count": self.highlights.count(),
-            "tags": [tag.to_dict() for tag in self.tags.all()],  # leaving this in case of client side filtering?
+            "tags": [
+                tag.to_dict() for tag in self.tags.all()
+            ],  # leaving this in case of client side filtering?
         }
         return data
 
@@ -828,6 +830,7 @@ class Highlight(db.Model):
             "untagged": self.untagged,
             "tags": [tag.to_dict() for tag in self.tags.all()],
         }
+
     @property
     def tag_list(self):
         return [tag.name for tag in self.tags.all()]
@@ -842,7 +845,7 @@ class Highlight(db.Model):
         if not self.is_tagged_with(tag) and tag.user_id == self.user_id:
             self.tags.append(tag)
             self.untagged = False
-    
+
     def remove_tag(self, tag):
         if self.is_tagged_with(tag):
             self.tags.remove(tag)
@@ -859,7 +862,7 @@ class Highlight(db.Model):
     # checks if a highlight is in a topic
     def is_added_topic(self, topic):
         return self.topics.filter(topic.id == highlights_topics.c.topic_id).count() > 0
-    
+
     def is_tagged_with(self, tag):
         return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
 
@@ -891,8 +894,6 @@ class Highlight(db.Model):
         )
 
         return q
-
-    
 
 
 tags_topics = db.Table(
