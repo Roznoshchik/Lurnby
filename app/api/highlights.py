@@ -1,4 +1,5 @@
 from flask import request, jsonify
+import json
 import traceback
 from uuid import UUID
 
@@ -8,6 +9,7 @@ from app.api.auth import token_auth
 from app.api.errors import bad_request, LurnbyValueError
 
 import app.api.helpers.highlight_query_maker as hqm
+from app.api.helpers.add_highlight_methods import verify_non_existing_highlight
 from app.api.helpers.query_maker import apply_pagination
 from app.models import Article, Highlight
 
@@ -78,6 +80,24 @@ def get_highlights():
         if isinstance(e, LurnbyValueError):
             return bad_request(str(e))
         else:
-            # logger.error(e)
             logger.error(traceback.print_exc())
             return bad_request("Something went wrong.")
+
+
+@token_auth.login_required
+@bp.route("/highlights", methods=["POST"])
+def create_highlight():
+    try:
+        user = token_auth.current_user()
+        data = json.loads(request.data) if request.data else None
+        if not data:
+            raise LurnbyValueError("Missing data in payload")
+
+        verify_non_existing_highlight(data)
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(traceback.print_exc())
+            return bad_request("Something went wrong")

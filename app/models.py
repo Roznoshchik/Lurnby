@@ -440,7 +440,7 @@ class Article(db.Model):
     __mapper_args__ = {"confirm_deleted_rows": False}
 
     id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True)
+    uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True, unique=True)
     unread = db.Column(db.Boolean, index=True, default=True)
     title = db.Column(db.String(255), index=True)
     filetype = db.Column(db.String(32))
@@ -788,6 +788,7 @@ class Suggestion(db.Model):
 
 class Highlight(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String, default=generate_str_id, unique=True)
     text = db.Column(db.String)  # should I set a max length?
     prompt = db.Column(db.String)
     source = db.Column(db.String)
@@ -816,6 +817,7 @@ class Highlight(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "uuid": self.uuid,
             "source": self.source or self.article.title if self.article else "unknown",
             "text": self.text,
             "note": self.note,
