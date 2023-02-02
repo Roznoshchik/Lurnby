@@ -9,9 +9,9 @@ from app.api.auth import token_auth
 from app.api.errors import bad_request, LurnbyValueError
 
 import app.api.helpers.highlight_query_maker as hqm
-from app.api.helpers.add_highlight_methods import verify_non_existing_highlight
+from app.api.helpers.add_highlight_methods import validate_request, add_to_tags, populate_highlight
 from app.api.helpers.query_maker import apply_pagination
-from app.models import Article, Highlight
+from app.models import Article, Highlight, Event
 
 
 logger = CustomLogger("API")
@@ -84,8 +84,8 @@ def get_highlights():
             return bad_request("Something went wrong.")
 
 
-@token_auth.login_required
 @bp.route("/highlights", methods=["POST"])
+@token_auth.login_required
 def create_highlight():
     try:
         user = token_auth.current_user()
@@ -93,7 +93,20 @@ def create_highlight():
         if not data:
             raise LurnbyValueError("Missing data in payload")
 
-        verify_non_existing_highlight(data)
+        validate_request(data)
+        highlight = Highlight(user_id=user.id)
+        db.session.add(highlight)
+
+        highlight = populate_highlight(highlight, data)
+        highlight = add_to_tags(highlight, data.get("tags", []))
+
+        ev = Event.add("added highlight", user=user)
+        db.session.add(ev)
+        db.session.commit()
+
+        response = jsonify(highlight=highlight.to_dict())
+        response.status_code = 201
+        return response
 
     except Exception as e:
         if isinstance(e, LurnbyValueError):

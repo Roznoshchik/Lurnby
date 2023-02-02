@@ -10,6 +10,7 @@ import json
 import uuid
 import os
 import random
+import re
 import redis
 import rq
 from sqlalchemy import desc, func, Index
@@ -818,7 +819,7 @@ class Highlight(db.Model):
         return {
             "id": self.id,
             "uuid": self.uuid,
-            "source": self.source or self.article.title if self.article else "unknown",
+            "source": self.source or (self.article.title if self.article else "unknown"),
             "text": self.text,
             "note": self.note,
             "prompt": self.prompt,
@@ -836,6 +837,18 @@ class Highlight(db.Model):
     @property
     def tag_list(self):
         return [tag.name for tag in self.tags.all()]
+
+    def create_prompt(self):
+        soup = BeautifulSoup(self.text, features="lxml")
+        for text in soup.find_all(text=True):
+            words = text.split(" ")
+            if len(words) > 3:
+                for i in range(0, len(words) // 3):
+                    num = random.randint(0, len(words) - 1)
+                    words[num] = re.sub(r"[\w\d]+", "_____", words[num])
+            text.replace_with(" ".join(words))
+
+        return soup.prettify()
 
     # add highlight to topic
     def AddToTopic(self, topic):

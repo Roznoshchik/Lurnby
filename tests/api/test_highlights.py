@@ -260,3 +260,195 @@ class GetHighlightsApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 1)
         self.assertFalse(data["has_next"])
+
+
+class AddHighlightApiTests(unittest.TestCase):
+    def setUp(self) -> None:
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+        return super().setUp()
+
+    def tearDown(self) -> None:
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+        return super().tearDown()
+
+    @patch("app.models.User.check_token")
+    def test_add_new_highlight(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        body = {
+            "text": "hello old friend",
+            "note": "this is super fun",
+            "source": "my favorite friend!",
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+        self.assertEqual(highlight.get("text"), body.get("text"))
+        self.assertEqual(highlight.get("note"), body.get("note"))
+        self.assertEqual(highlight.get("source"), body.get("source"))
+        self.assertIsNotNone(highlight.get("prompt"))
+        self.assertIsNotNone(highlight.get("uuid"))
+        self.assertIsNotNone(highlight.get("id"))
+        self.assertTrue(highlight.get("untagged"))
+        self.assertFalse(highlight.get("archived"))
+
+    @patch("app.models.User.check_token")
+    def test_add_new_highlight_with_passed_uuid(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        body = {
+            "text": "hello old friend",
+            "note": "this is super fun",
+            "source": "my favorite friend!",
+            "uuid": "abc123",
+            "id": 4,
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+
+        self.assertEqual(highlight.get("uuid"), body.get("uuid"))
+        self.assertNotEqual(highlight.get("id"), body.get("id"))
+        self.assertEqual(highlight.get("text"), body.get("text"))
+        self.assertEqual(highlight.get("note"), body.get("note"))
+        self.assertEqual(highlight.get("source"), body.get("source"))
+
+    @patch("app.models.User.check_token")
+    def test_add_new_highlight_attributes_source(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        article = Article(title="A tree grows in Brooklyn", user_id=user.id)
+        db.session.add(article)
+        db.session.commit()
+
+        body = {
+            "text": "hello old friend",
+            "source": "my favorite friend!",
+            "article_id": str(article.uuid),
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+
+        self.assertEqual(highlight.get("source"), body.get("source"))
+
+        body = {
+            "text": "hello old friend",
+            "article_id": str(article.uuid),
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+
+        self.assertEqual(highlight.get("source"), article.title)
+
+        body = {
+            "text": "hello old friend",
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+
+        self.assertEqual(highlight.get("source"), "unknown")
+
+    @patch("app.models.User.check_token")
+    def test_add_new_highlight_with_tags(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        body = {
+            "text": "hello old friend",
+            "note": "this is super fun",
+            "source": "my favorite friend!",
+            "tags": ["pikachu", "bulbasaur", "charmander"],
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlight = data.get("highlight")
+
+        self.assertCountEqual(
+            [tag.get("name") for tag in highlight.get("tags")], body.get("tags")
+        )
+
+    @patch("app.models.User.check_token")
+    def test_add_new_highlight_fails_with_bad_data(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        highlight1 = Highlight(user_id=user.id)
+        db.session.add(highlight1)
+        db.session.commit()
+
+        body = {
+            "uuid": highlight1.uuid,
+            "text": "hello old friend",
+            "note": "this is super fun",
+            "source": "my favorite friend!",
+        }
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(
+            data.get("message"), "Highlight exists, use update methods instead."
+        )
+
+        body = {"note": "this is super fun", "source": "my favorite friend!"}
+
+        res = self.client.post(
+            "/api/highlights",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data.get("message"), "Text is a required field")
