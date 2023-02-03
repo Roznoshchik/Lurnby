@@ -3,6 +3,15 @@ from app.models import Article, Highlight, tags_highlights
 from flask_sqlalchemy import query
 
 
+def apply_all_filters(query, status, tag_status, tag_ids, search_phrase):
+    query = filter_by_status(query, status)
+    query = filter_by_tag_status(query, tag_status)
+    query = filter_by_tags(query, tag_ids)
+    query = filter_by_search_phrase(query, search_phrase)
+
+    return query
+
+
 def filter_by_status(query: query.Query, status: str):
     """
     Args:

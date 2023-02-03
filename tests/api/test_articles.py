@@ -592,8 +592,26 @@ class UpdateArticleApiTests(unittest.TestCase):
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
-        self.assertEqual(400, res.status_code)
+        self.assertEqual(404, res.status_code)
         self.assertEqual("The resource can't be found", data["message"])
+
+    @patch("app.models.User.check_token")
+    def test_no_data_returns_error(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        article = Article(user_id=User.query.first().id, title="Hello World")
+        db.session.add(article)
+        db.session.commit()
+
+        res = self.client.patch(
+            "/api/articles/" + str(article.uuid),
+            headers={"Authorization": "Bearer abc123"},
+        )
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data.get("message"), "Check data")
 
     @patch("app.models.User.check_token")
     def test_article_updates_only_allowed_fields(self, mock_check_token):
@@ -637,7 +655,7 @@ class UpdateArticleApiTests(unittest.TestCase):
         for tag in tags:
             new_tag = Tag(name=tag, user_id=User.query.first().id)
             db.session.add(new_tag)
-            article.add_to_tag(new_tag)
+            article.add_tag(new_tag)
 
         db.session.commit()
 

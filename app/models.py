@@ -683,23 +683,23 @@ class Article(db.Model):
 
     # add article to tag
     def AddToTag(self, tag):
-        self.add_to_tag(tag)
+        self.add_tag(tag)
 
-    def add_to_tag(self, tag):
+    def add_tag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
             for h in self.highlights:
                 h.AddToTag(tag)
 
     # remove article from tag
-    def remove_from_tag(self, tag):
+    def remove_tag(self, tag):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
             for h in self.highlights:
                 h.RemoveFromTag(tag)
 
     def RemoveFromTag(self, tag):
-        self.remove_from_tag(tag)
+        self.remove_tag(tag)
 
     # checks if an article is in a tag
     def is_added_tag(self, tag):
@@ -819,7 +819,8 @@ class Highlight(db.Model):
         return {
             "id": self.id,
             "uuid": self.uuid,
-            "source": self.source or (self.article.title if self.article else "unknown"),
+            "source": self.source
+            or (self.article.title if self.article else "unknown"),
             "text": self.text,
             "note": self.note,
             "prompt": self.prompt,
@@ -837,6 +838,19 @@ class Highlight(db.Model):
     @property
     def tag_list(self):
         return [tag.name for tag in self.tags.all()]
+
+    @property
+    def fields_that_can_be_updated(self):
+        return [
+            "source",
+            "text",
+            "note",
+            "prompt",
+            "review_date",
+            "review_schedule",
+            "do_not_review",
+            "archived",
+        ]
 
     def create_prompt(self):
         soup = BeautifulSoup(self.text, features="lxml")

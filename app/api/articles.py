@@ -8,13 +8,13 @@ from app.api.helpers.query_maker import apply_pagination
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
-    add_to_tags,
+    add_tags,
     process_file,
     process_file_upload,
 )
 from app.models import Article, Event
-from app.api.errors import bad_request
-from app.api.helpers.update_article_methods import update_tags
+from app.api.errors import bad_request, error_response
+from app.api.helpers.update_tags import update_tags
 
 from flask import jsonify, request, url_for
 import json
@@ -116,7 +116,7 @@ def add_article():
         if url:
             article = process_url_entry(article, url)
 
-        article = add_to_tags(
+        article = add_tags(
             article=article, user_id=token_auth.current_user().id, tags=tags
         )
 
@@ -191,7 +191,7 @@ def update_article(article_uuid):
         article = Article.query.filter_by(uuid=UUID(article_uuid)).first()
 
         if not article or article.user_id != token_auth.current_user().id:
-            return bad_request("The resource can't be found")
+            return error_response(404, "The resource can't be found")
 
         data = json.loads(request.data)
         valid_fields = article.fields_that_can_be_updated
@@ -201,9 +201,7 @@ def update_article(article_uuid):
                 setattr(article, key, value)
 
         if "tags" in data:
-            article = update_tags(
-                tags=data["tags"], article=article, user=token_auth.current_user()
-            )
+            article = update_tags(tags=data["tags"], resource=article)
 
         ev = Event.add("updated article", user=token_auth.current_user())
         db.session.add(ev)
@@ -213,10 +211,8 @@ def update_article(article_uuid):
         response.status_code = 200
         return response
 
-    except TypeError as e:
-        if e == "the JSON object must be str, bytes or bytearray, not int":
-            return bad_request("No Data")
-        raise e
+    except json.JSONDecodeError as e:
+        return bad_request("Check data")
     except Exception as e:
         if isinstance(e, LurnbyValueError):
             return bad_request(str(e))

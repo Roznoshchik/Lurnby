@@ -71,7 +71,7 @@ def process_url_entry(article, url):
     return article
 
 
-def add_to_tags(article, user_id, tags=[]):
+def add_tags(article, user_id, tags=[]):
     """creates tags if they don't exist and adds them to the article
 
     Args:
@@ -89,7 +89,7 @@ def add_to_tags(article, user_id, tags=[]):
             tag = Tag(user_id=user_id, name=tag_name.lower())
             db.session.add(tag)
 
-        article.AddToTag(tag)
+        article.add_tag(tag)
 
     return article
 

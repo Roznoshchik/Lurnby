@@ -48,11 +48,11 @@ def populate_highlight(highlight, data: dict):
     highlight.note = data.get("note")
     highlight.source = data.get("source", highlight.source)
     highlight.prompt = highlight.create_prompt()
- 
+
     return highlight
 
 
-def add_to_tags(highlight, tags=[]):
+def add_tags(highlight, tags=[]):
     """creates tags if they don't exist and adds them to the highlight
 
     Args:
