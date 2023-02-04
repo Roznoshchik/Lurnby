@@ -179,7 +179,7 @@ def export_highlights():
             highlights, status, tag_status, tag_ids, search_phrase
         )
         task = user.launch_task(
-            "export_highlights", highlights, file_ext=export_file_ext
+            "export_highlights", highlights=highlights, ext=export_file_ext
         )
         ev = Event.add("Exported highlights", user=user)
         db.session.add(ev)

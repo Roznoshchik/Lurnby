@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as Soup
 import csv
 import json
 import os
+import traceback
 from zipfile import ZipFile
 
 from app import CustomLogger
@@ -97,7 +98,7 @@ def get_highlights_export(highlights: list, path:str, ext:str):
         return zip_path
 
     except Exception as e:
-        logger.error(e)
+        logger.error(traceback.print_exc())
         raise e
 
 def export_to_json(path, article_dict, highlights):
@@ -177,8 +178,8 @@ def create_plain_text_article_dict(article):
     return {
         "title": article.title,
         "source": article.source_url or article.source,
-        "notes": make_plain_text(article.notes),
-        "reflections": make_plain_text(article.reflections),
+        "notes": make_plain_text(article.notes) if article.notes else None,
+        "reflections": make_plain_text(article.reflections) if article.reflections else None,
         "tags": ", ".join(article.tag_list),
     }
 
@@ -188,11 +189,10 @@ def create_list_of_highlight_dicts(highlights):
     for highlight in highlights:
         highlights_list.append(
             {
-                "text": make_plain_text(highlight.text),
-                "note": make_plain_text(highlight.note),
-                "prompt": make_plain_text(highlight.prompt),
-                "from": highlight.article.title,
-                "source": highlight.article.source_url or highlight.article.source,
+                "text": make_plain_text(highlight.text) if highlight.text else None,
+                "note": make_plain_text(highlight.note) if highlight.note else None,
+                "prompt": make_plain_text(highlight.prompt) if highlight.prompt else None,
+                "source": highlight.source,
                 "tags": ", ".join([tag.name for tag in highlight.tags.all()]),
                 "topics": ", ".join([topic.title for topic in highlight.topics.all()]),
             }
@@ -202,6 +202,7 @@ def create_list_of_highlight_dicts(highlights):
 
 def make_plain_text(text):
     if not isinstance(text, str):
+        logger.error(f"{text} is of type: {type(text)} and should be str")
         raise LurnbyValueError('Text must be of type "str"')
 
     return Soup(text, features="html5lib").text

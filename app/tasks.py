@@ -368,7 +368,6 @@ def export_highlights(highlights, ext="csv"):
     The second contains the highlights, their notes, and their tags.
 
     Args:
-        user (class User): User requesting the export
         article (class Article): Article being exported
         ext (string): desired export format : CSV, JSON, TXT
     """
