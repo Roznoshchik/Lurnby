@@ -117,6 +117,25 @@ def create_highlight():
             return bad_request("Something went wrong")
 
 
+@bp.route("/highlights/<uuid>", methods=["GET"])
+@token_auth.login_required
+def get_highlight(uuid):
+    try:
+        user = token_auth.current_user()
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        if not highlight or highlight.user_id != user.id:
+            return error_response(404, "Resource not found")
+
+        return jsonify(highlight=highlight.to_dict())
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(traceback.print_exc())
+            return bad_request("Something went wrong")
+
+
 @bp.route("/highlights/<uuid>", methods=["PATCH"])
 @token_auth.login_required
 def update_highlight(uuid):
@@ -143,6 +162,31 @@ def update_highlight(uuid):
 
     except json.JSONDecodeError:
         return bad_request("Check data")
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(traceback.print_exc())
+            return bad_request("Something went wrong")
+
+
+@bp.route("/highlights/<uuid>", methods=["DELETE"])
+@token_auth.login_required
+def delete_highlight(uuid):
+    try:
+        user = token_auth.current_user()
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        if not highlight or highlight.user_id != user.id:
+            return error_response(404, "Resource not found")
+
+        db.session.delete(highlight)
+        ev = Event.add("deleted highlight", user=user)
+        db.session.add(ev)
+
+        db.session.commit()
+
+        return jsonify()
 
     except Exception as e:
         if isinstance(e, LurnbyValueError):

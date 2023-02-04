@@ -453,6 +453,57 @@ class AddHighlightApiTests(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data.get("message"), "Text is a required field")
 
+class GetHighlightApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_no_highlight_returns_error(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        body = {}
+        res = self.client.get(
+            "/api/highlights/random",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(404, res.status_code)
+        self.assertEqual("Resource not found", data["message"])
+
+    @patch("app.models.User.check_token")
+    def test_highlight_returns(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        highlight = Highlight(user_id=User.query.first().id, text="Hello World")
+        db.session.add(highlight)
+        db.session.commit()
+
+        uuid = highlight.uuid
+        res = self.client.get(
+            "/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"}
+        )
+        data = json.loads(res.data)
+        returned_highlight = data.get("highlight") 
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(highlight.text, returned_highlight.get("text"))
+        
+
 
 class UpdateHighlightApiTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -602,6 +653,57 @@ class UpdateHighlightApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Resource not found")
+
+
+class DeleteHighlightApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_no_highlight_returns_error(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        body = {}
+        res = self.client.delete(
+            "/api/highlights/random",
+            json=body,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(404, res.status_code)
+        self.assertEqual("Resource not found", data["message"])
+
+    @patch("app.models.User.check_token")
+    def test_highlight_deletes(self, mock_check_token):
+        mock_check_token.return_value = User.query.first()
+
+        highlight = Highlight(user_id=User.query.first().id, text="Hello World")
+        db.session.add(highlight)
+        db.session.commit()
+
+        uuid = highlight.uuid
+        res = self.client.delete(
+            "/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"}
+        )
+        self.assertEqual(res.status_code, 200)
+
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        self.assertIsNone(highlight)
 
 
 class ExportHighlightApiTests(unittest.TestCase):
