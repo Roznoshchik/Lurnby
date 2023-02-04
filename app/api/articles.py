@@ -211,7 +211,7 @@ def update_article(article_uuid):
         response.status_code = 200
         return response
 
-    except json.JSONDecodeError as e:
+    except json.JSONDecodeError:
         return bad_request("Check data")
     except Exception as e:
         if isinstance(e, LurnbyValueError):

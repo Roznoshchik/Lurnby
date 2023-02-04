@@ -117,7 +117,7 @@ def create_highlight():
             return bad_request("Something went wrong")
 
 
-@bp.route("/highlights/<uuid:str>", methods=["PATCH"])
+@bp.route("/highlights/<uuid>", methods=["PATCH"])
 @token_auth.login_required
 def update_highlight(uuid):
     try:

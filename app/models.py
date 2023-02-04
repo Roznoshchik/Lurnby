@@ -816,11 +816,12 @@ class Highlight(db.Model):
     do_not_review = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
+        source = self.source or (self.article.title if self.article else "unknown")
+
         return {
             "id": self.id,
             "uuid": self.uuid,
-            "source": self.source
-            or (self.article.title if self.article else "unknown"),
+            "source": source,
             "text": self.text,
             "note": self.note,
             "prompt": self.prompt,
