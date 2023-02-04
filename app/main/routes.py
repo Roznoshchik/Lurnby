@@ -266,7 +266,7 @@ def sw():
 @login_required
 def export_highlights():
 
-    if current_user.get_task_in_progress("export_highlights"):
+    if current_user.get_task_in_progress("export_legacy_highlights"):
         return (
             json.dumps({"msg": "An export task is currently in progress"}),
             400,
@@ -290,7 +290,7 @@ def export_highlights():
                 .all()
             )
             current_user.launch_task(
-                "export_highlights",
+                "export_legacy_highlights",
                 "Exporting highlights...",
                 u,
                 article_highlights,
@@ -379,7 +379,7 @@ def export_highlights():
             ).items
 
             current_user.launch_task(
-                "export_highlights",
+                "export_legacy_highlights",
                 "Exporting highlights...",
                 u,
                 highlights,

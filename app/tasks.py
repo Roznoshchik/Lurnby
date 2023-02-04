@@ -17,7 +17,7 @@ from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import Task, Article, Highlight, User
-from app.helpers.export_helpers import create_zip_file_for_article
+from app.helpers.export_helpers import create_zip_file_for_article, get_highlights_export
 
 
 logger = CustomLogger("Tasks")
@@ -137,7 +137,7 @@ def account_export(uid, ext, delete=False):
         logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
 
 
-def export_highlights(user, highlights, source, ext):
+def export_legacy_highlights(user, highlights, source, ext):
     if not highlights:
         return
     try:
@@ -330,6 +330,70 @@ def export_article(user, article, ext="csv"):
             az_path_base = f"{user.id}/exports"
 
         zip_path = create_zip_file_for_article(article, path, ext)
+        az_path = f"{az_path_base}/{file_title}.zip"
+
+        s3.upload_file(Bucket=bucket, Filename=zip_path, Key=az_path)
+
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": az_path},
+            ExpiresIn=604800,
+        )
+
+        logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
+
+        send_email(
+            "[Lurnby] Your exported highlights",
+            sender=app.config["ADMINS"][0],
+            recipients=[user.email],
+            text_body=render_template(
+                "email/export_highlights.txt", url=url, user=user
+            ),
+            html_body=render_template(
+                "email/export_highlights.html", url=url, user=user
+            ),
+            sync=True,
+        )
+        os.remove(zip_path)
+
+    except Exception as e:
+        logger.error(e)
+        raise e
+    finally:
+        _set_task_progress(100)
+
+def export_highlights(highlights, ext="csv"):
+    """exports a zip file with two files and sends an email with the download link.
+    The first file contains the article metadata and notes, reflections, and tags.
+    The second contains the highlights, their notes, and their tags.
+
+    Args:
+        user (class User): User requesting the export
+        article (class Article): Article being exported
+        ext (string): desired export format : CSV, JSON, TXT
+    """
+
+    try:
+        
+        if not highlights:
+            raise LurnbyValueError("Highlights are required")
+
+        user = User.query.filter_by(id=highlights[0].user_id).first()
+        _set_task_progress(0)
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(basedir, "temp")
+        file_title = "highlights"
+
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        if os.environ.get("DEV"):
+            az_path_base = f"staging/{user.id}/exports"
+        else:
+            az_path_base = f"{user.id}/exports"
+
+        zip_path = get_highlights_export(highlights, path, ext)
         az_path = f"{az_path_base}/{file_title}.zip"
 
         s3.upload_file(Bucket=bucket, Filename=zip_path, Key=az_path)
