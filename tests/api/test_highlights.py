@@ -741,7 +741,7 @@ class ExportHighlightApiTests(unittest.TestCase):
         db.session.commit()
 
         res = self.client.get(
-            f"/api/highlights/export?export_file_ext=csv",
+            "/api/highlights/export?export_file_ext=csv",
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)

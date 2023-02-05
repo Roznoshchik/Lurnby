@@ -55,7 +55,7 @@ def tag():
             raise LurnbyValueError("Missing data in payload")
 
         tag = Tag(user_id=user.id, name=data.get("name"))
-        if uuid := data.get('uuid'):
+        if uuid := data.get("uuid"):
             tag.uuid = uuid
         db.session.add(tag)
 

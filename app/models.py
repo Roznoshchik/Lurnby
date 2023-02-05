@@ -1086,7 +1086,7 @@ class Tag(db.Model):
             "name": self.name,
             "archived": self.archived,
             "highlight_count": self.highlight_count,
-            "article_count": self.article_count
+            "article_count": self.article_count,
         }
 
     @staticmethod

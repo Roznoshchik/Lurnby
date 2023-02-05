@@ -108,7 +108,7 @@ class GetTagsApiTests(unittest.TestCase):
         self.assertEqual(len(data.get("tags")), 1)
         self.assertTrue(data.get("has_next"))
 
-        params = {"page": "3", "per_page":"1"}
+        params = {"page": "3", "per_page": "1"}
         res = self.client.get(
             "/api/tags",
             query_string=params,
