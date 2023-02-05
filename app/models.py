@@ -688,14 +688,18 @@ class Article(db.Model):
     def add_tag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
+            tag.article_count += 1
             for h in self.highlights:
+                tag.highlight_count += 1
                 h.AddToTag(tag)
 
     # remove article from tag
     def remove_tag(self, tag):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
+            tag.article_count -= 1
             for h in self.highlights:
+                tag.highlight_count -= 1
                 h.RemoveFromTag(tag)
 
     def RemoveFromTag(self, tag):
@@ -875,10 +879,12 @@ class Highlight(db.Model):
         if not self.is_tagged_with(tag) and tag.user_id == self.user_id:
             self.tags.append(tag)
             self.untagged = False
+            tag.highlight_count += 1
 
     def remove_tag(self, tag):
         if self.is_tagged_with(tag):
             self.tags.remove(tag)
+            tag.highlight_count -= 1
             if self.tags.count() == 0:
                 self.untagged = True
 
@@ -1032,10 +1038,13 @@ class Topic(db.Model):
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String, default=generate_str_id)
     name = db.Column(db.String(128), index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     archived = db.Column(db.Boolean, index=True, default=False)
-    goal = db.Column(db.String(512))
+    goal = db.Column(db.String(512))  # firget what the thinking here was
+    highlight_count = db.Column(db.Integer, default=0)
+    article_count = db.Column(db.Integer, default=0)
 
     articles = db.relationship(
         "Article", secondary=tags_articles, back_populates="tags", lazy="dynamic"
@@ -1048,6 +1057,10 @@ class Tag(db.Model):
     topics = db.relationship(
         "Topic", secondary=tags_topics, back_populates="tags", lazy="dynamic"
     )
+
+    @property
+    def fields_that_can_be_updated(self):
+        return ["name", "archived"]
 
     # checks if a specific highlight is tagged
     def is_added_highlight(self, highlight):
@@ -1068,13 +1081,18 @@ class Tag(db.Model):
     def to_dict(self):
         return {
             "id": self.id,
+            "uuid": self.uuid,
             "user_id": self.user_id,
             "name": self.name,
             "archived": self.archived,
+            "highlight_count": self.highlight_count,
+            "article_count": self.article_count
         }
 
     @staticmethod
-    def query_with_count(user):
+    def query_with_count(
+        user,
+    ):  # this returns tags with the article count. Optimizing for the query.
         q = (
             db.session.query(Tag, Article.archived, func.count("*"))
             .outerjoin(tags_articles, tags_articles.c.tag_id == Tag.id)

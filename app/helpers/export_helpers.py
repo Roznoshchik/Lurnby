@@ -58,7 +58,8 @@ def create_zip_file_for_article(article: Article, path: str, ext: str):
         logger.error(e)
         raise e
 
-def get_highlights_export(highlights: list, path:str, ext:str):
+
+def get_highlights_export(highlights: list, path: str, ext: str):
     """creates the zip file
 
     Args:
@@ -101,10 +102,11 @@ def get_highlights_export(highlights: list, path:str, ext:str):
         logger.error(traceback.print_exc())
         raise e
 
+
 def export_to_json(path, article_dict, highlights):
     article_path = f"{path}/article.json"
     highlights_path = f"{path}/highlights.json"
-    
+
     if article_dict:
         with open(article_path, "w") as file:
             file.write(json.dumps(article_dict, indent=4))
@@ -179,7 +181,9 @@ def create_plain_text_article_dict(article):
         "title": article.title,
         "source": article.source_url or article.source,
         "notes": make_plain_text(article.notes) if article.notes else None,
-        "reflections": make_plain_text(article.reflections) if article.reflections else None,
+        "reflections": make_plain_text(article.reflections)
+        if article.reflections
+        else None,
         "tags": ", ".join(article.tag_list),
     }
 
@@ -191,7 +195,9 @@ def create_list_of_highlight_dicts(highlights):
             {
                 "text": make_plain_text(highlight.text) if highlight.text else None,
                 "note": make_plain_text(highlight.note) if highlight.note else None,
-                "prompt": make_plain_text(highlight.prompt) if highlight.prompt else None,
+                "prompt": make_plain_text(highlight.prompt)
+                if highlight.prompt
+                else None,
                 "source": highlight.source,
                 "tags": ", ".join([tag.name for tag in highlight.tags.all()]),
                 "topics": ", ".join([topic.title for topic in highlight.topics.all()]),

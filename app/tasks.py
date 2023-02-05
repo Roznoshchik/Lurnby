@@ -17,7 +17,10 @@ from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
 from app.models import Task, Article, Highlight, User
-from app.helpers.export_helpers import create_zip_file_for_article, get_highlights_export
+from app.helpers.export_helpers import (
+    create_zip_file_for_article,
+    get_highlights_export,
+)
 
 
 logger = CustomLogger("Tasks")
@@ -362,6 +365,7 @@ def export_article(user, article, ext="csv"):
     finally:
         _set_task_progress(100)
 
+
 def export_highlights(highlights, ext="csv"):
     """exports a zip file with two files and sends an email with the download link.
     The first file contains the article metadata and notes, reflections, and tags.
@@ -373,7 +377,7 @@ def export_highlights(highlights, ext="csv"):
     """
 
     try:
-        
+
         if not highlights:
             raise LurnbyValueError("Highlights are required")
 

@@ -453,6 +453,7 @@ class AddHighlightApiTests(unittest.TestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual(data.get("message"), "Text is a required field")
 
+
 class GetHighlightApiTests(unittest.TestCase):
     def setUp(self):
         os.environ["testing"] = "1"
@@ -499,10 +500,9 @@ class GetHighlightApiTests(unittest.TestCase):
             "/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"}
         )
         data = json.loads(res.data)
-        returned_highlight = data.get("highlight") 
+        returned_highlight = data.get("highlight")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(highlight.text, returned_highlight.get("text"))
-        
 
 
 class UpdateHighlightApiTests(unittest.TestCase):
