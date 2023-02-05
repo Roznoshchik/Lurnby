@@ -77,13 +77,10 @@ def update_user(id):
         if not data:
             return bad_request("empty payload")
 
-        for key in data:
-            if key == "id":
-                continue
-            # this should probably ensure that no protected values get updated,
-            # just not sure what those are
-            if hasattr(user, key):
+        for key in user.fields_that_can_be_updated:
+            if key in data:
                 setattr(user, key, data[key])
+
         ev = Event.add("updated user info", user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
