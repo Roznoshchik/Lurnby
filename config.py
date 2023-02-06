@@ -8,7 +8,7 @@ load_dotenv(dotenv_path)
 
 DB_URI = os.getenv("DATABASE_URL")  # or other relevant config var
 
-if DB_URI.startswith("postgres://"):
+if DB_URI and DB_URI.startswith("postgres://"):
     DB_URI = DB_URI.replace("postgres://", "postgresql://", 1)
 
 class Config(object):
