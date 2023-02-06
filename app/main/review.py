@@ -11,6 +11,7 @@ from flask_login import current_user
 # 6 - 180 days
 # 7 - 365 days
 
+
 def get_time_delta(tier):
     if tier == 0:
         time = timedelta(days=1)
@@ -38,8 +39,8 @@ def check_for_review(highlight, tier):
     time = get_time_delta(tier)
 
     if today - reviewed > time:
-        return True 
-    
+        return True
+
     return False
 
 
@@ -52,8 +53,8 @@ def order_highlights(highlights):
     tier5 = []
     tier6 = []
     tier7 = []
-    
-    #highlights = user.highlights.filter_by(archived=False).all()
+
+    # highlights = user.highlights.filter_by(archived=False).all()
     random.shuffle(highlights)
     count = current_user.review_count
 
@@ -90,7 +91,7 @@ def order_highlights(highlights):
             if len(tier7) < count:
                 if check_for_review(h, h.review_schedule):
                     tier7.append(h)
-    
+
     tiers = [tier0, tier1, tier2, tier3, tier4, tier5, tier6, tier7]
 
     return tiers

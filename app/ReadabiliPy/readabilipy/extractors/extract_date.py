@@ -15,7 +15,7 @@ def extract_date(html):
         ('//meta[@property="og:article:modified_time"]/@content', 10),
         ('//meta[@property="article:published"]/@content', 7),
         ('//meta[@itemprop="datePublished"]/@content', 3),
-        ('//time/@datetime', 3),
+        ("//time/@datetime", 3),
         ('//meta[@itemprop="dateModified"]/@content', 2),
         ('//meta[@property="article:modified_time"]/@content', 2),
     ]
@@ -28,8 +28,8 @@ def extract_date(html):
     # Search through the extracted date strings in order of score
     # and take the first that is in isoformat
     for date_string in sorted(
-            extracted_dates, key=lambda ds: extracted_dates[ds]["score"],
-            reverse=True):
+        extracted_dates, key=lambda ds: extracted_dates[ds]["score"], reverse=True
+    ):
 
         iso_date = ensure_iso_date_format(date_string)
         if iso_date:
@@ -40,12 +40,12 @@ def extract_date(html):
 def ensure_iso_date_format(date_string, ignoretz=True):
     """Check date_string is in one of our supported formats and return it"""
     supported_date_formats = [
-        "%Y-%m-%dT%H:%M:%S",      # '2014-10-24T17:32:46'
-        "%Y-%m-%dT%H:%M:%S%z",    # '2014-10-24T17:32:46+12:00'
-        "%Y-%m-%dT%H:%M%z",       # '2014-10-24T17:32+12:00'
-        "%Y-%m-%dT%H:%M:%SZ",     # '2014-10-24T17:32:46Z'
+        "%Y-%m-%dT%H:%M:%S",  # '2014-10-24T17:32:46'
+        "%Y-%m-%dT%H:%M:%S%z",  # '2014-10-24T17:32:46+12:00'
+        "%Y-%m-%dT%H:%M%z",  # '2014-10-24T17:32+12:00'
+        "%Y-%m-%dT%H:%M:%SZ",  # '2014-10-24T17:32:46Z'
         "%Y-%m-%dT%H:%M:%S.%fZ",  # '2014-10-24T17:32:46.000Z'
-        "%Y-%m-%dT%H:%M:%S.%f"    # '2014-10-24T17:32:46.493'
+        "%Y-%m-%dT%H:%M:%S.%f",  # '2014-10-24T17:32:46.493'
     ]
 
     for date_format in supported_date_formats:
@@ -55,11 +55,12 @@ def ensure_iso_date_format(date_string, ignoretz=True):
             # By stripping the colon here, we ensure that all versions of
             # python can parse datetimes like these
             if (
-                    date_format in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z")
-                    and date_string[-3] == ':'
-                    ):
-                isodate = (datetime.strptime(date_string[:-3] +
-                           date_string[-2:], date_format))
+                date_format in ("%Y-%m-%dT%H:%M:%S%z", "%Y-%m-%dT%H:%M%z")
+                and date_string[-3] == ":"
+            ):
+                isodate = datetime.strptime(
+                    date_string[:-3] + date_string[-2:], date_format
+                )
             else:
                 isodate = datetime.strptime(date_string, date_format)
             if ignoretz:

@@ -4,133 +4,143 @@ from random import randint
 import sys
 import json
 from rq import get_current_job
-from flask import render_template, url_for
+from flask import render_template
 from bs4 import BeautifulSoup
 import re
+import traceback
+from flask import current_app
 
-
-from app import create_app, db, s3, bucket
+from app import create_app, db, s3, bucket, CustomLogger
+from app.api.errors import LurnbyValueError
 from app.export import get_zip
 from app.email import send_email
 from app.main.ebooks import epubTitle, epubConverted
 from app.main.pdf import importPDF
-from app.models import Task, Article, Highlight, Tag, User, Event
+from app.models import Task, Article, Highlight, User
+from app.helpers.export_helpers import (
+    create_zip_file_for_article,
+    get_highlights_export,
+)
 
 
-app = create_app()
-app.app_context().push()
+logger = CustomLogger("Tasks")
 
-def delete_user(u):
-    highlights=u.highlights.all()
+try:
+    current_app.redis.ping()
+    app = create_app()
+    app.app_context().push()
+except Exception:
+    app = current_app
+
+
+def _set_task_progress(progress):
+    try:
+        app.redis.ping()
+        job = get_current_job()
+        if job:
+            logger.info(f"Job: {job}")
+            job.meta["progress"] = progress
+            job.save_meta()
+            logger.info(f"task id: {job.get_id()}")
+            task = Task.query.get(job.get_id())
+            logger.info(f"Task: {task}")
+            task.user.add_notification(
+                "task_progress", {"task_id": job.get_id(), "progress": progress}
+            )
+            if progress >= 100:
+                task.complete = True
+            db.session.commit()
+    except Exception:
+        pass
+
+
+def delete_user(id):
+    u = User.query.filter_by(id=id).first()
+    highlights = u.highlights.all()
     topics = u.topics.all()
     articles = u.articles.all()
     tags = u.tags.all()
     senders = u.approved_senders.all()
     comms = u.comms
+
     for h in highlights:
-        db.session.execute(f'DELETE from highlights_topics where highlight_id={h.id}')
-        db.session.execute(f'DELETE from tags_highlights where highlight_id={h.id}')
+        db.session.execute(f"DELETE from highlights_topics where highlight_id={h.id}")
+        db.session.execute(f"DELETE from tags_highlights where highlight_id={h.id}")
         db.session.delete(h)
     for t in topics:
-        db.session.execute(f'DELETE from highlights_topics where topic_id={t.id}')
+        db.session.execute(f"DELETE from highlights_topics where topic_id={t.id}")
         db.session.delete(t)
     for t in tags:
-        db.session.execute(f'DELETE from tags_articles where tag_id={t.id}')
-        db.session.execute(f'DELETE from tags_highlights where tag_id={t.id}')
+        db.session.execute(f"DELETE from tags_articles where tag_id={t.id}")
+        db.session.execute(f"DELETE from tags_highlights where tag_id={t.id}")
         db.session.delete(t)
     for a in articles:
-        db.session.execute(f'DELETE from tags_articles where article_id={a.id}')
+        db.session.execute(f"DELETE from tags_articles where article_id={a.id}")
         db.session.delete(a)
     for s in senders:
         db.session.delete(s)
-    db.session.delete(comms)
-    #db.session.delete(u)
-    u.email=None
-    u.goog_id=None
+    if comms:
+        db.session.delete(comms)
+
+    u.email = None
+    u.goog_id = None
     u.firstname = None
     u.username = None
-    u.add_by_email=None
-    u.token=None
-    u.deleted=True
+    u.add_by_email = None
+    u.token = None
+    u.deleted = True
     db.session.commit()
-
-
-def _set_task_progress(progress):
-    job = get_current_job()
-  
-    if job:
-        print(f'Job: {job}')
-        job.meta['progress'] = progress
-        job.save_meta()
-        print(f'task id: {job.get_id()}')
-        task = Task.query.get(job.get_id())
-        print(f'Task: {task}')
-        task.user.add_notification('task_progress',
-                                   {'task_id': job.get_id(),
-                                     'progress': progress })
-        if progress >= 100:
-            task.complete = True
-        db.session.commit()
 
 
 def account_export(uid, ext, delete=False):
     try:
         _set_task_progress(0)
-        user = User.query.get(uid)
-        if ext != 'none':
-            print('exporting')
-            if os.environ.get('DEV'):
-                az_path_base = f'staging/{user.id}/exports/'
+        user = User.query.filter_by(id=uid).first()
+        if ext != "none":
+            logger.info("exporting")
+            if os.environ.get("DEV"):
+                az_path_base = f"staging/{user.id}/exports/"
             else:
-                az_path_base = f'{user.id}/exports/'
+                az_path_base = f"{user.id}/exports/"
             filename = get_zip(user, ext)
-            az_path = f'{az_path_base}lurnby-export.zip'
-            s3.upload_file(
-                Bucket = bucket,
+            az_path = f"{az_path_base}lurnby-export.zip"
+            s3.upload_file(Bucket=bucket, Filename=filename, Key=az_path)
+            url = s3.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": bucket, "Key": az_path},
+                ExpiresIn=604800,
+            )
 
-                Filename=filename,
-                Key=az_path
-                )
-            location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-            #url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-            url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
-
-            delete_date = (datetime.today()+ timedelta(days=7)).strftime("%B %d, %Y")
-            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
-            send_email('[Lurnby] Your exported data',
-                    sender=app.config['ADMINS'][0], recipients=[user.email],
-                    text_body=render_template('email/export_highlights.txt', url=url, user=user, delete_date=delete_date),
-                    html_body=render_template('email/export_highlights.html', url=url, user=user, delete_date=delete_date),
-                    sync=True)
+            delete_date = (datetime.today() + timedelta(days=7)).strftime("%B %d, %Y")
+            logger.info(
+                f"sending email - [Lurnby] Your exported data for user: {user.id}"
+            )
+            send_email(
+                "[Lurnby] Your exported data",
+                sender=app.config["ADMINS"][0],
+                recipients=[user.email],
+                text_body=render_template(
+                    "email/export_highlights.txt",
+                    url=url,
+                    user=user,
+                    delete_date=delete_date,
+                ),
+                html_body=render_template(
+                    "email/export_highlights.html",
+                    url=url,
+                    user=user,
+                    delete_date=delete_date,
+                ),
+                sync=True,
+            )
         if delete:
-            # if os.environ.get('DEV'):
-            #     az_path_base = f'staging/{user.id}/'
-            # else:
-            #     az_path_base = f'{user.id}/'
+            delete_user(user.id)
 
-            # az = boto3.resource('s3')
-            # buck = az.Bucket(bucket)
-            # buck.objects.filter(Prefix=az_path_base).delete()
-            delete_user(user)
-
-            # for tag in user.tags.all():
-            #     db.session.delete(tag)
-            # for highlight in user.highlights.all():
-            #     db.session.delete(highlight)
-            # for topic in user.topics.all():
-            #     db.session.delete(topic)
-            # for article in user.articles.all():
-            #     db.session.delete(article)
-            # _set_task_progress(100)
-            # db.session.delete(user)
-            # db.session.commit()
-        
-    except:
-        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
-  
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
 
 
-def export_highlights(user, highlights, source, ext):
+def export_legacy_highlights(user, highlights, source, ext):
     if not highlights:
         return
     try:
@@ -138,268 +148,420 @@ def export_highlights(user, highlights, source, ext):
         data = []
         i = 0
         total_highlights = len(highlights)
-        
+
         basedir = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(
-            basedir, 'temp'
-        )
+        path = os.path.join(basedir, "temp")
 
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        if os.environ.get('DEV'):
-            az_path_base = f'staging/{user.id}/exports/'
+        if os.environ.get("DEV"):
+            az_path_base = f"staging/{user.id}/exports/"
         else:
-            az_path_base = f'{user.id}/exports/'
+            az_path_base = f"{user.id}/exports/"
 
-
-        if ext == 'txt':
-            if source == 'article':
+        if ext == "txt":
+            if source == "article":
                 a = Article.query.get(highlights[0].article_id)
                 title = a.title
                 a_source = a.source_url if a.source_url else a.source
-                with open(f'{path}/highlights.txt', 'w', encoding='utf-16') as f:
-                    f.write(f'FROM: {title} \nSOURCE: {a_source}\n\n')
+                with open(f"{path}/highlights.txt", "w", encoding="utf-16") as f:
+                    f.write(f"FROM: {title} \nSOURCE: {a_source}\n\n")
                     for highlight in highlights:
-                        highlight = Highlight.query.get(highlight.id) 
-                        f.write(f'TEXT:\n{highlight.text}\n\n')
+                        highlight = Highlight.query.get(highlight.id)
+                        f.write(f"TEXT:\n{highlight.text}\n\n")
                         if highlight.note:
-                            f.write(f'NOTE:\n{highlight.note}\n\n')
+                            f.write(f"NOTE:\n{highlight.note}\n\n")
                         if highlight.topics.count() > 0:
-                            f.write(f'TOPICS:\n{", ".join([topic.title for topic in highlight.topics.filter_by(archived=False).all()])}\n\n')
+                            topic_titles = [
+                                topic.title
+                                for topic in highlight.topics.filter_by(
+                                    archived=False
+                                ).all()
+                            ]
+                            f.write(f'TOPICS:\n{", ".join(topic_titles)}\n\n')
                         i += 1
                         _set_task_progress(100 * i // total_highlights)
-                    f.write('\n')
+                    f.write("\n")
             else:
-                with open(f'{path}/highlights.txt', 'w', encoding='utf-16') as f:
+                with open(f"{path}/highlights.txt", "w", encoding="utf-16") as f:
                     for highlight in highlights:
-                        highlight = Highlight.query.get(highlight.id) 
+                        highlight = Highlight.query.get(highlight.id)
                         a = highlight.article
                         title = a.title
                         a_source = a.source_url if a.source_url else a.source
-                        f.write(f'FROM: {title}\nSOURCE: {a_source}\n\n')
-                        f.write(f'TEXT:\n{highlight.text}\n\n')
+                        f.write(f"FROM: {title}\nSOURCE: {a_source}\n\n")
+                        f.write(f"TEXT:\n{highlight.text}\n\n")
                         if highlight.note:
-                            f.write(f'NOTE:\n{highlight.note}\n\n')
-                        f.write(f'TOPICS:\n{", ".join([topic.title for topic in highlight.topics.filter_by(archived=False).all()])}\n\n')
-                        f.write('\n')
-                        
+                            f.write(f"NOTE:\n{highlight.note}\n\n")
+                        topic_titles = [
+                            topic.title
+                            for topic in highlight.topics.filter_by(
+                                archived=False
+                            ).all()
+                        ]
+                        f.write(f'TOPICS:\n{", ".join(topic_titles)}\n\n')
+                        f.write("\n")
+
                         i += 1
                         _set_task_progress(100 * i // total_highlights)
-                    f.write('\n')
-            
-            filename = f'{path}/highlights.txt'
-            az_path = f'{az_path_base}highlights.txt'
-            s3.upload_file(
-                Bucket = bucket,
-                Filename=filename,
-                Key=az_path
-                )
-            location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-            #url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-            url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
+                    f.write("\n")
 
+            filename = f"{path}/highlights.txt"
+            az_path = f"{az_path_base}highlights.txt"
+            s3.upload_file(Bucket=bucket, Filename=filename, Key=az_path)
+            url = s3.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": bucket, "Key": az_path},
+                ExpiresIn=604800,
+            )
 
-            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
-            send_email('[Lurnby] Your exported highlights',
-                    sender=app.config['ADMINS'][0], recipients=[user.email],
-                    text_body=render_template('email/export_highlights.txt', url=url, user=user),
-                    html_body=render_template('email/export_highlights.html', url=url, user=user),
-                    sync=True)
-            
+            logger.info(
+                f"sending email - [Lurnby] Your exported data for user: {user.id}"
+            )
+            send_email(
+                "[Lurnby] Your exported highlights",
+                sender=app.config["ADMINS"][0],
+                recipients=[user.email],
+                text_body=render_template(
+                    "email/export_highlights.txt", url=url, user=user
+                ),
+                html_body=render_template(
+                    "email/export_highlights.html", url=url, user=user
+                ),
+                sync=True,
+            )
+
         else:
             for highlight in highlights:
                 highlight = Highlight.query.get(highlight.id)
-                if source == 'topics':
-                    data.append({
-                            'from': highlight.article.title,
-                            'source': highlight.article.source_url if highlight.article.source_url else highlight.article.source,
-                            'text': highlight.text,
-                            'note': highlight.note,
-                            'topics': [topic.title for topic in highlight.topics.filter_by(archived=False).all()]
-                            })
+                if source == "topics":
+                    data.append(
+                        {
+                            "from": highlight.article.title,
+                            "source": highlight.article.source_url
+                            if highlight.article.source_url
+                            else highlight.article.source,
+                            "text": highlight.text,
+                            "note": highlight.note,
+                            "topics": [
+                                topic.title
+                                for topic in highlight.topics.filter_by(
+                                    archived=False
+                                ).all()
+                            ],
+                        }
+                    )
                 else:
-                    data.append({'text': highlight.text,
-                                'note': highlight.note,
-                                'topics': [topic.title for topic in highlight.topics.filter_by(archived=False).all() ]
-                                })
+                    data.append(
+                        {
+                            "text": highlight.text,
+                            "note": highlight.note,
+                            "topics": [
+                                topic.title
+                                for topic in highlight.topics.filter_by(
+                                    archived=False
+                                ).all()
+                            ],
+                        }
+                    )
                 i += 1
                 _set_task_progress(100 * i // total_highlights)
 
-            with open(f'{path}/highlights.json', 'w', encoding='utf-16') as f:
-                f.write(json.dumps({'highlights': data}, ensure_ascii=False, indent=4))
-           
-            filename = f'{path}/highlights.json'
-            az_path = f'{az_path_base}highlights.json'
-            s3.upload_file(
-                Bucket = bucket,
-                Filename=filename,
-                Key=az_path
-                )
-            location = s3.get_bucket_location(Bucket=bucket)['LocationConstraint']
-            # url = "https://s3-%s.amazonaws.com/%s/%s" % (location, bucket, az_path)
-            url = s3.generate_presigned_url('get_object', Params = {'Bucket': bucket, 'Key': az_path}, ExpiresIn = 604800)
+            with open(f"{path}/highlights.json", "w", encoding="utf-16") as f:
+                f.write(json.dumps({"highlights": data}, ensure_ascii=False, indent=4))
 
-            print(f'sending email - [Lurnby] Your exported data for user: {user.id}')
-            send_email('[Lurnby] Your exported highlights',
-                    sender=app.config['ADMINS'][0], recipients=[user.email],
-                    text_body=render_template('email/export_highlights.txt', url=url, user=user),
-                    html_body=render_template('email/export_highlights.html', url=url, user=user),
-                    sync=True)                
-                
-    except:
-        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+            filename = f"{path}/highlights.json"
+            az_path = f"{az_path_base}highlights.json"
+            s3.upload_file(Bucket=bucket, Filename=filename, Key=az_path)
+
+            url = s3.generate_presigned_url(
+                "get_object",
+                Params={"Bucket": bucket, "Key": az_path},
+                ExpiresIn=604800,
+            )
+
+            logger.info(
+                f"sending email - [Lurnby] Your exported data for user: {user.id}"
+            )
+            send_email(
+                "[Lurnby] Your exported highlights",
+                sender=app.config["ADMINS"][0],
+                recipients=[user.email],
+                text_body=render_template(
+                    "email/export_highlights.txt", url=url, user=user
+                ),
+                html_body=render_template(
+                    "email/export_highlights.html", url=url, user=user
+                ),
+                sync=True,
+            )
+
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
 
-    
-def bg_add_article(u, a_id, pdf, epub, tags):
+
+def export_article(user, article, ext="csv"):
+    """exports a zip file with two files and sends an email with the download link.
+    The first file contains the article metadata and notes, reflections, and tags.
+    The second contains the highlights, their notes, and their tags.
+
+    Args:
+        user (class User): User requesting the export
+        article (class Article): Article being exported
+        ext (string): desired export format : CSV, JSON, TXT
+    """
+
     try:
+        if not user or not article:
+            raise LurnbyValueError("Both User and Article are required")
+
         _set_task_progress(0)
-        today = date.today()
-        today = today.strftime("%B %d, %Y")
-        
+
         basedir = os.path.abspath(os.path.dirname(__file__))
-        path = os.path.join(
-            basedir, 'temp'
-        )
+        path = os.path.join(basedir, "temp")
+        file_title = "_".join(article.title.split())
 
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        path = f'{path}/{a_id}'
-
-        if pdf == 'true':
-            path = f'{path}.pdf'
-            with open(path, "w") as f:
-                pass
-            s3.download_file(bucket, a_id, path)
-
-            _set_task_progress(10)
-            pdf = importPDF(path, u)
-            _set_task_progress(90)
-            source = 'PDF File: added ' + today
-
-            article = Article(content=pdf['content'], archived=False,
-                            source=source, progress = 0.0,
-                            unread=True, title=pdf['title'],
-                            user_id = u.id, filetype='pdf')
-            db.session.add(article)
-            article.date_read_date = datetime.utcnow().date()
-            article.estimated_reading()
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=u.id
-                                        ).first()
-
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=u.id)
-                    db.session.add(t)
-                    article.AddToTag(t)
-
-                else:
-                    if t.archived:
-                        t.archived = False
-                    article.AddToTag(t)
-
-            db.session.commit()
+        if os.environ.get("DEV"):
+            az_path_base = f"staging/{user.id}/exports"
         else:
-            path = f'{path}.epub'
-            s3.download_file(bucket, a_id, path)
+            az_path_base = f"{user.id}/exports"
 
-            content = epubConverted(path, u)
-            title = epubTitle(path)
-            title = title[0][0]
-            epubtext = content
+        zip_path = create_zip_file_for_article(article, path, ext)
+        az_path = f"{az_path_base}/{file_title}.zip"
 
-            source = 'Epub File: added ' + today
+        s3.upload_file(Bucket=bucket, Filename=zip_path, Key=az_path)
 
-            new_article = Article(unread=True, title=title, content=epubtext,
-                                source=source, user_id=u.id,
-                                archived=False, progress=0.0,
-                                filetype="epub")
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": az_path},
+            ExpiresIn=604800,
+        )
 
-            db.session.add(new_article)
-            new_article.date_read_date = datetime.utcnow().date()
-            new_article.estimated_reading()
+        logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
 
-            for tag in tags:
-                t = Tag.query.filter_by(name=tag, user_id=u.id
-                                        ).first()
+        send_email(
+            "[Lurnby] Your exported highlights",
+            sender=app.config["ADMINS"][0],
+            recipients=[user.email],
+            text_body=render_template(
+                "email/export_highlights.txt", url=url, user=user
+            ),
+            html_body=render_template(
+                "email/export_highlights.html", url=url, user=user
+            ),
+            sync=True,
+        )
+        os.remove(zip_path)
 
-                if not t:
-                    t = Tag(name=tag, archived=False, user_id=u.id)
-                    db.session.add(t)
-                    new_article.AddToTag(t)
-
-                else:
-                    if t.archived:
-                        t.archived = False
-                    new_article.AddToTag(t)
-
-            db.session.commit()
-            os.remove(path)
-            
-    except:
-        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+    except Exception as e:
+        logger.error(e)
+        raise e
     finally:
         _set_task_progress(100)
+
+
+def export_highlights(highlights, ext="csv"):
+    """exports a zip file with two files and sends an email with the download link.
+    The first file contains the article metadata and notes, reflections, and tags.
+    The second contains the highlights, their notes, and their tags.
+
+    Args:
+        article (class Article): Article being exported
+        ext (string): desired export format : CSV, JSON, TXT
+    """
+
+    try:
+
+        if not highlights:
+            raise LurnbyValueError("Highlights are required")
+
+        user = User.query.filter_by(id=highlights[0].user_id).first()
+        _set_task_progress(0)
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(basedir, "temp")
+        file_title = "highlights"
+
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        if os.environ.get("DEV"):
+            az_path_base = f"staging/{user.id}/exports"
+        else:
+            az_path_base = f"{user.id}/exports"
+
+        zip_path = get_highlights_export(highlights, path, ext)
+        az_path = f"{az_path_base}/{file_title}.zip"
+
+        s3.upload_file(Bucket=bucket, Filename=zip_path, Key=az_path)
+
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": az_path},
+            ExpiresIn=604800,
+        )
+
+        logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
+
+        send_email(
+            "[Lurnby] Your exported highlights",
+            sender=app.config["ADMINS"][0],
+            recipients=[user.email],
+            text_body=render_template(
+                "email/export_highlights.txt", url=url, user=user
+            ),
+            html_body=render_template(
+                "email/export_highlights.html", url=url, user=user
+            ),
+            sync=True,
+        )
+        os.remove(zip_path)
+
+    except Exception as e:
+        logger.error(e)
+        raise e
+    finally:
+        _set_task_progress(100)
+
+
+def bg_add_article(article_uuid=None, file_ext=None, file=None):
+    try:
+        _set_task_progress(0)
+        article = Article.query.filter_by(uuid=article_uuid).first()
+
+        today = date.today()
+        today = today.strftime("%B %d, %Y")
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        path = os.path.join(basedir, "temp")
+
+        if not os.path.isdir(path):
+            os.mkdir(path)
+
+        path = f"{path}/{article_uuid}"
+
+        if file_ext == ".pdf":
+            if not file:
+                file = f"{path}.pdf"
+                s3.download_file(bucket, article_uuid, file)
+
+            _set_task_progress(10)
+            pdf = importPDF(file, article.user)
+            _set_task_progress(90)
+            source = "PDF File: added " + today
+            article.content = pdf["content"]
+            article.source = source
+            article.title = pdf["title"]
+            article.filetype = "pdf"
+
+            article.date_read_date = datetime.utcnow().date()  # why is this needed?
+            article.date_read = datetime.utcnow()
+            article.estimated_reading()
+            article.processing = False
+
+            db.session.commit()
+            s3.delete_object(Bucket=bucket, Key=article_uuid)
+            try:
+                os.remove(f"{path}.pdf")
+            except Exception:
+                pass
+
+        else:
+            if not file:
+                file = f"{path}.epub"
+                s3.download_file(bucket, article_uuid, file)
+
+            content = epubConverted(file, article.user)
+            title = epubTitle(file)
+
+            source = "Epub File: added " + today
+            article.title = title
+            article.content = content
+            article.source = source
+            article.filetype = "epub"
+
+            article.date_read_date = datetime.utcnow().date()
+            article.date_read = datetime.utcnow()
+            article.estimated_reading()
+            article.processing = False
+            db.session.commit()
+            s3.delete_object(Bucket=bucket, Key=article_uuid)
+            try:
+                os.remove(f"{path}.epub")
+            except Exception:
+                pass
+
+    except Exception as e:
+        logger.error(traceback.print_exc())
+        logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
+    finally:
+        _set_task_progress(100)
+        return
+
 
 def set_images_lazy(aid):
     try:
         _set_task_progress(0)
-        a = Article.query.get(aid)
+        a = Article.query.filter_by(id=aid).first()
         soup = BeautifulSoup(a.content, "html5lib")
         images = soup.find_all("img")
         for img in images:
             img["loading"] = "lazy"
         a.content = str(soup.prettify())
         db.session.commit()
-    except:
-        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
+
 
 def set_absolute_urls(aid):
     try:
         _set_task_progress(0)
-        a = Article.query.get(aid)
+        a = Article.query.filter_by(id=aid).first()
         if a.source_url:
             soup = BeautifulSoup(a.content, "html5lib")
             images = soup.find_all("img")
             for img in images:
                 try:
-                    if 'http' not in img['src']:
-                        img['src'] = f'{a.source_url}{img["src"]}'
-                except:
-                    print('no src in image')
-            links = soup.find_all('a')
-            for l in links:
+                    if "http" not in img["src"]:
+                        img["src"] = f'{a.source_url}{img["src"]}'
+                except Exception:
+                    logger.info("no src in image")
+            links = soup.find_all("a")
+            for link in links:
                 try:
-                    if 'http' not in l['href']:
-                        l['href'] = f'{a.source_url}{l["href"]}'
-                except:
-                    print('no href in url')
+                    if "http" not in link["href"]:
+                        link["href"] = f'{a.source_url}{link["href"]}'
+                except Exception:
+                    logger.info("no href in url")
             a.content = str(soup.prettify())
             db.session.commit()
-    except:
-        app.logger.error('Unhandled exception', exc_info=sys.exc_info())
+
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}", exc_info=sys.exc_info())
     finally:
         _set_task_progress(100)
-  
+
+
 # Also consider changing the algorithm for finding the spaces
 # to be a bit more sophisticated.
 def create_recall_text(highlightId):
     highlight = Highlight.query.filter_by(id=highlightId).first()
-    soup = BeautifulSoup(highlight.text, features='lxml')
+    soup = BeautifulSoup(highlight.text, features="lxml")
     for text in soup.find_all(text=True):
-        words = text.split(' ')
-        if (len(words) > 3):
-            for i in range(0,len(words) // 3):
-                num = randint(0, len(words) -1)
-                words[num] = re.sub('[\w\d]+','_____', words[num])
-        text.replace_with(' '.join(words))
-        
+        words = text.split(" ")
+        if len(words) > 3:
+            for i in range(0, len(words) // 3):
+                num = randint(0, len(words) - 1)
+                words[num] = re.sub(r"[\w\d]+", "_____", words[num])
+        text.replace_with(" ".join(words))
+
     highlight.prompt = soup.prettify()
     db.session.commit()
-
-

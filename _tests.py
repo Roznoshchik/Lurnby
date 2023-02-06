@@ -6,11 +6,10 @@ from config import Config
 
 class TestConfig(Config):
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = 'sqlite://'
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
 class HighlightModelCase(unittest.TestCase):
-
     def setUp(self):
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
@@ -26,10 +25,8 @@ class HighlightModelCase(unittest.TestCase):
         u = User(username="john")
         db.session.add(u)
 
-        h1 = Highlight(text="this is a highlight",
-                       user_id=u.id, archived=False)
-        h2 = Highlight(text="This is a second highlight",
-                       user_id=u.id, archived=False)
+        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
+        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
         t1 = Topic(title="Canaries", user_id=u.id, archived=False)
         t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
 
@@ -44,9 +41,9 @@ class HighlightModelCase(unittest.TestCase):
 
         self.assertTrue(h1.is_added_topic(t1))
         self.assertEqual(h1.topics.count(), 1)
-        self.assertEqual(h1.topics.first().title, 'Canaries')
+        self.assertEqual(h1.topics.first().title, "Canaries")
         self.assertEqual(t1.highlights.count(), 1)
-        self.assertEqual(t1.highlights.first().text, 'this is a highlight')
+        self.assertEqual(t1.highlights.first().text, "this is a highlight")
 
         h1.RemoveFromTopic(t1)
         db.session.commit()
@@ -60,14 +57,10 @@ class HighlightModelCase(unittest.TestCase):
         db.session.add(u)
         u = User.query.first()
 
-        h1 = Highlight(text="this is a highlight",
-                       user_id=u.id, archived=False)
-        h2 = Highlight(text="This is a second highlight",
-                       user_id=u.id, archived=False)
-        h3 = Highlight(text="This is a third highlight",
-                       user_id=u.id, archived=False)
-        h4 = Highlight(text="This is a fourth highlight",
-                       user_id=u.id, archived=False)
+        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
+        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
+        h3 = Highlight(text="This is a third highlight", user_id=u.id, archived=False)
+        h4 = Highlight(text="This is a fourth highlight", user_id=u.id, archived=False)
 
         t1 = Topic(title="Canaries", user_id=u.id, archived=False)
         t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
@@ -132,16 +125,12 @@ class TagModelCase(unittest.TestCase):
         u = User(username="john")
         db.session.add(u)
 
-        h1 = Highlight(text="this is a highlight", user_id=u.id,
-                       archived=False)
-        h2 = Highlight(text="This is a second highlight", user_id=u.id,
-                       archived=False)
+        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
+        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
         t1 = Topic(title="Canaries", user_id=u.id, archived=False)
         t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
-        a1 = Article(title="Breaking Breaking!", user_id=u.id,
-                     archived=False)
-        a2 = Article(title="Read all about it!", user_id=u.id,
-                     archived=False)
+        a1 = Article(title="Breaking Breaking!", user_id=u.id, archived=False)
+        a2 = Article(title="Read all about it!", user_id=u.id, archived=False)
         tag1 = Tag(name="tag1", user_id=u.id, archived=False)
         tag2 = Tag(name="tag2", user_id=u.id, archived=False)
 
@@ -166,21 +155,21 @@ class TagModelCase(unittest.TestCase):
 
         self.assertTrue(a1.is_added_tag(tag1))
         self.assertEqual(a1.tags.count(), 1)
-        self.assertEqual(a1.tags.first().name, 'tag1')
+        self.assertEqual(a1.tags.first().name, "tag1")
         self.assertEqual(tag1.articles.count(), 1)
-        self.assertEqual(tag1.articles.first().title, 'Breaking Breaking!')
+        self.assertEqual(tag1.articles.first().title, "Breaking Breaking!")
 
         self.assertTrue(h1.is_added_tag(tag1))
         self.assertEqual(h1.tags.count(), 1)
-        self.assertEqual(h1.tags.first().name, 'tag1')
+        self.assertEqual(h1.tags.first().name, "tag1")
         self.assertEqual(tag1.highlights.count(), 1)
-        self.assertEqual(tag1.highlights.first().text, 'this is a highlight')
+        self.assertEqual(tag1.highlights.first().text, "this is a highlight")
 
         self.assertTrue(t1.is_added_tag(tag1))
         self.assertEqual(t1.tags.count(), 1)
-        self.assertEqual(t1.tags.first().name, 'tag1')
+        self.assertEqual(t1.tags.first().name, "tag1")
         self.assertEqual(tag1.topics.count(), 1)
-        self.assertEqual(tag1.topics.first().title, 'Canaries')
+        self.assertEqual(tag1.topics.first().title, "Canaries")
 
         a1.RemoveFromTag(tag1)
         h1.RemoveFromTag(tag1)
@@ -196,14 +185,10 @@ class TagModelCase(unittest.TestCase):
         db.session.add(u)
         u = User.query.first()
 
-        h1 = Highlight(text="this is a highlight",
-                       user_id=u.id, archived=False)
-        h2 = Highlight(text="This is a second highlight", user_id=u.id,
-                       archived=False)
-        h3 = Highlight(text="this is a third highlight", user_id=u.id,
-                       archived=False)
-        h4 = Highlight(text="This is a fourth highlight", user_id=u.id,
-                       archived=False)
+        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
+        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
+        h3 = Highlight(text="this is a third highlight", user_id=u.id, archived=False)
+        h4 = Highlight(text="This is a fourth highlight", user_id=u.id, archived=False)
 
         t1 = Topic(title="Canaries", user_id=u.id, archived=False)
         t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
@@ -220,8 +205,9 @@ class TagModelCase(unittest.TestCase):
         tag3 = Tag(name="Major", user_id=u.id, archived=False)
         tag4 = Tag(name="Pablo", user_id=u.id, archived=False)
 
-        db.session.add_all([h1, h2, h3, h4, t1, t2, t3, t4, a1, a2, a3, a4,
-                            tag1, tag2, tag3, tag4])
+        db.session.add_all(
+            [h1, h2, h3, h4, t1, t2, t3, t4, a1, a2, a3, a4, tag1, tag2, tag3, tag4]
+        )
         db.session.commit()
 
         # in 2 tags
