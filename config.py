@@ -6,14 +6,16 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 dotenv_path = os.path.join(basedir, ".env")
 load_dotenv(dotenv_path)
 
+DB_URI = os.getenv("DATABASE_URL")  # or other relevant config var
+
+if DB_URI.startswith("postgres://"):
+    DB_URI = DB_URI.replace("postgres://", "postgresql://", 1)
 
 class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY") or "Slava-fakes-it-till-he-makes-it"
 
     # SQL Alchemy Configs
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL"
-    ) or "sqlite:///" + os.path.join(basedir, "app.db")
+    SQLALCHEMY_DATABASE_URI = DB_URI or "sqlite:///" + os.path.join(basedir, "app.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
 
