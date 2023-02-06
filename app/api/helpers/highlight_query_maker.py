@@ -27,7 +27,6 @@ def filter_by_status(query: query.Query, status: str):
         pass
     elif status.lower() == "archived":
         query = query.filter_by(archived=True)
-
     return query
 
 
@@ -46,7 +45,6 @@ def filter_by_tag_status(query: query.Query, tag_status: str):
         query = query.filter_by(untagged=False)
     elif tag_status.lower() == "untagged":
         query = query.filter_by(untagged=True)
-
     return query
 
 
@@ -67,7 +65,6 @@ def filter_by_tags(query: query.Query, tag_ids: str):
         query = query.join(tags_highlights, (join_highlight_id == Highlight.id))
         # apply filter
         query = query.filter(join_tag_id.in_(tag_ids))
-
     return query
 
 
@@ -81,7 +78,7 @@ def filter_by_search_phrase(query: query.Query, search_phrase: str):
         query (flask_sqlalchemy.query.Query): updated query object
     """
     if search_phrase is not None:
-        query = query.join(Highlight.article)
+        query = query.outerjoin(Article, Highlight.article_id == Article.id)
         query = query.filter(
             db.or_(
                 Highlight.text.ilike(f"%{search_phrase}%"),
@@ -89,7 +86,6 @@ def filter_by_search_phrase(query: query.Query, search_phrase: str):
                 Article.title.ilike(f"%{search_phrase}%"),
             )
         )
-
     return query
 
 

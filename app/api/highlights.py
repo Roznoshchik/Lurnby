@@ -196,6 +196,38 @@ def delete_highlight(uuid):
             return bad_request("Something went wrong")
 
 
+@bp.route("/highlights/review", methods=["GET"])
+@token_auth.login_required
+def get_highlights_for_review():
+    """
+    Query args
+    ----------
+    per_tier : how many highlights to show per tier, defaults to user review_count field
+        number e.g 15, 30, 50
+    tag_ids : comma separated list of tag ids for filtering
+        e.g. 1,5,71
+    """
+    try:
+        user = token_auth.current_user()
+
+        per_tier = int(request.args.get("per_tier", user.review_count))
+        tag_ids = request.args.get("tag_ids")
+        if tag_ids:
+            tag_ids = [int(tag_id) for tag_id in tag_ids.split(",")]
+
+        response = jsonify(highlights=user.get_highlights_for_review(tag_ids, per_tier))
+        response.status_code = 200
+        return response
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        elif isinstance(e, ValueError) and "invalid literal for int()" in str(e):
+            return bad_request("Invalid data in params")
+        else:
+            logger.error(traceback.print_exc())
+            return bad_request("Something went wrong.")
+
+
 @bp.route("/highlights/export", methods=["GET"])
 @token_auth.login_required
 def export_highlights():

@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 import json
 import os
 
@@ -54,10 +55,10 @@ class GetHighlightsApiTests(unittest.TestCase):
 
         # Setup highlights
         hlght1 = Highlight(article_id=art1.id, user_id=user.id, text="alabama")
-        hlght2 = Highlight(article_id=art1.id, user_id=user.id, text="arkansas")
+        hlght2 = Highlight(user_id=user.id, text="arkansas")
         hlght3 = Highlight(article_id=art1.id, user_id=user.id, text="I")
         hlght4 = Highlight(article_id=art1.id, user_id=user.id, text="do")
-        hlght5 = Highlight(article_id=art2.id, user_id=user.id, text="love")
+        hlght5 = Highlight(article_id=art1.id, user_id=user.id, text="love")
         hlght6 = Highlight(article_id=art2.id, user_id=user.id, text="my")
         hlght7 = Highlight(article_id=art2.id, user_id=user.id, text="ma")
         hlght8 = Highlight(article_id=art2.id, user_id=user.id, text="and")
@@ -193,6 +194,7 @@ class GetHighlightsApiTests(unittest.TestCase):
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
+        print(data)
         self.assertEqual(len(data.get("highlights")), 1)
 
         # return 1 highlights with text with Arkansas
@@ -204,6 +206,16 @@ class GetHighlightsApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(len(data.get("highlights")), 1)
+
+        # return 4 highlights with Article title with Article 1
+        params = {"q": "Article 1"}
+        res = self.client.get(
+            "/api/highlights",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(len(data.get("highlights")), 4)
 
     @patch("app.models.User.check_token")
     def test_get_highlights_with_sorting(self, mock_check_token):
@@ -757,3 +769,266 @@ class ExportHighlightApiTests(unittest.TestCase):
         self.assertEqual(mock_s3.upload_file.call_count, 1)
         self.assertEqual(mock_s3.generate_presigned_url.call_count, 1)
         self.assertEqual(mock_send_email.call_count, 1)
+
+
+class ReviewHighlightApiTests(unittest.TestCase):
+    def setUp(self):
+        os.environ["testing"] = "1"
+        self.app = create_app(TestConfig)
+        self.app_context = self.app.app_context()
+        self.app_context.push()
+        self.client = self.app.test_client()
+        db.create_all()
+
+        # setup user
+        user = User(email="test@test.com")
+        db.session.add(user)
+        db.session.commit()
+
+        # Setup highlights
+        today = datetime.today()
+
+        three = timedelta(days=4)
+        week = timedelta(days=8)
+        two_weeks = timedelta(days=15)
+        month = timedelta(days=31)
+        three_months = timedelta(days=91)
+        half_year = timedelta(days=181)
+        year = timedelta(days=366)
+
+        hlght1 = Highlight(
+            user_id=user.id,
+            review_date=today - timedelta(days=1),
+            review_schedule=0,
+            text="alabama",
+        )
+        hlght2 = Highlight(
+            user_id=user.id,
+            review_date=today,
+            review_schedule=1,
+            text="arkansas",
+        )
+        hlght3 = Highlight(
+            user_id=user.id, review_date=today, review_schedule=1, text="I"
+        )
+        hlght4 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="do"
+        )
+        hlght5 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="love"
+        )
+        hlght6 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="my"
+        )
+        hlght7 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="ma"
+        )
+        hlght8 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="and"
+        )
+        hlght9 = Highlight(
+            user_id=user.id, review_date=today - three, review_schedule=1, text="pa"
+        )
+        hlght10 = Highlight(
+            user_id=user.id, review_date=today - week, review_schedule=2, text="not"
+        )
+        hlght11 = Highlight(
+            user_id=user.id,
+            review_date=today - two_weeks,
+            review_schedule=3,
+            text="the",
+        )
+        hlght12 = Highlight(
+            user_id=user.id, review_date=today - month, review_schedule=4, text="way"
+        )
+        hlght13 = Highlight(
+            user_id=user.id,
+            review_date=today - three_months,
+            review_schedule=5,
+            text="that",
+        )
+        hlght14 = Highlight(
+            user_id=user.id, review_date=today - half_year, review_schedule=6, text="I"
+        )
+        hlght15 = Highlight(
+            user_id=user.id, review_date=today - year, review_schedule=7, text="do"
+        )
+        hlght16 = Highlight(
+            user_id=user.id, review_date=today - year, review_schedule=7, text="love"
+        )
+        hlght17 = Highlight(
+            user_id=user.id, review_date=today - year, review_schedule=7, text="you"
+        )
+
+        db.session.add_all(
+            [
+                hlght1,
+                hlght2,
+                hlght3,
+                hlght4,
+                hlght5,
+                hlght6,
+                hlght7,
+                hlght8,
+                hlght9,
+                hlght10,
+                hlght11,
+                hlght12,
+                hlght13,
+                hlght14,
+                hlght15,
+                hlght16,
+                hlght17,
+            ]
+        )
+
+        db.session.commit()
+
+        tag1 = Tag(user_id=user.id, name="Zebra")
+        tag2 = Tag(user_id=user.id, name="Giraffe")
+
+        db.session.add_all([tag1, tag2])
+        db.session.commit()
+
+        hlght1.add_tag(tag1)
+        hlght2.add_tag(tag1)
+        hlght3.add_tag(tag1)
+        hlght4.add_tag(tag1)
+        hlght5.add_tag(tag2)
+        hlght6.add_tag(tag2)
+        hlght17.add_tag(tag2)
+
+        db.session.commit()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        self.app_context.pop()
+
+    @patch("app.models.User.check_token")
+    def test_get_highlights_for_review(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        params = {}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlights = data.get("highlights")
+
+        self.assertEqual(len(highlights.get("tier0")), 1)
+        self.assertEqual(len(highlights.get("tier1")), 5)
+        self.assertEqual(len(highlights.get("tier2")), 1)
+        self.assertEqual(len(highlights.get("tier3")), 1)
+        self.assertEqual(len(highlights.get("tier4")), 1)
+        self.assertEqual(len(highlights.get("tier5")), 1)
+        self.assertEqual(len(highlights.get("tier6")), 1)
+        self.assertEqual(len(highlights.get("tier7")), 3)
+
+    @patch("app.models.User.check_token")
+    def test_per_tier_max(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        params = {"per_tier": 10}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlights = data.get("highlights")
+
+        self.assertEqual(len(highlights.get("tier0")), 1)
+        self.assertEqual(len(highlights.get("tier1")), 6)
+        self.assertEqual(len(highlights.get("tier2")), 1)
+        self.assertEqual(len(highlights.get("tier3")), 1)
+        self.assertEqual(len(highlights.get("tier4")), 1)
+        self.assertEqual(len(highlights.get("tier5")), 1)
+        self.assertEqual(len(highlights.get("tier6")), 1)
+        self.assertEqual(len(highlights.get("tier7")), 3)
+
+        params = {"per_tier": "1"}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlights = data.get("highlights")
+
+        self.assertEqual(len(highlights.get("tier0")), 1)
+        self.assertEqual(len(highlights.get("tier1")), 1)
+        self.assertEqual(len(highlights.get("tier2")), 1)
+        self.assertEqual(len(highlights.get("tier3")), 1)
+        self.assertEqual(len(highlights.get("tier4")), 1)
+        self.assertEqual(len(highlights.get("tier5")), 1)
+        self.assertEqual(len(highlights.get("tier6")), 1)
+        self.assertEqual(len(highlights.get("tier7")), 1)
+
+    @patch("app.models.User.check_token")
+    def test_review_with_tags(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        params = {"per_tier": 10, "tag_ids": "1"}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlights = data.get("highlights")
+
+        self.assertEqual(len(highlights.get("tier0")), 1)
+        self.assertEqual(len(highlights.get("tier1")), 1)
+        self.assertEqual(len(highlights.get("tier2")), 0)
+        self.assertEqual(len(highlights.get("tier3")), 0)
+        self.assertEqual(len(highlights.get("tier4")), 0)
+        self.assertEqual(len(highlights.get("tier5")), 0)
+        self.assertEqual(len(highlights.get("tier6")), 0)
+        self.assertEqual(len(highlights.get("tier7")), 0)
+
+        params = {"per_tier": 10, "tag_ids": "1,2"}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        highlights = data.get("highlights")
+
+        self.assertEqual(len(highlights.get("tier0")), 1)
+        self.assertEqual(len(highlights.get("tier1")), 3)
+        self.assertEqual(len(highlights.get("tier2")), 0)
+        self.assertEqual(len(highlights.get("tier3")), 0)
+        self.assertEqual(len(highlights.get("tier4")), 0)
+        self.assertEqual(len(highlights.get("tier5")), 0)
+        self.assertEqual(len(highlights.get("tier6")), 0)
+        self.assertEqual(len(highlights.get("tier7")), 1)
+
+    @patch("app.models.User.check_token")
+    def test_review_errors(self, mock_check_token):
+        user = User.query.first()
+        mock_check_token.return_value = user
+
+        params = {"per_tier": "pikachu", "tag_ids": "1"}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(data.get("message"), "Invalid data in params")
+
+        params = {"per_tier": "1", "tag_ids": "1,alabama"}
+        res = self.client.get(
+            "/api/highlights/review",
+            query_string=params,
+            headers={"Authorization": "Bearer abc123"},
+        )
+        data = json.loads(res.data)
+        self.assertEqual(data.get("message"), "Invalid data in params")

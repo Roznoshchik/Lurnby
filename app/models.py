@@ -304,6 +304,113 @@ class User(UserMixin, db.Model):
         db.session.add(n)
         return n
 
+    ##########################
+    #     review methods     #
+    ##########################
+    def get_highlights_for_review(self, tag_ids, per_tier):
+        if not per_tier:
+            per_tier = self.review_count
+
+        join_highlight_id = tags_highlights.c.highlight_id
+        join_tag_id = tags_highlights.c.tag_id
+
+        highlights = self.highlights.filter_by(archived=False, do_not_review=False)
+
+        if tag_ids:
+            highlights = highlights.join(
+                tags_highlights, join_highlight_id == Highlight.id
+            ).filter(join_tag_id.in_(tag_ids))
+
+        return self.get_highlights_by_tier(highlights, per_tier)
+
+    def get_highlights_by_tier(self, highlights, per_tier):
+        today = datetime.today()
+
+        tier0 = highlights.filter(Highlight.review_schedule == 0)
+        tier1 = highlights.filter(Highlight.review_schedule == 1)
+        tier2 = highlights.filter(Highlight.review_schedule == 2)
+        tier3 = highlights.filter(Highlight.review_schedule == 3)
+        tier4 = highlights.filter(Highlight.review_schedule == 4)
+        tier5 = highlights.filter(Highlight.review_schedule == 5)
+        tier6 = highlights.filter(Highlight.review_schedule == 6)
+        tier7 = highlights.filter(Highlight.review_schedule == 7)
+
+        tier0 = [
+            highlight.to_dict()
+            for highlight in tier0.filter(
+                Highlight.review_date < today - timedelta(days=1)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier1 = [
+            highlight.to_dict()
+            for highlight in tier1.filter(
+                Highlight.review_date < today - timedelta(days=3)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier2 = [
+            highlight.to_dict()
+            for highlight in tier2.filter(
+                Highlight.review_date < today - timedelta(days=7)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier3 = [
+            highlight.to_dict()
+            for highlight in tier3.filter(
+                Highlight.review_date < today - timedelta(days=14)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier4 = [
+            highlight.to_dict()
+            for highlight in tier4.filter(
+                Highlight.review_date < today - timedelta(days=30)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier5 = [
+            highlight.to_dict()
+            for highlight in tier5.filter(
+                Highlight.review_date < today - timedelta(days=90)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier6 = [
+            highlight.to_dict()
+            for highlight in tier6.filter(
+                Highlight.review_date < today - timedelta(days=180)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+        tier7 = [
+            highlight.to_dict()
+            for highlight in tier7.filter(
+                Highlight.review_date < today - timedelta(days=365)
+            )
+            .limit(per_tier)
+            .all()
+        ]
+
+        return {
+            "tier0": tier0,
+            "tier1": tier1,
+            "tier2": tier2,
+            "tier3": tier3,
+            "tier4": tier4,
+            "tier5": tier5,
+            "tier6": tier6,
+            "tier7": tier7,
+        }
+
 
 class Message(db.Model):
     id = db.Column(db.Integer, primary_key=True)
