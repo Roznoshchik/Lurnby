@@ -802,7 +802,7 @@ class Article(db.Model):
             tag.article_count += 1
             for h in self.highlights:
                 tag.highlight_count += 1
-                h.AddToTag(tag)
+                h.add_tag(tag)
 
     # remove article from tag
     def remove_tag(self, tag):
@@ -811,7 +811,7 @@ class Article(db.Model):
             tag.article_count -= 1
             for h in self.highlights:
                 tag.highlight_count -= 1
-                h.RemoveFromTag(tag)
+                h.remove_tag(tag)
 
     def RemoveFromTag(self, tag):
         self.remove_tag(tag)
