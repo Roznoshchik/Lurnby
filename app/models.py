@@ -1122,7 +1122,7 @@ class Topic(db.Model):
             db.session.query(Topic, Highlight.archived, func.count("*"))
             .outerjoin(highlights_topics, highlights_topics.c.topic_id == Topic.id)
             .outerjoin(Highlight, highlights_topics.c.highlight_id == Highlight.id)
-            .filter(Topic.user_id == user.id, Topic.archived is False)
+            .filter(Topic.user_id == user.id, Topic.archived == False)  # noqa E712
             .group_by(Topic.id, Highlight.archived)
         )
 
@@ -1208,10 +1208,10 @@ class Tag(db.Model):
             db.session.query(Tag, Article.archived, func.count("*"))
             .outerjoin(tags_articles, tags_articles.c.tag_id == Tag.id)
             .outerjoin(Article, tags_articles.c.article_id == Article.id)
-            .filter(Tag.user_id == user.id, Tag.archived is False)
+            .filter(Tag.user_id == user.id, Tag.archived == False)  # noqa E712
             .group_by(Tag.id, Article.archived)
         )
-
+        print(q)
         dedupe = {}
         for row in q:
             if row[0].id in dedupe:
