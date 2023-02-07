@@ -154,7 +154,7 @@ class AddArticleApiTests(unittest.TestCase):
         for tag in payload["tags"]:
             self.assertTrue(tag in tags)
 
-    @patch("app.main.pulltext.requests.get")
+    @patch("app.helpers.pulltext.requests.get")
     @patch("app.models.User.check_token")
     def test_add_url_entry(self, mock_check_token, mock_get):
         mock_check_token.return_value = User.query.first()

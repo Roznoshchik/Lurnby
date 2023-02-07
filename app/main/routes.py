@@ -8,8 +8,8 @@ import validators
 from app import csrf, db, s3, bucket, CustomLogger
 from app.email import send_email
 from app.main.forms import ContentForm, AddTopicForm, AddHighlightForm, SuggestionForm
-from app.main.pulltext import pull_text
-from app.main.review import order_highlights
+from app.helpers.pulltext import pull_text
+from app.helpers.review import order_highlights
 
 from app.models import (
     User,
