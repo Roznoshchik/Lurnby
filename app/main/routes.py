@@ -900,11 +900,11 @@ def add_article():
             if not t:
                 t = Tag(name=tag, archived=False, user_id=current_user.id)
                 db.session.add(t)
-                new_article.AddToTag(t)
+                new_article.add_tag(t)
             else:
                 if t.archived:
                     t.archived = False
-                new_article.AddToTag(t)
+                new_article.add_tag(t)
 
     if new_article not in db.session:
         db.session.add(new_article)
@@ -1209,13 +1209,13 @@ def mark_read(uuid):
                 db.session.add(tag)
             if tag.archived:
                 tag.archived = False
-            article.AddToTag(tag)
+            article.add_tag(tag)
         for t in data["notTaggedList"]:
             tag = Tag.query.filter_by(name=t, user_id=current_user.id).first()
             if tag:
                 if tag.archived:
                     tag.archived = False
-                article.RemoveFromTag(tag)
+                article.remove_tag(tag)
         db.session.commit()
 
         response = jsonify({"message": "success"})
@@ -1324,7 +1324,7 @@ def updateArticle(uuid):
                         db.session.add(ev)
                 if t.archived:
                     t.archived = False
-                article.AddToTag(t)
+                article.add_tag(t)
 
             for tag in data["remove_tags"]:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()
@@ -1334,7 +1334,7 @@ def updateArticle(uuid):
                     ev = Event.add("added tag")
                     if ev:
                         db.session.add(ev)
-                article.RemoveFromTag(t)
+                article.remove_tag(t)
 
             ev = Event.add("updated article")
             if ev:

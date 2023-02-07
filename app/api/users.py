@@ -300,7 +300,7 @@ def legacy_add_article(id):
         tag = Tag.query.filter_by(name=tag_name).first()
         if tag.archived:
             tag.archived = False
-        article.AddToTag(tag)
+        article.add_tag(tag)
 
     db.session.commit()
     response = jsonify(article.to_legacy_dict())
