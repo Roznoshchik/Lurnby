@@ -2,7 +2,7 @@ from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
-from app.main.pulltext import pull_text
+from app.helpers.pulltext import pull_text
 from app.models import Article, User, Tag, Comms, Approved_Sender, Event
 
 from datetime import datetime

@@ -14,8 +14,8 @@ from app import create_app, db, s3, bucket, CustomLogger
 from app.api.errors import LurnbyValueError
 from app.export import get_zip
 from app.email import send_email
-from app.main.ebooks import epubTitle, epubConverted
-from app.main.pdf import importPDF
+from app.helpers.ebooks import epubTitle, epubConverted
+from app.helpers.pdf import importPDF
 from app.models import Task, Article, Highlight, User
 from app.helpers.export_helpers import (
     create_zip_file_for_article,
@@ -558,7 +558,7 @@ def create_recall_text(highlightId):
     for text in soup.find_all(text=True):
         words = text.split(" ")
         if len(words) > 3:
-            for i in range(0, len(words) // 3):
+            for _ in range(0, len(words) // 3):
                 num = randint(0, len(words) - 1)
                 words[num] = re.sub(r"[\w\d]+", "_____", words[num])
         text.replace_with(" ".join(words))

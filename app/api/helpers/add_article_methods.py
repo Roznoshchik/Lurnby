@@ -4,7 +4,7 @@ import validators
 
 from app import db, CustomLogger, s3, bucket
 from app.api.errors import LurnbyValueError
-from app.main.pulltext import pull_text
+from app.helpers.pulltext import pull_text
 from app.models import Tag
 
 logger = CustomLogger("API")
