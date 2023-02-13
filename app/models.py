@@ -17,6 +17,7 @@ from sqlalchemy import desc, func, Index
 from sqlalchemy_utils import UUIDType
 import string
 from time import time
+import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -269,8 +270,11 @@ class User(UserMixin, db.Model):
                 )
                 id = rq_job.get_id()
                 task = Task(id=id, name=name, description=description, user=self)
-                if task not in db.session:
-                    db._make_scoped_session.add(task)
+                try:
+                    db.session.add(task)
+                except Exception:
+                    logger.error(traceback.print_exc())
+                    db._make_scoped_session().add(task)
                 return task
             else:
                 raise redis.exceptions.ConnectionError
@@ -554,7 +558,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True, unique=True)
     unread = db.Column(db.Boolean, index=True, default=True)
-    title = db.Column(db.String(255), index=True)
+    title = db.Column(db.String(255), default="Something went wrong", index=True)
     filetype = db.Column(db.String(32))
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
