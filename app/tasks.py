@@ -27,15 +27,15 @@ from app.helpers.export_helpers import (
 logger = CustomLogger("Tasks")
 
 try:
-    logger.info('Checking For Redis Connection')
+    logger.info("Checking For Redis Connection")
     REDIS_URL = os.environ.get("REDIS_URL") or "redis://"
     redis_check = Redis.from_url(REDIS_URL)
     redis_check.ping()
-    
+
     app = create_app()
     app.app_context().push()
 except Exception:
-    logger.info('Redis connection not found, assuming in same thread')
+    logger.info("Redis connection not found, assuming in same thread")
     logger.error(traceback.print_exc())
     app = current_app
 

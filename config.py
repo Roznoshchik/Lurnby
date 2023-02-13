@@ -11,6 +11,7 @@ DB_URI = os.getenv("DATABASE_URL")  # or other relevant config var
 if DB_URI and DB_URI.startswith("postgres://"):
     DB_URI = DB_URI.replace("postgres://", "postgresql://", 1)
 
+
 class Config(object):
     SECRET_KEY = os.environ.get("SECRET_KEY") or "Slava-fakes-it-till-he-makes-it"
 

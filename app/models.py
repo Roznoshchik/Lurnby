@@ -276,7 +276,7 @@ class User(UserMixin, db.Model):
             else:
                 raise redis.exceptions.ConnectionError
         except redis.exceptions.ConnectionError:
-            logger.error('Error connecting to Redis')
+            logger.error("Error connecting to Redis")
             import app.tasks as app_tasks
 
             func = getattr(app_tasks, name)
