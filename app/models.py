@@ -264,21 +264,19 @@ class User(UserMixin, db.Model):
 
     def launch_task(self, name, description="", *args, **kwargs):
         try:
+            logger.info(f"Starting task: {name} for user {self.id}")
             if not os.environ.get("testing"):
                 rq_job = current_app.task_queue.enqueue(
                     "app.tasks." + name, *args, **kwargs, job_timeout=500
                 )
                 id = rq_job.get_id()
                 task = Task(id=id, name=name, description=description, user=self)
-                try:
-                    db.session.add(task)
-                except Exception:
-                    logger.error(traceback.print_exc())
-                    db._make_scoped_session().add(task)
+                db.session.add(task)
                 return task
             else:
                 raise redis.exceptions.ConnectionError
         except redis.exceptions.ConnectionError:
+            logger.error("Error connecting to Redis")
             import app.tasks as app_tasks
 
             func = getattr(app_tasks, name)
@@ -287,9 +285,7 @@ class User(UserMixin, db.Model):
             task = Task(
                 id=generate_str_id(), name=name, description=description, user=self
             )
-
-            if task not in db.session:
-                db.session.add(task)
+            db.session.add(task)
             return task
 
     def get_tasks_in_progress(self):
