@@ -213,8 +213,8 @@ class User(UserMixin, db.Model):
             "id": self.id,
             "tags": tag_names,
             "_links": {
-                "self": url_for("api.get_user_tags", id=self.id),
-                "articles": url_for("api.add_article", id=self.id),
+                "self": url_for("api.legacy_get_user_tags", id=self.id),
+                "articles": url_for("api.legacy_add_article", id=self.id),
             },
         }
         return data
