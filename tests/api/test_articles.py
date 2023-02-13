@@ -360,7 +360,7 @@ class GetArticleApiTests(unittest.TestCase):
             for tag in article["tags"]:
                 t = Tag.query.filter_by(name=tag).first()
             db.session.add(a)
-            a.AddToTag(t)
+            a.add_tag(t)
 
         db.session.commit()
 

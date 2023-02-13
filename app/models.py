@@ -17,6 +17,7 @@ from sqlalchemy import desc, func, Index
 from sqlalchemy_utils import UUIDType
 import string
 from time import time
+import traceback
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -269,8 +270,11 @@ class User(UserMixin, db.Model):
                 )
                 id = rq_job.get_id()
                 task = Task(id=id, name=name, description=description, user=self)
-                if task not in db.session:
-                    db._make_scoped_session.add(task)
+                try:
+                    db.session.add(task)
+                except Exception:
+                    logger.error(traceback.print_exc())
+                    db._make_scoped_session().add(task)
                 return task
             else:
                 raise redis.exceptions.ConnectionError
@@ -554,7 +558,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True, unique=True)
     unread = db.Column(db.Boolean, index=True, default=True)
-    title = db.Column(db.String(255), index=True)
+    title = db.Column(db.String(255), default="Something went wrong", index=True)
     filetype = db.Column(db.String(32))
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
@@ -792,10 +796,6 @@ class Article(db.Model):
 
         self.read_time = f"{high}-{low} read"
 
-    # add article to tag
-    def AddToTag(self, tag):
-        self.add_tag(tag)
-
     def add_tag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
@@ -812,9 +812,6 @@ class Article(db.Model):
             for h in self.highlights:
                 tag.highlight_count -= 1
                 h.remove_tag(tag)
-
-    def RemoveFromTag(self, tag):
-        self.remove_tag(tag)
 
     # checks if an article is in a tag
     def is_added_tag(self, tag):
@@ -1010,6 +1007,10 @@ class Highlight(db.Model):
     def is_added_topic(self, topic):
         return self.topics.filter(topic.id == highlights_topics.c.topic_id).count() > 0
 
+    # checks if an highlight is in a tag
+    def is_added_tag(self, tag):
+        return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
+
     def is_tagged_with(self, tag):
         return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
 
@@ -1037,6 +1038,21 @@ class Highlight(db.Model):
             .filter(~Topic.id.in_(sub))
             .filter_by(user_id=user.id, archived=False)
             .order_by(Topic.last_used.desc())
+            .all()
+        )
+
+        return q
+
+    def not_in_tags(self, user):
+        sub = (
+            db.session.query(Tag.id)
+            .outerjoin(tags_highlights, tags_highlights.c.tag_id == Tag.id)
+            .filter(tags_highlights.c.highlight_id == self.id)
+        )
+        q = (
+            db.session.query(Tag)
+            .filter(~Tag.id.in_(sub))
+            .filter_by(user_id=user.id, archived=False)
             .all()
         )
 
@@ -1072,12 +1088,12 @@ class Topic(db.Model):
         return self.highlights.filter(highlight.id == h_id).count() > 0
 
     # add topic to tag
-    def AddToTag(self, tag):
+    def add_tag(self, tag):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
 
     # remove topic from tag
-    def RemoveFromTag(self, tag):
+    def remove_tag(self, tag):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
 

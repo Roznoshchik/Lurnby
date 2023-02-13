@@ -8,10 +8,10 @@ def match_tags():
         tags = a.tags.all()
         for t in tags:
             if t.user_id != a.user_id:
-                a.RemoveFromTag(t)
+                a.remove_tag(t)
                 tag = Tag.query.filter_by(name=t.name, user_id=a.user_id).first()
                 if not tag:
                     tag = Tag(name=t.name, user_id=a.user_id)
                     db.session.add(tag)
-                a.AddToTag(tag)
+                a.add_tag(tag)
     db.session.commit()

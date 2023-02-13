@@ -57,7 +57,7 @@ class ExportArticleTests(unittest.TestCase):
             for tag in article["tags"]:
                 t = Tag.query.filter_by(name=tag).first()
             db.session.add(a)
-            a.AddToTag(t)
+            a.add_tag(t)
 
             for _ in range(randrange(10)):
                 highlight = Highlight(user_id=1, article_id=a.id)
@@ -208,7 +208,7 @@ class ExportHighlightTests(unittest.TestCase):
             for tag in article["tags"]:
                 t = Tag.query.filter_by(name=tag).first()
             db.session.add(a)
-            a.AddToTag(t)
+            a.add_tag(t)
 
             for _ in range(randrange(10)):
                 highlight = Highlight(user_id=1, article_id=a.id)

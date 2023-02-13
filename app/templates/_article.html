@@ -1,6 +1,6 @@
 <div id="article{{uuid}}" class = "article_card">
     <div class="article_title">
-        {% if article.title|length > 88 %}
+        {% if article.title and article.title|length > 88 %}
         <h4><a href="{{ url_for('main.article', uuid=article.uuid) }}">{{'%.88s' % article.title}} ...</a></h4>
         {% else %}
         <h4><a href="{{ url_for('main.article', uuid=article.uuid) }}">{{ article.title}}</a></h4>

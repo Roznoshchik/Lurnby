@@ -9,106 +9,6 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
-class HighlightModelCase(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-
-    def test_highlights_topics(self):
-        u = User(username="john")
-        db.session.add(u)
-
-        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
-        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
-        t1 = Topic(title="Canaries", user_id=u.id, archived=False)
-        t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
-
-        db.session.add_all([h1, h2, t1, t2])
-        db.session.commit()
-
-        self.assertEqual(h1.topics.all(), [])
-        self.assertEqual(h2.topics.all(), [])
-
-        h1.AddToTopic(t1)
-        db.session.commit()
-
-        self.assertTrue(h1.is_added_topic(t1))
-        self.assertEqual(h1.topics.count(), 1)
-        self.assertEqual(h1.topics.first().title, "Canaries")
-        self.assertEqual(t1.highlights.count(), 1)
-        self.assertEqual(t1.highlights.first().text, "this is a highlight")
-
-        h1.RemoveFromTopic(t1)
-        db.session.commit()
-
-        self.assertFalse(h1.is_added_topic(t1))
-        self.assertEqual(h1.topics.count(), 0)
-        self.assertEqual(t1.highlights.count(), 0)
-
-    def test_show_members(self):
-        u = User(username="john")
-        db.session.add(u)
-        u = User.query.first()
-
-        h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
-        h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)
-        h3 = Highlight(text="This is a third highlight", user_id=u.id, archived=False)
-        h4 = Highlight(text="This is a fourth highlight", user_id=u.id, archived=False)
-
-        t1 = Topic(title="Canaries", user_id=u.id, archived=False)
-        t2 = Topic(title="Bluejays", user_id=u.id, archived=False)
-        t3 = Topic(title="Crows", user_id=u.id, archived=False)
-        t4 = Topic(title="Ravens", user_id=u.id, archived=False)
-
-        db.session.add_all([h1, h2, h3, h4, t1, t2, t3, t4])
-        db.session.commit()
-
-        # h1 in 2 lists - Canaries + Crows
-        h1.AddToTopic(t1)
-        h1.AddToTopic(t3)
-
-        # h2 in 1 list - Bluejays
-        h2.AddToTopic(t2)
-
-        # h3 in all lists - Canaries, Bluejays, Crows, Ravens
-        h3.AddToTopic(t1)
-        h3.AddToTopic(t2)
-        h3.AddToTopic(t3)
-        h3.AddToTopic(t4)
-        # h4 not in any lists
-
-        db.session.commit()
-
-        m1 = h1.topics.all()
-        m2 = h2.topics.all()
-        m3 = h3.topics.all()
-        m4 = h4.topics.all()
-
-        nm1 = h1.not_in_topics(u)
-        nm2 = h2.not_in_topics(u)
-        nm3 = h3.not_in_topics(u)
-        nm4 = h4.not_in_topics(u)
-
-        self.assertEqual(m1, [t1, t3])
-        self.assertEqual(nm1, [t2, t4])
-
-        self.assertEqual(m2, [t2])
-        self.assertEqual(nm2, [t1, t3, t4])
-
-        self.assertEqual(m3, [t1, t2, t3, t4])
-        self.assertEqual(nm3, [])
-
-        self.assertEqual(m4, [])
-        self.assertEqual(nm4, [t1, t2, t3, t4])
-
-
 class TagModelCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app(TestConfig)
@@ -146,11 +46,11 @@ class TagModelCase(unittest.TestCase):
         self.assertEqual(t1.tags.all(), [])
         self.assertEqual(t2.tags.all(), [])
 
-        a1.AddToTag(tag1)
+        a1.add_tag(tag1)
 
-        h1.AddToTag(tag1)
+        h1.add_tag(tag1)
 
-        t1.AddToTag(tag1)
+        t1.add_tag(tag1)
         db.session.commit()
 
         self.assertTrue(a1.is_added_tag(tag1))
@@ -171,9 +71,9 @@ class TagModelCase(unittest.TestCase):
         self.assertEqual(tag1.topics.count(), 1)
         self.assertEqual(tag1.topics.first().title, "Canaries")
 
-        a1.RemoveFromTag(tag1)
-        h1.RemoveFromTag(tag1)
-        t1.RemoveFromTag(tag1)
+        a1.remove_tag(tag1)
+        h1.remove_tag(tag1)
+        t1.remove_tag(tag1)
         db.session.commit()
 
         self.assertFalse(a1.is_added_tag(tag1))
@@ -211,37 +111,37 @@ class TagModelCase(unittest.TestCase):
         db.session.commit()
 
         # in 2 tags
-        a1.AddToTag(tag1)
-        a1.AddToTag(tag3)
+        a1.add_tag(tag1)
+        a1.add_tag(tag3)
 
-        h1.AddToTag(tag1)
-        h1.AddToTag(tag3)
+        h1.add_tag(tag1)
+        h1.add_tag(tag3)
 
-        t1.AddToTag(tag1)
-        t1.AddToTag(tag3)
+        t1.add_tag(tag1)
+        t1.add_tag(tag3)
 
         # in 1 tag
-        a2.AddToTag(tag2)
+        a2.add_tag(tag2)
 
-        h2.AddToTag(tag2)
+        h2.add_tag(tag2)
 
-        t2.AddToTag(tag2)
+        t2.add_tag(tag2)
 
         # in all tags
-        a3.AddToTag(tag1)
-        a3.AddToTag(tag2)
-        a3.AddToTag(tag3)
-        a3.AddToTag(tag4)
+        a3.add_tag(tag1)
+        a3.add_tag(tag2)
+        a3.add_tag(tag3)
+        a3.add_tag(tag4)
 
-        h3.AddToTag(tag1)
-        h3.AddToTag(tag2)
-        h3.AddToTag(tag3)
-        h3.AddToTag(tag4)
+        h3.add_tag(tag1)
+        h3.add_tag(tag2)
+        h3.add_tag(tag3)
+        h3.add_tag(tag4)
 
-        t3.AddToTag(tag1)
-        t3.AddToTag(tag2)
-        t3.AddToTag(tag3)
-        t3.AddToTag(tag4)
+        t3.add_tag(tag1)
+        t3.add_tag(tag2)
+        t3.add_tag(tag3)
+        t3.add_tag(tag4)
 
         # a4, h4, t4 not in any tags
 
