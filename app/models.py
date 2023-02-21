@@ -699,7 +699,7 @@ class Article(db.Model):
             "article_id": self.id,
             "_links": {
                 "self": url_for("api.add_article", id=self.id),
-                "tags": url_for("api.get_user_tags", id=self.id),
+                "tags": url_for("api.legacy_get_user_tags", id=self.id),
             },
         }
         return data
