@@ -237,9 +237,9 @@ def epub2html(filepath):
 
 def epubTitle(filepath):
     book = epub.read_epub(filepath)
-    title = book.get_metadata("DC", "title")[0][
-        0
-    ]  # always returns a list with a tuple [('title', {})]
+
+    # always returns a list with a tuple [('title', {})]
+    title = book.get_metadata("DC", "title")[0][0]
 
     return title
 

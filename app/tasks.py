@@ -10,6 +10,7 @@ import re
 import traceback
 from flask import current_app
 from redis import Redis
+from sqlalchemy import text
 
 from app import create_app, db, s3, bucket, CustomLogger
 from app.api.errors import LurnbyValueError
@@ -71,18 +72,31 @@ def delete_user(id):
     comms = u.comms
 
     for h in highlights:
-        db.session.execute(f"DELETE from highlights_topics where highlight_id={h.id}")
-        db.session.execute(f"DELETE from tags_highlights where highlight_id={h.id}")
+        db.session.execute(
+            text("DELETE from highlights_topics where highlight_id=:h_id"),
+            {"h_id": h.id},
+        )
+        db.session.execute(
+            text("DELETE from tags_highlights where highlight_id=:h_id"), {"h_id": h.id}
+        )
         db.session.delete(h)
     for t in topics:
-        db.session.execute(f"DELETE from highlights_topics where topic_id={t.id}")
+        db.session.execute(
+            text("DELETE from highlights_topics where topic_id=:t_id"), {"t_id": t.id}
+        )
         db.session.delete(t)
     for t in tags:
-        db.session.execute(f"DELETE from tags_articles where tag_id={t.id}")
-        db.session.execute(f"DELETE from tags_highlights where tag_id={t.id}")
+        db.session.execute(
+            text("DELETE from tags_articles where tag_id=:t_id"), {"t_id": t.id}
+        )
+        db.session.execute(
+            text("DELETE from tags_highlights where tag_id=:t_id"), {"t_id": t.id}
+        )
         db.session.delete(t)
     for a in articles:
-        db.session.execute(f"DELETE from tags_articles where article_id={a.id}")
+        db.session.execute(
+            text("DELETE from tags_articles where article_id=:a_id"), {"a_id": a.id}
+        )
         db.session.delete(a)
     for s in senders:
         db.session.delete(s)
@@ -559,15 +573,29 @@ def set_absolute_urls(aid):
 
 # Also consider changing the algorithm for finding the spaces
 # to be a bit more sophisticated.
-def create_recall_text(highlightId):
-    highlight = Highlight.query.filter_by(id=highlightId).first()
+def create_recall_text(highlight_id):
+
+    highlight = Highlight.query.filter_by(id=highlight_id).first()
+
+    if not highlight:
+        logger.error(f"Couldn't find highlight with id: {highlight_id}")
+        return
+
     soup = BeautifulSoup(highlight.text, features="lxml")
     for text in soup.find_all(text=True):
         words = text.split(" ")
         if len(words) > 3:
             for _ in range(0, len(words) // 3):
-                num = randint(0, len(words) - 1)
-                words[num] = re.sub(r"[\w\d]+", "_____", words[num])
+                changed = False
+                attempts = 0
+                while not changed and attempts < 10:
+                    num = randint(0, len(words) - 1)
+                    word = words[num]
+                    if not word.istitle() and len(word) > 3:
+                        words[num] = re.sub(r"[\w\d]+", "_____", words[num])
+                        changed = True
+                    attempts += 1
+
         text.replace_with(" ".join(words))
 
     highlight.prompt = soup.prettify()
