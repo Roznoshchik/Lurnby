@@ -26,7 +26,7 @@ class SendEmail(unittest.TestCase):
 
     @patch.object(mail, "send")
     def test_send_email(self, mock_send):
-        with patch.object(mail, 'send') as mock_send:
+        with patch.object(mail, "send") as mock_send:
             subject = "Test Subject"
             sender = "test@example.com"
             recipients = ["recipient@example.com"]
@@ -35,16 +35,15 @@ class SendEmail(unittest.TestCase):
             send_email(subject, sender, recipients, text_body, html_body)
 
             expected_msg = Message(
-                subject=subject, sender=sender, recipients=recipients)
+                subject=subject, sender=sender, recipients=recipients
+            )
             expected_msg.body = text_body
             expected_msg.html = html_body
 
             sent_msg = mock_send.call_args_list[0][0][0]
-            
+
             self.assertEqual(sent_msg.subject, expected_msg.subject)
             self.assertEqual(sent_msg.sender, expected_msg.sender)
             self.assertEqual(sent_msg.recipients, expected_msg.recipients)
             self.assertEqual(sent_msg.body, expected_msg.body)
             self.assertEqual(sent_msg.html, expected_msg.html)
-
-      
