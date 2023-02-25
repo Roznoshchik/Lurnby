@@ -27,7 +27,7 @@ preferences = '{"font": "sans-serif","color": "light-mode", \
 
 
 def generate_str_id():
-    return str(uuid.uuid4())
+    return uuid.uuid4().hex
 
 
 class Comms(db.Model):
@@ -41,10 +41,10 @@ class Comms(db.Model):
 
     def __repr__(self):
         return (
-            f"<User {self.user_id}>\n",
+            f"<User {self.user_id}>\n"
             f"informational: {self.informational}, educational: {self.educational}, "
             f"promotional: {self.promotional}, highlights: {self.highlights}, "
-            f"reminders: {self.reminders}",
+            f"reminders: {self.reminders}"
         )
 
     def to_dict(self):
