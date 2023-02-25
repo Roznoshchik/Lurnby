@@ -16,7 +16,7 @@ from app import create_app, db, s3, bucket, CustomLogger
 from app.api.errors import LurnbyValueError
 from app.export import get_zip
 from app.email import send_email
-from app.helpers.ebooks import epubTitle, epubConverted
+from app.helpers.ebooks import get_epub_title, convert_epub
 from app.helpers.pdf import importPDF
 from app.models import Task, Article, Highlight, User
 from app.helpers.export_helpers import (
@@ -498,8 +498,8 @@ def bg_add_article(article_uuid=None, file_ext=None, file=None):
                 file = f"{path}.epub"
                 s3.download_file(bucket, article_uuid, file)
 
-            content = epubConverted(file, article.user)
-            title = epubTitle(file)
+            content = convert_epub(file, article.user)
+            title = get_epub_title(file)
 
             source = "Epub File: added " + today
             article.title = title

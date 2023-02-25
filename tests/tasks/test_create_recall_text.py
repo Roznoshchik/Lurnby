@@ -43,7 +43,6 @@ class RecallTextCase(unittest.TestCase):
         self.assertTrue("for" in highlight.prompt)
         self.assertTrue("his" in highlight.prompt)
 
-
         highlight2 = Highlight(text="stop right this minute.")
         db.session.add(highlight2)
         db.session.commit()

@@ -25,20 +25,20 @@ class DeleteUser(unittest.TestCase):
     def test_delete_user(self):
         # create a user and some associated data
         u = User(
-            goog_id='123',
-            firstname='John',
-            username='jdoe',
-            email='jdoe@example.com',
-            password_hash='foo'
+            goog_id="123",
+            firstname="John",
+            username="jdoe",
+            email="jdoe@example.com",
+            password_hash="foo",
         )
-        h1 = Highlight(text='highlight1', user=u)
-        h2 = Highlight(text='highlight2', user=u)
-        a1 = Article(title='article1', user=u)
-        a2 = Article(title='article2', user=u)
-        t1 = Tag(name='tag1', user=u)
-        t2 = Tag(name='tag2', user=u)
-        s1 = Approved_Sender(email='sender1', user=u)
-        s2 = Approved_Sender(email='sender2', user=u)
+        h1 = Highlight(text="highlight1", user=u)
+        h2 = Highlight(text="highlight2", user=u)
+        a1 = Article(title="article1", user=u)
+        a2 = Article(title="article2", user=u)
+        t1 = Tag(name="tag1", user=u)
+        t2 = Tag(name="tag2", user=u)
+        s1 = Approved_Sender(email="sender1", user=u)
+        s2 = Approved_Sender(email="sender2", user=u)
         comms = Comms(user=u)
         db.session.add_all([u, h1, h2, a1, a2, t1, t2, s1, s2, comms])
         db.session.commit()

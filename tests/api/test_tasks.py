@@ -40,8 +40,8 @@ class TasksApiTests(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    @patch("app.tasks.epubTitle")
-    @patch("app.tasks.epubConverted")
+    @patch("app.tasks.get_epub_title")
+    @patch("app.tasks.convert_epub")
     @patch("app.tasks.s3.download_file")
     @patch("app.api.tasks.current_app.redis")
     @patch("app.models.User.check_token")
