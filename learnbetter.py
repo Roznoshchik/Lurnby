@@ -15,7 +15,6 @@ from app.models import (
     Suggestion,
     Event,
     Comms,
-    Message,
 )
 
 app = create_app()
@@ -40,5 +39,4 @@ def make_shell_context():
         "Suggestion": Suggestion,
         "Event": Event,
         "Comms": Comms,
-        "Message": Message,
     }

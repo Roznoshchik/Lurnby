@@ -33,7 +33,6 @@ def convert_epub(filepath, user=None):
                     if child.name == "body":
                         for tag in child:
                             html += str(tag)
-
     return html
 
 
