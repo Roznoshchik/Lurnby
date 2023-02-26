@@ -22,7 +22,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 logger = CustomLogger("MODELS")
-preferences = '{"font": "sans-serif","color": "light-mode", \
+PREFERENCES = '{"font": "sans-serif","color": "light-mode", \
               "size": "4","spacing": "line-height-min"}'
 
 
@@ -84,8 +84,7 @@ class User(UserMixin, db.Model):
         "Highlight", backref="user", lazy="dynamic", cascade="delete, all"
     )
     events = db.relationship("Event", backref="user", lazy="dynamic")
-    messages = db.relationship("Message", backref="user", lazy="dynamic")
-
+    
     approved_senders = db.relationship(
         "Approved_Sender", backref="user", lazy="dynamic", cascade="delete, all"
     )
@@ -123,7 +122,7 @@ class User(UserMixin, db.Model):
     ################################
     ####    custom settings    #####
     ################################
-    preferences = db.Column(db.String, index=True, default=preferences)
+    preferences = db.Column(db.String, index=True, default=PREFERENCES)
     add_by_email = db.Column(db.String(120), unique=True)
     review_count = db.Column(db.Integer, default=5)
 
@@ -412,21 +411,6 @@ class User(UserMixin, db.Model):
         }
 
 
-class Message(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    name = db.Column(db.String())
-    date = db.Column(db.Date())
-
-    @staticmethod
-    def add(name, user):
-        msg = Message(user_id=user.id, name=name, date=datetime.utcnow())
-        return msg
-
-    def __repr__(self):
-        return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'
-
-
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
@@ -680,18 +664,6 @@ class Article(db.Model):
             articles["recent"].append(articles["read"][i])
 
         return articles
-
-    # return resource for datatable rendering
-    def to_table(self):
-        return {
-            "uuid": self.uuid,
-            "title": self.title,
-            "progress": self.progress,
-            "unread": self.unread,
-            "done": self.done,
-            "date_read": self.date_read,
-            "read_time": self.read_time,
-        }
 
     # api return article resource
     def to_legacy_dict(self):  # for chrome extension
@@ -1213,35 +1185,39 @@ class Tag(db.Model):
         }
 
     @staticmethod
-    def query_with_count(
-        user,
-    ):  # this returns tags with the article count. Optimizing for the query.
-        q = (
+    def query_with_count(user):
+        # Create the query to join the Tag, Article, and association tables
+        query = (
             db.session.query(Tag, Article.archived, func.count("*"))
             .outerjoin(tags_articles, tags_articles.c.tag_id == Tag.id)
             .outerjoin(Article, tags_articles.c.article_id == Article.id)
-            .filter(Tag.user_id == user.id, Tag.archived == False)  # noqa E712
+            .filter(Tag.user_id == user.id, Tag.archived == False)
             .group_by(Tag.id, Article.archived)
         )
-        print(q)
+
+        # Create a dictionary to store the de-duplicated results
         dedupe = {}
-        for row in q:
-            if row[0].id in dedupe:
-                if row[1] is None or row[1] is True:
+        for row in query:
+            tag = row[0]
+            is_archived = row[1]
+            article_count = row[2]
+
+            if tag.id in dedupe:
+                # If the tag has already been added, add to the count if the article is not archived
+                if is_archived is None or is_archived is True:
                     continue
                 else:
-                    dedupe[row[0].id]["count"] += row[2]
+                    dedupe[tag.id]["count"] += article_count
             else:
-                dedupe[row[0].id] = {"tag": row[0]}
-                if row[1] is False:
-                    dedupe[row[0].id]["count"] = row[2]
+                # If the tag hasn't been added, create a new dictionary entry with the tag and count (0 if no non-archived articles)
+                dedupe[tag.id] = {"tag": tag}
+                if is_archived is False:
+                    dedupe[tag.id]["count"] = article_count
                 else:
-                    dedupe[row[0].id]["count"] = 0
+                    dedupe[tag.id]["count"] = 0
 
-        res = []
-        for k, v in dedupe.items():
-            res.append(v)
-
+        # Convert the dictionary to a list of tag dictionaries and return it
+        res = list(dedupe.values())
         return res
 
 
@@ -1251,45 +1227,3 @@ def update_user_last_action(action, user=current_user):
         db.session.execute(
             User.__table__.update().values(last_action=action).where(User.id == user.id)
         )
-
-
-# def after_insert_listener(mapper, connection, target):
-#     # 'target' is the inserted object
-#     if isinstance(target, Highlight):
-#         update_user_last_action('added highlight')
-#     elif isinstance(target, Article):
-#         update_user_last_action('added article')
-#     elif isinstance(target, Tag):
-#         update_user_last_action('added tag')
-#     elif isinstance(target, Topic):
-#         update_user_last_action('added topic')
-
-
-# def after_update_listener(mapper, connection, target):
-#     # 'target' is the inserted object
-#     if isinstance(target, Highlight):
-#         update_user_last_action('updated highlight')
-
-#     elif isinstance(target, Article):
-#         update_user_last_action('updated article')
-
-#     elif isinstance(target, Tag):
-#         update_user_last_action('updated tag')
-
-#     elif isinstance(target, Topic):
-#         update_user_last_action('updated topic')
-
-
-# db.event.listen(Article, 'after_insert', after_insert_listener)
-# db.event.listen(Highlight, 'after_insert', after_insert_listener)
-# db.event.listen(Topic, 'after_insert', after_insert_listener)
-# db.event.listen(Tag, 'after_insert', after_insert_listener)
-# db.event.listen(Task, 'after_insert', after_insert_listener)
-
-
-# def receive_team_users_append(target, value, initiator):
-#     update_user_last_action('added/removed highlight from topic')
-
-
-# db.event.listen(Highlight.topics, 'append', receive_team_users_append)
-# db.event.listen(Highlight.topics, 'remove', receive_team_users_append)
