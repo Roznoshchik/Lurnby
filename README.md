@@ -1,6 +1,9 @@
 # Lurnby
 A tool for building a personal knowledge practice. Lurnby helps you read and remember more. It works with web articles and epubs, allowing you to highlight, categorize, and review your content with active recall and spaced reptition tools. 
 
+[![codecov](https://codecov.io/gh/roznoshchik/lurnby/branch/main/graph/badge.svg)](https://codecov.io/gh/roznoshchik/lurnby/branch/main)
+
+
 ## Backend
 ![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
 ![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
