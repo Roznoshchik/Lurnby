@@ -84,7 +84,7 @@ class User(UserMixin, db.Model):
         "Highlight", backref="user", lazy="dynamic", cascade="delete, all"
     )
     events = db.relationship("Event", backref="user", lazy="dynamic")
-    
+
     approved_senders = db.relationship(
         "Approved_Sender", backref="user", lazy="dynamic", cascade="delete, all"
     )
