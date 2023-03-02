@@ -881,7 +881,7 @@ def add_article():
             new_article.title = title
             new_article.content = content
             new_article.source_url = url
-            new_article.filetype = url
+            new_article.filetype = "url"
 
             db.session.add(new_article)
             new_article.date_read_date = datetime.utcnow().date()
