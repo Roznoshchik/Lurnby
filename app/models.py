@@ -702,7 +702,7 @@ class Article(db.Model):
         return data
 
     def estimated_reading(self):
-        soup = BeautifulSoup(self.content, "html.parser")
+        soup = BeautifulSoup(self.content or "", "html.parser")
         text = soup.find_all(text=True)
         output = ""
         blacklist = [
