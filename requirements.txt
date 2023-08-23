@@ -5,7 +5,7 @@ black==22.12.0
 blinker==1.4
 boto3==1.17.12
 botocore==1.20.112
-certifi==2021.10.8
+certifi==2023.7.22
 chardet==3.0.4
 charset-normalizer==2.0.12
 click==8.1.3
