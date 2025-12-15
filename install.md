@@ -10,15 +10,29 @@ To run the following things should be installed on the system.
 1. `cd` into directory
 1. `python3 -m venv venv` // isolates and creates a virtual env
 1. `. venv/bin/activate` // activate venv
-1. `pip install -r requirements.txt` // installs requirements
-1. `npm install` // installs node requirements
+1. `pip install -r requirements.txt` // installs Python requirements
+1. `cd client && npm install && cd ..` // installs Node.js requirements for Preact frontend
 1. `flask db upgrade` // creates the db
-1. `flask run` // starts the flask server
-1. open new terminal tab
-1. `redis-server` // start redis server
-1. open new terminal tab
-1. `. venv/bin/activate` // activate venv
-1. `rq worker lurnby-tasks` // start listening for bg tasks
+1. `cp .env.example .env` // create env file and edit with your credentials
+
+### Running the development server
+
+**Easy way (recommended):** One command starts everything
+```bash
+export FLASK_DEBUG=1
+flask serve
+```
+This automatically starts:
+- Redis server
+- RQ worker (for background tasks)
+- Vite dev server (for frontend with HMR)
+- Flask server
+
+**Manual way (old):** Multiple terminals
+1. Terminal 1: `flask run` // starts the flask server
+1. Terminal 2: `redis-server` // start redis server
+1. Terminal 3: `. venv/bin/activate && rq worker lurnby-tasks` // start listening for bg tasks
+1. Terminal 4: `cd client && npm start` // start Vite dev server
 
 ## apis
 The app also uses some apis to do what it needs to do. 

@@ -1,6 +1,9 @@
 from datetime import datetime
 import os
 import subprocess
+import time
+
+import click
 
 from app import db
 from app.models import User
@@ -36,21 +39,54 @@ def register(app):
         check_for_delete()
 
     @app.cli.command()
-    def serve():
-        """Run Flask and Vite dev server concurrently."""
-        client_dir = os.path.join(os.getcwd(), "client")
-
-        print("Starting npm dev server in client directory...")
-        npm_process = subprocess.Popen(["npm", "start"], cwd=client_dir)  # nosec
+    @click.option('--prod', is_flag=True, help='Run in production mode (use built assets, no Vite dev server)')
+    def serve(prod):
+        """Run Flask, Redis, RQ worker, and optionally Vite dev server concurrently."""
+        processes = []
 
         try:
+            # Start Redis server
+            print("Starting Redis server...")
+            redis_process = subprocess.Popen(["redis-server"])  # nosec
+            processes.append(("Redis server", redis_process))
+
+            # Wait for Redis to be ready
+            print("Waiting for Redis to initialize...")
+            time.sleep(2)
+
+            # Start RQ worker
+            print("Starting RQ worker for background tasks...")
+            rq_process = subprocess.Popen(["rq", "worker", "lurnby-tasks"])  # nosec
+            processes.append(("RQ worker", rq_process))
+
+            # Start Vite dev server only if not in prod mode
+            if not prod:
+                client_dir = os.path.join(os.getcwd(), "client")
+                print("Starting Vite dev server in client directory...")
+                npm_process = subprocess.Popen(["npm", "start"], cwd=client_dir)  # nosec
+                processes.append(("Vite dev server", npm_process))
+            else:
+                print("Running in production mode (using built assets)")
+                # Build assets first
+                client_dir = os.path.join(os.getcwd(), "client")
+                print("Building assets with Vite...")
+                subprocess.run(["npm", "run", "build"], cwd=client_dir, check=True)  # nosec
+                print("Build complete!")
+                # Set FLASK_DEBUG=0 for production mode
+                os.environ["FLASK_DEBUG"] = "0"
+
+            # Start Flask server
             print("Starting Flask server...")
             subprocess.run(["flask", "run"], check=True)  # nosec
+
         finally:
-            print("Flask server has exited. Shutting down npm server...")
-            npm_process.terminate()
-            try:
-                npm_process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                npm_process.kill()
-            print("npm server shutdown complete.")
+            print("Flask server has exited. Shutting down subprocesses...")
+            for name, process in processes:
+                print(f"Shutting down {name}...")
+                process.terminate()
+                try:
+                    process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    print(f"{name} did not terminate, killing...")
+                    process.kill()
+            print("All subprocesses shutdown complete.")

@@ -13,8 +13,8 @@ project_path = Path(os.path.dirname(os.path.abspath(__file__)))
 assets_blueprint = Blueprint(
     "assets_blueprint",
     __name__,
-    static_folder="/static/dist/assets",
-    static_url_path="/static/dist/assets",
+    static_folder="static/dist/bundled",
+    static_url_path="/static/dist/bundled",
 )
 
 manifest = {}
@@ -32,7 +32,7 @@ if is_production:
 @assets_blueprint.app_context_processor
 def add_context():
     def dev_asset(file_path):
-        return f"{VITE_ORIGIN}/static/{file_path}"
+        return f"{VITE_ORIGIN}/static/dist/{file_path}"
 
     def prod_asset(file_path):
         try:
