@@ -2,6 +2,10 @@
 
 node_modules
 
+# Vite build output
+app/static/dist/
+client/node_modules
+
 **/temp/
 **/samples/
 
