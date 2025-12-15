@@ -22,7 +22,7 @@ from app.auth.forms import (
 from app.auth.email import send_password_reset_email
 from app.models import User, Comms, Event
 
-from werkzeug.urls import url_parse
+from urllib.parse import urlparse
 from oauthlib.oauth2 import WebApplicationClient
 
 
@@ -37,7 +37,7 @@ def login():
             if user.check_password(form.password.data):
                 login_user(user, remember=True)
                 next_page = request.args.get("next")
-                if not next_page or url_parse(next_page).netloc != "":
+                if not next_page or urlparse(next_page).netloc != "":
                     next_page = url_for("main.articles")
                 return redirect(next_page)
 
@@ -60,7 +60,7 @@ def login():
 
             login_user(user, remember=True)
             next_page = request.args.get("next")
-            if not next_page or url_parse(next_page).netloc != "":
+            if not next_page or urlparse(next_page).netloc != "":
                 next_page = url_for("main.articles")
             return redirect(next_page)
 

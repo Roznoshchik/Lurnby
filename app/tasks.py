@@ -582,7 +582,7 @@ def create_recall_text(highlight_id):
         return
 
     soup = BeautifulSoup(highlight.text, features="lxml")
-    for text in soup.find_all(text=True):
+    for text in soup.find_all(string=True):
         words = text.split(" ")
         if len(words) > 3:
             for _ in range(0, len(words) // 3):
