@@ -45,6 +45,7 @@ jobs:
       
       - name: Test with pytest
         run: |
+          export FLASK_DEBUG=1
           python -m pytest
 
       - name: Upload coverage reports to Codecov
