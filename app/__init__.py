@@ -148,6 +148,10 @@ def create_app(config_class=Config):
 
     app.register_blueprint(dotcom_bp)
 
+    from app.assets_blueprint import assets_blueprint
+
+    app.register_blueprint(assets_blueprint)
+
     if __name__ == "__main__":
         app.run(ssl_context=("cert.pem", "key.pem"))
 
