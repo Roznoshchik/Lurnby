@@ -139,7 +139,7 @@ class UserTest(unittest.TestCase):
         db.session.add_all([user, tag1, tag2, tag3])
         db.session.commit()
 
-        with mock.patch("app.models.url_for") as mock_url_for:
+        with mock.patch("app.models.user.url_for") as mock_url_for:
             mock_url_for.return_value = "http://example.com"
             data = user.get_tags_dict()
             self.assertIsInstance(data, dict)
