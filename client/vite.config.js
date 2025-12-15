@@ -6,10 +6,14 @@ export default defineConfig({
   plugins: [preact()],
   root: path.join(__dirname, './static/'),
   base: '/static/dist/',
+  server: {
+    origin: 'http://localhost:5173',
+    cors: true,
+  },
   build: {
     outDir: path.join(__dirname, '../app/static/dist/'),
     manifest: 'manifest.json',
-    assetsDir: 'assets',
+    assetsDir: 'bundled',
     rollupOptions: {
       input: ['./static/main.jsx', './static/style.css'],
     },

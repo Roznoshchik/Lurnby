@@ -8,9 +8,10 @@ Lurnby is a personal knowledge practice tool built with Flask that helps users r
 
 **Tech Stack:**
 - Backend: Flask, SQLAlchemy, PostgreSQL, Redis
-- Frontend: Jinja2 templates, JavaScript, SASS
+- Frontend: Preact + Vite (migrating from Jinja2 templates), JavaScript, SASS
 - Background Tasks: RQ (Redis Queue)
 - External Services: AWS S3 (epub images), Google OAuth, SendGrid (email)
+- Deployment: Heroku (via git push using Dockerfile)
 
 ## Development Setup
 
@@ -20,9 +21,11 @@ Lurnby is a personal knowledge practice tool built with Flask that helps users r
 python3 -m venv venv
 . venv/bin/activate
 
-# Install dependencies
+# Install Python dependencies
 pip install -r requirements.txt
-npm install
+
+# Install Node.js dependencies for Preact frontend
+cd client && npm install && cd ..
 
 # Setup database
 flask db upgrade
@@ -33,6 +36,21 @@ cp .env.example .env
 ```
 
 ### Running the Application
+
+**Recommended (one command):**
+```bash
+# Development mode with HMR
+export FLASK_DEBUG=1
+flask serve
+# This starts: Redis → RQ worker → Vite dev server → Flask
+
+# Production mode (tests built assets)
+flask serve --prod
+# This starts: Redis → RQ worker → Flask
+# Automatically builds assets first
+```
+
+**Manual (old method, multiple terminals):**
 ```bash
 # Terminal 1: Flask server
 flask run
@@ -43,6 +61,9 @@ redis-server
 # Terminal 3: Background task worker
 . venv/bin/activate
 rq worker lurnby-tasks
+
+# Terminal 4: Vite dev server (for Preact frontend)
+cd client && npm start
 ```
 
 ### Testing
@@ -155,6 +176,25 @@ Located in `app/static/`:
 - SASS stylesheets
 - Service worker for PWA functionality
 - Third-party libraries (Rangy for text selection)
+- `dist/` - Vite build output for Preact frontend (gitignored in dev)
+
+### Preact Frontend Architecture
+Vite:
+
+**Structure:**
+- `client/` - Preact source code and Vite configuration
+  - `client/static/` - Preact components and entry points
+  - `client/vite.config.js` - Build config (outputs to `app/static/dist/`)
+  - `client/package.json` - Node.js dependencies
+- `app/assets_blueprint.py` - Blueprint for dev/prod asset resolution
+  - Dev mode: Proxies to Vite dev server on port 5173 with HMR
+  - Prod mode: Serves built files from `app/static/dist/bundled/`
+- `app/templates/*.html` - Gradually migrating from Jinja2 to Preact
+
+**Asset Resolution:**
+- Templates use `asset('file.ext')` helper function
+- Dev: Returns Vite dev server URLs (e.g., `http://localhost:5173/static/dist/main.jsx`)
+- Prod: Returns static file URLs from manifest (e.g., `/static/dist/bundled/main-[hash].js`)
 
 ### Browser Extensions
 
@@ -208,6 +248,22 @@ Required for full functionality (see `.env.example`):
 - `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER`: SendGrid email
 - `SERVER_NAME`: For generating URLs in background tasks
 
+## Deployment
+
+**Platform:** Heroku
+
+**Method:** Git push deployment using Dockerfile
+```bash
+git push heroku main
+```
+
+The app uses a Dockerfile for containerized deployment. Heroku builds and deploys the container automatically on push to the `main` branch.
+
+**Important for Preact frontend:**
+- Production builds must be generated before deployment
+- Vite build output (`app/static/dist/`) should be committed or built during deployment
+- Set `FLASK_DEBUG=0` in production environment variables
+
 ## Common Gotchas
 
 1. **PostgreSQL URL format**: The config automatically converts `postgres://` to `postgresql://` for SQLAlchemy compatibility
@@ -216,6 +272,7 @@ Required for full functionality (see `.env.example`):
 4. **Migrations**: The app excludes ReadabiliPy and other directories from flake8 checks
 5. **CSRF**: API routes are exempt from CSRF protection, but web routes require CSRF tokens
 6. **Boolean comparisons**: Some files have flake8 exceptions for explicit boolean comparisons (E712) where they're intentional
+7. **Vite build artifacts**: The `app/static/dist/` directory is in `.gitignore` to avoid committing build artifacts during development
 
 ## Code comments
 Obvious comments are not necessary and should only be added sparingly and if its necessary to understand what is happening.
