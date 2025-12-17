@@ -10,7 +10,7 @@ from flask import jsonify, request, url_for
 @bp.route("/tokens", methods=["POST", "GET"])
 @basic_auth.login_required
 def get_token():
-    token = basic_auth.current_user().get_token()
+    token = basic_auth.current_user().get_api_token()
     db.session.commit()
     return jsonify({"token": token, "id": basic_auth.current_user().id})
 
@@ -26,7 +26,7 @@ def google_login():
 
     user = User.query.filter_by(email=data["email"]).first()
     if user:
-        token = user.get_token()
+        token = user.get_api_token()
         db.session.commit()
         response = jsonify({"token": token, "id": user.id})
         return response
@@ -34,7 +34,7 @@ def google_login():
     user = User(
         goog_id=data["goog_id"], email=data["email"], firstname=data["first_name"]
     )
-    token = user.get_token()
+    token = user.get_api_token()
     db.session.add(user)
     db.session.commit()
     comms = Comms(user_id=user.id)
@@ -49,6 +49,6 @@ def google_login():
 @bp.route("/tokens", methods=["DELETE"])
 @token_auth.login_required
 def revoke_token():
-    token_auth.current_user().revoke_token()
+    token_auth.current_user().revoke_api_token()
     db.session.commit()
     return "", 204

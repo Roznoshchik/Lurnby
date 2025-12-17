@@ -208,19 +208,19 @@ class UserTest(unittest.TestCase):
         with mock.patch.object(
             os, "urandom", return_value=b"abcdefghijklmnopqrstuvwxyz"
         ) as mock_urandom:
-            token = user.get_token(expires_in=180)
+            token = user.get_api_token(expires_in=180)
             self.assertEqual(token, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")
-            self.assertEqual(user.token, token)
+            self.assertEqual(user.api_token, token)
             self.assertGreaterEqual(
-                user.token_expiration, datetime.utcnow() + timedelta(seconds=60)
+                user.api_token_expiration, datetime.utcnow() + timedelta(seconds=60)
             )
 
             # Test that the token is not regenerated before it expires
-            token2 = user.get_token(expires_in=60)
+            token2 = user.get_api_token(expires_in=60)
             self.assertEqual(token2, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")
-            self.assertEqual(user.token, token2)
+            self.assertEqual(user.api_token, token2)
             self.assertLessEqual(
-                user.token_expiration, datetime.utcnow() + timedelta(seconds=180)
+                user.api_token_expiration, datetime.utcnow() + timedelta(seconds=180)
             )
             mock_urandom.assert_called_once_with(24)
 
@@ -235,9 +235,9 @@ class UserTest(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
 
-        user.token_expiration = datetime.utcnow() + timedelta(seconds=60)
-        user.revoke_token()
-        self.assertTrue(user.token_expiration < datetime.utcnow())
+        user.api_token_expiration = datetime.utcnow() + timedelta(seconds=60)
+        user.revoke_api_token()
+        self.assertTrue(user.api_token_expiration < datetime.utcnow())
 
     def test_check_token(self):
         user = User(
@@ -250,20 +250,20 @@ class UserTest(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
 
-        # Test a valid token
-        user.token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
-        user.token_expiration = datetime.utcnow() + timedelta(seconds=60)
+        # Test a valid API token
+        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
+        user.api_token_expiration = datetime.utcnow() + timedelta(seconds=60)
         db.session.commit()
 
-        user2 = User.check_token(user.token)
+        user2 = User.check_token(user.api_token)
         self.assertEqual(user2, user)
 
-        # Test an expired token
-        user.token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
-        user.token_expiration = datetime.utcnow() - timedelta(seconds=60)
+        # Test an expired API token
+        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
+        user.api_token_expiration = datetime.utcnow() - timedelta(seconds=60)
         db.session.commit()
 
-        user = User.check_token(user.token)
+        user = User.check_token(user.api_token)
         self.assertEqual(user, None)
 
         # Test a non-existent token

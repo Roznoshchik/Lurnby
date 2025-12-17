@@ -32,7 +32,7 @@ def create_user():
 
     user = User()
     user.from_dict(data)
-    token = user.get_token()
+    token = user.get_api_token()
     db.session.add(user)
     db.session.commit()  # The user id doesn't get set until after commit.
     comms = Comms(user_id=user.id)
@@ -106,7 +106,7 @@ def delete_user(id):
     if user and user.id == token_auth.current_user().id:
         ev = Event.add("deleted account", user=token_auth.current_user())
         db.session.add(ev)
-        user.revoke_token()
+        user.revoke_api_token()
         if export is True:
             user.launch_task(
                 "account_export",

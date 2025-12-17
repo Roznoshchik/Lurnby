@@ -75,8 +75,17 @@ class User(UserMixin, db.Model):
     ######################
     ####    API??    #####
     ######################
-    token = db.Column(db.String(32), index=True, unique=True)
-    token_expiration = db.Column(db.DateTime)
+    # API token for browser extensions (long-lived, 30 days)
+    api_token = db.Column(db.String(32), index=True, unique=True)
+    api_token_expiration = db.Column(db.DateTime)
+
+    # Access token for web app (short-lived, 15 minutes)
+    access_token = db.Column(db.String(32), index=True, unique=True)
+    access_token_expiration = db.Column(db.DateTime)
+
+    # Refresh token for web app (long-lived, 30 days)
+    refresh_token = db.Column(db.String(32), index=True, unique=True)
+    refresh_token_expiration = db.Column(db.DateTime)
 
     ################################
     ####    custom settings    #####
@@ -193,22 +202,58 @@ class User(UserMixin, db.Model):
             setattr(self, field, data[field])
         self.set_password(data["password"])
 
-    def get_token(self, expires_in=2592000):
+    def get_api_token(self, expires_in=2592000):
+        """Get long-lived API token for browser extensions (30 days)"""
         now = datetime.utcnow()
-        if self.token and self.token_expiration > now + timedelta(seconds=60):
-            return self.token
-        self.token = base64.b64encode(os.urandom(24)).decode("utf-8")
-        self.token_expiration = now + timedelta(seconds=expires_in)
+        if self.api_token and self.api_token_expiration > now + timedelta(seconds=60):
+            return self.api_token
+        self.api_token = base64.b64encode(os.urandom(24)).decode("utf-8")
+        self.api_token_expiration = now + timedelta(seconds=expires_in)
         db.session.add(self)
-        return self.token
+        return self.api_token
 
-    def revoke_token(self):
-        self.token_expiration = datetime.utcnow() - timedelta(seconds=1)
+    def get_access_token(self, expires_in=900):
+        """Get short-lived access token for web app (15 minutes)"""
+        now = datetime.utcnow()
+        self.access_token = base64.b64encode(os.urandom(24)).decode("utf-8")
+        self.access_token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.access_token
+
+    def get_refresh_token(self, expires_in=2592000):
+        """Get long-lived refresh token for web app (30 days)"""
+        now = datetime.utcnow()
+        self.refresh_token = base64.b64encode(os.urandom(24)).decode("utf-8")
+        self.refresh_token_expiration = now + timedelta(seconds=expires_in)
+        db.session.add(self)
+        return self.refresh_token
+
+    def revoke_api_token(self):
+        """Revoke API token"""
+        self.api_token_expiration = datetime.utcnow() - timedelta(seconds=1)
+
+    def revoke_refresh_token(self):
+        """Revoke refresh token"""
+        self.refresh_token_expiration = datetime.utcnow() - timedelta(seconds=1)
 
     @staticmethod
     def check_token(token):
-        user = User.query.filter_by(token=token).first()
-        if user is None or user.token_expiration < datetime.utcnow():
+        """Check both API token and access token"""
+        user = User.query.filter_by(api_token=token).first()
+        if user and user.api_token_expiration > datetime.utcnow():
+            return user
+
+        user = User.query.filter_by(access_token=token).first()
+        if user and user.access_token_expiration > datetime.utcnow():
+            return user
+
+        return None
+
+    @staticmethod
+    def check_refresh_token(token):
+        """Check refresh token only"""
+        user = User.query.filter_by(refresh_token=token).first()
+        if user is None or user.refresh_token_expiration < datetime.utcnow():
             return None
         return user
 
