@@ -2,7 +2,7 @@ from app import db
 from app.api import bp
 from app.api.auth import basic_auth, token_auth
 from app.api.errors import bad_request
-from app.models import User, Comms
+from app.models import User
 
 from flask import jsonify, request, url_for
 
@@ -36,10 +36,7 @@ def google_login():
     )
     token = user.get_api_token()
     db.session.add(user)
-    db.session.commit()
-    comms = Comms(user_id=user.id)
-    db.session.add(comms)
-    db.session.commit()
+    db.session.commit()  # Comms created automatically via after_insert event
     response = jsonify({"token": token, "id": user.id})
     response.status_code = 201
     response.headers["location"] = url_for("api.get_user_tags", id=user.id)

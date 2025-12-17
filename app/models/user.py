@@ -8,6 +8,7 @@ from time import time
 import jwt
 from flask import current_app, url_for
 from flask_login import UserMixin
+from sqlalchemy import event
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from app.models.base import db, login, CustomLogger, redis, rq, generate_str_id
@@ -424,3 +425,11 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+@event.listens_for(User, 'after_insert')
+def create_user_comms(mapper, connection, target):
+    """Automatically create Comms record for new users"""
+    from app.models.comms import Comms
+    comms = Comms(user_id=target.id)
+    db.session.add(comms)

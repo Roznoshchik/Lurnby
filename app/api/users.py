@@ -3,7 +3,7 @@ from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request
 from app.helpers.pulltext import pull_text
-from app.models import Article, User, Tag, Comms, Approved_Sender, Event
+from app.models import Article, User, Tag, Approved_Sender, Event
 
 from datetime import datetime
 from flask import jsonify, request, url_for
@@ -34,10 +34,9 @@ def create_user():
     user.from_dict(data)
     token = user.get_api_token()
     db.session.add(user)
-    db.session.commit()  # The user id doesn't get set until after commit.
-    comms = Comms(user_id=user.id)
+    db.session.commit()  # Comms created automatically via after_insert event
     ev = Event.add("created account", user=user)
-    db.session.add_all([comms, ev])
+    db.session.add(ev)
     db.session.commit()
 
     response = jsonify({"token": token, "id": user.id})
