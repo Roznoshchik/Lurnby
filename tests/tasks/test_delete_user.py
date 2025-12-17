@@ -1,29 +1,12 @@
-import unittest
-from app import db, create_app
+from app import db
 from app.models import User, Highlight, Approved_Sender, Tag, Article, Comms
 from app.tasks import delete_user
-from config import Config
+from tests.conftest import BaseTestCase
 
 
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-
-
-class DeleteUser(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-
+class DeleteUser(BaseTestCase):
     def test_delete_user(self):
-        # create a user and some associated data
+        # Create a user (Comms and Event created automatically via after_insert hook)
         u = User(
             goog_id="123",
             firstname="John",
@@ -39,8 +22,8 @@ class DeleteUser(unittest.TestCase):
         t2 = Tag(name="tag2", user=u)
         s1 = Approved_Sender(email="sender1", user=u)
         s2 = Approved_Sender(email="sender2", user=u)
-        comms = Comms(user=u)
-        db.session.add_all([u, h1, h2, a1, a2, t1, t2, s1, s2, comms])
+        # Comms created automatically, no need to add manually
+        db.session.add_all([u, h1, h2, a1, a2, t1, t2, s1, s2])
         db.session.commit()
 
         # call delete_user and make assertions
@@ -51,7 +34,7 @@ class DeleteUser(unittest.TestCase):
         self.assertIsNone(u.firstname)
         self.assertIsNone(u.username)
         self.assertIsNone(u.add_by_email)
-        self.assertIsNone(u.token)
+        self.assertIsNone(u.api_token)  # Updated from u.token
         self.assertIsNone(u.comms)
 
         self.assertEqual(Highlight.query.count(), 0)
