@@ -17,6 +17,7 @@ from app.api.helpers.add_highlight_methods import (
 from app.api.helpers.query_maker import apply_pagination
 from app.api.helpers.update_tags import update_tags
 from app.models import Article, Highlight, Event
+from app.models.event import EventName
 
 
 logger = CustomLogger("API")
@@ -101,7 +102,7 @@ def create_highlight():
         highlight = populate_highlight(highlight, data)
         highlight = add_tags(highlight, data.get("tags", []))
 
-        ev = Event.add("added highlight", user=user)
+        ev = Event.add(EventName.ADDED_HIGHLIGHT, user=user)
         db.session.add(ev)
         db.session.commit()
 
@@ -154,7 +155,7 @@ def update_highlight(uuid):
         if "tags" in data:
             highlight = update_tags(tags=data["tags"], resource=highlight)
 
-        ev = Event.add("updated highlight", user=user)
+        ev = Event.add(EventName.UPDATED_HIGHLIGHT, user=user)
         db.session.add(ev)
         db.session.commit()
 
@@ -181,7 +182,7 @@ def delete_highlight(uuid):
             return error_response(404, "Resource not found")
 
         db.session.delete(highlight)
-        ev = Event.add("deleted highlight", user=user)
+        ev = Event.add(EventName.DELETED_HIGHLIGHT, user=user)
         db.session.add(ev)
 
         db.session.commit()
@@ -257,7 +258,7 @@ def export_highlights():
         task = user.launch_task(
             "export_highlights", highlights=highlights, ext=export_file_ext
         )
-        ev = Event.add("Exported highlights", user=user)
+        ev = Event.add(EventName.EXPORTED_HIGHLIGHTS, user=user)
         db.session.add(ev)
         db.session.commit()
 

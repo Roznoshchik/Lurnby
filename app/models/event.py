@@ -15,11 +15,14 @@ class EventName(Enum):
     ADDED_TOPIC = "added topic"
     CREATED_ACCOUNT = "created account"
     DELETED_ACCOUNT = "deleted account"
+    DELETED_ARTICLE = "deleted article"
+    DELETED_HIGHLIGHT = "deleted highlight"
+    DELETED_TAG = "deleted tag"
     ENABLED_ADD_BY_EMAIL = "enabled add by email"
     EXPORTED_ALL_DATA = "exported all data"
+    EXPORTED_ARTICLE = "exported article"
     EXPORTED_HIGHLIGHTS = "exported highlights"
     OPENED_ARTICLE = "opened article"
-    DELETED_ARTICLE = "deleted article"
     RESET_PASSWORD = "reset password"
     REVIEWED_HIGHLIGHTS = "reviewed highlights"
     REVIEWED_A_HIGHLIGHT = "reviewed a highlight"
@@ -32,6 +35,7 @@ class EventName(Enum):
     UPDATED_HIGHLIGHT = "updated highlight"
     UPDATED_HIGHLIGHT_TOPICS = "updated highlight topics"
     UPDATED_PASSWORD = "updated password"
+    UPDATED_TAG = "updated tag"
     UPDATED_USER_CREDENTIALS = "updated user credentials"
     UPDATED_USER_INFO = "updated user info"
     USER_REGISTERED = "user registered"
@@ -82,11 +86,25 @@ class Event(db.Model):
     """
 
     @staticmethod
-    def add(kind: EventName, daily=False, user=current_user):
-        """Add an event with the given EventName enum"""
+    def add(kind: EventName | str, daily=False, user=current_user):
+        """Add an event with the given EventName enum or string
+
+        Args:
+            kind: EventName enum or string that matches an EventName value
+            daily: If True, only creates one event per day for this type
+            user: User object (defaults to current_user)
+
+        Returns:
+            Event object if created, False if daily event already exists
+
+        Raises:
+            ValueError: If kind is a string that doesn't match any EventName value
+        """
         from app.models.user import User
 
-        event_name = kind.value
+        # Convert to EventName enum (raises ValueError if invalid)
+        event_enum = EventName(kind)
+        event_name = event_enum.value
 
         if daily:
             today_start = datetime(

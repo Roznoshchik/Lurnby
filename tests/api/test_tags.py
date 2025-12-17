@@ -302,7 +302,12 @@ class UpdateTagApiTests(BaseTestCase):
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Resource not found")
 
-        tag2 = Tag(user_id=2)
+        # Create a second user for testing wrong user access
+        user2 = User(email="test2@test.com")
+        db.session.add(user2)
+        db.session.commit()
+
+        tag2 = Tag(user_id=user2.id)
         db.session.add(tag2)
         db.session.commit()
 

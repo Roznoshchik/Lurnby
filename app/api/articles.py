@@ -13,6 +13,7 @@ from app.api.helpers.add_article_methods import (
     process_file_upload,
 )
 from app.models import Article, Event
+from app.models.event import EventName
 from app.api.errors import bad_request, error_response
 from app.api.helpers.update_tags import update_tags
 
@@ -134,7 +135,7 @@ def add_article():
         article.processing = False
         token_auth.current_user().launch_task("set_images_lazy", aid=article.id)
         token_auth.current_user().launch_task("set_absolute_urls", aid=article.id)
-        ev = Event.add("added article", user=token_auth.current_user())
+        ev = Event.add(EventName.ADDED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
 
@@ -203,7 +204,7 @@ def update_article(article_uuid):
         if "tags" in data:
             article = update_tags(tags=data["tags"], resource=article)
 
-        ev = Event.add("updated article", user=token_auth.current_user())
+        ev = Event.add(EventName.UPDATED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
 
@@ -236,7 +237,7 @@ def delete_article(article_uuid):
             return bad_request("The resource can't be found")
 
         db.session.delete(article)
-        ev = Event.add("deleted article", user=token_auth.current_user())
+        ev = Event.add(EventName.DELETED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
 
@@ -314,7 +315,7 @@ def export_article(article_uuid):
         task = token_auth.current_user().launch_task(
             "export_article", user=user, article=article, ext=export_file_ext
         )
-        ev = Event.add("exported article", user=user)
+        ev = Event.add(EventName.EXPORTED_ARTICLE, user=user)
         db.session.add(ev)
         db.session.commit()
 
