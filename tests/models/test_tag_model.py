@@ -1,25 +1,9 @@
-import unittest
-from app import create_app, db
+from app import db
 from app.models import User, Highlight, Tag, Topic, Article
-from config import Config
+from tests.conftest import BaseTestCase
 
 
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-
-
-class TagModelCase(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+class TagModelCase(BaseTestCase):
 
     def test_add_removing_tags(self):
         u = User(username="john")
@@ -203,7 +187,3 @@ class TagModelCase(unittest.TestCase):
         self.assertEqual(nmt3, [])
         self.assertEqual(mt4, [])
         self.assertEqual(nmt4, [tag1, tag2, tag3, tag4])
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)

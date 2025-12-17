@@ -249,7 +249,3 @@ class UserTest(BaseTestCase):
         # Test a non-existent token
         user = User.check_token("nonexistenttoken")
         self.assertEqual(user, None)
-
-
-if __name__ == "__main__":
-    unittest.main()

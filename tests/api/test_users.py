@@ -145,7 +145,3 @@ class UserApiTests(BaseTestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(self.comms.educational, False)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
