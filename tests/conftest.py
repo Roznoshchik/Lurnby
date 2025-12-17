@@ -1,4 +1,5 @@
 """Shared pytest configuration for all tests"""
+import os
 import unittest
 from app import create_app, db
 from config import Config
@@ -7,7 +8,10 @@ from config import Config
 class TestConfig(Config):
     """Test configuration using local postgres database"""
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "postgresql://localhost/lurnby-test"
+    # Use TEST_DATABASE_URL from environment (for CI) or default to local test db
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "TEST_DATABASE_URL", "postgresql://localhost/lurnby-test"
+    )
     WTF_CSRF_ENABLED = False
     REDIS_URL = "redis://"
 
