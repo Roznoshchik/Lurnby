@@ -1,41 +1,26 @@
 import json
 import os
-import unittest
 from unittest.mock import patch
-from app import create_app, db
-from app.models import User, Comms
-from config import Config
+from app import db
+from app.models import User
+from tests.conftest import BaseTestCase
 
 
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-
-
-class UserApiTests(unittest.TestCase):
+class UserApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
+        # Create user (Comms and Event created automatically via after_insert hook)
         user = User(email="foo@baz.com")
         db.session.add(user)
         db.session.commit()
 
-        comms = Comms(user_id=user.id)
-        db.session.add(comms)
-        db.session.commit()
-
         self.user = user
-        self.comms = comms
+        self.comms = user.comms  # Access auto-created Comms
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     def test_create_user_fails_without_data(self):
         res = self.client.post("/api/users", json={"a": "b"})

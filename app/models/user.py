@@ -29,7 +29,7 @@ class User(UserMixin, db.Model):
     firstname = db.Column(db.String, index=True)
     username = db.Column(db.String(64), index=True, unique=True)
     email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    password_hash = db.Column(db.String(256))  # Increased for scrypt hashes
     admin = db.Column(db.Boolean)
     test_account = db.Column(db.Boolean, default=False)
     deleted = db.Column(db.Boolean, default=False)
@@ -428,8 +428,29 @@ def load_user(id):
 
 
 @event.listens_for(User, 'after_insert')
-def create_user_comms(mapper, connection, target):
-    """Automatically create Comms record for new users"""
+def create_user_related_records(mapper, connection, target):
+    """Automatically create Comms and Event records for new users"""
+    from sqlalchemy import insert
     from app.models.comms import Comms
-    comms = Comms(user_id=target.id)
-    db.session.add(comms)
+    from app.models.event import Event, EventName
+
+    # Insert Comms record using connection
+    connection.execute(
+        insert(Comms.__table__).values(
+            user_id=target.id,
+            informational=True,
+            educational=True,
+            promotional=True,
+            highlights=True,
+            reminders=True
+        )
+    )
+
+    # Insert Event record using connection and enum
+    connection.execute(
+        insert(Event.__table__).values(
+            user_id=target.id,
+            name=EventName.CREATED_ACCOUNT.value,
+            date=datetime.utcnow()
+        )
+    )

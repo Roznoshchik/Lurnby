@@ -1,9 +1,8 @@
 import base64
 from datetime import datetime, timedelta
 import os
-import unittest
 from unittest import mock
-from app import db, create_app
+from app import db
 from app.models import (
     User,
     Article,
@@ -16,63 +15,45 @@ from app.models import (
     Notification,
     Comms,
 )
-from config import Config
+from tests.conftest import BaseTestCase
 
 
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-
-
-class UserTest(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+class UserTest(BaseTestCase):
 
     def test_relationships(self):
         user = User(username="testuser", email="testuser@example.com")
         article = Article(user=user)
         highlight = Highlight(user=user)
-        event = Event(user=user)
         approved_sender = Approved_Sender(user=user)
         topic = Topic(user=user)
         tag = Tag(user=user)
         task = Task(user=user, id="foo")
         notification = Notification(user=user)
-        comms = Comms(user=user)
+        # Comms and Event are created automatically via after_insert hook
 
         db.session.add_all(
             [
                 user,
                 article,
                 highlight,
-                event,
                 approved_sender,
                 topic,
                 tag,
                 task,
                 notification,
-                comms,
             ]
         )
         db.session.commit()
 
         self.assertEqual(user.articles.count(), 1)
         self.assertEqual(user.highlights.count(), 1)
-        self.assertEqual(user.events.count(), 1)
+        self.assertEqual(user.events.count(), 1)  # Created automatically
         self.assertEqual(user.approved_senders.count(), 1)
         self.assertEqual(user.topics.count(), 1)
         self.assertEqual(user.tags.count(), 1)
         self.assertEqual(user.tasks.count(), 1)
         self.assertEqual(user.notifications.count(), 1)
-        self.assertEqual(user.comms.user_id, user.id)
+        self.assertEqual(user.comms.user_id, user.id)  # Created automatically
 
     def test_create_user(self):
         user = User(
@@ -206,10 +187,10 @@ class UserTest(unittest.TestCase):
         db.session.commit()
 
         with mock.patch.object(
-            os, "urandom", return_value=b"abcdefghijklmnopqrstuvwxyz"
+            os, "urandom", return_value=b"abcdefghijklmnopqrstuv"  # 24 bytes
         ) as mock_urandom:
             token = user.get_api_token(expires_in=180)
-            self.assertEqual(token, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")
+            self.assertEqual(token, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dg==")  # 32 chars
             self.assertEqual(user.api_token, token)
             self.assertGreaterEqual(
                 user.api_token_expiration, datetime.utcnow() + timedelta(seconds=60)
@@ -217,7 +198,7 @@ class UserTest(unittest.TestCase):
 
             # Test that the token is not regenerated before it expires
             token2 = user.get_api_token(expires_in=60)
-            self.assertEqual(token2, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=")
+            self.assertEqual(token2, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dg==")
             self.assertEqual(user.api_token, token2)
             self.assertLessEqual(
                 user.api_token_expiration, datetime.utcnow() + timedelta(seconds=180)
@@ -241,7 +222,6 @@ class UserTest(unittest.TestCase):
 
     def test_check_token(self):
         user = User(
-            id=1,
             username="johndoe",
             email="johndoe@example.com",
             firstname="John",
@@ -250,8 +230,8 @@ class UserTest(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
 
-        # Test a valid API token
-        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
+        # Test a valid API token (24 bytes encodes to 32 base64 chars)
+        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuv").decode("utf-8")
         user.api_token_expiration = datetime.utcnow() + timedelta(seconds=60)
         db.session.commit()
 
@@ -259,7 +239,7 @@ class UserTest(unittest.TestCase):
         self.assertEqual(user2, user)
 
         # Test an expired API token
-        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuvwxyz").decode("utf-8")
+        user.api_token = base64.b64encode(b"abcdefghijklmnopqrstuv").decode("utf-8")
         user.api_token_expiration = datetime.utcnow() - timedelta(seconds=60)
         db.session.commit()
 

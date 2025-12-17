@@ -4,6 +4,7 @@ from app.api.auth import token_auth
 from app.api.errors import bad_request
 from app.helpers.pulltext import pull_text
 from app.models import Article, User, Tag, Approved_Sender, Event
+from app.models.event import EventName
 
 from datetime import datetime
 from flask import jsonify, request, url_for
@@ -34,10 +35,7 @@ def create_user():
     user.from_dict(data)
     token = user.get_api_token()
     db.session.add(user)
-    db.session.commit()  # Comms created automatically via after_insert event
-    ev = Event.add("created account", user=user)
-    db.session.add(ev)
-    db.session.commit()
+    db.session.commit()  # Comms and Event created automatically via after_insert event
 
     response = jsonify({"token": token, "id": user.id})
     response.status_code = 201
@@ -80,7 +78,7 @@ def update_user(id):
             if key in data:
                 setattr(user, key, data[key])
 
-        ev = Event.add("updated user info", user=token_auth.current_user())
+        ev = Event.add(EventName.UPDATED_USER_INFO, user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.to_dict())
@@ -103,7 +101,7 @@ def delete_user(id):
     file_extension = request.args.get("fileExtension", "json")
     export = request.args.get("export", False)
     if user and user.id == token_auth.current_user().id:
-        ev = Event.add("deleted account", user=token_auth.current_user())
+        ev = Event.add(EventName.DELETED_ACCOUNT, user=token_auth.current_user())
         db.session.add(ev)
         user.revoke_api_token()
         if export is True:
@@ -135,7 +133,7 @@ def export_data(id):
     user = User.query.filter_by(id=id).first()
     file_extension = request.args.get("fileExtension", "json")
     if user and user.id == token_auth.current_user().id:
-        ev = Event.add("exported all data", user=user)
+        ev = Event.add(EventName.EXPORTED_ALL_DATA, user=user)
         db.session.add(ev)
         user.launch_task(
             "account_export", "exporting data...", user.id, file_extension, delete=False
@@ -158,7 +156,7 @@ def enable_add_by_email(id):
     user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         user.set_lurnby_email()
-        ev = Event.add("enabled add by email", user=user)
+        ev = Event.add(EventName.ENABLED_ADD_BY_EMAIL, user=user)
         db.session.add(ev)
         db.session.commit()
         response = jsonify(email=user.add_by_email)
@@ -200,7 +198,7 @@ def add_approved_senders(id):
         if email:
             email = email.lower()
             sender = Approved_Sender(user_id=user.id, email=email)
-            event = Event.add("added aproved sender", user=user)
+            event = Event.add(EventName.ADDED_APPROVED_SENDER, user=user)
             db.session.add_all([sender, event])
             db.session.commit()
             response = jsonify(email=email)
@@ -253,7 +251,7 @@ def update_user_comms(id):
             for key in VALID_KEYS:
                 if key in data:
                     setattr(comms, key, data[key])
-        ev = Event.add("updated comms", user=user)
+        ev = Event.add(EventName.UPDATED_COMMS, user=user)
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.comms.to_dict())

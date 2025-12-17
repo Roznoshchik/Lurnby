@@ -41,7 +41,7 @@ def login():
 
 
 @bp.post("/auth/google")
-def google_login():
+def google_auth():
     """
     Google OAuth login endpoint for web app and mobile apps.
     Expects JSON: {goog_id, email, first_name}.
