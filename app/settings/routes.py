@@ -5,6 +5,7 @@ from flask_wtf.csrf import CSRFError
 
 from app.settings import bp
 from app.models import Approved_Sender, User, update_user_last_action, Event
+from app.models.event import EventName
 from app.settings.forms import (
     AddApprovedSenderForm,
     DeleteAccountForm,
@@ -248,10 +249,9 @@ def enable_add_by_email():
     update_user_last_action("enabled add by email")
     e = Approved_Sender(user_id=current_user.id, email=current_user.email)
     db.session.add(e)
-    ev = Event(
-        user_id=current_user.id, name="enabled add by email", date=datetime.utcnow()
-    )
-    db.session.add(ev)
+    ev = Event.add(EventName.ENABLED_ADD_BY_EMAIL)
+    if ev:
+        db.session.add(ev)
 
     db.session.commit()
 

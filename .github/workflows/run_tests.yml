@@ -16,9 +16,25 @@ permissions:
 jobs:
   python:
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: lurnby-test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Set up Python 3.12
         uses: actions/setup-python@v3
         with:
@@ -44,6 +60,8 @@ jobs:
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       
       - name: Test with pytest
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lurnby-test
         run: |
           export FLASK_DEBUG=1
           python -m pytest

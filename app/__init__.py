@@ -113,7 +113,7 @@ def create_app(config_class=Config):
 
     db.init_app(app)
 
-    migrate.init_app(app, db)
+    migrate.init_app(app, db, render_as_batch=True, compare_type=True)
     login.init_app(app)
     mail.init_app(app)
     talisman.init_app(app, content_security_policy=None)
@@ -143,6 +143,11 @@ def create_app(config_class=Config):
     from app.content import bp as content_bp
 
     app.register_blueprint(content_bp, url_prefix="/app")
+
+    from app.client import bp as client_bp
+
+    app.register_blueprint(client_bp, url_prefix="/client")
+    csrf.exempt(client_bp)
 
     from app.dotcom import bp as dotcom_bp
 

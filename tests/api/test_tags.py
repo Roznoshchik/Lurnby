@@ -1,17 +1,9 @@
 import json
 import os
-
-import unittest
 from unittest.mock import patch
-
-from app import create_app, db
+from app import db
 from app.models import User, Tag
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
+from tests.conftest import BaseTestCase
 
 
 class MockResponse:
@@ -19,14 +11,10 @@ class MockResponse:
         self.text = text
 
 
-class GetTagsApiTests(unittest.TestCase):
+class GetTagsApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -43,9 +31,7 @@ class GetTagsApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_get_unarchived_tags(self, mock_check_token):
@@ -119,26 +105,18 @@ class GetTagsApiTests(unittest.TestCase):
         self.assertFalse(data.get("has_next"))
 
 
-class AddTagApiTests(unittest.TestCase):
+class AddTagApiTests(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
         db.session.add(user)
         db.session.commit()
-        return super().setUp()
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        return super().tearDown()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_add_new_highlight(self, mock_check_token):
@@ -183,14 +161,10 @@ class AddTagApiTests(unittest.TestCase):
         self.assertEqual(tag.get("name"), body.get("name"))
 
 
-class GetTagApiTests(unittest.TestCase):
+class GetTagApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -198,9 +172,7 @@ class GetTagApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_tag_returns_error(self, mock_check_token):
@@ -234,26 +206,18 @@ class GetTagApiTests(unittest.TestCase):
         self.assertEqual(tag.name, returned_tag.get("name"))
 
 
-class UpdateTagApiTests(unittest.TestCase):
+class UpdateTagApiTests(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
         db.session.add(user)
         db.session.commit()
-        return super().setUp()
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        return super().tearDown()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_update_tag(self, mock_check_token):
@@ -338,7 +302,12 @@ class UpdateTagApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Resource not found")
 
-        tag2 = Tag(user_id=2)
+        # Create a second user for testing wrong user access
+        user2 = User(email="test2@test.com")
+        db.session.add(user2)
+        db.session.commit()
+
+        tag2 = Tag(user_id=user2.id)
         db.session.add(tag2)
         db.session.commit()
 
@@ -354,14 +323,10 @@ class UpdateTagApiTests(unittest.TestCase):
         self.assertEqual(data.get("message"), "Resource not found")
 
 
-class DeleteTagApiTests(unittest.TestCase):
+class DeleteTagApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -369,9 +334,7 @@ class DeleteTagApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_tag_returns_error(self, mock_check_token):

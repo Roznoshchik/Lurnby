@@ -3,19 +3,12 @@ import json
 import os
 from pathlib import Path
 from uuid import uuid4, UUID
-import unittest
 from unittest.mock import patch
 
-from app import create_app, db
+from app import db
 from app.models import Article, User, Tag
-from config import Config
-
+from tests.conftest import BaseTestCase
 from tests.mocks.mocks import mock_articles, mock_tags
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
 class MockResponse:
@@ -23,14 +16,10 @@ class MockResponse:
         self.text = text
 
 
-class AddArticleApiTests(unittest.TestCase):
+class AddArticleApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -38,9 +27,7 @@ class AddArticleApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_add_supplied_epub_article(self, mock_check_token):
@@ -329,14 +316,10 @@ class AddArticleApiTests(unittest.TestCase):
         self.assertEqual('upload_file_ext should be ".epub" or ".pdf"', data["message"])
 
 
-class GetArticleApiTests(unittest.TestCase):
+class GetArticleApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -365,9 +348,7 @@ class GetArticleApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_get_articles(self, mock_check_token):
@@ -561,14 +542,10 @@ class GetArticleApiTests(unittest.TestCase):
         self.assertIsNotNone(data["has_next"])
 
 
-class UpdateArticleApiTests(unittest.TestCase):
+class UpdateArticleApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -576,9 +553,7 @@ class UpdateArticleApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_article_returns_error(self, mock_check_token):
@@ -673,14 +648,10 @@ class UpdateArticleApiTests(unittest.TestCase):
         self.assertCountEqual(article.tag_list, body["tags"])
 
 
-class DeleteArticleApiTests(unittest.TestCase):
+class DeleteArticleApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -688,9 +659,7 @@ class DeleteArticleApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_article_returns_error(self, mock_check_token):
@@ -725,14 +694,10 @@ class DeleteArticleApiTests(unittest.TestCase):
         self.assertIsNone(article)
 
 
-class ExportArticleApiTests(unittest.TestCase):
+class ExportArticleApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -740,9 +705,7 @@ class ExportArticleApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.tasks.send_email")
     @patch("app.tasks.s3")

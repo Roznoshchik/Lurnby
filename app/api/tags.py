@@ -8,6 +8,7 @@ from app.api.auth import token_auth
 from app.api.errors import bad_request, LurnbyValueError, error_response
 from app.api.helpers.query_maker import apply_pagination
 from app.models import Event, Tag
+from app.models.event import EventName
 
 
 logger = CustomLogger("API")
@@ -59,7 +60,7 @@ def tag():
             tag.uuid = uuid
         db.session.add(tag)
 
-        ev = Event.add("added tag", user=user)
+        ev = Event.add(EventName.ADDED_TAG, user=user)
         db.session.add(ev)
         db.session.commit()
 
@@ -109,7 +110,7 @@ def update_tag(uuid):
             if key in tag.fields_that_can_be_updated:
                 setattr(tag, key, value)
 
-        ev = Event.add("updated tag", user=user)
+        ev = Event.add(EventName.UPDATED_TAG, user=user)
         db.session.add(ev)
         db.session.commit()
 
@@ -136,7 +137,7 @@ def delete_tag(uuid):
             return error_response(404, "Resource not found")
 
         db.session.delete(tag)
-        ev = Event.add("deleted tag", user=user)
+        ev = Event.add(EventName.DELETED_TAG, user=user)
         db.session.add(ev)
 
         db.session.commit()

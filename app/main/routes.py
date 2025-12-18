@@ -26,6 +26,7 @@ from app.models import (
     highlights_topics,
     Event,
 )
+from app.models.event import EventName
 
 from app.ReadabiliPy.readabilipy.simple_json import simple_json_from_html_string
 
@@ -71,11 +72,10 @@ def articles():
         Event.user_id == current_user.id,
     ).first()
     if not ev:
-        ev = Event(
-            user_id=current_user.id, name="visited platform", date=datetime.utcnow()
-        )
-        db.session.add(ev)
-        db.session.commit()
+        ev = Event.add(EventName.VISITED_PLATFORM, daily=True)
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
 
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
     review_streak = Event.query.filter(
@@ -274,11 +274,10 @@ def export_highlights():
         )
     else:
 
-        ev = Event(
-            user_id=current_user.id, name="exported highlights", date=datetime.utcnow()
-        )
-        db.session.add(ev)
-        db.session.commit()
+        ev = Event.add(EventName.EXPORTED_HIGHLIGHTS)
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
 
         data = json.loads(request.form["data"])
         u = User.query.get(current_user.id)
@@ -561,11 +560,10 @@ def add_by_email():
         new_article.date_read_date = datetime.utcnow().date()
         new_article.estimated_reading()
 
-        ev = Event(
-            user_id=current_user.id, name="added article", date=datetime.utcnow()
-        )
-        db.session.add(ev)
-        db.session.commit()
+        ev = Event.add(EventName.ADDED_ARTICLE)
+        if ev:
+            db.session.add(ev)
+            db.session.commit()
 
         u.launch_task("set_images_lazy", "lazy load images", new_article.id)
         u.launch_task("set_absolute_urls", "set absolute urls", new_article.id)
@@ -667,10 +665,9 @@ def feedback():
     logger.info("sending email - Feedback submit")
     send_email(subject, sender, recipients, text_body, html_body)
     update_user_last_action("submitted feedback")
-    ev = Event(
-        user_id=current_user.id, name="submitted feedback", date=datetime.utcnow()
-    )
-    db.session.add(ev)
+    ev = Event.add(EventName.SUBMITTED_FEEDBACK)
+    if ev:
+        db.session.add(ev)
 
     return "Thank you for the feedback!"
 
@@ -706,10 +703,9 @@ def add_suggested_article():
     db.session.add(new_article)
     new_article.date_read_date = datetime.utcnow().date()
     new_article.estimated_reading()
-    ev = Event(
-        user_id=current_user.id, name="added suggested article", date=datetime.utcnow()
-    )
-    db.session.add(ev)
+    ev = Event.add(EventName.ADDED_SUGGESTED_ARTICLE)
+    if ev:
+        db.session.add(ev)
 
     db.session.commit()
 
@@ -838,7 +834,7 @@ def add_article():
 
             new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
-            ev = Event.add("added article")
+            ev = Event.add(EventName.ADDED_ARTICLE)
             if ev:
                 db.session.add(ev)
                 db.session.commit()
@@ -886,7 +882,7 @@ def add_article():
             db.session.add(new_article)
             new_article.date_read_date = datetime.utcnow().date()
             new_article.estimated_reading()
-            ev = Event.add("added article")
+            ev = Event.add(EventName.ADDED_ARTICLE)
             if ev:
                 db.session.add(ev)
                 db.session.commit()
@@ -960,9 +956,10 @@ def bg_add_article():
         file=None,
     )
     update_user_last_action("added article")
-    ev = Event(user_id=current_user.id, name="added article", date=datetime.utcnow())
-    db.session.add(ev)
-    db.session.commit()
+    ev = Event.add(EventName.ADDED_ARTICLE)
+    if ev:
+        db.session.add(ev)
+        db.session.commit()
     res = json.dumps({"taskID": new_task.id})
     return (res, 200, {"ContentType": "application/json"})
 
@@ -999,7 +996,7 @@ def process_article(task_id, a_uuid):
                 showing=showing,
                 articles=articles,
             )
-            ev = Event.add("added article")
+            ev = Event.add(EventName.ADDED_ARTICLE)
             if ev:
                 db.session.add(ev)
                 db.session.commit()
@@ -1078,10 +1075,9 @@ def article(uuid):
         article.unread = False
         article.last_reviewed = datetime.utcnow()
 
-        ev = Event(
-            user_id=current_user.id, name="opened article", date=datetime.utcnow()
-        )
-        db.session.add(ev)
+        ev = Event.add(EventName.OPENED_ARTICLE)
+        if ev:
+            db.session.add(ev)
 
         db.session.commit()
 
@@ -1429,8 +1425,9 @@ def addhighlight():
 
     db.session.add(newHighlight)
 
-    ev = Event(user_id=current_user.id, name="added highlight", date=datetime.utcnow())
-    db.session.add(ev)
+    ev = Event.add(EventName.ADDED_HIGHLIGHT)
+    if ev:
+        db.session.add(ev)
 
     topics = data["topics"]
     article = Article.query.filter_by(uuid=data["article_uuid"]).first()
@@ -1448,10 +1445,9 @@ def addhighlight():
             newTopic = Topic(user_id=current_user.id, title=t, archived=False)
             db.session.add(newTopic)
 
-            ev = Event(
-                user_id=current_user.id, name="added topic", date=datetime.today()
-            )
-            db.session.add(ev)
+            ev = Event.add(EventName.ADDED_TOPIC)
+            if ev:
+                db.session.add(ev)
 
             newHighlight.AddToTopic(newTopic)
             newTopic.last_used = datetime.utcnow()
@@ -1568,10 +1564,9 @@ def view_highlight(id):
             else:
                 t = Topic(user_id=current_user.id, title=member, archived=False)
                 db.session.add(t)
-                ev = Event(
-                    user_id=current_user.id, name="added topic", date=datetime.today()
-                )
-                db.session.add(ev)
+                ev = Event.add(EventName.ADDED_TOPIC)
+                if ev:
+                    db.session.add(ev)
                 highlight.AddToTopic(t)
                 t.last_used = datetime.utcnow()
 
@@ -1583,7 +1578,7 @@ def view_highlight(id):
             if topic:
                 highlight.RemoveFromTopic(topic)
 
-        ev = Event.add("updated highlight")
+        ev = Event.add(EventName.UPDATED_HIGHLIGHT)
         if ev:
             db.session.add(ev)
 
@@ -1951,15 +1946,13 @@ def tier(id):
         Event.date < today_end,
     ).first()
     if not ev:
-        ev = Event(
-            user_id=current_user.id, name="reviewed highlights", date=datetime.utcnow()
-        )
-        db.session.add(ev)
+        ev = Event.add(EventName.REVIEWED_HIGHLIGHTS, daily=True)
+        if ev:
+            db.session.add(ev)
 
-    ev = Event(
-        user_id=current_user.id, name="reviewed a highlight", date=datetime.utcnow()
-    )
-    db.session.add(ev)
+    ev = Event.add(EventName.REVIEWED_A_HIGHLIGHT)
+    if ev:
+        db.session.add(ev)
 
     db.session.commit()
 

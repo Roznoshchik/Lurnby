@@ -2,17 +2,11 @@ from datetime import datetime, timedelta
 import json
 import os
 
-import unittest
 from unittest.mock import patch
 
-from app import create_app, db
+from app import db
 from app.models import Article, User, Tag, Highlight
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
+from tests.conftest import BaseTestCase
 
 
 class MockResponse:
@@ -20,14 +14,10 @@ class MockResponse:
         self.text = text
 
 
-class GetHighlightsApiTests(unittest.TestCase):
+class GetHighlightsApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -92,9 +82,7 @@ class GetHighlightsApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_get_unarchived_highlights(self, mock_check_token):
@@ -274,26 +262,18 @@ class GetHighlightsApiTests(unittest.TestCase):
         self.assertFalse(data["has_next"])
 
 
-class AddHighlightApiTests(unittest.TestCase):
+class AddHighlightApiTests(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
         db.session.add(user)
         db.session.commit()
-        return super().setUp()
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        return super().tearDown()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_add_new_highlight(self, mock_check_token):
@@ -466,14 +446,10 @@ class AddHighlightApiTests(unittest.TestCase):
         self.assertEqual(data.get("message"), "Text is a required field")
 
 
-class GetHighlightApiTests(unittest.TestCase):
+class GetHighlightApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -481,9 +457,7 @@ class GetHighlightApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_highlight_returns_error(self, mock_check_token):
@@ -517,26 +491,18 @@ class GetHighlightApiTests(unittest.TestCase):
         self.assertEqual(highlight.text, returned_highlight.get("text"))
 
 
-class UpdateHighlightApiTests(unittest.TestCase):
+class UpdateHighlightApiTests(BaseTestCase):
     def setUp(self) -> None:
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
         db.session.add(user)
         db.session.commit()
-        return super().setUp()
 
     def tearDown(self) -> None:
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
-        return super().tearDown()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_update_highlight(self, mock_check_token):
@@ -651,7 +617,12 @@ class UpdateHighlightApiTests(unittest.TestCase):
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Resource not found")
 
-        highlight2 = Highlight(user_id=2)
+        # Create a second user for testing wrong user access
+        user2 = User(email="test2@test.com")
+        db.session.add(user2)
+        db.session.commit()
+
+        highlight2 = Highlight(user_id=user2.id)
         db.session.add(highlight2)
         db.session.commit()
 
@@ -667,14 +638,10 @@ class UpdateHighlightApiTests(unittest.TestCase):
         self.assertEqual(data.get("message"), "Resource not found")
 
 
-class DeleteHighlightApiTests(unittest.TestCase):
+class DeleteHighlightApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -682,9 +649,7 @@ class DeleteHighlightApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_no_highlight_returns_error(self, mock_check_token):
@@ -718,14 +683,10 @@ class DeleteHighlightApiTests(unittest.TestCase):
         self.assertIsNone(highlight)
 
 
-class ExportHighlightApiTests(unittest.TestCase):
+class ExportHighlightApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -733,9 +694,7 @@ class ExportHighlightApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.tasks.send_email")
     @patch("app.tasks.s3")
@@ -771,14 +730,10 @@ class ExportHighlightApiTests(unittest.TestCase):
         self.assertEqual(mock_send_email.call_count, 1)
 
 
-class ReviewHighlightApiTests(unittest.TestCase):
+class ReviewHighlightApiTests(BaseTestCase):
     def setUp(self):
+        super().setUp()
         os.environ["testing"] = "1"
-        self.app = create_app(TestConfig)
-        self.app_context = self.app.app_context()
-        self.app_context.push()
-        self.client = self.app.test_client()
-        db.create_all()
 
         # setup user
         user = User(email="test@test.com")
@@ -901,9 +856,7 @@ class ReviewHighlightApiTests(unittest.TestCase):
         db.session.commit()
 
     def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-        self.app_context.pop()
+        super().tearDown()
 
     @patch("app.models.User.check_token")
     def test_get_highlights_for_review(self, mock_check_token):
