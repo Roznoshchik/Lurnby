@@ -1,0 +1,11 @@
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.loading-text {
+  font-size: 1.2rem;
+  color: #666;
+}
