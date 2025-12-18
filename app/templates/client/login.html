@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Lurnby</title>
+    {% if is_production %}
+        <link rel="stylesheet" href="{{ asset('style.css') }}">
+    {% else %}
+        <script type="module" src="{{ asset('@vite/client') }}"></script>
+        <script type="module" src="{{ asset('login.jsx') }}"></script>
+    {% endif %}
+</head>
+<body>
+    <div id="app"></div>
+    {% if is_production %}
+        <script type="module" src="{{ asset('login.jsx') }}"></script>
+    {% endif %}
+</body>
+</html>

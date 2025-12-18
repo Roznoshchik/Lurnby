@@ -144,6 +144,11 @@ def create_app(config_class=Config):
 
     app.register_blueprint(content_bp, url_prefix="/app")
 
+    from app.client import bp as client_bp
+
+    app.register_blueprint(client_bp, url_prefix="/client")
+    csrf.exempt(client_bp)
+
     from app.dotcom import bp as dotcom_bp
 
     app.register_blueprint(dotcom_bp)
