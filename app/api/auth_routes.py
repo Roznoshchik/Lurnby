@@ -1,10 +1,12 @@
 from flask import jsonify, request
-from app import db
+from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import basic_auth, token_auth
 from app.api.errors import bad_request
 from app.models import User
 
+
+logger = CustomLogger("API")
 
 @bp.post("/auth/login")
 @basic_auth.login_required
@@ -16,7 +18,6 @@ def login():
     Also sets refresh token as HttpOnly cookie for web browsers.
     """
     user = basic_auth.current_user()
-
     access_token = user.get_access_token()
     refresh_token = user.get_refresh_token()
     db.session.commit()
