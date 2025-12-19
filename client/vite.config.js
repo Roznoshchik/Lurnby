@@ -15,7 +15,7 @@ export default defineConfig({
     manifest: 'manifest.json',
     assetsDir: 'bundled',
     rollupOptions: {
-      input: ['./static/main.jsx', './static/style.css'],
+      input: ['./static/login.jsx', './static/style.css'],
     },
     emptyOutDir: true,
     copyPublicDir: false,

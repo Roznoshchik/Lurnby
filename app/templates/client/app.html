@@ -4,17 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lurnby</title>
-    {% if is_production %}
-        <link rel="stylesheet" href="{{ asset('style.css') }}">
-    {% else %}
-        <script type="module" src="{{ asset('@vite/client') }}"></script>
-        <script type="module" src="{{ asset('app.jsx') }}"></script>
-    {% endif %}
 </head>
 <body>
-    <div id="app"></div>
-    {% if is_production %}
-        <script type="module" src="{{ asset('app.jsx') }}"></script>
-    {% endif %}
+    <div id="app">
+        <h1>Lurnby App</h1>
+        <p>Welcome! You are logged in.</p>
+        <p>Articles page coming soon...</p>
+    </div>
 </body>
 </html>

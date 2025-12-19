@@ -5,6 +5,8 @@
  * The access token is stored privately within this module and never exposed.
  */
 
+import { ROUTES } from './routes.js';
+
 // Private module-level state (only place access token lives)
 let _accessToken = null;
 
@@ -35,7 +37,7 @@ export const clearAccessToken = () => {
  */
 export async function bootstrapAuth() {
   try {
-    const response = await fetch('/auth/refresh', {
+    const response = await fetch(ROUTES.API.REFRESH, {
       method: 'POST',
       credentials: 'include', // Send HttpOnly cookie
       headers: {
@@ -118,13 +120,16 @@ async function fetchWithAuth(url, options = {}) {
  */
 export async function login(username, password) {
   try {
-    const response = await fetch('/auth/login', {
+    // Encode credentials for HTTP Basic Auth
+    const credentials = btoa(`${username}:${password}`);
+
+    const response = await fetch(ROUTES.API.LOGIN, {
       method: 'POST',
       headers: {
+        'Authorization': `Basic ${credentials}`,
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify({ username, password }),
     });
 
     if (response.ok) {
@@ -149,7 +154,7 @@ export async function login(username, password) {
  */
 export async function loginWithGoogle(token) {
   try {
-    const response = await fetch('/auth/google', {
+    const response = await fetch(ROUTES.API.GOOGLE_LOGIN, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -179,7 +184,7 @@ export async function loginWithGoogle(token) {
  */
 export async function logout() {
   try {
-    await fetch('/auth/logout', {
+    await fetch(ROUTES.API.LOGOUT, {
       method: 'POST',
       credentials: 'include',
     });

@@ -1993,8 +1993,3 @@ def tier(id):
 def resources():
 
     return render_template("resources.html")
-
-
-@bp.route("/test-preact", methods=["GET"])
-def test_preact():
-    return render_template("test_preact.html")
