@@ -1,0 +1,130 @@
+/**
+ * Theme — Semantic Tokens
+ * Light / Dark overrides only
+ * References palette.css for all color values
+ */
+
+/* ================================================================
+   Light Theme (Default)
+   ================================================================ */
+
+:root {
+  /* --- Backgrounds --- */
+  --background: var(--white-100);
+  --card: var(--white-50);
+  --popover: var(--white-50);
+  --input-background: var(--white-200);
+  --secondary: var(--grey-300);
+  --accent: var(--grey-400);
+  --muted: var(--grey-500);
+  
+  /* --- Borders & UI Elements --- */
+  --border: var(--grey-500);
+  --input: transparent;
+  --switch-background: var(--grey-600);
+  --ring: var(--grey-700);
+  
+  /* --- Text Colors --- */
+  --foreground: var(--black-900);
+  --card-foreground: var(--black-900);
+  --popover-foreground: var(--black-900);
+  --secondary-foreground: var(--black-900);
+  --accent-foreground: var(--black-900);
+  --muted-foreground: var(--grey-800);
+  
+  /* --- Primary Actions --- */
+  --primary: var(--black-900);
+  --primary-foreground: var(--white-50);
+  
+  /* --- Destructive/Error --- */
+  --destructive: var(--rose-600);
+  --destructive-foreground: var(--white-50);
+  
+  /* --- Sidebar --- */
+  --sidebar: var(--neutral-50);
+  --sidebar-foreground: var(--neutral-900);
+  --sidebar-primary: var(--black-950);
+  --sidebar-primary-foreground: var(--neutral-50);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: var(--neutral-800);
+  --sidebar-border: var(--neutral-100);
+  --sidebar-ring: var(--neutral-300);
+  
+  /* --- Charts --- */
+  --chart-1: var(--orange-500);
+  --chart-2: var(--blue-300);
+  --chart-3: var(--blue-700);
+  --chart-4: var(--yellow-300);
+  --chart-5: var(--yellow-400);
+}
+
+
+/* ================================================================
+   Dark Theme
+   ================================================================ */
+
+.dark {
+  /* --- Backgrounds --- */
+  --background: var(--neutral-900);
+  --card: var(--neutral-900);
+  --popover: var(--neutral-900);
+  --secondary: var(--neutral-700);
+  --accent: var(--neutral-700);
+  --muted: var(--neutral-700);
+  
+  /* --- Borders & UI Elements --- */
+  --border: var(--neutral-700);
+  --input: var(--neutral-700);
+  --ring: var(--neutral-500);
+  
+  /* --- Text Colors --- */
+  --foreground: var(--neutral-50);
+  --card-foreground: var(--neutral-50);
+  --popover-foreground: var(--neutral-50);
+  --secondary-foreground: var(--neutral-50);
+  --accent-foreground: var(--neutral-50);
+  --muted-foreground: var(--neutral-300);
+  
+  /* --- Primary Actions --- */
+  --primary: var(--neutral-50);
+  --primary-foreground: var(--neutral-800);
+  
+  /* --- Destructive/Error --- */
+  --destructive: var(--red-700);
+  --destructive-foreground: var(--red-500);
+  
+  /* --- Sidebar --- */
+  --sidebar: var(--neutral-800);
+  --sidebar-foreground: var(--neutral-50);
+  --sidebar-primary: var(--purple-300);
+  --sidebar-primary-foreground: var(--neutral-50);
+  --sidebar-accent: var(--neutral-700);
+  --sidebar-accent-foreground: var(--neutral-50);
+  --sidebar-border: var(--neutral-700);
+  --sidebar-ring: var(--neutral-500);
+  
+  /* --- Charts --- */
+  --chart-1: var(--purple-300);
+  --chart-2: var(--teal-400);
+  --chart-3: var(--yellow-400);
+  --chart-4: var(--magenta-500);
+  --chart-5: var(--red-400);
+}
+
+
+/* ================================================================
+   Tag Colors (shared across themes)
+   ================================================================ */
+
+:root {
+  --tag-work: var(--blue-400);
+  --tag-technology: var(--purple-500);
+  --tag-science: var(--green-500);
+  --tag-environment: var(--green-400);
+  --tag-leadership: var(--gold-400);
+  --tag-arts: var(--rose-400);
+  --tag-culture: var(--purple-600);
+  --tag-healthcare: var(--rose-500);
+  --tag-economics: var(--blue-500);
+  --tag-philosophy: var(--purple-400);
+}
