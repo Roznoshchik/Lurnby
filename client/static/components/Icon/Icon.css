@@ -1,0 +1,45 @@
+/* Material Symbols styling */
+
+.material-symbols-outlined,
+.material-symbols-rounded,
+.material-symbols-sharp {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Filled variant */
+.material-symbols-outlined.filled,
+.material-symbols-rounded.filled,
+.material-symbols-sharp.filled {
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Size variants for buttons */
+button .material-symbols-outlined,
+button .material-symbols-rounded,
+button .material-symbols-sharp {
+  font-size: inherit;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+button.btn-sm .material-symbols-outlined,
+button.btn-sm .material-symbols-rounded,
+button.btn-sm .material-symbols-sharp {
+  width: var(--space-3);
+  height: var(--space-3);
+}
+
+button.btn-lg .material-symbols-outlined,
+button.btn-lg .material-symbols-rounded,
+button.btn-lg .material-symbols-sharp {
+  width: var(--space-6);
+  height: var(--space-6);
+}

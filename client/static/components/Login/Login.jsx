@@ -1,6 +1,7 @@
 import { useState } from 'preact/hooks';
 import { login } from '../../utils/api';
 import { ROUTES } from '../../utils/routes';
+import Button from '../Button/Button';
 import './Login.css';
 
 export default function Login() {
@@ -62,9 +63,9 @@ export default function Login() {
 
           {error && <div className="error-message">{error}</div>}
 
-          <button className="btn-default" type="submit" disabled={loading}>
+          <Button variant="default" type="submit" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
-          </button>
+          </Button>
         </form>
       </div>
     </div>
