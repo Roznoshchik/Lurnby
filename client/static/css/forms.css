@@ -19,7 +19,7 @@ input[type="time"],
 input[type="datetime-local"],
 textarea {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-2) var(--space-3);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   line-height: var(--line-height-normal);
@@ -82,7 +82,7 @@ textarea {
 
 select {
   width: 100%;
-  padding: 0.5rem 2rem 0.5rem 0.75rem;
+  padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-normal);
   line-height: var(--line-height-normal);
@@ -90,7 +90,7 @@ select {
   background-color: var(--input-background);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 0.75rem center;
+  background-position: right var(--space-3) center;
   background-size: 12px;
   border: 1px solid var(--input);
   border-radius: var(--radius-md);
@@ -116,8 +116,8 @@ select:disabled {
 
 input[type="checkbox"],
 input[type="radio"] {
-  width: 1rem;
-  height: 1rem;
+  width: var(--space-4);
+  height: var(--space-4);
   color: var(--primary);
   background-color: var(--input-background);
   border: 1px solid var(--input);
@@ -185,7 +185,7 @@ label {
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-normal);
   color: var(--foreground);
-  margin-bottom: 0.375rem;
+  margin-bottom: var(--space-1-5);
 }
 
 label.required::after {
@@ -200,15 +200,15 @@ label.required::after {
 fieldset {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 legend {
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   color: var(--foreground);
-  padding: 0 0.5rem;
+  padding: var(--space-0) var(--space-2);
 }
 
 /* ================================================================
@@ -216,23 +216,23 @@ legend {
    ================================================================ */
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: var(--space-4);
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.375rem;
+  margin-bottom: var(--space-1-5);
 }
 
 .form-group-inline {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .form-group-inline label {
-  margin-bottom: 0;
+  margin-bottom: var(--space-0);
 }
 
 /* ================================================================
@@ -271,14 +271,14 @@ select.success:focus {
 
 .error-message {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: var(--space-1);
   font-size: var(--font-size-sm);
   color: var(--destructive);
 }
 
 .help-text {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: var(--space-1);
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
 }
@@ -298,8 +298,8 @@ input[type="range"] {
 
 input[type="range"]::-webkit-slider-thumb {
   appearance: none;
-  width: 16px;
-  height: 16px;
+  width: var(--space-4);
+  height: var(--space-4);
   background: var(--primary);
   border-radius: 50%;
   cursor: pointer;
@@ -307,8 +307,8 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: var(--space-4);
+  height: var(--space-4);
   background: var(--primary);
   border: none;
   border-radius: 50%;
@@ -334,14 +334,14 @@ input[type="file"] {
 }
 
 input[type="file"]::file-selector-button {
-  padding: 0.5rem 1rem;
+  padding: var(--space-2) var(--space-4);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   color: var(--primary-foreground);
   background-color: var(--primary);
   border: none;
   border-radius: var(--radius-md);
-  margin-right: 0.75rem;
+  margin-right: var(--space-3);
   cursor: pointer;
   transition: opacity 150ms ease;
 }

@@ -1,15 +1,18 @@
 @import './palette.css';
 @import './theme.css';
 @import './text.css';
+@import './sizing.css';
 @import './forms.css';
 @import './buttons.css';
 
 :root {
-  --radius: 0.25rem;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: var(--space-0);    /* 0px */
+  --radius-md: var(--space-0-5);  /* 2px */
+  --radius-lg: var(--space-1);    /* 4px */
+  --radius-xl: var(--space-2);    /* 8px */
+
+  /* Default radius */
+  --radius: var(--radius-md);
 }
 
 /* ================================================================
