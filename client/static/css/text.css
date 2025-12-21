@@ -1,0 +1,161 @@
+/**
+ * Typography System
+ * Font scales, weights, and semantic text styles
+ */
+
+/* ================================================================
+   Font Size Scale
+   Base size: 16px (1rem)
+   ================================================================ */
+:root {
+  --font-size-xs:   0.75rem;    /* 12px */
+  --font-size-sm:   0.875rem;   /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-lg:   1.125rem;   /* 18px */
+  --font-size-xl:   1.25rem;    /* 20px */
+  --font-size-2xl:  1.5rem;     /* 24px */
+  --font-size-3xl:  1.875rem;   /* 30px */
+  --font-size-4xl:  2.25rem;    /* 36px */
+}
+
+/* ================================================================
+   Font Weight Scale
+   ================================================================ */
+:root {
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+}
+
+/* ================================================================
+   Line Height Scale
+   ================================================================ */
+:root {
+  --line-height-none:   1;
+  --line-height-tight:  1.25;
+  --line-height-normal: 1.5;
+  --line-height-loose:  1.75;
+}
+
+/* ================================================================
+   Letter Spacing
+   ================================================================ */
+:root {
+  --letter-spacing-tight:  -0.01em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide:   0.025em;
+}
+
+/* ================================================================
+   Base
+   ================================================================ */
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ================================================================
+   Headings
+   ================================================================ */
+
+h1 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+h4 {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+h5 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+h6 {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+/* ================================================================
+   Body Text
+   ================================================================ */
+
+p {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+small {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}
+
+strong,
+b {
+  font-weight: var(--font-weight-semibold);
+}
+
+em,
+i {
+  font-style: italic;
+}
+
+/* ================================================================
+   Interactive Elements
+   ================================================================ */
+
+label {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+button {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+}
+
+input,
+textarea,
+select {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-normal);
+}

@@ -1,0 +1,223 @@
+/**
+ * Buttons System
+ * All button styling centralized in CSS
+ */
+
+/* ================================================================
+   Base Button Styles
+   ================================================================ */
+
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  white-space: nowrap;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-none);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  outline: none;
+  cursor: pointer;
+  transition: all 150ms ease;
+  user-select: none;
+
+  /* Default sizing */
+  height: var(--space-9);
+  padding: var(--space-2) var(--space-4);
+}
+
+button:has(> [class*='material-symbols-']) {
+  padding-left: var(--space-3);
+  padding-right: var(--space-3);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 0;
+  opacity: 0.5;
+}
+
+/* ================================================================
+   Button Variants
+   ================================================================ */
+
+/* Default/Primary */
+.btn-default {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.btn-default:hover:not(:disabled) {
+  background-color: var(--primary);
+  opacity: 0.9;
+}
+
+/* Destructive */
+.btn-destructive {
+  background-color: var(--destructive);
+  color: white;
+}
+
+.btn-destructive:hover:not(:disabled) {
+  background-color: var(--destructive);
+  opacity: 0.9;
+}
+
+.btn-destructive:focus-visible {
+  outline-color: var(--destructive);
+  opacity: 0.2;
+}
+
+:is(.dark *) .btn-destructive {
+  background-color: var(--destructive);
+  opacity: 0.6;
+}
+
+:is(.dark *) .btn-destructive:hover:not(:disabled) {
+  opacity: 0.5;
+}
+
+:is(.dark *) .btn-destructive:focus-visible {
+  opacity: 0.4;
+}
+
+/* Outline */
+.btn-outline {
+  background-color: var(--background);
+  color: var(--foreground);
+  border-color: var(--border);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+:is(.dark *) .btn-outline {
+  background-color: var(--input);
+  opacity: 0.3;
+  border-color: var(--input);
+}
+
+:is(.dark *) .btn-outline:hover:not(:disabled) {
+  background-color: var(--input);
+  opacity: 0.5;
+}
+
+/* Secondary */
+.btn-secondary {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--secondary);
+  opacity: 0.8;
+}
+
+/* Ghost */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--foreground);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+:is(.dark *) .btn-ghost:hover:not(:disabled) {
+  background-color: var(--accent);
+  opacity: 0.5;
+}
+
+/* Link */
+.btn-link {
+  background-color: transparent;
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.btn-link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+/* ================================================================
+   Button Sizes
+   ================================================================ */
+
+.btn-sm {
+  height: var(--space-8);
+  padding: var(--space-2) var(--space-3);
+  gap: var(--space-1-5);
+  border-radius: var(--radius-md);
+}
+
+.btn-sm:has(> [class*='material-symbols-']) {
+  padding-left: var(--space-2-5);
+  padding-right: var(--space-2-5);
+}
+
+.btn-lg {
+  height: var(--space-10);
+  padding: var(--space-2) var(--space-6);
+  border-radius: var(--radius-md);
+}
+
+.btn-lg:has(> [class*='material-symbols-']) {
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+.btn-icon {
+  width: var(--space-9);
+  height: var(--space-9);
+  padding: var(--space-0);
+  border-radius: var(--radius-md);
+}
+
+/* ================================================================
+   Button Groups
+   ================================================================ */
+
+.button-group {
+  display: inline-flex;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.button-group button {
+  border-radius: 0;
+  margin-left: -1px;
+}
+
+.button-group button:first-child {
+  border-top-left-radius: var(--radius-md);
+  border-bottom-left-radius: var(--radius-md);
+  margin-left: 0;
+}
+
+.button-group button:last-child {
+  border-top-right-radius: var(--radius-md);
+  border-bottom-right-radius: var(--radius-md);
+}
+
+/* ================================================================
+   Loading State Animation
+   ================================================================ */
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

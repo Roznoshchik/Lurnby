@@ -1,4 +1,5 @@
 import { render } from 'preact';
+import './style.css';
 import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 import Login from './components/Login/Login';
 

@@ -1,6 +1,8 @@
 import { useState } from 'preact/hooks';
 import { login } from '../../utils/api';
 import { ROUTES } from '../../utils/routes';
+import Button from '../Button/Button';
+import './Login.css';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -27,40 +29,45 @@ export default function Login() {
   };
 
   return (
-    <div>
-      <h1>Login to Lurnby</h1>
-
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="username">Username:</label>
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            disabled={loading}
-          />
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1 className="login-title">Welcome to Lurnby</h1>
+          <p className="login-subtitle">Sign in to continue</p>
         </div>
 
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            disabled={loading}
-          />
-        </div>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
 
-        {error && <div style={{ color: 'red' }}>{error}</div>}
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-      </form>
+          {error && <div className="error-message">{error}</div>}
+
+          <Button variant="default" type="submit" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign in'}
+          </Button>
+        </form>
+      </div>
     </div>
   );
 }
