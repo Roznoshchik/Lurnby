@@ -258,15 +258,15 @@ select.error:focus {
 input.success,
 textarea.success,
 select.success {
-  border-color: #22c55e;
+  border-color: var(--success);
 }
 
 .form-success:focus,
 input.success:focus,
 textarea.success:focus,
 select.success:focus {
-  border-color: #22c55e;
-  box-shadow: 0 0 0 2px #22c55e;
+  border-color: var(--success);
+  box-shadow: 0 0 0 2px var(--success);
 }
 
 .error-message {

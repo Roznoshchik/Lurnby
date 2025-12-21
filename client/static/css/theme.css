@@ -39,7 +39,11 @@
   /* --- Destructive/Error --- */
   --destructive: var(--rose-600);
   --destructive-foreground: var(--white-50);
-  
+
+  /* --- Success --- */
+  --success: var(--green-600);
+  --success-foreground: var(--white-50);
+
   /* --- Sidebar --- */
   --sidebar: var(--neutral-50);
   --sidebar-foreground: var(--neutral-900);
@@ -92,7 +96,11 @@
   /* --- Destructive/Error --- */
   --destructive: var(--red-700);
   --destructive-foreground: var(--red-500);
-  
+
+  /* --- Success --- */
+  --success: var(--green-600);
+  --success-foreground: var(--white-50);
+
   /* --- Sidebar --- */
   --sidebar: var(--neutral-800);
   --sidebar-foreground: var(--neutral-50);
