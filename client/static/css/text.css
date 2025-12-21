@@ -32,6 +32,7 @@
    Line Height Scale
    ================================================================ */
 :root {
+  --line-height-none:   1;
   --line-height-tight:  1.25;
   --line-height-normal: 1.5;
   --line-height-loose:  1.75;

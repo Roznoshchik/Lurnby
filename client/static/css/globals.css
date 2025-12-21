@@ -1,6 +1,8 @@
 @import './palette.css';
 @import './theme.css';
 @import './text.css';
+@import './forms.css';
+@import './buttons.css';
 
 :root {
   --radius: 0.25rem;

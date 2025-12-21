@@ -36,12 +36,9 @@ export default function Login() {
         </div>
 
         <form className="login-form" onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label className="form-label" htmlFor="username">
-              Username
-            </label>
+          <div className="form-group">
+            <label htmlFor="username">Username</label>
             <input
-              className="form-input"
               id="username"
               type="text"
               value={username}
@@ -51,12 +48,9 @@ export default function Login() {
             />
           </div>
 
-          <div className="form-field">
-            <label className="form-label" htmlFor="password">
-              Password
-            </label>
+          <div className="form-group">
+            <label htmlFor="password">Password</label>
             <input
-              className="form-input"
               id="password"
               type="password"
               value={password}
@@ -68,7 +62,7 @@ export default function Login() {
 
           {error && <div className="error-message">{error}</div>}
 
-          <button className="submit-button" type="submit" disabled={loading}>
+          <button className="btn-default" type="submit" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
