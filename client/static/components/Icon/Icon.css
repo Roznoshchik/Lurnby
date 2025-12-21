@@ -21,25 +21,21 @@
     'opsz' 24;
 }
 
-/* Size variants for buttons */
+/* Size variants for buttons - controlled via font-size */
 button .material-symbols-outlined,
 button .material-symbols-rounded,
 button .material-symbols-sharp {
-  font-size: inherit;
-  width: var(--space-4);
-  height: var(--space-4);
+  font-size: var(--font-size-base);
 }
 
 button.btn-sm .material-symbols-outlined,
 button.btn-sm .material-symbols-rounded,
 button.btn-sm .material-symbols-sharp {
-  width: var(--space-3);
-  height: var(--space-3);
+  font-size: var(--font-size-xs);
 }
 
 button.btn-lg .material-symbols-outlined,
 button.btn-lg .material-symbols-rounded,
 button.btn-lg .material-symbols-sharp {
-  width: var(--space-6);
-  height: var(--space-6);
+  font-size: var(--font-size-2xl);
 }
