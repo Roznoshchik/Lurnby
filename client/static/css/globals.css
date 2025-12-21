@@ -11,6 +11,7 @@
   --radius-lg: var(--space-1);    /* 4px */
   --radius-xl: var(--space-2);    /* 8px */
   --radius-circle: 50%;           /* Fully circular */
+  --radius-pill: 999px;           /* pill shaped for tags */
 
   /* Default radius */
   --radius: var(--radius-md);
