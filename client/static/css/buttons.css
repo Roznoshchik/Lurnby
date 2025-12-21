@@ -29,7 +29,7 @@ button {
   padding: var(--space-2) var(--space-4);
 }
 
-button:has(> svg) {
+button:has(> [class*='material-symbols-']) {
   padding-left: var(--space-3);
   padding-right: var(--space-3);
 }
@@ -44,16 +44,6 @@ button:focus-visible {
   outline: 3px solid var(--ring);
   outline-offset: 0;
   opacity: 0.5;
-}
-
-button svg {
-  flex-shrink: 0;
-  pointer-events: none;
-}
-
-button svg:not([class*='size-']) {
-  width: var(--space-4);
-  height: var(--space-4);
 }
 
 /* ================================================================
@@ -173,7 +163,7 @@ button svg:not([class*='size-']) {
   border-radius: var(--radius-md);
 }
 
-.btn-sm:has(> svg) {
+.btn-sm:has(> [class*='material-symbols-']) {
   padding-left: var(--space-2-5);
   padding-right: var(--space-2-5);
 }
@@ -184,7 +174,7 @@ button svg:not([class*='size-']) {
   border-radius: var(--radius-md);
 }
 
-.btn-lg:has(> svg) {
+.btn-lg:has(> [class*='material-symbols-']) {
   padding-left: var(--space-4);
   padding-right: var(--space-4);
 }
