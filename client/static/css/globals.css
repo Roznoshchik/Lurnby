@@ -10,6 +10,7 @@
   --radius-md: var(--space-0-5);  /* 2px */
   --radius-lg: var(--space-1);    /* 4px */
   --radius-xl: var(--space-2);    /* 8px */
+  --radius-circle: 50%;           /* Fully circular */
 
   /* Default radius */
   --radius: var(--radius-md);

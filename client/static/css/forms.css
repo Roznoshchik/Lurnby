@@ -130,7 +130,7 @@ input[type="radio"] {
 }
 
 input[type="radio"] {
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
 }
 
 input[type="checkbox"]:checked,
@@ -159,7 +159,7 @@ input[type="radio"]:checked::after {
   width: 6px;
   height: 6px;
   background-color: var(--primary-foreground);
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   transform: translate(-50%, -50%);
 }
 
@@ -301,7 +301,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: var(--space-4);
   height: var(--space-4);
   background: var(--primary);
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   cursor: pointer;
   transition: all 150ms ease;
 }
@@ -311,7 +311,7 @@ input[type="range"]::-moz-range-thumb {
   height: var(--space-4);
   background: var(--primary);
   border: none;
-  border-radius: 50%;
+  border-radius: var(--radius-circle);
   cursor: pointer;
   transition: all 150ms ease;
 }
