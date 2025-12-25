@@ -1,0 +1,15 @@
+/* Main application layout styles */
+
+.app-container {
+  min-height: 100vh;
+}
+
+.main-content {
+  min-height: 100vh;
+}
+
+@media (min-width: 768px) {
+  .main-content {
+    margin-left: 16rem; /* 256px sidebar width */
+  }
+}

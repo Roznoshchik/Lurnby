@@ -1,0 +1,173 @@
+/* MobileNav Component Styles */
+
+/* ================================================================
+   Mobile Header
+   ================================================================ */
+
+.mobile-header {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .mobile-header {
+    display: none;
+  }
+}
+
+.mobile-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  height: 3.5rem;
+  width: 100%;
+}
+
+.mobile-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.mobile-logo .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--foreground);
+}
+
+.mobile-logo span {
+  letter-spacing: -0.025em;
+}
+
+.mobile-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Override icon size in mobile header buttons to maintain consistent sizing */
+.mobile-header-actions .btn-ghost .material-symbols-outlined,
+.mobile-header-actions .btn-ghost .material-symbols-rounded,
+.mobile-header-actions .btn-ghost .material-symbols-sharp {
+  font-size: 1.25rem;
+}
+
+/* Mobile dropdown menu */
+.mobile-dropdown {
+  border-top: 1px solid var(--border);
+  background-color: var(--card);
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.mobile-dropdown nav {
+  padding: var(--space-2);
+}
+
+.mobile-dropdown ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mobile-dropdown li {
+  margin-bottom: var(--space-1);
+}
+
+.mobile-dropdown li:last-child {
+  margin-bottom: 0;
+}
+
+.mobile-dropdown .nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  color: var(--foreground);
+  border-radius: var(--radius);
+  transition: background-color 150ms, color 150ms;
+  text-decoration: none;
+}
+
+.mobile-dropdown .nav-link:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.mobile-dropdown .nav-link .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.menu-link-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.menu-link-label .external-icon {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+/* ================================================================
+   Mobile Bottom Tab Bar
+   ================================================================ */
+
+.mobile-tab-bar {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background-color: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+@media (min-width: 768px) {
+  .mobile-tab-bar {
+    display: none;
+  }
+}
+
+.mobile-tab-bar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: var(--space-2);
+  width: 100%;
+}
+
+.tab-link {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-3);
+  color: var(--muted-foreground);
+  border-radius: var(--radius);
+  transition: color 150ms;
+  text-decoration: none;
+  min-width: 4rem;
+}
+
+.tab-link:hover {
+  color: var(--foreground);
+}
+
+.tab-link .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.tab-link span {
+  font-size: 0.75rem;
+}

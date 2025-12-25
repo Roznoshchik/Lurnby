@@ -40,7 +40,18 @@ def add_context():
         except Exception:
             return "asset-not-found"
 
+    def asset_css(file_path):
+        """Get CSS files for an entry point"""
+        if not is_production:
+            return []
+        try:
+            css_files = manifest.get(file_path, {}).get('css', [])
+            return [f"/static/dist/{css_file}" for css_file in css_files]
+        except Exception:
+            return []
+
     return {
         "asset": prod_asset if is_production else dev_asset,
+        "asset_css": asset_css,
         "is_production": is_production,
     }
