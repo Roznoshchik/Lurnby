@@ -4,8 +4,7 @@ import Icon from '../Icon/Icon';
 import logoCuteUrl from '../Logo/logo-cute.svg';
 import './Sidebar.css';
 
-export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard = false }) {
-  const [isExpanded, setIsExpanded] = useState(true);
+export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard = false, isExpanded = false, onToggle }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const mainNavItems = [
@@ -60,7 +59,7 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={onToggle}
           className="sidebar-toggle-btn"
           aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
         >

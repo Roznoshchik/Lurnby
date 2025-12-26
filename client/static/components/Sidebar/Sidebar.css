@@ -12,7 +12,7 @@
   height: 100vh;
   background-color: var(--card);
   border-right: 1px solid var(--border);
-  transition: all 300ms ease-in-out;
+  transition: width 300ms ease-in-out;
   flex-direction: column;
   z-index: 40;
 }
