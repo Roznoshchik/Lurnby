@@ -5,13 +5,19 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "preact": "^10.19.3"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.8.1",
-    "vite": "^5.0.10"
+    "@testing-library/preact": "^3.2.4",
+    "happy-dom": "^20.0.11",
+    "vite": "^5.0.10",
+    "vitest": "^4.0.16"
   }
 }

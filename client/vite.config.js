@@ -20,4 +20,9 @@ export default defineConfig({
     emptyOutDir: true,
     copyPublicDir: false,
   },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: './test-setup.js',
+  },
 });
