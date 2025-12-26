@@ -205,67 +205,82 @@ export const api = {
    * GET request
    * @param {string} endpoint - API endpoint (e.g., '/api/articles')
    * @param {object} params - Query parameters
-   * @returns {Promise<Response>}
+   * @returns {Promise<object>} Parsed JSON response
    */
   async get(endpoint, params = {}) {
     const queryString = Object.keys(params).length
       ? '?' + new URLSearchParams(params).toString()
       : '';
     const response = await fetchWithAuth(`${endpoint}${queryString}`);
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
   },
 
   /**
    * POST request
    * @param {string} endpoint - API endpoint
    * @param {object} data - Request body
-   * @returns {Promise<Response>}
+   * @returns {Promise<object>} Parsed JSON response
    */
   async post(endpoint, data = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
     });
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
   },
 
   /**
    * PATCH request
    * @param {string} endpoint - API endpoint
    * @param {object} data - Request body
-   * @returns {Promise<Response>}
+   * @returns {Promise<object>} Parsed JSON response
    */
   async patch(endpoint, data = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'PATCH',
       body: JSON.stringify(data),
     });
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
   },
 
   /**
    * PUT request
    * @param {string} endpoint - API endpoint
    * @param {object} data - Request body
-   * @returns {Promise<Response>}
+   * @returns {Promise<object>} Parsed JSON response
    */
   async put(endpoint, data = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
   },
 
   /**
    * DELETE request
    * @param {string} endpoint - API endpoint
-   * @returns {Promise<Response>}
+   * @returns {Promise<object>} Parsed JSON response
    */
   async delete(endpoint) {
     const response = await fetchWithAuth(endpoint, {
       method: 'DELETE',
     });
-    return response;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+    return response.json();
   },
 };
