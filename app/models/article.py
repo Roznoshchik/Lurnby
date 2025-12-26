@@ -1,4 +1,5 @@
 from datetime import datetime
+import math
 
 from bs4 import BeautifulSoup
 from flask import url_for
@@ -163,6 +164,13 @@ class Article(db.Model):
         return data
 
     def to_dict(self, preview=True):
+        # Handle None and NaN progress values
+        progress = self.progress
+        if progress is None:
+            progress = 0.0
+        elif math.isnan(progress):
+            progress = 0.0
+
         data = {
             "_id": self.id,
             "id": str(self.uuid),
@@ -178,7 +186,7 @@ class Article(db.Model):
             "notes": self.notes if not preview else None,
             "reflections": self.reflections if not preview else None,
             "read_time": self.read_time,
-            "progress": self.progress,
+            "progress": progress,
             "created_at": self.article_created_date,
             "highlights_count": self.highlights.count(),
             "tags": [
