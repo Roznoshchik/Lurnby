@@ -1,18 +1,4 @@
+{% set entry_point = 'login.jsx' %}
 {% extends "client/base.html" %}
 
 {% block title %}Login - Lurnby{% endblock %}
-
-{% block head %}
-    {% if is_production %}
-        <link rel="stylesheet" href="{{ asset('style.css') }}">
-    {% else %}
-        <script type="module" src="{{ asset('@vite/client') }}"></script>
-        <script type="module" src="{{ asset('login.jsx') }}"></script>
-    {% endif %}
-{% endblock %}
-
-{% block scripts %}
-    {% if is_production %}
-        <script type="module" src="{{ asset('login.jsx') }}"></script>
-    {% endif %}
-{% endblock %}

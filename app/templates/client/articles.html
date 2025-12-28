@@ -1,21 +1,4 @@
+{% set entry_point = 'articles.jsx' %}
 {% extends "client/base.html" %}
 
 {% block title %}Articles - Lurnby{% endblock %}
-
-{% block head %}
-    {% if is_production %}
-        <link rel="stylesheet" href="{{ asset('style.css') }}">
-        {% for css_file in asset_css('articles.jsx') %}
-        <link rel="stylesheet" href="{{ css_file }}">
-        {% endfor %}
-    {% else %}
-        <script type="module" src="{{ asset('@vite/client') }}"></script>
-        <script type="module" src="{{ asset('articles.jsx') }}"></script>
-    {% endif %}
-{% endblock %}
-
-{% block scripts %}
-    {% if is_production %}
-        <script type="module" src="{{ asset('articles.jsx') }}"></script>
-    {% endif %}
-{% endblock %}
