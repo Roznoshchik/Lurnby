@@ -11,6 +11,7 @@
 :root {
   /* --- Backgrounds --- */
   --background: var(--white-100);
+  --background-secondary: var(--cool-grey-300);
   --card: var(--white-50);
   --popover: var(--white-50);
   --input-background: var(--white-200);
@@ -73,6 +74,7 @@
 .dark {
   /* --- Backgrounds --- */
   --background: var(--neutral-900);
+  --background-secondary: var(--neutral-800);
   --card: var(--neutral-800);
   --popover: var(--neutral-800);
   --secondary: var(--neutral-700);
