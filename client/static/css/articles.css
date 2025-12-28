@@ -1,6 +1,148 @@
 /* Articles Page Styles */
 
 /* ================================================================
+   Page Header
+   ================================================================ */
+
+.page-header {
+  position: relative;
+  border-bottom: 1px solid var(--border);
+  background: var(--background-secondary);
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+  margin-top: 4rem;
+  background-image: url('../images/icons/notebook-markings.svg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@media (min-width: 768px) {
+  .page-header {
+    margin-top: 0;
+  }
+}
+
+.page-header-content {
+  position: relative;
+  z-index: 1;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+}
+
+.page-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.page-header-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.page-header-title .material-symbols-outlined {
+  font-size: var(--font-size-4xl);
+  color: var(--foreground);
+}
+
+.page-header-title h1 {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.page-header-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  font-weight: var(--font-weight-normal);
+}
+
+/* ================================================================
+   Monthly Stats Grid
+   ================================================================ */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card {
+  background-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--grey-400);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.stat-icon {
+  flex-shrink: 0;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-reviews .stat-icon {
+  background-color: var(--purple-400);
+}
+
+.stat-articles .stat-icon {
+  background-color: var(--blue-400);
+}
+
+.stat-highlights .stat-icon {
+  background-color: var(--gold-400);
+}
+
+.stat-icon .material-symbols-outlined {
+  font-size: var(--font-size-2xl);
+  color: var(--white-50);
+}
+
+.stat-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.stat-value {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  line-height: var(--line-height-tight);
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+  margin-top: var(--space-0-5);
+}
+
+.stat-period {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  margin-top: var(--space-0-5);
+}
+
+/* ================================================================
    Content Container
    ================================================================ */
 
