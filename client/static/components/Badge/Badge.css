@@ -1,0 +1,65 @@
+/* Badge Component Styles */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  border: 1px solid;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  width: fit-content;
+  white-space: nowrap;
+  flex-shrink: 0;
+  gap: var(--space-1);
+  transition: color 200ms, box-shadow 200ms;
+  overflow: hidden;
+}
+
+/* Default variant */
+.badge.variant-default {
+  border-color: transparent;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Secondary variant */
+.badge.variant-secondary {
+  border-color: transparent;
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+}
+
+/* Destructive variant */
+.badge.variant-destructive {
+  border-color: transparent;
+  background-color: var(--destructive);
+  color: var(--destructive-foreground);
+}
+
+/* Outline variant */
+.badge.variant-outline {
+  color: var(--foreground);
+}
+
+/* Icon sizing within badge */
+.badge .icon,
+.badge .material-symbols-outlined,
+.badge .material-symbols-rounded,
+.badge .material-symbols-sharp {
+  font-size: 0.875rem;
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+/* Tag color classes (computed from tag name hash) */
+.badge.tag-color-0 { color: var(--tag-color-0); border-color: var(--tag-color-0); }
+.badge.tag-color-1 { color: var(--tag-color-1); border-color: var(--tag-color-1); }
+.badge.tag-color-2 { color: var(--tag-color-2); border-color: var(--tag-color-2); }
+.badge.tag-color-3 { color: var(--tag-color-3); border-color: var(--tag-color-3); }
+.badge.tag-color-4 { color: var(--tag-color-4); border-color: var(--tag-color-4); }
+.badge.tag-color-5 { color: var(--tag-color-5); border-color: var(--tag-color-5); }
+.badge.tag-color-6 { color: var(--tag-color-6); border-color: var(--tag-color-6); }
+.badge.tag-color-7 { color: var(--tag-color-7); border-color: var(--tag-color-7); }
+.badge.tag-color-8 { color: var(--tag-color-8); border-color: var(--tag-color-8); }

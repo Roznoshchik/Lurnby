@@ -1,0 +1,18 @@
+/* Progress Component Styles */
+
+.progress {
+  position: relative;
+  height: var(--space-2);
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--secondary);
+}
+
+.progress-indicator {
+  height: 100%;
+  width: 100%;
+  flex: 1 1 0%;
+  background-color: var(--primary);
+  transition: transform 300ms ease-in-out;
+}

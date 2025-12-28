@@ -11,6 +11,7 @@
 :root {
   /* --- Backgrounds --- */
   --background: var(--white-100);
+  --background-secondary: var(--cool-grey-300);
   --card: var(--white-50);
   --popover: var(--white-50);
   --input-background: var(--white-200);
@@ -44,6 +45,9 @@
   --success: var(--green-600);
   --success-foreground: var(--white-50);
 
+  /* --- In Progress --- */
+  --in-progress: var(--gold-400);
+
   /* --- Sidebar --- */
   --sidebar: var(--neutral-50);
   --sidebar-foreground: var(--neutral-900);
@@ -70,8 +74,9 @@
 .dark {
   /* --- Backgrounds --- */
   --background: var(--neutral-900);
-  --card: var(--neutral-900);
-  --popover: var(--neutral-900);
+  --background-secondary: var(--neutral-800);
+  --card: var(--neutral-800);
+  --popover: var(--neutral-800);
   --secondary: var(--neutral-700);
   --accent: var(--neutral-700);
   --muted: var(--neutral-700);
@@ -101,6 +106,9 @@
   --success: var(--green-600);
   --success-foreground: var(--white-50);
 
+  /* --- In Progress --- */
+  --in-progress: var(--gold-400);
+
   /* --- Sidebar --- */
   --sidebar: var(--neutral-800);
   --sidebar-foreground: var(--neutral-50);
@@ -119,20 +127,18 @@
   --chart-5: var(--red-400);
 }
 
-
 /* ================================================================
-   Tag Colors (shared across themes)
+   Tag Colors (generic list)
    ================================================================ */
 
 :root {
-  --tag-work: var(--blue-400);
-  --tag-technology: var(--purple-500);
-  --tag-science: var(--green-500);
-  --tag-environment: var(--green-400);
-  --tag-leadership: var(--gold-400);
-  --tag-arts: var(--rose-400);
-  --tag-culture: var(--purple-600);
-  --tag-healthcare: var(--rose-500);
-  --tag-economics: var(--blue-500);
-  --tag-philosophy: var(--purple-400);
+  --tag-color-0: var(--blue-400);
+  --tag-color-1: var(--purple-500);
+  --tag-color-2: var(--green-500);
+  --tag-color-3: var(--gold-400);
+  --tag-color-4: var(--rose-500);
+  --tag-color-5: var(--blue-500);
+  --tag-color-6: var(--purple-400);
+  --tag-color-7: var(--rose-400);
+  --tag-color-8: var(--green-400);
 }

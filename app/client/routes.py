@@ -10,6 +10,11 @@ def login():
 
 
 @bp.get("/articles")
+def articles():
+    """Articles list page"""
+    return render_template("client/articles.html")
+
+
 @bp.get("/articles/<uuid>")
 @bp.get("/highlights")
 @bp.get("/review")

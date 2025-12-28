@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
 from enum import Enum
+from typing import Optional
 from flask_login import current_user
+import sqlalchemy as sa
+import sqlalchemy.orm as so
 
 from app.models.base import db
 
@@ -43,10 +46,15 @@ class EventName(Enum):
 
 
 class Event(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    name = db.Column(db.String())
-    date = db.Column(db.DateTime())
+    __tablename__ = 'event'
+    __table_args__ = (
+        sa.Index('ix_event_user_name_date', 'user_id', 'name', 'date'),
+    )
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"))
+    name: so.Mapped[str] = so.mapped_column(sa.String())
+    date: so.Mapped[datetime] = so.mapped_column(sa.DateTime())
 
     """
     Tracked Events
@@ -115,12 +123,13 @@ class Event(db.Model):
                 0,
             )
             today_end = today_start + timedelta(days=1)
-            ev = Event.query.filter(
+            stmt = sa.select(Event).where(
                 Event.name == event_name,
                 Event.date >= today_start,
                 Event.date < today_end,
                 Event.user_id == user.id,
-            ).first()
+            )
+            ev = db.session.scalar(stmt)
             if not ev:
                 ev = Event(user_id=user.id, name=event_name, date=datetime.utcnow())
                 update_user_last_action(event_name, user=user)
@@ -131,6 +140,79 @@ class Event(db.Model):
             ev = Event(user_id=user.id, name=event_name, date=datetime.utcnow())
             update_user_last_action(event_name, user=user)
             return ev
+
+    @staticmethod
+    def count_events(
+        user_id: int,
+        event_names: list[EventName],
+        start_date: datetime,
+        end_date: datetime
+    ) -> int:
+        """Count events by type, user, and date range
+
+        Args:
+            user_id: User ID to filter by
+            event_names: List of EventName enums to count
+            start_date: Start of date range (inclusive)
+            end_date: End of date range (exclusive)
+
+        Returns:
+            Count of matching events
+        """
+        # Convert EventName enums to their string values
+        name_values = [event.value for event in event_names]
+
+        stmt = sa.select(sa.func.count()).select_from(Event).where(
+            Event.user_id == user_id,
+            Event.name.in_(name_values),
+            Event.date >= start_date,
+            Event.date < end_date
+        )
+        count = db.session.scalar(stmt)
+
+        return count
+
+    @staticmethod
+    def count_reviews_this_month(user_id: int) -> int:
+        """Count review events for this month"""
+        now = datetime.utcnow()
+        month_start = datetime(now.year, now.month, 1, 0, 0)
+        next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
+
+        return Event.count_events(
+            user_id,
+            [EventName.REVIEWED_A_HIGHLIGHT, EventName.REVIEWED_HIGHLIGHTS],
+            month_start,
+            next_month
+        )
+
+    @staticmethod
+    def count_articles_opened_this_month(user_id: int) -> int:
+        """Count articles opened this month"""
+        now = datetime.utcnow()
+        month_start = datetime(now.year, now.month, 1, 0, 0)
+        next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
+
+        return Event.count_events(
+            user_id,
+            [EventName.OPENED_ARTICLE],
+            month_start,
+            next_month
+        )
+
+    @staticmethod
+    def count_highlights_added_this_month(user_id: int) -> int:
+        """Count highlights added or updated this month"""
+        now = datetime.utcnow()
+        month_start = datetime(now.year, now.month, 1, 0, 0)
+        next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
+
+        return Event.count_events(
+            user_id,
+            [EventName.ADDED_HIGHLIGHT, EventName.UPDATED_HIGHLIGHT],
+            month_start,
+            next_month
+        )
 
     def __repr__(self):
         return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'

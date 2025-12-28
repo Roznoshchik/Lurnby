@@ -1,0 +1,20 @@
+/* Main application layout styles */
+
+.app-container {
+  min-height: 100vh;
+}
+
+.main-content {
+  min-height: 100vh;
+  transition: margin-left 300ms ease-in-out;
+}
+
+@media (min-width: 768px) {
+  .main-content.sidebar-expanded {
+    margin-left: 16rem; /* 256px sidebar width */
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 4rem; /* 64px sidebar width */
+  }
+}

@@ -15,9 +15,14 @@ export default defineConfig({
     manifest: 'manifest.json',
     assetsDir: 'bundled',
     rollupOptions: {
-      input: ['./static/login.jsx', './static/style.css'],
+      input: ['./static/login.jsx', './static/articles.jsx', './static/style.css'],
     },
     emptyOutDir: true,
     copyPublicDir: false,
+  },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
+    setupFiles: './test-setup.js',
   },
 });
