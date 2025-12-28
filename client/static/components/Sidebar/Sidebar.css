@@ -49,12 +49,12 @@
   right: 0;
   top: 0;
   transform: translate(50%, -50%);
-  width: 2rem;
-  height: 2rem;
-  min-width: 2rem;
-  max-width: 2rem;
-  min-height: 2rem;
-  max-height: 2rem;
+  width: var(--space-8);
+  height: var(--space-8);
+  min-width: var(--space-8);
+  max-width: var(--space-8);
+  min-height: var(--space-8);
+  max-height: var(--space-8);
   padding: 0;
   gap: 0;
   border-radius: var(--radius-circle);
@@ -78,8 +78,8 @@
 }
 
 .sidebar-logo .icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: var(--space-10);
+  height: var(--space-10);
   color: var(--foreground);
 }
 
@@ -98,7 +98,7 @@
 .sidebar-bottom .btn-ghost .material-symbols-outlined,
 .sidebar-bottom .btn-ghost .material-symbols-rounded,
 .sidebar-bottom .btn-ghost .material-symbols-sharp {
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
 }
 
 /* ================================================================
@@ -146,8 +146,7 @@
 }
 
 .nav-link .icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  font-size: var(--font-size-xl);
   flex-shrink: 0;
 }
 
@@ -237,8 +236,7 @@
 }
 
 .menu-link .icon {
-  width: 1.25rem;
-  height: 1.25rem;
+  font-size: var(--font-size-xl);
 }
 
 .menu-link-label {
@@ -248,8 +246,7 @@
 }
 
 .menu-link-label .external-icon {
-  width: 0.75rem;
-  height: 0.75rem;
+  font-size: var(--font-size-sm);
 }
 
 /* ================================================================
