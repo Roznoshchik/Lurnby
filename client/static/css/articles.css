@@ -83,12 +83,16 @@
 .stat-card {
   background-color: rgba(255, 255, 255, 0.3);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--grey-400);
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   display: flex;
   align-items: center;
   gap: var(--space-4);
+}
+
+.dark .stat-card {
+  background-color: rgba(23, 23, 23, 0.5);
 }
 
 .stat-icon {
