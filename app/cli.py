@@ -39,6 +39,18 @@ def register(app):
         check_for_delete()
 
     @app.cli.command()
+    def build():
+        """Build frontend assets with Vite."""
+        client_dir = os.path.join(os.getcwd(), "client")
+        print("Building assets with Vite...")
+        try:
+            subprocess.run(["npm", "run", "build"], cwd=client_dir, check=True)  # nosec
+            print("Build complete!")
+        except subprocess.CalledProcessError as e:
+            print(f"Build failed with error: {e}")
+            raise
+
+    @app.cli.command()
     @click.option('--prod', is_flag=True, help='Run in production mode (use built assets, no Vite dev server)')
     def serve(prod):
         """Run Flask, Redis, RQ worker, and optionally Vite dev server concurrently."""
