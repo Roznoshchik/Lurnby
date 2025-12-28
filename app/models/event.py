@@ -123,12 +123,13 @@ class Event(db.Model):
                 0,
             )
             today_end = today_start + timedelta(days=1)
-            ev = Event.query.filter(
+            stmt = sa.select(Event).where(
                 Event.name == event_name,
                 Event.date >= today_start,
                 Event.date < today_end,
                 Event.user_id == user.id,
-            ).first()
+            )
+            ev = db.session.scalar(stmt)
             if not ev:
                 ev = Event(user_id=user.id, name=event_name, date=datetime.utcnow())
                 update_user_last_action(event_name, user=user)
@@ -161,12 +162,13 @@ class Event(db.Model):
         # Convert EventName enums to their string values
         name_values = [event.value for event in event_names]
 
-        count = Event.query.filter(
+        stmt = sa.select(sa.func.count()).select_from(Event).where(
             Event.user_id == user_id,
             Event.name.in_(name_values),
             Event.date >= start_date,
             Event.date < end_date
-        ).count()
+        )
+        count = db.session.scalar(stmt)
 
         return count
 
