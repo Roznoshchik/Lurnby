@@ -117,9 +117,7 @@ def add_article():
         if url:
             article = process_url_entry(article, url)
 
-        article = add_tags(
-            article=article, user_id=token_auth.current_user().id, tags=tags
-        )
+        article = add_tags(article=article, user_id=token_auth.current_user().id, tags=tags)
 
         article.processing = True
         db.session.commit()
@@ -265,9 +263,7 @@ def file_uploaded(article_uuid):
         upload_file_ext = request.args.get("upload_file_ext", None)
         if upload_file_ext and "." not in upload_file_ext:
             upload_file_ext = f".{upload_file_ext}"
-        if not upload_file_ext or (
-            upload_file_ext != ".epub" and upload_file_ext != ".pdf"
-        ):
+        if not upload_file_ext or (upload_file_ext != ".epub" and upload_file_ext != ".pdf"):
             return bad_request('upload_file_ext query arg should be ".epub" or ".pdf"')
 
         task = token_auth.current_user().launch_task(
@@ -312,9 +308,7 @@ def export_article(article_uuid):
         if article.user_id != user.id:
             return bad_request("The resource can't be found")
 
-        task = token_auth.current_user().launch_task(
-            "export_article", user=user, article=article, ext=export_file_ext
-        )
+        task = token_auth.current_user().launch_task("export_article", user=user, article=article, ext=export_file_ext)
         ev = Event.add(EventName.EXPORTED_ARTICLE, user=user)
         db.session.add(ev)
         db.session.commit()

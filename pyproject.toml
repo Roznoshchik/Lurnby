@@ -1,0 +1,17 @@
+[tool.black]
+line-length = 119
+extend-exclude = '''
+/(
+    \.git
+  | __pycache__
+  | \.github
+  | \.aws-sam
+  | \.vscode
+  | aws-dist
+  | frontend
+  | \.pytest_cache
+  | venv
+  | app/ReadabiliPy
+  | migrations
+)/
+'''

@@ -1,0 +1,69 @@
+repos:
+  # Python formatting
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        language_version: python3.12
+        types: [python]
+
+  # Python linting
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        name: Flake8 (strict)
+        args:
+          [
+            "--count",
+            "--select=E9,F63,F7,F82",
+            "--show-source",
+            "--statistics",
+          ]
+        language: python
+        types: [python]
+      - id: flake8
+        name: Flake8 (warnings)
+        args: ["--exit-zero", "--max-line-length=127"]
+        verbose: true
+        language: python
+        types: [python]
+
+  # Python security
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        args: ["-r", "app/", "-ll"]
+        files: ^app/
+        pass_filenames: false
+
+  # Python tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c '. venv/bin/activate && pytest'
+        language: system
+        pass_filenames: false
+        types: [python]
+
+  # JavaScript/Frontend tests
+  - repo: local
+    hooks:
+      - id: vitest
+        name: vitest
+        entry: bash -c 'cd client && npm run test:run'
+        language: system
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
+
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict

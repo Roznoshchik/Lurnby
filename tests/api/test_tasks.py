@@ -70,9 +70,7 @@ class TasksApiTests(unittest.TestCase):
         db.session.commit()
         article_uuid = str(article.uuid)
 
-        task = User.query.first().launch_task(
-            "bg_add_article", article_uuid=article_uuid, file_ext=".eoub", file=None
-        )
+        task = User.query.first().launch_task("bg_add_article", article_uuid=article_uuid, file_ext=".eoub", file=None)
 
         db.session.commit()
 

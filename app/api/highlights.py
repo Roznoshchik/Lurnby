@@ -58,11 +58,7 @@ def get_highlights():
         tag_ids = request.args.get("tag_ids", None)
 
         # filter query
-        article = (
-            Article.query.filter_by(uuid=UUID(article_id)).first()
-            if article_id
-            else None
-        )
+        article = Article.query.filter_by(uuid=UUID(article_id)).first() if article_id else None
         if article:
             query = Article.highlights
         else:
@@ -242,22 +238,14 @@ def export_highlights():
         export_file_ext = request.args.get("export_file_ext", "csv")
 
         # filter query
-        article = (
-            Article.query.filter_by(uuid=UUID(article_id)).first()
-            if article_id
-            else None
-        )
+        article = Article.query.filter_by(uuid=UUID(article_id)).first() if article_id else None
         if article:
             highlights = Article.highlights
         else:
             highlights = user.highlights
 
-        highlights = hqm.apply_all_filters(
-            highlights, status, tag_status, tag_ids, search_phrase
-        )
-        task = user.launch_task(
-            "export_highlights", highlights=highlights, ext=export_file_ext
-        )
+        highlights = hqm.apply_all_filters(highlights, status, tag_status, tag_ids, search_phrase)
+        task = user.launch_task("export_highlights", highlights=highlights, ext=export_file_ext)
         ev = Event.add(EventName.EXPORTED_HIGHLIGHTS, user=user)
         db.session.add(ev)
         db.session.commit()

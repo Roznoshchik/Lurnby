@@ -29,9 +29,7 @@ highlights_topics = db.Table(
 
 tags_highlights = db.Table(
     "tags_highlights",
-    db.Column(
-        "tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False, index=True
-    ),
+    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False, index=True),
     db.Column(
         "highlight_id",
         db.Integer,
@@ -61,9 +59,7 @@ class Highlight(db.Model):
     no_topics = db.Column(db.Boolean, default=True, index=True)
     untagged = db.Column(db.Boolean, default=True)
     note = db.Column(db.String, index=True)
-    tags = db.relationship(
-        "Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic"
-    )
+    tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic")
     position = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -155,11 +151,7 @@ class Highlight(db.Model):
 
     def not_added_topic(self):
 
-        query = (
-            db.session.query(highlights_topics)
-            .filter(highlights_topics.c.highlight_id == self.id)
-            .count()
-        )
+        query = db.session.query(highlights_topics).filter(highlights_topics.c.highlight_id == self.id).count()
 
         if query == 0:
             return True
@@ -192,11 +184,6 @@ class Highlight(db.Model):
             .outerjoin(tags_highlights, tags_highlights.c.tag_id == Tag.id)
             .filter(tags_highlights.c.highlight_id == self.id)
         )
-        q = (
-            db.session.query(Tag)
-            .filter(~Tag.id.in_(sub))
-            .filter_by(user_id=user.id, archived=False)
-            .all()
-        )
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id, archived=False).all()
 
         return q

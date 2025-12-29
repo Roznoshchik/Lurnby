@@ -53,9 +53,7 @@ class GetHighlightsApiTests(BaseTestCase):
         hlght7 = Highlight(article_id=art2.id, user_id=user.id, text="ma")
         hlght8 = Highlight(article_id=art2.id, user_id=user.id, text="and")
         hlght9 = Highlight(article_id=art3.id, user_id=user.id, text="pa")
-        hlght10 = Highlight(
-            article_id=art3.id, user_id=user.id, archived=True, text="Not the way"
-        )
+        hlght10 = Highlight(article_id=art3.id, user_id=user.id, archived=True, text="Not the way")
 
         db.session.add_all(
             [
@@ -403,9 +401,7 @@ class AddHighlightApiTests(BaseTestCase):
         data = json.loads(res.data)
         highlight = data.get("highlight")
 
-        self.assertCountEqual(
-            [tag.get("name") for tag in highlight.get("tags")], body.get("tags")
-        )
+        self.assertCountEqual([tag.get("name") for tag in highlight.get("tags")], body.get("tags"))
 
     @patch("app.models.User.check_token")
     def test_add_new_highlight_fails_with_bad_data(self, mock_check_token):
@@ -430,9 +426,7 @@ class AddHighlightApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            data.get("message"), "Highlight exists, use update methods instead."
-        )
+        self.assertEqual(data.get("message"), "Highlight exists, use update methods instead.")
 
         body = {"note": "this is super fun", "source": "my favorite friend!"}
 
@@ -482,9 +476,7 @@ class GetHighlightApiTests(BaseTestCase):
         db.session.commit()
 
         uuid = highlight.uuid
-        res = self.client.get(
-            "/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"})
         data = json.loads(res.data)
         returned_highlight = data.get("highlight")
         self.assertEqual(res.status_code, 200)
@@ -580,9 +572,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         returned_highlight = data.get("highlight")
-        self.assertCountEqual(
-            highlight.to_dict().get("tags"), returned_highlight.get("tags")
-        )
+        self.assertCountEqual(highlight.to_dict().get("tags"), returned_highlight.get("tags"))
         self.assertCountEqual(highlight.tag_list, body.get("tags"))
 
     @patch("app.models.User.check_token")
@@ -674,9 +664,7 @@ class DeleteHighlightApiTests(BaseTestCase):
         db.session.commit()
 
         uuid = highlight.uuid
-        res = self.client.delete(
-            "/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.delete("/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
 
         highlight = Highlight.query.filter_by(uuid=uuid).first()
@@ -699,9 +687,7 @@ class ExportHighlightApiTests(BaseTestCase):
     @patch("app.tasks.send_email")
     @patch("app.tasks.s3")
     @patch("app.models.User.check_token")
-    def test_export_article_returns_task(
-        self, mock_check_token, mock_s3, mock_send_email
-    ):
+    def test_export_article_returns_task(self, mock_check_token, mock_s3, mock_send_email):
         user = User.query.first()
         mock_check_token.return_value = user
 
@@ -763,57 +749,31 @@ class ReviewHighlightApiTests(BaseTestCase):
             review_schedule=1,
             text="arkansas",
         )
-        hlght3 = Highlight(
-            user_id=user.id, review_date=today, review_schedule=1, text="I"
-        )
-        hlght4 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="do"
-        )
-        hlght5 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="love"
-        )
-        hlght6 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="my"
-        )
-        hlght7 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="ma"
-        )
-        hlght8 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="and"
-        )
-        hlght9 = Highlight(
-            user_id=user.id, review_date=today - three, review_schedule=1, text="pa"
-        )
-        hlght10 = Highlight(
-            user_id=user.id, review_date=today - week, review_schedule=2, text="not"
-        )
+        hlght3 = Highlight(user_id=user.id, review_date=today, review_schedule=1, text="I")
+        hlght4 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="do")
+        hlght5 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="love")
+        hlght6 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="my")
+        hlght7 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="ma")
+        hlght8 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="and")
+        hlght9 = Highlight(user_id=user.id, review_date=today - three, review_schedule=1, text="pa")
+        hlght10 = Highlight(user_id=user.id, review_date=today - week, review_schedule=2, text="not")
         hlght11 = Highlight(
             user_id=user.id,
             review_date=today - two_weeks,
             review_schedule=3,
             text="the",
         )
-        hlght12 = Highlight(
-            user_id=user.id, review_date=today - month, review_schedule=4, text="way"
-        )
+        hlght12 = Highlight(user_id=user.id, review_date=today - month, review_schedule=4, text="way")
         hlght13 = Highlight(
             user_id=user.id,
             review_date=today - three_months,
             review_schedule=5,
             text="that",
         )
-        hlght14 = Highlight(
-            user_id=user.id, review_date=today - half_year, review_schedule=6, text="I"
-        )
-        hlght15 = Highlight(
-            user_id=user.id, review_date=today - year, review_schedule=7, text="do"
-        )
-        hlght16 = Highlight(
-            user_id=user.id, review_date=today - year, review_schedule=7, text="love"
-        )
-        hlght17 = Highlight(
-            user_id=user.id, review_date=today - year, review_schedule=7, text="you"
-        )
+        hlght14 = Highlight(user_id=user.id, review_date=today - half_year, review_schedule=6, text="I")
+        hlght15 = Highlight(user_id=user.id, review_date=today - year, review_schedule=7, text="do")
+        hlght16 = Highlight(user_id=user.id, review_date=today - year, review_schedule=7, text="love")
+        hlght17 = Highlight(user_id=user.id, review_date=today - year, review_schedule=7, text="you")
 
         db.session.add_all(
             [

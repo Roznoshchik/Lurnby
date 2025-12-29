@@ -65,9 +65,7 @@ def add_tags(highlight, tags=[]):
     """
 
     for tag_name in tags:
-        tag = Tag.query.filter_by(
-            name=tag_name.lower(), user_id=highlight.user_id
-        ).first()
+        tag = Tag.query.filter_by(name=tag_name.lower(), user_id=highlight.user_id).first()
         if not tag:
             tag = Tag(user_id=highlight.user_id, name=tag_name.lower())
             db.session.add(tag)

@@ -51,7 +51,96 @@ def register(app):
             raise
 
     @app.cli.command()
-    @click.option('--prod', is_flag=True, help='Run in production mode (use built assets, no Vite dev server)')
+    @click.option("--python-only", is_flag=True, help="Format only Python files")
+    @click.option("--client-only", is_flag=True, help="Format only client files")
+    def format(python_only, client_only):
+        """Format code with black (Python) and biome (client)."""
+        client_dir = os.path.join(os.getcwd(), "client")
+
+        if client_only or not python_only:
+            print("Running biome formatter on client files...")
+            try:
+                subprocess.run(["npm", "run", "format"], cwd=client_dir, check=True)  # nosec
+                print("Client formatting complete!")
+            except subprocess.CalledProcessError as e:
+                print(f"Client formatting failed with error: {e}")
+                raise
+
+        if python_only or not client_only:
+            print("Running black formatter on Python files...")
+            try:
+                subprocess.run(["black", "."], check=True)  # nosec
+                print("Python formatting complete!")
+            except subprocess.CalledProcessError as e:
+                print(f"Python formatting failed with error: {e}")
+                raise
+
+    @app.cli.command()
+    @click.option("--python-only", is_flag=True, help="Lint only Python files")
+    @click.option("--client-only", is_flag=True, help="Lint only client files")
+    def lint(python_only, client_only):
+        """Check code with flake8 (Python) and biome (client)."""
+        client_dir = os.path.join(os.getcwd(), "client")
+        has_errors = False
+
+        if client_only or not python_only:
+            print("Running biome linter on client files...")
+            try:
+                subprocess.run(["npm", "run", "lint"], cwd=client_dir, check=True)  # nosec
+                print("Client linting complete - no issues found!")
+            except subprocess.CalledProcessError:
+                print("Client linting found issues")
+                has_errors = True
+
+        if python_only or not client_only:
+            print("\nRunning flake8 linter on Python files...")
+            # First, check for serious errors only (following pre-commit pattern)
+            try:
+                subprocess.run(
+                    ["flake8", "--count", "--select=E9,F63,F7,F82", "--show-source", "--statistics"],
+                    check=True,
+                )  # nosec
+            except subprocess.CalledProcessError:
+                print("Python linting found SERIOUS ERRORS (see output above)")
+                has_errors = True
+
+            # Then, show all warnings without failing (following pre-commit pattern)
+            print("Checking for style warnings...")
+            subprocess.run(["flake8", "--exit-zero"], check=False)  # nosec
+
+            if not has_errors:
+                print("Python linting complete - no serious errors found!")
+
+        if has_errors:
+            raise subprocess.CalledProcessError(1, "lint")
+
+    @app.cli.command()
+    @click.option("--all", is_flag=True, help="Run both pytest and npm tests")
+    def test(all):
+        """Run frontend tests with Vitest. Use --all to run both Python and frontend tests."""
+        client_dir = os.path.join(os.getcwd(), "client")
+
+        if all:
+            # Run pytest first
+            print("Running Python tests with pytest...")
+            try:
+                subprocess.run(["pytest"], check=True)  # nosec
+                print("Python tests complete!")
+            except subprocess.CalledProcessError as e:
+                print(f"Python tests failed with error: {e}")
+                raise
+
+        # Run npm tests
+        print("Running frontend tests with Vitest...")
+        try:
+            subprocess.run(["npm", "run", "test:run"], cwd=client_dir, check=True)  # nosec
+            print("Frontend tests complete!")
+        except subprocess.CalledProcessError as e:
+            print(f"Frontend tests failed with error: {e}")
+            raise
+
+    @app.cli.command()
+    @click.option("--prod", is_flag=True, help="Run in production mode (use built assets, no Vite dev server)")
     def serve(prod):
         """Run Flask, Redis, RQ worker, and optionally Vite dev server concurrently."""
         processes = []

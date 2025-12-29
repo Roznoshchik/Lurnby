@@ -23,9 +23,7 @@ class Config(object):
     # Google Client Configs
     GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
     GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
-    GOOGLE_DISCOVERY_URL = (
-        "https://accounts.google.com/.well-known/openid-configuration"
-    )
+    GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
     LOG_TO_STDOUT = os.environ.get("LOG_TO_STDOUT")
     MAIL_SERVER = "smtp.sendgrid.net"

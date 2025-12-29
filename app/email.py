@@ -20,9 +20,7 @@ def send_email(
     sync=False,
     extra_headers=None,
 ):
-    msg = Message(
-        subject, sender=sender, recipients=recipients, extra_headers=extra_headers
-    )
+    msg = Message(subject, sender=sender, recipients=recipients, extra_headers=extra_headers)
     msg.body = text_body
     msg.html = html_body
     if attachments:
@@ -31,6 +29,4 @@ def send_email(
     if sync:
         mail.send(msg)
     else:
-        Thread(
-            target=send_async_email, args=(current_app._get_current_object(), msg)
-        ).start()
+        Thread(target=send_async_email, args=(current_app._get_current_object(), msg)).start()

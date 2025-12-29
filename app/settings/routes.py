@@ -15,8 +15,6 @@ from app.auth.forms import UpdateAccountForm, UpdatePasswordForm, UpdateEmailFor
 from app.settings.email import send_email_verification, send_delete_verification
 from app import db
 
-from datetime import datetime
-
 
 # ############################### #
 # ##     Account settings      ## #
@@ -42,9 +40,7 @@ def settings_account():
         db.session.commit()
 
     u = {
-        "username": current_user.username
-        if current_user.username
-        else current_user.email,
+        "username": current_user.username if current_user.username else current_user.email,
         "name": current_user.firstname if current_user.firstname else None,
         "email": current_user.email,
     }
@@ -76,9 +72,7 @@ def update_password():
             else:
                 flash("Current password is incorrect", "error")
                 # return redirect(url_for('settings.update_password'))
-                return render_template(
-                    "settings/settings_password.html", form=form, pw=pw
-                )
+                return render_template("settings/settings_password.html", form=form, pw=pw)
         else:
             current_user.set_password(new)
 
@@ -224,16 +218,12 @@ def settings_content():
             db.session.add(ev)
 
         db.session.commit()
-        approved_senders = Approved_Sender.query.filter_by(
-            user_id=current_user.id
-        ).all()
+        approved_senders = Approved_Sender.query.filter_by(user_id=current_user.id).all()
 
         # return redirect(url_for('settings.settings_content'))
 
     # return render_template('settings.html',form=form, senders=approved_senders)
-    return render_template(
-        "settings/settings_content.html", form=form, senders=approved_senders
-    )
+    return render_template("settings/settings_content.html", form=form, senders=approved_senders)
 
 
 # ########################## #
@@ -310,6 +300,4 @@ def comms():
 
         flash("Preferences updated", "success")
 
-    return render_template(
-        "settings/settings_communication.html", form=form, comms=comms
-    )
+    return render_template("settings/settings_communication.html", form=form, comms=comms)

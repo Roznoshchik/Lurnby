@@ -1,21 +1,25 @@
-import { useState } from 'preact/hooks';
-import Button from '../Button/Button';
-import Icon from '../Icon/Icon';
-import logoCuteUrl from '../Logo/logo-cute.svg';
-import './MobileNav.css';
+import { useState } from 'preact/hooks'
+import Button from '../Button/Button'
+import Icon from '../Icon/Icon'
+import logoCuteUrl from '../Logo/logo-cute.svg'
+import './MobileNav.css'
 
 export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard = false }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const mainNavItems = [
     { href: '/client/articles', icon: 'book', label: 'Articles' },
     { href: '/client/highlights', icon: 'ink_highlighter', label: 'Highlights' },
     { href: '/client/review', icon: 'rotate_left', label: 'Review' },
     { href: '/client/tags', icon: 'sell', label: 'Tags' },
-  ];
+  ]
 
   if (showAppDashboard) {
-    mainNavItems.push({ href: '/client/app_dashboard/users', icon: 'dashboard', label: 'Dashboard' });
+    mainNavItems.push({
+      href: '/client/app_dashboard/users',
+      icon: 'dashboard',
+      label: 'Dashboard',
+    })
   }
 
   const secondaryNavItems = [
@@ -23,7 +27,7 @@ export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard
     { href: '/client/resources', icon: 'menu_book', label: 'Guides' },
     { href: '/client/settings', icon: 'settings', label: 'Settings' },
     { href: '/api/auth/logout', icon: 'logout', label: 'Logout' },
-  ];
+  ]
 
   return (
     <>
@@ -42,7 +46,7 @@ export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard
               onClick={onDarkModeToggle}
               aria-label="Toggle dark mode"
             >
-              <Icon name={darkMode ? "light_mode" : "dark_mode"} />
+              <Icon name={darkMode ? 'light_mode' : 'dark_mode'} />
             </Button>
 
             <Button
@@ -87,11 +91,7 @@ export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard
       <nav className="mobile-tab-bar">
         <div className="mobile-tab-bar-content">
           {mainNavItems.slice(0, 4).map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="tab-link"
-            >
+            <a key={item.href} href={item.href} className="tab-link">
               <Icon name={item.icon} className="icon" />
               <span>{item.label}</span>
             </a>
@@ -99,5 +99,5 @@ export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard
         </div>
       </nav>
     </>
-  );
+  )
 }

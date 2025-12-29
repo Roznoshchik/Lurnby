@@ -11,7 +11,8 @@ from flask_login import UserMixin
 from sqlalchemy import event
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from app.models.base import db, login, CustomLogger, redis, rq, generate_str_id
+from app import db, login, CustomLogger
+from app.models.base import generate_str_id, redis
 
 
 logger = CustomLogger("MODELS")
@@ -37,20 +38,12 @@ class User(UserMixin, db.Model):
     ##############################
     ####    Relationships    #####
     ##############################
-    articles = db.relationship(
-        "Article", backref="user", lazy="dynamic", cascade="delete, all"
-    )
-    highlights = db.relationship(
-        "Highlight", backref="user", lazy="dynamic", cascade="delete, all"
-    )
+    articles = db.relationship("Article", backref="user", lazy="dynamic", cascade="delete, all")
+    highlights = db.relationship("Highlight", backref="user", lazy="dynamic", cascade="delete, all")
     events = db.relationship("Event", backref="user", lazy="dynamic")
 
-    approved_senders = db.relationship(
-        "Approved_Sender", backref="user", lazy="dynamic", cascade="delete, all"
-    )
-    topics = db.relationship(
-        "Topic", backref="user", lazy="dynamic", cascade="delete, all"
-    )
+    approved_senders = db.relationship("Approved_Sender", backref="user", lazy="dynamic", cascade="delete, all")
+    topics = db.relationship("Topic", backref="user", lazy="dynamic", cascade="delete, all")
     tags = db.relationship("Tag", backref="user", lazy="dynamic", cascade="delete, all")
     tasks = db.relationship(
         "Task",
@@ -59,9 +52,7 @@ class User(UserMixin, db.Model):
         lazy="dynamic",
         cascade="delete, all",
     )
-    notifications = db.relationship(
-        "Notification", backref="user", lazy="dynamic", cascade="delete, all"
-    )
+    notifications = db.relationship("Notification", backref="user", lazy="dynamic", cascade="delete, all")
     suggestion_id = db.Column(db.Integer, db.ForeignKey("suggestion.id"))
     comms = db.relationship("Comms", backref="user", uselist=False)
 
@@ -125,9 +116,7 @@ class User(UserMixin, db.Model):
     @staticmethod
     def verify_reset_password_token(token):
         try:
-            id = jwt.decode(
-                token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
-            )["reset_password"]
+            id = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])["reset_password"]
         except jwt.exceptions.InvalidTokenError:
             return
         return User.query.get(id)
@@ -135,9 +124,7 @@ class User(UserMixin, db.Model):
     @staticmethod
     def verify_delete_account_token(token):
         try:
-            id = jwt.decode(
-                token, current_app.config["SECRET_KEY"], algorithms=["HS256"]
-            )["delete_account"]
+            id = jwt.decode(token, current_app.config["SECRET_KEY"], algorithms=["HS256"])["delete_account"]
         except jwt.exceptions.InvalidTokenError:
             return
         return User.query.get(id)
@@ -264,12 +251,11 @@ class User(UserMixin, db.Model):
 
     def launch_task(self, name, description="", *args, **kwargs):
         from app.models.task import Task
+
         try:
             logger.info(f"Starting task: {name} for user {self.id}")
             if not os.environ.get("testing"):
-                rq_job = current_app.task_queue.enqueue(
-                    "app.tasks." + name, *args, **kwargs, job_timeout=500
-                )
+                rq_job = current_app.task_queue.enqueue("app.tasks." + name, *args, **kwargs, job_timeout=500)
                 id = rq_job.get_id()
                 task = Task(id=id, name=name, description=description, user=self)
                 db.session.add(task)
@@ -283,18 +269,18 @@ class User(UserMixin, db.Model):
             func = getattr(app_tasks, name)
             func(*args, **kwargs)
 
-            task = Task(
-                id=generate_str_id(), name=name, description=description, user=self
-            )
+            task = Task(id=generate_str_id(), name=name, description=description, user=self)
             db.session.add(task)
             return task
 
     def get_tasks_in_progress(self):
         from app.models.task import Task
+
         return Task.query.filter_by(user=self, complete=False).all()
 
     def get_task_in_progress(self, name):
         from app.models.task import Task
+
         return Task.query.filter_by(name=name, user=self, complete=False).first()
 
     #################
@@ -304,6 +290,7 @@ class User(UserMixin, db.Model):
     def add_notification(self, name, data):
         from app.models.notification import Notification
         import json
+
         self.notifications.filter_by(name=name).delete()
         n = Notification(name=name, payload_json=json.dumps(data), user=self)
         db.session.add(n)
@@ -325,9 +312,9 @@ class User(UserMixin, db.Model):
         highlights = self.highlights.filter_by(archived=False, do_not_review=False)
 
         if tag_ids:
-            highlights = highlights.join(
-                tags_highlights, join_highlight_id == Highlight.id
-            ).filter(join_tag_id.in_(tag_ids))
+            highlights = highlights.join(tags_highlights, join_highlight_id == Highlight.id).filter(
+                join_tag_id.in_(tag_ids)
+            )
 
         return self.get_highlights_by_tier(highlights, per_tier)
 
@@ -347,67 +334,35 @@ class User(UserMixin, db.Model):
 
         tier0 = [
             highlight.to_dict()
-            for highlight in tier0.filter(
-                Highlight.review_date < today - timedelta(days=1)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier0.filter(Highlight.review_date < today - timedelta(days=1)).limit(per_tier).all()
         ]
         tier1 = [
             highlight.to_dict()
-            for highlight in tier1.filter(
-                Highlight.review_date < today - timedelta(days=3)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier1.filter(Highlight.review_date < today - timedelta(days=3)).limit(per_tier).all()
         ]
         tier2 = [
             highlight.to_dict()
-            for highlight in tier2.filter(
-                Highlight.review_date < today - timedelta(days=7)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier2.filter(Highlight.review_date < today - timedelta(days=7)).limit(per_tier).all()
         ]
         tier3 = [
             highlight.to_dict()
-            for highlight in tier3.filter(
-                Highlight.review_date < today - timedelta(days=14)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier3.filter(Highlight.review_date < today - timedelta(days=14)).limit(per_tier).all()
         ]
         tier4 = [
             highlight.to_dict()
-            for highlight in tier4.filter(
-                Highlight.review_date < today - timedelta(days=30)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier4.filter(Highlight.review_date < today - timedelta(days=30)).limit(per_tier).all()
         ]
         tier5 = [
             highlight.to_dict()
-            for highlight in tier5.filter(
-                Highlight.review_date < today - timedelta(days=90)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier5.filter(Highlight.review_date < today - timedelta(days=90)).limit(per_tier).all()
         ]
         tier6 = [
             highlight.to_dict()
-            for highlight in tier6.filter(
-                Highlight.review_date < today - timedelta(days=180)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier6.filter(Highlight.review_date < today - timedelta(days=180)).limit(per_tier).all()
         ]
         tier7 = [
             highlight.to_dict()
-            for highlight in tier7.filter(
-                Highlight.review_date < today - timedelta(days=365)
-            )
-            .limit(per_tier)
-            .all()
+            for highlight in tier7.filter(Highlight.review_date < today - timedelta(days=365)).limit(per_tier).all()
         ]
 
         return {
@@ -427,7 +382,7 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-@event.listens_for(User, 'after_insert')
+@event.listens_for(User, "after_insert")
 def create_user_related_records(mapper, connection, target):
     """Automatically create Comms and Event records for new users"""
     from sqlalchemy import insert
@@ -437,20 +392,11 @@ def create_user_related_records(mapper, connection, target):
     # Insert Comms record using connection
     connection.execute(
         insert(Comms.__table__).values(
-            user_id=target.id,
-            informational=True,
-            educational=True,
-            promotional=True,
-            highlights=True,
-            reminders=True
+            user_id=target.id, informational=True, educational=True, promotional=True, highlights=True, reminders=True
         )
     )
 
     # Insert Event record using connection and enum
     connection.execute(
-        insert(Event.__table__).values(
-            user_id=target.id,
-            name=EventName.CREATED_ACCOUNT.value,
-            date=datetime.utcnow()
-        )
+        insert(Event.__table__).values(user_id=target.id, name=EventName.CREATED_ACCOUNT.value, date=datetime.utcnow())
     )

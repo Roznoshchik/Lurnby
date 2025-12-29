@@ -1,6 +1,6 @@
 from flask_mail import Message
 import unittest
-from unittest.mock import patch, call
+from unittest.mock import patch
 from app import db, create_app
 from app.email import send_email, mail
 from config import Config
@@ -34,9 +34,7 @@ class SendEmail(unittest.TestCase):
             html_body = "<h1>This is a test message</h1>"
             send_email(subject, sender, recipients, text_body, html_body)
 
-            expected_msg = Message(
-                subject=subject, sender=sender, recipients=recipients
-            )
+            expected_msg = Message(subject=subject, sender=sender, recipients=recipients)
             expected_msg.body = text_body
             expected_msg.html = html_body
 

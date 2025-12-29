@@ -3,7 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import patch, call, MagicMock
+from unittest.mock import patch, MagicMock
 
 from app import db, create_app
 from app.models import User
@@ -58,10 +58,8 @@ class PDFProcessingTests(unittest.TestCase):
             26: '<img src =/download/1/1/foo_bar_baz/3.jpeg loading="lazy">',
         }
 
-        with patch("app.helpers.pdf.s3") as mock_s3:
-            url_dict = process_images_and_get_url_dict(
-                pdf_doc, title_for_dir, self.user
-            )
+        with patch("app.helpers.pdf.s3"):
+            url_dict = process_images_and_get_url_dict(pdf_doc, title_for_dir, self.user)
 
         if os.environ.get("DEV"):
             self.assertDictEqual(url_dict, expected_staging_dict)

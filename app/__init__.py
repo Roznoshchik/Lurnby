@@ -27,9 +27,7 @@ class CustomLogger(logging.Logger):
         name: str,
         stream_handler=sys.stdout,
         level=logging.INFO,
-        log_format=logging.Formatter(
-            "%(asctime)s [%(name)s] %(levelname)-8s %(filename)s:%(funcName)s - %(message)s"
-        ),
+        log_format=logging.Formatter("%(asctime)s [%(name)s] %(levelname)-8s %(filename)s:%(funcName)s - %(message)s"),
     ):
 
         super().__init__(name)
@@ -185,18 +183,14 @@ def create_app(config_class=Config):
     if app.config["LOG_TO_STDOUT"]:
         stream_handler = logging.StreamHandler()
         stream_handler.setLevel(logging.INFO)
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
+        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
         stream_handler.setFormatter(formatter)
         app.logger.addHandler(stream_handler)
         app.logger.removeHandler(default_handler)
     else:
         if not os.path.exists("logs"):
             os.mkdir("logs")
-        file_handler = RotatingFileHandler(
-            "logs/lurnby.log", maxBytes=10240, backupCount=10
-        )
+        file_handler = RotatingFileHandler("logs/lurnby.log", maxBytes=10240, backupCount=10)
         file_handler.setLevel(logging.INFO)
         app.logger.addHandler(file_handler)
 

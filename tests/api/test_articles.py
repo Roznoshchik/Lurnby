@@ -32,9 +32,7 @@ class AddArticleApiTests(BaseTestCase):
     @patch("app.models.User.check_token")
     def test_add_supplied_epub_article(self, mock_check_token):
         mock_check_token.return_value = User.query.first()
-        mock_file = open(
-            f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb"
-        )
+        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
         payload = {"tags": ["pikachu"]}
 
         res = self.client.post(
@@ -57,9 +55,7 @@ class AddArticleApiTests(BaseTestCase):
     @patch("app.models.User.check_token")
     def test_add_supplied_pdf_article(self, mock_check_token):
         mock_check_token.return_value = User.query.first()
-        mock_file = open(
-            f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb"
-        )
+        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb")
         # payload = {"tags": ["pikachu"]}
 
         res = self.client.post(
@@ -166,9 +162,7 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual("The coolest Title Ever", res.json["article"]["title"])
         self.assertEqual("https://www.mock.com", article.source_url)
         self.assertEqual("https://www.mock.com", res.json["article"]["source"])
-        self.assertTrue(
-            "Is there anybody going to listen to my story?" in article.content
-        )
+        self.assertTrue("Is there anybody going to listen to my story?" in article.content)
 
     @patch("app.models.User.check_token")
     def test_article_uploaded_returns_error_without_query_args(self, mock_check_token):
@@ -182,9 +176,7 @@ class AddArticleApiTests(BaseTestCase):
             headers={"Authorization": "Bearer abc123"},
         )
 
-        self.assertEqual(
-            res.json["message"], 'upload_file_ext query arg should be ".epub" or ".pdf"'
-        )
+        self.assertEqual(res.json["message"], 'upload_file_ext query arg should be ".epub" or ".pdf"')
 
         args = {"upload_file_ext": "txt"}
         res = self.client.get(
@@ -192,9 +184,7 @@ class AddArticleApiTests(BaseTestCase):
             query_string=args,
             headers={"Authorization": "Bearer abc123"},
         )
-        self.assertEqual(
-            res.json["message"], 'upload_file_ext query arg should be ".epub" or ".pdf"'
-        )
+        self.assertEqual(res.json["message"], 'upload_file_ext query arg should be ".epub" or ".pdf"')
 
     @patch("app.tasks.s3.download_file")
     @patch("app.models.User.check_token")
@@ -239,9 +229,7 @@ class AddArticleApiTests(BaseTestCase):
 
         data = res.json
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            "No article to create. Check data and try again", data["message"]
-        )
+        self.assertEqual("No article to create. Check data and try again", data["message"])
 
         # bad url
         payload = {"url": "foo.bar"}
@@ -254,9 +242,7 @@ class AddArticleApiTests(BaseTestCase):
 
         data = res.json
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            "Can't validate url. Please check the data and try again", data["message"]
-        )
+        self.assertEqual("Can't validate url. Please check the data and try again", data["message"])
 
         # bad url that passes validators check
         payload = {"url": "https://www.lurnby.com/static/images/rrfeedback-40.png"}
@@ -285,9 +271,7 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual("Missing Title or Content", data["message"])
 
         # non pdf or no epub file
-        mock_file = open(
-            f"{Path(os.path.dirname(__file__)).parent}/mocks/mocks.py", "rb"
-        )
+        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mocks.py", "rb")
 
         payload = {"tags": ["pikachu", "bulbasaur", "charmander"]}
 
@@ -685,9 +669,7 @@ class DeleteArticleApiTests(BaseTestCase):
         db.session.commit()
 
         id = str(article.uuid)
-        res = self.client.delete(
-            "/api/articles/" + id, headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.delete("/api/articles/" + id, headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
 
         article = Article.query.filter_by(uuid=UUID(id)).first()
@@ -710,9 +692,7 @@ class ExportArticleApiTests(BaseTestCase):
     @patch("app.tasks.send_email")
     @patch("app.tasks.s3")
     @patch("app.models.User.check_token")
-    def test_export_article_returns_task(
-        self, mock_check_token, mock_s3, mock_send_email
-    ):
+    def test_export_article_returns_task(self, mock_check_token, mock_s3, mock_send_email):
         mock_check_token.return_value = User.query.first()
 
         article = Article(

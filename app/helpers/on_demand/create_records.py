@@ -22,14 +22,10 @@ def create_fake_highlights(n, u):
         content = ""
         notes = ""
         for i in range(random.randrange(4)):
-            content += faker.paragraph(
-                nb_sentences=3, variable_nb_sentences=True, ext_word_list=None
-            )
+            content += faker.paragraph(nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
 
         for i in range(random.randrange(5)):
-            notes += faker.paragraph(
-                nb_sentences=3, variable_nb_sentences=True, ext_word_list=None
-            )
+            notes += faker.paragraph(nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)
 
         i = random.randrange(count)
 
@@ -60,9 +56,7 @@ def create_fake_articles(n, u):
             s += f"<p>{faker.paragraph(nb_sentences=3, variable_nb_sentences=True, ext_word_list=None)}</p>"
 
         article = Article(
-            title=faker.sentence(
-                nb_words=9, variable_nb_words=True, ext_word_list=None
-            ),
+            title=faker.sentence(nb_words=9, variable_nb_words=True, ext_word_list=None),
             unread=faker.boolean(chance_of_getting_true=25),
             content=s,
             archived=False,

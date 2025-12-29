@@ -44,9 +44,7 @@ def check_for_delete():
     logger.info("Checking if anything needs deleting from Amazon.")
     today = datetime.utcnow()
     last_week = today - timedelta(days=8)
-    evs = Event.query.filter(
-        Event.name == "deleted account", Event.date <= last_week
-    ).all()
+    evs = Event.query.filter(Event.name == "deleted account", Event.date <= last_week).all()
     if evs:
         for ev in evs:
             if ev.user:

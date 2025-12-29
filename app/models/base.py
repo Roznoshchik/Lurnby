@@ -1,25 +1,8 @@
-import base64
-
-from app import db, login, CustomLogger
-from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
-from flask import current_app, url_for
-from flask_login import UserMixin, current_user
-import jwt
-import json
 import uuid
-import os
-import random
-import re
-import redis
-import rq
-from sqlalchemy import desc, func, Index
-from sqlalchemy_utils import UUIDType
-import string
-from time import time
-import traceback
-from werkzeug.security import generate_password_hash, check_password_hash
 
+from app import CustomLogger, db  # noqa: F401
+import redis  # noqa: F401
+import rq  # noqa: F401
 
 logger = CustomLogger("MODELS")
 PREFERENCES = '{"font": "sans-serif","color": "light-mode", \

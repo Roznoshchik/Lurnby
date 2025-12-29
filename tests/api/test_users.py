@@ -26,9 +26,7 @@ class UserApiTests(BaseTestCase):
         res = self.client.post("/api/users", json={"a": "b"})
         data = json.loads(res.data)
         self.assertEqual(res.status_code, 400)
-        self.assertEqual(
-            data["message"], "must include username, email, and password fields"
-        )
+        self.assertEqual(data["message"], "must include username, email, and password fields")
 
     def test_create_user(self):
         res = self.client.post(
@@ -47,9 +45,7 @@ class UserApiTests(BaseTestCase):
     @patch("app.models.User.check_token")
     def test_get_user(self, mock_check_token):
         mock_check_token.return_value = User.query.first()
-        res = self.client.get(
-            "/api/users/1", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1", headers={"Authorization": "Bearer abc123"})
         data = json.loads(res.data)
         self.assertEqual(data, self.user.to_dict())
 
@@ -82,9 +78,7 @@ class UserApiTests(BaseTestCase):
 
         self.assertIsNone(self.user.add_by_email)
 
-        res = self.client.get(
-            "/api/users/1/enable_email", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1/enable_email", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
         self.assertIsNotNone(self.user.add_by_email)
 
@@ -94,14 +88,10 @@ class UserApiTests(BaseTestCase):
 
         self.assertIsNone(self.user.add_by_email)
 
-        res = self.client.get(
-            "/api/users/1/senders", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1/senders", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
         self.assertEqual([], self.user.approved_senders.all())
-        res = self.client.get(
-            "/api/users/1/senders", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1/senders", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
         self.assertEqual([], self.user.approved_senders.all())
 
@@ -113,9 +103,7 @@ class UserApiTests(BaseTestCase):
         self.assertEqual(res.status_code, 201)
         self.assertEqual(json.loads(res.data)["email"], "john@smith.com")
 
-        res = self.client.get(
-            "/api/users/1/senders", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1/senders", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(
             ["john@smith.com"],
@@ -126,9 +114,7 @@ class UserApiTests(BaseTestCase):
     def test_get_user_comms(self, mock_check_token):
         mock_check_token.return_value = User.query.first()
 
-        res = self.client.get(
-            "/api/users/1/comms", headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/users/1/comms", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
         self.assertEqual(json.loads(res.data), self.comms.to_dict())
 

@@ -18,17 +18,11 @@ def filter_by_status(query: query.Query, status: str):
     elif status.lower() == "archived":
         query = query.filter_by(archived=True)
     elif status.lower() == "unread":
-        query = query.filter(
-            Article.unread == True, Article.done == False, Article.archived == False
-        )
+        query = query.filter(Article.unread == True, Article.done == False, Article.archived == False)
     elif status.lower() == "in_progress":
-        query = query.filter(
-            Article.unread == False, Article.done == False, Article.archived == False
-        )
+        query = query.filter(Article.unread == False, Article.done == False, Article.archived == False)
     elif status.lower() == "read":
-        query = query.filter(
-            Article.unread == False, Article.done == True, Article.archived == False
-        )
+        query = query.filter(Article.unread == False, Article.done == True, Article.archived == False)
 
     return query
 

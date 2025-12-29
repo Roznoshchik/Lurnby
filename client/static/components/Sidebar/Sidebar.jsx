@@ -1,21 +1,31 @@
-import { useState } from 'preact/hooks';
-import Button from '../Button/Button';
-import Icon from '../Icon/Icon';
-import logoCuteUrl from '../Logo/logo-cute.svg';
-import './Sidebar.css';
+import { useState } from 'preact/hooks'
+import Button from '../Button/Button'
+import Icon from '../Icon/Icon'
+import logoCuteUrl from '../Logo/logo-cute.svg'
+import './Sidebar.css'
 
-export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard = false, isExpanded = false, onToggle }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+export function Sidebar({
+  darkMode = false,
+  onDarkModeToggle,
+  showAppDashboard = false,
+  isExpanded = false,
+  onToggle,
+}) {
+  const [menuOpen, setMenuOpen] = useState(false)
 
   const mainNavItems = [
     { href: '/client/articles', icon: 'book', label: 'Articles' },
     { href: '/client/highlights', icon: 'ink_highlighter', label: 'Highlights' },
     { href: '/client/review', icon: 'rotate_left', label: 'Review' },
     { href: '/client/tags', icon: 'sell', label: 'Tags' },
-  ];
+  ]
 
   if (showAppDashboard) {
-    mainNavItems.push({ href: '/client/app_dashboard/users', icon: 'dashboard', label: 'Dashboard' });
+    mainNavItems.push({
+      href: '/client/app_dashboard/users',
+      icon: 'dashboard',
+      label: 'Dashboard',
+    })
   }
 
   const secondaryNavItems = [
@@ -23,7 +33,7 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
     { href: '/client/resources', icon: 'menu_book', label: 'Guides' },
     { href: '/client/settings', icon: 'settings', label: 'Settings' },
     { href: '/api/auth/logout', icon: 'logout', label: 'Logout' },
-  ];
+  ]
 
   return (
     <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
@@ -61,9 +71,9 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
           size="sm"
           onClick={onToggle}
           className="sidebar-toggle-btn"
-          aria-label={isExpanded ? "Collapse sidebar" : "Expand sidebar"}
+          aria-label={isExpanded ? 'Collapse sidebar' : 'Expand sidebar'}
         >
-          <Icon name={isExpanded ? "chevron_left" : "chevron_right"} />
+          <Icon name={isExpanded ? 'chevron_left' : 'chevron_right'} />
         </Button>
 
         {/* Dark Mode Toggle */}
@@ -74,8 +84,10 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
           className={!isExpanded ? 'justify-center' : 'justify-start'}
           aria-label="Toggle dark mode"
         >
-          <Icon name={darkMode ? "light_mode" : "dark_mode"} />
-          {isExpanded && <span className="icon-label">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>}
+          <Icon name={darkMode ? 'light_mode' : 'dark_mode'} />
+          {isExpanded && (
+            <span className="icon-label">{darkMode ? 'Light Mode' : 'Dark Mode'}</span>
+          )}
         </Button>
 
         {/* More Menu Button */}
@@ -98,6 +110,11 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
               <div
                 className="menu-backdrop"
                 onClick={() => setMenuOpen(false)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') setMenuOpen(false)
+                }}
+                tabIndex={-1}
+                aria-label="Close menu"
               />
 
               {/* Menu Popover */}
@@ -125,5 +142,5 @@ export function Sidebar({ darkMode = false, onDarkModeToggle, showAppDashboard =
         </div>
       </div>
     </aside>
-  );
+  )
 }

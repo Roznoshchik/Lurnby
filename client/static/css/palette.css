@@ -7,7 +7,7 @@
    White (warm cream)
    ================================================================ */
 :root {
-  --white-50:  #fdfcfb;
+  --white-50: #fdfcfb;
   --white-100: #f7f5f3;
   --white-200: #f0ede8;
 }
@@ -45,7 +45,7 @@
    Neutral (achromatic)
    ================================================================ */
 :root {
-  --neutral-50:  oklch(0.985 0 0);
+  --neutral-50: oklch(0.985 0 0);
   --neutral-100: oklch(0.922 0 0);
   --neutral-300: oklch(0.708 0 0);
   --neutral-500: oklch(0.439 0 0);

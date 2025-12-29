@@ -17,9 +17,7 @@ def createHighlightPrompts():
             highlight.text = highlight.note
             continue
         else:
-            highlight.user.launch_task(
-                "create_recall_text", "Creating highlight recall text", highlight.id
-            )
+            highlight.user.launch_task("create_recall_text", "Creating highlight recall text", highlight.id)
 
             # create_recall_text(highlight.id)
 

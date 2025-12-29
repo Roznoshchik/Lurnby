@@ -24,9 +24,7 @@ def download_image(id, resource):
         return "resource not found", 403
 
     """ resource: name of the file to download"""
-    url = s3.generate_presigned_url(
-        "get_object", Params={"Bucket": bucket, "Key": resource}, ExpiresIn=30
-    )
+    url = s3.generate_presigned_url("get_object", Params={"Bucket": bucket, "Key": resource}, ExpiresIn=30)
     return redirect(url, code=302)
 
 

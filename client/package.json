@@ -8,12 +8,16 @@
     "serve": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint ."
   },
   "dependencies": {
     "preact": "^10.19.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.3.10",
     "@preact/preset-vite": "^2.8.1",
     "@testing-library/preact": "^3.2.4",
     "happy-dom": "^20.0.11",

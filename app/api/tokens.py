@@ -31,9 +31,7 @@ def google_login():
         response = jsonify({"token": token, "id": user.id})
         return response
 
-    user = User(
-        goog_id=data["goog_id"], email=data["email"], firstname=data["first_name"]
-    )
+    user = User(goog_id=data["goog_id"], email=data["email"], firstname=data["first_name"])
     token = user.get_api_token()
     db.session.add(user)
     db.session.commit()  # Comms created automatically via after_insert event

@@ -35,9 +35,7 @@ class Article(db.Model):
     highlights = db.relationship("Highlight", lazy="dynamic", backref="article")
     archived = db.Column(db.Boolean, index=True, default=False)
     highlightedText = db.Column(db.String, default="")
-    tags = db.relationship(
-        "Tag", secondary=tags_articles, back_populates="articles", lazy="dynamic"
-    )
+    tags = db.relationship("Tag", secondary=tags_articles, back_populates="articles", lazy="dynamic")
     progress = db.Column(db.Float, index=True, default=0.0)
     bookmarks = db.Column(db.String)
     done = db.Column(db.Boolean, default=False)
@@ -189,9 +187,7 @@ class Article(db.Model):
             "progress": progress,
             "created_at": self.article_created_date,
             "highlights_count": self.highlights.count(),
-            "tags": [
-                tag.to_dict() for tag in self.tags.all()
-            ],
+            "tags": [tag.to_dict() for tag in self.tags.all()],
         }
         return data
 
@@ -294,12 +290,7 @@ class Article(db.Model):
             .filter(tags_articles.c.article_id == self.id)
         )
 
-        q = (
-            db.session.query(Tag)
-            .filter(~Tag.id.in_(sub))
-            .filter_by(user_id=user.id, archived=False)
-            .all()
-        )
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id, archived=False).all()
 
         return q
 

@@ -1,5 +1,5 @@
-import { useAuth } from '../../contexts/AuthContext/AuthContext.jsx';
-import './RequireAuth.css';
+import { useAuth } from '../../contexts/AuthContext/AuthContext.jsx'
+import './RequireAuth.css'
 
 /**
  * RequireAuth Wrapper Component
@@ -13,7 +13,7 @@ import './RequireAuth.css';
  *   </RequireAuth>
  */
 export default function RequireAuth({ children }) {
-  const { status } = useAuth();
+  const { status } = useAuth()
 
   // Show nothing while checking auth status
   if (status === 'loading') {
@@ -21,17 +21,17 @@ export default function RequireAuth({ children }) {
       <div className="loading-container">
         <div className="loading-text">Loading...</div>
       </div>
-    );
+    )
   }
 
   // Redirect to login if not authenticated
   if (status === 'anon') {
-    const currentPath = window.location.pathname;
-    const loginUrl = `/client/login?next=${encodeURIComponent(currentPath)}`;
-    window.location.replace(loginUrl);
-    return null;
+    const currentPath = window.location.pathname
+    const loginUrl = `/client/login?next=${encodeURIComponent(currentPath)}`
+    window.location.replace(loginUrl)
+    return null
   }
 
   // Render children if authenticated
-  return children;
+  return children
 }

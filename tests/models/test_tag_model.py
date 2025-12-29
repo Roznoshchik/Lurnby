@@ -89,9 +89,7 @@ class TagModelCase(BaseTestCase):
         tag3 = Tag(name="Major", user_id=u.id, archived=False)
         tag4 = Tag(name="Pablo", user_id=u.id, archived=False)
 
-        db.session.add_all(
-            [h1, h2, h3, h4, t1, t2, t3, t4, a1, a2, a3, a4, tag1, tag2, tag3, tag4]
-        )
+        db.session.add_all([h1, h2, h3, h4, t1, t2, t3, t4, a1, a2, a3, a4, tag1, tag2, tag3, tag4])
         db.session.commit()
 
         # in 2 tags

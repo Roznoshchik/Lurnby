@@ -86,9 +86,7 @@ class ExportArticleTests(unittest.TestCase):
         with self.assertRaises(LurnbyValueError) as cm:
             create_zip_file_for_article(article, path, "pikachu")
 
-        self.assertEqual(
-            str(cm.exception), 'ext must be one of "csv", "txt", or "json"'
-        )
+        self.assertEqual(str(cm.exception), 'ext must be one of "csv", "txt", or "json"')
 
     def test_zip_file_exists(self):
         article = Article.query.first()
@@ -115,9 +113,7 @@ class ExportArticleTests(unittest.TestCase):
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        article_path, highlights_path = export_to_json(
-            path, article_dict, article_highlights
-        )
+        article_path, highlights_path = export_to_json(path, article_dict, article_highlights)
 
         with open(article_path, "r") as file:
             loaded_article = json.loads(file.read())
@@ -145,9 +141,7 @@ class ExportArticleTests(unittest.TestCase):
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        article_path, highlights_path = export_to_txt(
-            path, article_dict, article_highlights
-        )
+        article_path, highlights_path = export_to_txt(path, article_dict, article_highlights)
 
         self.assertTrue(os.path.exists(article_path))
         self.assertTrue(os.path.exists(highlights_path))
@@ -166,9 +160,7 @@ class ExportArticleTests(unittest.TestCase):
         if not os.path.isdir(path):
             os.mkdir(path)
 
-        article_path, highlights_path = export_to_csv(
-            path, article_dict, article_highlights
-        )
+        article_path, highlights_path = export_to_csv(path, article_dict, article_highlights)
 
         self.assertTrue(os.path.exists(article_path))
         self.assertTrue(os.path.exists(highlights_path))
@@ -238,9 +230,7 @@ class ExportHighlightTests(unittest.TestCase):
         with self.assertRaises(LurnbyValueError) as cm:
             get_highlights_export(highlights, path, "pikachu")
 
-        self.assertEqual(
-            str(cm.exception), 'ext must be one of "csv", "txt", or "json"'
-        )
+        self.assertEqual(str(cm.exception), 'ext must be one of "csv", "txt", or "json"')
 
     def test_zip_file_exists(self):
         user = User.query.first()

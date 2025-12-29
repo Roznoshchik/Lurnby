@@ -20,11 +20,7 @@ def print_data():
 
 
 def data_dashboard():
-    users = (
-        User.query.filter_by(test_account=False)
-        .order_by(desc(User.last_active))
-        .limit(15)
-    )
+    users = User.query.filter_by(test_account=False).order_by(desc(User.last_active)).limit(15)
     user_list = []
     for u in users:
         ev = u.events.order_by(Event.date.desc()).limit(1).first()

@@ -197,9 +197,7 @@ class GetTagApiTests(BaseTestCase):
         db.session.commit()
 
         uuid = tag.uuid
-        res = self.client.get(
-            "/api/tags/" + uuid, headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.get("/api/tags/" + uuid, headers={"Authorization": "Bearer abc123"})
         data = json.loads(res.data)
         returned_tag = data.get("tag")
         self.assertEqual(res.status_code, 200)
@@ -359,9 +357,7 @@ class DeleteTagApiTests(BaseTestCase):
         db.session.commit()
 
         uuid = tag.uuid
-        res = self.client.delete(
-            "/api/tags/" + uuid, headers={"Authorization": "Bearer abc123"}
-        )
+        res = self.client.delete("/api/tags/" + uuid, headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
 
         tag = Tag.query.filter_by(uuid=uuid).first()

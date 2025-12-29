@@ -4,10 +4,10 @@
 .material-symbols-rounded,
 .material-symbols-sharp {
   font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 0,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 /* Filled variant */
@@ -15,10 +15,10 @@
 .material-symbols-rounded.filled,
 .material-symbols-sharp.filled {
   font-variation-settings:
-    'FILL' 1,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
+    "FILL" 1,
+    "wght" 400,
+    "GRAD" 0,
+    "opsz" 24;
 }
 
 /* Size variants for buttons - controlled via font-size */

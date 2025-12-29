@@ -28,7 +28,9 @@ textarea {
   border: 1px solid var(--input);
   border-radius: var(--radius-md);
   outline: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 input[type="text"]:focus,
@@ -97,7 +99,9 @@ select {
   outline: none;
   cursor: pointer;
   appearance: none;
-  transition: border-color 150ms ease, box-shadow 150ms ease;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 select:focus {
@@ -140,7 +144,7 @@ input[type="radio"]:checked {
 }
 
 input[type="checkbox"]:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 2px;
   left: 5px;
@@ -152,7 +156,7 @@ input[type="checkbox"]:checked::after {
 }
 
 input[type="radio"]:checked::after {
-  content: '';
+  content: "";
   position: absolute;
   top: 50%;
   left: 50%;
@@ -189,7 +193,7 @@ label {
 }
 
 label.required::after {
-  content: ' *';
+  content: " *";
   color: var(--destructive);
 }
 

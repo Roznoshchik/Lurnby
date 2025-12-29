@@ -7,13 +7,11 @@ from app.models import (
     User,
     Article,
     Highlight,
-    Event,
     Approved_Sender,
     Topic,
     Tag,
     Task,
     Notification,
-    Comms,
 )
 from tests.conftest import BaseTestCase
 
@@ -91,10 +89,7 @@ class UserTest(BaseTestCase):
         email = user.create_lurnby_email()
         self.assertIsInstance(email, str)
         self.assertTrue(email.startswith("johndoe-"))
-        self.assertTrue(
-            email.endswith("@add-article.lurnby.com")
-            or email.endswith("@add-article-staging.lurnby.com")
-        )
+        self.assertTrue(email.endswith("@add-article.lurnby.com") or email.endswith("@add-article-staging.lurnby.com"))
 
     def test_set_lurnby_email(self):
         user = User(email="johndoe@example.com")
@@ -186,23 +181,17 @@ class UserTest(BaseTestCase):
         db.session.add(user)
         db.session.commit()
 
-        with mock.patch.object(
-            os, "urandom", return_value=b"abcdefghijklmnopqrstuv"  # 24 bytes
-        ) as mock_urandom:
+        with mock.patch.object(os, "urandom", return_value=b"abcdefghijklmnopqrstuv") as mock_urandom:  # 24 bytes
             token = user.get_api_token(expires_in=180)
             self.assertEqual(token, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dg==")  # 32 chars
             self.assertEqual(user.api_token, token)
-            self.assertGreaterEqual(
-                user.api_token_expiration, datetime.utcnow() + timedelta(seconds=60)
-            )
+            self.assertGreaterEqual(user.api_token_expiration, datetime.utcnow() + timedelta(seconds=60))
 
             # Test that the token is not regenerated before it expires
             token2 = user.get_api_token(expires_in=60)
             self.assertEqual(token2, "YWJjZGVmZ2hpamtsbW5vcHFyc3R1dg==")
             self.assertEqual(user.api_token, token2)
-            self.assertLessEqual(
-                user.api_token_expiration, datetime.utcnow() + timedelta(seconds=180)
-            )
+            self.assertLessEqual(user.api_token_expiration, datetime.utcnow() + timedelta(seconds=180))
             mock_urandom.assert_called_once_with(24)
 
     def test_revoke_token(self):

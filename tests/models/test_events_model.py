@@ -33,9 +33,7 @@ class EventTest(BaseTestCase):
         self.assertEqual(daily_event.user_id, user.id)
         self.assertEqual(daily_event.name, EventName.REVIEWED_HIGHLIGHTS.value)
 
-        today_start = datetime(
-            datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0
-        )
+        today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
         today_end = today_start + timedelta(days=1)
 
         existing_event = Event.query.filter(
