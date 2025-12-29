@@ -1,0 +1,59 @@
+repos:
+  # Python hooks
+  - repo: https://github.com/psf/black
+    rev: 24.10.0
+    hooks:
+      - id: black
+        language_version: python3
+        files: \.py$
+        # Only check, don't fail commit
+        args: ['--check', '--diff']
+        # Allow to fail without blocking commit
+        verbose: true
+        stages: [manual]
+
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.1.1
+    hooks:
+      - id: flake8
+        files: \.py$
+        # Only check for serious errors:
+        # E9: syntax errors
+        # F63: invalid % format strings
+        # F7: syntax errors in docstrings
+        # F82: undefined names
+        # F821: undefined variable
+        args: ['--select=E9,F63,F7,F82']
+
+  # Python tests
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby && . venv/bin/activate && pytest'
+        language: system
+        pass_filenames: false
+        always_run: true
+        stages: [pre-commit]
+
+  # JavaScript/Frontend tests
+  - repo: local
+    hooks:
+      - id: vitest
+        name: vitest
+        entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby/client && npm run test:run'
+        language: system
+        pass_filenames: false
+        always_run: true
+        files: \.(jsx?|tsx?)$
+        stages: [pre-commit]
+
+  # General hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-added-large-files
+      - id: check-merge-conflict
