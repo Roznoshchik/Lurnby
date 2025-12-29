@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
-    
+
 permissions:
   contents: read
 
@@ -45,20 +45,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest flake8
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      
+
       - name: Install npm dependencies
         run: |
           cd app/ReadabiliPy
           npm i
           cd ../..
-      
+
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
           # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
           flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
+
       - name: Test with pytest
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/lurnby-test
@@ -68,3 +68,26 @@ jobs:
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
+
+  node:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Run Vitest
+        run: |
+          cd client
+          npm run test:run
