@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from enum import Enum
 from typing import Optional
 from flask_login import current_user
@@ -55,43 +55,6 @@ class Event(db.Model):
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"))
     name: so.Mapped[str] = so.mapped_column(sa.String())
     date: so.Mapped[datetime] = so.mapped_column(sa.DateTime())
-
-    """
-    Tracked Events
-
-    -> added approved sender     //    all
-    -> added article             //    all
-    -> added highlight           //    all
-    -> added suggested article   //    all
-    -> added tag                 //    all
-    -> added topic               //    all
-    -> created account           //    one time
-    -> deleted account           //    one time
-    -> enabled add by email      //    one time
-    -> exported all data         //    all
-    -> exported highlights       //    all
-    -> opened article            //    all
-    -> deleted article           //    all
-    -> reset password            //    all
-    -> reviewed highlights       //    daily
-    -> reviewed a highlight      //    all
-    -> submitted feedback        //    all
-    -> tos accepted              //    one time
-    -> updated account email     //    all
-    -> updated article           //    all
-    -> updated article tags      //    all
-    -> updated comms             //    all
-    -> updated highlight         //    all
-    -> updated highlight topics  //    all
-    -> updated password          //    all
-    XX updated tag               //    all
-    XX updated topic             //    all
-    -> updated user credentials  //    all
-    -> updated user info         //    all
-    -> user registered           //    all
-    -> visited platform          //    daily
-
-    """
 
     @staticmethod
     def add(kind: EventName | str, daily=False, user=current_user):
@@ -175,13 +138,13 @@ class Event(db.Model):
     @staticmethod
     def count_reviews_this_month(user_id: int) -> int:
         """Count review events for this month"""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
         return Event.count_events(
             user_id,
-            [EventName.REVIEWED_A_HIGHLIGHT, EventName.REVIEWED_HIGHLIGHTS],
+            [EventName.REVIEWED_A_HIGHLIGHT],
             month_start,
             next_month
         )
@@ -189,7 +152,7 @@ class Event(db.Model):
     @staticmethod
     def count_articles_opened_this_month(user_id: int) -> int:
         """Count articles opened this month"""
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
@@ -202,14 +165,14 @@ class Event(db.Model):
 
     @staticmethod
     def count_highlights_added_this_month(user_id: int) -> int:
-        """Count highlights added or updated this month"""
-        now = datetime.utcnow()
+        """Count highlights added this month"""
+        now = datetime.now(timezone.utc)
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
         return Event.count_events(
             user_id,
-            [EventName.ADDED_HIGHLIGHT, EventName.UPDATED_HIGHLIGHT],
+            [EventName.ADDED_HIGHLIGHT],
             month_start,
             next_month
         )

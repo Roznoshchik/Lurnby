@@ -9,6 +9,7 @@ import ArticleCard from './components/ArticleCard/ArticleCard';
 import Button from './components/Button/Button';
 import Icon from './components/Icon/Icon';
 import { api } from './utils/api';
+import { ROUTES } from './utils/routes';
 import { getReadableSource } from './utils/sourceFormatter';
 
 function ArticlesList() {
@@ -23,7 +24,7 @@ function ArticlesList() {
 
   useEffect(() => {
     fetchArticles();
-    // TODO: Fetch monthly stats from /api/users/:id/stats endpoint
+    fetchStats();
   }, []);
 
   const fetchArticles = async () => {
@@ -37,6 +38,19 @@ function ArticlesList() {
       setError('Failed to load articles');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchStats = async () => {
+    try {
+      const data = await api.get(ROUTES.API.STATS);
+      setMonthlyStats({
+        reviewEvents: data.reviews_this_month,
+        articlesOpened: data.articles_opened_this_month,
+        highlightsAdded: data.highlights_added_this_month,
+      });
+    } catch (err) {
+      console.error('Error fetching stats:', err);
     }
   };
 

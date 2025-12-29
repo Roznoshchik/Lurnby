@@ -18,5 +18,6 @@ export const ROUTES = {
     GOOGLE_LOGIN: '/api/auth/google',
     REFRESH: '/api/auth/refresh',
     LOGOUT: '/api/auth/logout',
+    STATS: '/api/user/stats',
   },
 };

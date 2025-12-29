@@ -5,6 +5,7 @@ from app.api.errors import bad_request
 from app.helpers.pulltext import pull_text
 from app.models import Article, User, Tag, Approved_Sender, Event
 from app.models.event import EventName
+from http import HTTPStatus
 
 from datetime import datetime
 from flask import jsonify, request, url_for
@@ -38,9 +39,28 @@ def create_user():
     db.session.commit()  # Comms and Event created automatically via after_insert event
 
     response = jsonify({"token": token, "id": user.id})
-    response.status_code = 201
     # response.headers['location'] = url_for('api.legacy_get_user_tags', id=user.id)
-    return response
+    return response, HTTPStatus.CREATED
+
+
+""" ############################# """
+""" ##  Get current user stats ## """
+""" ############################# """
+
+
+@bp.get("/user/stats")
+@token_auth.login_required
+def get_user_stats():
+    user = token_auth.current_user()
+
+    stats = {
+        "reviews_this_month": Event.count_reviews_this_month(user.id),
+        "articles_opened_this_month": Event.count_articles_opened_this_month(user.id),
+        "highlights_added_this_month": Event.count_highlights_added_this_month(user.id),
+    }
+
+    response = jsonify(stats)
+    return response, HTTPStatus.OK
 
 
 """ ########################### """
@@ -54,8 +74,7 @@ def get_user(id):
     user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(user.to_dict())
-        response.status_code = 200
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -82,9 +101,8 @@ def update_user(id):
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.to_dict())
-        response.status_code = 200
 
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -117,7 +135,7 @@ def delete_user(id):
 
         db.session.commit()
 
-        return ("", 204)
+        return "", HTTPStatus.NO_CONTENT
     else:
         return bad_request("Not found")
 
@@ -140,7 +158,7 @@ def export_data(id):
         )
         db.session.commit()
 
-        return ("", 200)
+        return "", HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -160,8 +178,7 @@ def enable_add_by_email(id):
         db.session.add(ev)
         db.session.commit()
         response = jsonify(email=user.add_by_email)
-        response.status_code = 200
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -177,8 +194,7 @@ def get_approved_senders(id):
     user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(senders=[user.email for user in user.approved_senders.all()])
-        response.status_code = 200
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -202,8 +218,7 @@ def add_approved_senders(id):
             db.session.add_all([sender, event])
             db.session.commit()
             response = jsonify(email=email)
-            response.status_code = 201
-            return response
+            return response, HTTPStatus.CREATED
         else:
             return bad_request("missing email")
     else:
@@ -221,8 +236,7 @@ def get_user_comms(id):
     user = User.query.filter_by(id=id).first()
     if user and user.id == token_auth.current_user().id:
         response = jsonify(user.comms.to_dict())
-        response.status_code = 200
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -255,8 +269,7 @@ def update_user_comms(id):
         db.session.add(ev)
         db.session.commit()
         response = jsonify(user.comms.to_dict())
-        response.status_code = 200
-        return response
+        return response, HTTPStatus.OK
     else:
         return bad_request("Not found")
 
@@ -301,12 +314,11 @@ def legacy_add_article(id):
 
     db.session.commit()
     response = jsonify(article.to_legacy_dict())
-    response.status_code = 201
     response.headers["Location"] = url_for("main.article", uuid=article.uuid)
 
     # why did I want to log users out? this is logging me out every time I add new code.
     # logout_user()
-    return response
+    return response, HTTPStatus.CREATED
 
 
 """ ############################################# """
