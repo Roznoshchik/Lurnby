@@ -1,29 +1,41 @@
 repos:
-  # Python hooks
+  # Python formatting
   - repo: https://github.com/psf/black
     rev: 24.10.0
     hooks:
       - id: black
-        language_version: python3
-        files: \.py$
-        # Only check, don't fail commit
-        args: ['--check', '--diff']
-        # Allow to fail without blocking commit
-        verbose: true
-        stages: [manual]
+        language_version: python3.12
+        types: [python]
 
+  # Python linting
   - repo: https://github.com/pycqa/flake8
     rev: 7.1.1
     hooks:
       - id: flake8
-        files: \.py$
-        # Only check for serious errors:
-        # E9: syntax errors
-        # F63: invalid % format strings
-        # F7: syntax errors in docstrings
-        # F82: undefined names
-        # F821: undefined variable
-        args: ['--select=E9,F63,F7,F82']
+        name: Flake8 (strict)
+        args:
+          [
+            "--count",
+            "--select=E9,F63,F7,F82",
+            "--show-source",
+            "--statistics",
+          ]
+        language: python
+        types: [python]
+      - id: flake8
+        name: Flake8 (warnings)
+        args: ["--exit-zero", "--max-line-length=127"]
+        verbose: true
+        language: python
+        types: [python]
+
+  # Python security
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.10
+    hooks:
+      - id: bandit
+        args: ["-r", "app/", "-ll"]
+        files: ^app/
 
   # Python tests
   - repo: local
@@ -33,8 +45,7 @@ repos:
         entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby && . venv/bin/activate && pytest'
         language: system
         pass_filenames: false
-        always_run: true
-        stages: [pre-commit]
+        types: [python]
 
   # JavaScript/Frontend tests
   - repo: local
@@ -44,9 +55,7 @@ repos:
         entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby/client && npm run test:run'
         language: system
         pass_filenames: false
-        always_run: true
-        files: \.(jsx?|tsx?)$
-        stages: [pre-commit]
+        types_or: [javascript, jsx, ts, tsx]
 
   # General hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
