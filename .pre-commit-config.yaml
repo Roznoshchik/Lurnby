@@ -43,7 +43,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby && . venv/bin/activate && pytest'
+        entry: bash -c '. venv/bin/activate && pytest'
         language: system
         pass_filenames: false
         types: [python]
@@ -53,7 +53,7 @@ repos:
     hooks:
       - id: vitest
         name: vitest
-        entry: bash -c 'cd /Users/rr/Desktop/code/projects/lurnby/client && npm run test:run'
+        entry: bash -c 'cd client && npm run test:run'
         language: system
         pass_filenames: false
         types_or: [javascript, jsx, ts, tsx]
