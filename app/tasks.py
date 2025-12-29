@@ -52,9 +52,7 @@ def _set_task_progress(progress):
             logger.info(f"task id: {job.get_id()}")
             task = Task.query.get(job.get_id())
             logger.info(f"Task: {task}")
-            task.user.add_notification(
-                "task_progress", {"task_id": job.get_id(), "progress": progress}
-            )
+            task.user.add_notification("task_progress", {"task_id": job.get_id(), "progress": progress})
             if progress >= 100:
                 task.complete = True
             db.session.commit()
@@ -76,27 +74,17 @@ def delete_user(id):
             text("DELETE from highlights_topics where highlight_id=:h_id"),
             {"h_id": h.id},
         )
-        db.session.execute(
-            text("DELETE from tags_highlights where highlight_id=:h_id"), {"h_id": h.id}
-        )
+        db.session.execute(text("DELETE from tags_highlights where highlight_id=:h_id"), {"h_id": h.id})
         db.session.delete(h)
     for t in topics:
-        db.session.execute(
-            text("DELETE from highlights_topics where topic_id=:t_id"), {"t_id": t.id}
-        )
+        db.session.execute(text("DELETE from highlights_topics where topic_id=:t_id"), {"t_id": t.id})
         db.session.delete(t)
     for t in tags:
-        db.session.execute(
-            text("DELETE from tags_articles where tag_id=:t_id"), {"t_id": t.id}
-        )
-        db.session.execute(
-            text("DELETE from tags_highlights where tag_id=:t_id"), {"t_id": t.id}
-        )
+        db.session.execute(text("DELETE from tags_articles where tag_id=:t_id"), {"t_id": t.id})
+        db.session.execute(text("DELETE from tags_highlights where tag_id=:t_id"), {"t_id": t.id})
         db.session.delete(t)
     for a in articles:
-        db.session.execute(
-            text("DELETE from tags_articles where article_id=:a_id"), {"a_id": a.id}
-        )
+        db.session.execute(text("DELETE from tags_articles where article_id=:a_id"), {"a_id": a.id})
         db.session.delete(a)
     for s in senders:
         db.session.delete(s)
@@ -133,9 +121,7 @@ def account_export(uid, ext, delete=False):
             )
 
             delete_date = (datetime.today() + timedelta(days=7)).strftime("%B %d, %Y")
-            logger.info(
-                f"sending email - [Lurnby] Your exported data for user: {user.id}"
-            )
+            logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
             send_email(
                 "[Lurnby] Your exported data",
                 sender=app.config["ADMINS"][0],
@@ -194,12 +180,7 @@ def export_legacy_highlights(user, highlights, source, ext):
                         if highlight.note:
                             f.write(f"NOTE:\n{highlight.note}\n\n")
                         if highlight.topics.count() > 0:
-                            topic_titles = [
-                                topic.title
-                                for topic in highlight.topics.filter_by(
-                                    archived=False
-                                ).all()
-                            ]
+                            topic_titles = [topic.title for topic in highlight.topics.filter_by(archived=False).all()]
                             f.write(f'TOPICS:\n{", ".join(topic_titles)}\n\n')
                         i += 1
                         _set_task_progress(100 * i // total_highlights)
@@ -215,12 +196,7 @@ def export_legacy_highlights(user, highlights, source, ext):
                         f.write(f"TEXT:\n{highlight.text}\n\n")
                         if highlight.note:
                             f.write(f"NOTE:\n{highlight.note}\n\n")
-                        topic_titles = [
-                            topic.title
-                            for topic in highlight.topics.filter_by(
-                                archived=False
-                            ).all()
-                        ]
+                        topic_titles = [topic.title for topic in highlight.topics.filter_by(archived=False).all()]
                         f.write(f'TOPICS:\n{", ".join(topic_titles)}\n\n')
                         f.write("\n")
 
@@ -237,19 +213,13 @@ def export_legacy_highlights(user, highlights, source, ext):
                 ExpiresIn=604800,
             )
 
-            logger.info(
-                f"sending email - [Lurnby] Your exported data for user: {user.id}"
-            )
+            logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
             send_email(
                 "[Lurnby] Your exported highlights",
                 sender=app.config["ADMINS"][0],
                 recipients=[user.email],
-                text_body=render_template(
-                    "email/export_highlights.txt", url=url, user=user
-                ),
-                html_body=render_template(
-                    "email/export_highlights.html", url=url, user=user
-                ),
+                text_body=render_template("email/export_highlights.txt", url=url, user=user),
+                html_body=render_template("email/export_highlights.html", url=url, user=user),
                 sync=True,
             )
 
@@ -260,17 +230,14 @@ def export_legacy_highlights(user, highlights, source, ext):
                     data.append(
                         {
                             "from": highlight.article.title,
-                            "source": highlight.article.source_url
-                            if highlight.article.source_url
-                            else highlight.article.source,
+                            "source": (
+                                highlight.article.source_url
+                                if highlight.article.source_url
+                                else highlight.article.source
+                            ),
                             "text": highlight.text,
                             "note": highlight.note,
-                            "topics": [
-                                topic.title
-                                for topic in highlight.topics.filter_by(
-                                    archived=False
-                                ).all()
-                            ],
+                            "topics": [topic.title for topic in highlight.topics.filter_by(archived=False).all()],
                         }
                     )
                 else:
@@ -278,12 +245,7 @@ def export_legacy_highlights(user, highlights, source, ext):
                         {
                             "text": highlight.text,
                             "note": highlight.note,
-                            "topics": [
-                                topic.title
-                                for topic in highlight.topics.filter_by(
-                                    archived=False
-                                ).all()
-                            ],
+                            "topics": [topic.title for topic in highlight.topics.filter_by(archived=False).all()],
                         }
                     )
                 i += 1
@@ -302,19 +264,13 @@ def export_legacy_highlights(user, highlights, source, ext):
                 ExpiresIn=604800,
             )
 
-            logger.info(
-                f"sending email - [Lurnby] Your exported data for user: {user.id}"
-            )
+            logger.info(f"sending email - [Lurnby] Your exported data for user: {user.id}")
             send_email(
                 "[Lurnby] Your exported highlights",
                 sender=app.config["ADMINS"][0],
                 recipients=[user.email],
-                text_body=render_template(
-                    "email/export_highlights.txt", url=url, user=user
-                ),
-                html_body=render_template(
-                    "email/export_highlights.html", url=url, user=user
-                ),
+                text_body=render_template("email/export_highlights.txt", url=url, user=user),
+                html_body=render_template("email/export_highlights.html", url=url, user=user),
                 sync=True,
             )
 
@@ -370,12 +326,8 @@ def export_article(user, article, ext="csv"):
             "[Lurnby] Your exported highlights",
             sender=app.config["ADMINS"][0],
             recipients=[user.email],
-            text_body=render_template(
-                "email/export_highlights.txt", url=url, user=user
-            ),
-            html_body=render_template(
-                "email/export_highlights.html", url=url, user=user
-            ),
+            text_body=render_template("email/export_highlights.txt", url=url, user=user),
+            html_body=render_template("email/export_highlights.html", url=url, user=user),
             sync=True,
         )
         os.remove(zip_path)
@@ -434,12 +386,8 @@ def export_highlights(highlights, ext="csv"):
             "[Lurnby] Your exported highlights",
             sender=app.config["ADMINS"][0],
             recipients=[user.email],
-            text_body=render_template(
-                "email/export_highlights.txt", url=url, user=user
-            ),
-            html_body=render_template(
-                "email/export_highlights.html", url=url, user=user
-            ),
+            text_body=render_template("email/export_highlights.txt", url=url, user=user),
+            html_body=render_template("email/export_highlights.html", url=url, user=user),
             sync=True,
         )
         os.remove(zip_path)
@@ -582,8 +530,8 @@ def create_recall_text(highlight_id):
         return
 
     soup = BeautifulSoup(highlight.text, features="lxml")
-    for text in soup.find_all(string=True):
-        words = text.split(" ")
+    for text_node in soup.find_all(string=True):
+        words = text_node.split(" ")
         if len(words) > 3:
             for _ in range(0, len(words) // 3):
                 changed = False
@@ -596,7 +544,7 @@ def create_recall_text(highlight_id):
                         changed = True
                     attempts += 1
 
-        text.replace_with(" ".join(words))
+        text_node.replace_with(" ".join(words))
 
     highlight.prompt = soup.prettify()
     db.session.commit()

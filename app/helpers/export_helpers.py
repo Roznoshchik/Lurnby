@@ -32,19 +32,13 @@ def create_zip_file_for_article(article: Article, path: str, ext: str):
         article_highlights = create_list_of_highlight_dicts(article.highlights.all())
 
         if ext == "csv":
-            article_path, highlights_path = export_to_csv(
-                path, article_dict, article_highlights
-            )
+            article_path, highlights_path = export_to_csv(path, article_dict, article_highlights)
 
         if ext == "txt":
-            article_path, highlights_path = export_to_txt(
-                path, article_dict, article_highlights
-            )
+            article_path, highlights_path = export_to_txt(path, article_dict, article_highlights)
 
         if ext == "json":
-            article_path, highlights_path = export_to_json(
-                path, article_dict, article_highlights
-            )
+            article_path, highlights_path = export_to_json(path, article_dict, article_highlights)
 
         with ZipFile(zip_path, "w") as myzip:
             myzip.write(article_path, os.path.basename(article_path))
@@ -78,19 +72,13 @@ def get_highlights_export(highlights: list, path: str, ext: str):
         highlights = create_list_of_highlight_dicts(highlights)
 
         if ext == "csv":
-            _, highlights_path = export_to_csv(
-                path, article_dict=None, highlights=highlights
-            )
+            _, highlights_path = export_to_csv(path, article_dict=None, highlights=highlights)
 
         if ext == "txt":
-            _, highlights_path = export_to_txt(
-                path, article_dict=None, highlights=highlights
-            )
+            _, highlights_path = export_to_txt(path, article_dict=None, highlights=highlights)
 
         if ext == "json":
-            _, highlights_path = export_to_json(
-                path, article_dict=None, highlights=highlights
-            )
+            _, highlights_path = export_to_json(path, article_dict=None, highlights=highlights)
 
         with ZipFile(zip_path, "w") as myzip:
             myzip.write(highlights_path, os.path.basename(highlights_path))
@@ -181,9 +169,7 @@ def create_plain_text_article_dict(article):
         "title": article.title,
         "source": article.source_url or article.source,
         "notes": make_plain_text(article.notes) if article.notes else None,
-        "reflections": make_plain_text(article.reflections)
-        if article.reflections
-        else None,
+        "reflections": make_plain_text(article.reflections) if article.reflections else None,
         "tags": ", ".join(article.tag_list),
     }
 
@@ -195,9 +181,7 @@ def create_list_of_highlight_dicts(highlights):
             {
                 "text": make_plain_text(highlight.text) if highlight.text else None,
                 "note": make_plain_text(highlight.note) if highlight.note else None,
-                "prompt": make_plain_text(highlight.prompt)
-                if highlight.prompt
-                else None,
+                "prompt": make_plain_text(highlight.prompt) if highlight.prompt else None,
                 "source": highlight.source,
                 "tags": ", ".join([tag.name for tag in highlight.tags.all()]),
                 "topics": ", ".join([topic.title for topic in highlight.topics.all()]),

@@ -153,9 +153,7 @@ def export_data(id):
     if user and user.id == token_auth.current_user().id:
         ev = Event.add(EventName.EXPORTED_ALL_DATA, user=user)
         db.session.add(ev)
-        user.launch_task(
-            "account_export", "exporting data...", user.id, file_extension, delete=False
-        )
+        user.launch_task("account_export", "exporting data...", user.id, file_extension, delete=False)
         db.session.commit()
 
         return "", HTTPStatus.OK

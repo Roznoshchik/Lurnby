@@ -1,20 +1,20 @@
-import { useState, useEffect } from 'preact/hooks';
-import { Sidebar } from '../Sidebar/Sidebar';
-import { MobileNav } from '../MobileNav/MobileNav';
-import './Layout.css';
+import { useEffect, useState } from 'preact/hooks'
+import { MobileNav } from '../MobileNav/MobileNav'
+import { Sidebar } from '../Sidebar/Sidebar'
+import './Layout.css'
 
 export function Layout({ children, showAppDashboard = false }) {
-  const [darkMode, setDarkMode] = useState(false);
-  const [sidebarExpanded, setSidebarExpanded] = useState(false);
+  const [darkMode, setDarkMode] = useState(false)
+  const [sidebarExpanded, setSidebarExpanded] = useState(false)
 
   // Apply dark mode class to document root
   useEffect(() => {
     if (darkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add('dark')
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove('dark')
     }
-  }, [darkMode]);
+  }, [darkMode])
 
   return (
     <div className="app-container">
@@ -36,5 +36,5 @@ export function Layout({ children, showAppDashboard = false }) {
         {children}
       </div>
     </div>
-  );
+  )
 }

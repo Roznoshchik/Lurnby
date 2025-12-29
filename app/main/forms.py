@@ -7,9 +7,7 @@ from app.models import Topic
 
 class ContentForm(FlaskForm):
     url = URLField("URL", validators=[URL(), Optional()])
-    epub = FileField(
-        "Choose an epub file", validators=[FileAllowed(["epub"], "Epub only.")]
-    )
+    epub = FileField("Choose an epub file", validators=[FileAllowed(["epub"], "Epub only.")])
 
     title = StringField("Title")
     source = StringField("Source")

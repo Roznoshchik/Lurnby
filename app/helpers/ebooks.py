@@ -75,9 +75,7 @@ def process_images(soup, filepath, user):
             file_path = find_img_path(epub_dir, file_name)
             az_path = f"{az_path_base}/{file_name}"
             if file_path is not None:
-                img["xlink:href"] = upload_to_s3_and_get_url(
-                    file_path, az_path, user=user
-                )
+                img["xlink:href"] = upload_to_s3_and_get_url(file_path, az_path, user=user)
 
     images = soup.find_all("img")
     if images:

@@ -24,9 +24,7 @@ if is_production:
         with open(manifest_path, "r") as content:
             manifest = json.load(content)
     except OSError as exception:
-        raise OSError(
-            f"Manifest file not found at {manifest_path}. Run `npm run build`."
-        ) from exception
+        raise OSError(f"Manifest file not found at {manifest_path}. Run `npm run build`.") from exception
 
 
 @assets_blueprint.app_context_processor
@@ -60,10 +58,10 @@ def add_context():
                 entry = manifest.get(entry_key, {})
 
                 # Collect direct CSS files
-                css_files.extend(entry.get('css', []))
+                css_files.extend(entry.get("css", []))
 
                 # Recursively collect CSS from imports
-                for import_key in entry.get('imports', []):
+                for import_key in entry.get("imports", []):
                     css_files.extend(collect_css(import_key, visited))
 
             except Exception:

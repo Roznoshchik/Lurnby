@@ -90,11 +90,23 @@ cd client && npm run test:ui
 
 ### Code Quality
 ```bash
-# Lint with flake8
-flake8
+# Format code (both Python and client)
+flask format
 
-# Format with black
-black .
+# Format only Python files
+flask format --python-only
+
+# Format only client files
+flask format --client-only
+
+# Lint code (both Python and client)
+flask lint
+
+# Lint only Python files
+flask lint --python-only
+
+# Lint only client files
+flask lint --client-only
 
 # Run pre-commit hooks manually
 pre-commit run --all-files
@@ -102,6 +114,11 @@ pre-commit run --all-files
 # Install pre-commit hooks (runs automatically on commit)
 pre-commit install
 ```
+
+**Flask format and lint commands:**
+- Format: Uses Black for Python, Biome for client (JavaScript/JSX)
+- Lint: Uses Flake8 for Python, Biome for client
+- Automatically excludes ReadabiliPy, migrations, and other configured directories
 
 **Pre-commit hooks include:**
 - Flake8 (serious errors only: syntax errors, undefined names)

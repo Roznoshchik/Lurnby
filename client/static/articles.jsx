@@ -1,63 +1,63 @@
-import { render } from 'preact';
-import { useState, useEffect } from 'preact/hooks';
-import './css/globals.css';
-import './css/articles.css';
-import { Layout } from './components/Layout/Layout';
-import { AuthProvider } from './contexts/AuthContext/AuthContext';
-import RequireAuth from './components/RequireAuth/RequireAuth';
-import ArticleCard from './components/ArticleCard/ArticleCard';
-import Button from './components/Button/Button';
-import Icon from './components/Icon/Icon';
-import { api } from './utils/api';
-import { ROUTES } from './utils/routes';
-import { getReadableSource } from './utils/sourceFormatter';
+import { render } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
+import './css/globals.css'
+import './css/articles.css'
+import ArticleCard from './components/ArticleCard/ArticleCard'
+import Button from './components/Button/Button'
+import Icon from './components/Icon/Icon'
+import { Layout } from './components/Layout/Layout'
+import RequireAuth from './components/RequireAuth/RequireAuth'
+import { AuthProvider } from './contexts/AuthContext/AuthContext'
+import { api } from './utils/api'
+import { ROUTES } from './utils/routes'
+import { getReadableSource } from './utils/sourceFormatter'
 
 function ArticlesList() {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [articles, setArticles] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [monthlyStats, setMonthlyStats] = useState({
     reviewEvents: 0,
     articlesOpened: 0,
     highlightsAdded: 0,
-  });
+  })
 
   useEffect(() => {
-    fetchArticles();
-    fetchStats();
-  }, []);
+    fetchArticles()
+    fetchStats()
+  }, [])
 
   const fetchArticles = async () => {
     try {
-      setLoading(true);
-      const data = await api.get('/api/articles', { per_page: 50 });
-      setArticles(data.articles || []);
-      setError(null);
+      setLoading(true)
+      const data = await api.get('/api/articles', { per_page: 50 })
+      setArticles(data.articles || [])
+      setError(null)
     } catch (err) {
-      console.error('Error fetching articles:', err);
-      setError('Failed to load articles');
+      console.error('Error fetching articles:', err)
+      setError('Failed to load articles')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const fetchStats = async () => {
     try {
-      const data = await api.get(ROUTES.API.STATS);
+      const data = await api.get(ROUTES.API.STATS)
       setMonthlyStats({
         reviewEvents: data.reviews_this_month,
         articlesOpened: data.articles_opened_this_month,
         highlightsAdded: data.highlights_added_this_month,
-      });
+      })
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      console.error('Error fetching stats:', err)
     }
-  };
+  }
 
   const handleArticleClick = (article) => {
     // TODO: Navigate to article reader page
-    console.log('Article clicked:', article);
-  };
+    console.log('Article clicked:', article)
+  }
 
   return (
     <>
@@ -70,11 +70,7 @@ function ArticlesList() {
               <h1>Articles</h1>
               <span className="page-header-subtitle">Your Reading Library</span>
             </div>
-            <Button
-              variant="default"
-              icon="add"
-              onClick={() => console.log('Add new article')}
-            >
+            <Button variant="default" icon="add" onClick={() => console.log('Add new article')}>
               Add Article
             </Button>
           </div>
@@ -147,7 +143,7 @@ function ArticlesList() {
       {!loading && !error && articles.length > 0 && (
         <div className="content-container">
           <div className="articles-grid">
-            {articles.map(article => (
+            {articles.map((article) => (
               <ArticleCard
                 key={article.id}
                 article={{
@@ -161,7 +157,7 @@ function ArticlesList() {
         </div>
       )}
     </>
-  );
+  )
 }
 
 function ArticlesPage() {
@@ -173,7 +169,7 @@ function ArticlesPage() {
         </Layout>
       </RequireAuth>
     </AuthProvider>
-  );
+  )
 }
 
-render(<ArticlesPage />, document.getElementById('app'));
+render(<ArticlesPage />, document.getElementById('app'))

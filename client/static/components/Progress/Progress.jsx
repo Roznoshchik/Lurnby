@@ -1,11 +1,7 @@
-import './Progress.css';
+import './Progress.css'
 
-export default function Progress({
-  value = 0,
-  className = "",
-  ...props
-}) {
-  const clampedValue = Math.min(Math.max(value || 0, 0), 100);
+export default function Progress({ value = 0, className = '', ...props }) {
+  const clampedValue = Math.min(Math.max(value || 0, 0), 100)
 
   return (
     <div
@@ -21,5 +17,5 @@ export default function Progress({
         style={{ transform: `translateX(-${100 - clampedValue}%)` }}
       />
     </div>
-  );
+  )
 }

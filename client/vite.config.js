@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
-import preact from '@preact/preset-vite';
-import path from 'path';
+import path from 'node:path'
+import preact from '@preact/preset-vite'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [preact()],
@@ -25,4 +25,4 @@ export default defineConfig({
     environment: 'happy-dom',
     setupFiles: './test-setup.js',
   },
-});
+})

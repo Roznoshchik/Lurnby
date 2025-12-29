@@ -18,9 +18,7 @@ def get_task_status(task_id):
             return error_response(404, "resource not found")
 
         article_id = request.args.get("article_id", None)
-        location = (
-            url_for("api.get_article", article_uuid=article_id) if article_id else None
-        )
+        location = url_for("api.get_article", article_uuid=article_id) if article_id else None
 
         try:
             current_app.redis.ping()
@@ -31,15 +29,11 @@ def get_task_status(task_id):
         for _ in range(10):
             time.sleep(1)
             if task.complete:
-                response = jsonify(
-                    processing=False, progress=100, task_id=task_id, location=location
-                )
+                response = jsonify(processing=False, progress=100, task_id=task_id, location=location)
                 response.status_code = 200
                 return response
 
-        response = jsonify(
-            processing=True, progress=task.get_progress(), task_id=task_id
-        )
+        response = jsonify(processing=True, progress=task.get_progress(), task_id=task_id)
         response.status_code = 200
         return response
 

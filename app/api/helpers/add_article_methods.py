@@ -48,9 +48,7 @@ def process_url_entry(article, url):
     """
 
     if not validators.url(url):
-        raise LurnbyValueError(
-            "Can't validate url. Please check the data and try again"
-        )
+        raise LurnbyValueError("Can't validate url. Please check the data and try again")
 
     try:
         processed_url = pull_text(url)
@@ -148,9 +146,7 @@ def process_file_upload(article, upload_file_ext):
     if upload_file_ext and "." not in upload_file_ext:
         upload_file_ext = f".{upload_file_ext}"
 
-    if not upload_file_ext or (
-        upload_file_ext != ".epub" and upload_file_ext != ".pdf"
-    ):
+    if not upload_file_ext or (upload_file_ext != ".epub" and upload_file_ext != ".pdf"):
         raise LurnbyValueError('upload_file_ext should be ".epub" or ".pdf"')
 
     upload_url = s3.generate_presigned_url(

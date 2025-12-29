@@ -101,9 +101,7 @@ def article_export(user, articles, ext):
     else:
         for a in articles:
             data = {}
-            data["Title"] = "".join(
-                [c for c in a.title if c.isalpha() or c.isdigit()]
-            ).rstrip()
+            data["Title"] = "".join([c for c in a.title if c.isalpha() or c.isdigit()]).rstrip()
             data["Source"] = a.source_url if a.source_url else a.source
             data["Notes"] = a.notes
             data["Tags"] = [t.name for t in a.tags.filter_by(archived=False).all()]
@@ -113,15 +111,11 @@ def article_export(user, articles, ext):
                 highlight = {}
                 highlight["text"] = h.text
                 highlight["note"] = h.note
-                highlight["topics"] = [
-                    t.title for t in h.topics.filter_by(archived=False).all()
-                ]
+                highlight["topics"] = [t.title for t in h.topics.filter_by(archived=False).all()]
                 highlights.append(highlight)
             data["Highlights"] = highlights
 
-            with open(
-                f'{path}/{data["Title"]}_notes.json', "w", encoding="utf-16"
-            ) as f:
+            with open(f'{path}/{data["Title"]}_notes.json', "w", encoding="utf-16") as f:
                 f.write(json.dumps(data, ensure_ascii=False, indent=4))
 
 
@@ -144,9 +138,7 @@ def topics_export(user, topics, ext):
                     if h.article.source_url:
                         f.write(f"URL: {h.article.source_url} \n\n")
                     f.write("TOPICS\n")
-                    f.write(
-                        f'{", ".join([t.title for t in h.topics.filter_by(archived=False).all()])}\n\n'
-                    )
+                    f.write(f'{", ".join([t.title for t in h.topics.filter_by(archived=False).all()])}\n\n')
                     f.write(f"TEXT\n{h.text}\n\n")
                     f.write(f"Note\n{h.note}\n\n\n\n")
 
@@ -158,12 +150,8 @@ def topics_export(user, topics, ext):
             for h in t.highlights.filter_by(archived=False).all():
                 highlight = {}
                 highlight["From"] = h.article.title
-                highlight["Source"] = (
-                    h.article.source_url if h.article.source_url else h.article.source
-                )
-                highlight["Topics"] = [
-                    t.title for t in h.topics.filter_by(archived=False).all()
-                ]
+                highlight["Source"] = h.article.source_url if h.article.source_url else h.article.source
+                highlight["Topics"] = [t.title for t in h.topics.filter_by(archived=False).all()]
                 highlight["Text"] = h.text
                 highlight["Note"] = h.note
                 highlights.append(highlight)
@@ -190,9 +178,7 @@ def highlights_export(user, highlights, ext):
                 if h.article.source_url:
                     f.write(f"URL: {h.article.source_url} \n\n")
                 f.write("TOPICS\n")
-                f.write(
-                    f'{", ".join([t.title for t in h.topics.filter_by(archived=False).all()])}\n\n'
-                )
+                f.write(f'{", ".join([t.title for t in h.topics.filter_by(archived=False).all()])}\n\n')
                 f.write(f"TEXT\n{h.text}\n\n")
                 f.write(f"Note\n{h.note}\n\n\n\n")
 
@@ -202,12 +188,8 @@ def highlights_export(user, highlights, ext):
         for h in highlights:
             highlight = {}
             highlight["From"] = h.article.title
-            highlight["Source"] = (
-                h.article.source_url if h.article.source_url else h.article.source
-            )
-            highlight["Topics"] = [
-                t.title for t in h.topics.filter_by(archived=False).all()
-            ]
+            highlight["Source"] = h.article.source_url if h.article.source_url else h.article.source
+            highlight["Topics"] = [t.title for t in h.topics.filter_by(archived=False).all()]
             highlight["Text"] = h.text
             highlight["Note"] = h.note
 

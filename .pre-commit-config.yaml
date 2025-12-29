@@ -36,6 +36,7 @@ repos:
       - id: bandit
         args: ["-r", "app/", "-ll"]
         files: ^app/
+        pass_filenames: false
 
   # Python tests
   - repo: local

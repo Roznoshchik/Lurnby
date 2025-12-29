@@ -8,6 +8,7 @@ from app.models import User
 
 logger = CustomLogger("API")
 
+
 @bp.post("/auth/login")
 @basic_auth.login_required
 def login():
@@ -22,20 +23,11 @@ def login():
     refresh_token = user.get_refresh_token()
     db.session.commit()
 
-    response = jsonify({
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "user": user.to_dict()
-    })
+    response = jsonify({"access_token": access_token, "refresh_token": refresh_token, "user": user.to_dict()})
 
     # Set HttpOnly cookie for web browsers
     response.set_cookie(
-        "refresh_token",
-        refresh_token,
-        max_age=2592000,  # 30 days
-        httponly=True,
-        secure=True,
-        samesite="Lax"
+        "refresh_token", refresh_token, max_age=2592000, httponly=True, secure=True, samesite="Lax"  # 30 days
     )
 
     return response
@@ -56,11 +48,7 @@ def google_auth():
     user = User.query.filter_by(email=data["email"]).first()
     created = False
     if not user:
-        user = User(
-            goog_id=data["goog_id"],
-            email=data["email"],
-            firstname=data["first_name"]
-        )
+        user = User(goog_id=data["goog_id"], email=data["email"], firstname=data["first_name"])
         db.session.add(user)
         db.session.commit()  # Comms created automatically via after_insert event
         created = True
@@ -69,20 +57,11 @@ def google_auth():
     refresh_token = user.get_refresh_token()
     db.session.commit()
 
-    response = jsonify({
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "user": user.to_dict()
-    })
+    response = jsonify({"access_token": access_token, "refresh_token": refresh_token, "user": user.to_dict()})
 
     # Set HttpOnly cookie for web browsers
     response.set_cookie(
-        "refresh_token",
-        refresh_token,
-        max_age=2592000,  # 30 days
-        httponly=True,
-        secure=True,
-        samesite="Lax"
+        "refresh_token", refresh_token, max_age=2592000, httponly=True, secure=True, samesite="Lax"  # 30 days
     )
 
     if created:
@@ -114,10 +93,7 @@ def refresh():
     access_token = user.get_access_token()
     db.session.commit()
 
-    return jsonify({
-        "access_token": access_token,
-        "user": user.to_dict()
-    })
+    return jsonify({"access_token": access_token, "user": user.to_dict()})
 
 
 @bp.post("/auth/logout")
@@ -134,13 +110,6 @@ def logout():
     response = jsonify({"message": "logged out"})
 
     # Clear cookie for web browsers
-    response.set_cookie(
-        "refresh_token",
-        "",
-        max_age=0,
-        httponly=True,
-        secure=True,
-        samesite="Lax"
-    )
+    response.set_cookie("refresh_token", "", max_age=0, httponly=True, secure=True, samesite="Lax")
 
     return response

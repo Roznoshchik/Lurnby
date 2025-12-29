@@ -24,9 +24,7 @@ class Topic(db.Model):
         lazy="dynamic",
     )
     archived = db.Column(db.Boolean, index=True)
-    tags = db.relationship(
-        "Tag", secondary=tags_topics, back_populates="topics", lazy="dynamic"
-    )
+    tags = db.relationship("Tag", secondary=tags_topics, back_populates="topics", lazy="dynamic")
     last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
     def is_added_highlight(self, highlight):
@@ -46,11 +44,7 @@ class Topic(db.Model):
 
     def not_added_tag(self):
 
-        query = (
-            db.session.query(tags_topics)
-            .filter(tags_topics.c.topic_id == self.id)
-            .count()
-        )
+        query = db.session.query(tags_topics).filter(tags_topics.c.topic_id == self.id).count()
 
         if query == 0:
             return True
@@ -65,12 +59,7 @@ class Topic(db.Model):
             .outerjoin(tags_topics, tags_topics.c.tag_id == Tag.id)
             .filter(tags_topics.c.topic_id == self.id)
         )
-        q = (
-            db.session.query(Tag)
-            .filter(~Tag.id.in_(sub))
-            .filter_by(user_id=user.id)
-            .all()
-        )
+        q = db.session.query(Tag).filter(~Tag.id.in_(sub)).filter_by(user_id=user.id).all()
 
         return q
 

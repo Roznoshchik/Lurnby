@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from app import db, create_app
-from app.models import User, Highlight, Approved_Sender, Tag, Article, Comms
+from app.models import Highlight
 from app.tasks import create_recall_text
 from config import Config
 

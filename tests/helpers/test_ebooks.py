@@ -3,8 +3,7 @@ import os
 import shutil
 import tempfile
 import unittest
-from unittest.mock import patch, call
-from zipfile import ZipFile
+from unittest.mock import patch
 
 from app import db, create_app
 from app.models import User
@@ -51,7 +50,7 @@ class EbookProcessingTests(unittest.TestCase):
             """,
             "lxml",
         )
-        with patch("app.helpers.ebooks.s3") as mock_s3:
+        with patch("app.helpers.ebooks.s3"):
             with patch("app.helpers.ebooks.find_img_path") as mock_find_img:
                 mock_find_img.return_value = "path/to/img/"
                 soup = process_images(soup, epub_file, self.user)

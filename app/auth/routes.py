@@ -204,9 +204,7 @@ def reset_password_request():
             send_password_reset_email(user)
         flash("Check your email for the instructions to reset your password", "message")
         return redirect(url_for("auth.login"))
-    return render_template(
-        "auth/reset_password_request.html", title="Reset Password", form=form
-    )
+    return render_template("auth/reset_password_request.html", title="Reset Password", form=form)
 
 
 @bp.route("/reset_password_request2", methods=["GET", "POST"])
@@ -220,9 +218,7 @@ def reset_password_request2():
             send_password_reset_email(user)
         flash("Check your email for the instructions to reset your password", "message")
         return redirect(url_for("auth.login"))
-    return render_template(
-        "auth/reset_password_request.html", title="Reset Password", form=form
-    )
+    return render_template("auth/reset_password_request.html", title="Reset Password", form=form)
 
 
 @bp.route("/reset_password/<token>", methods=["GET", "POST"])

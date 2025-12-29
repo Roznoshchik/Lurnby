@@ -21,9 +21,7 @@ class UpdateAccountForm(FlaskForm):
         user = User.query.filter_by(username=username.data.lower()).first()
 
         if user and user.username != username.data.lower():
-            raise ValidationError(
-                message="Username not available. Please use a different username."
-            )
+            raise ValidationError(message="Username not available. Please use a different username.")
 
 
 class UpdateEmailForm(FlaskForm):
@@ -74,7 +72,5 @@ class UpdatePasswordForm(FlaskForm):
 
 class ResetPasswordForm(FlaskForm):
     password = PasswordField("Password", validators=[DataRequired()])
-    repeat_password = PasswordField(
-        "Repeat Password", validators=[DataRequired(), EqualTo("password")]
-    )
+    repeat_password = PasswordField("Repeat Password", validators=[DataRequired(), EqualTo("password")])
     submit = SubmitField("Reset Your Password")

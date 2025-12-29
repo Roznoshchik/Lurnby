@@ -5,29 +5,29 @@
  * The access token is stored privately within this module and never exposed.
  */
 
-import { ROUTES } from './routes.js';
+import { ROUTES } from './routes.js'
 
 // Private module-level state (only place access token lives)
-let _accessToken = null;
+let _accessToken = null
 
 /**
  * Set the access token (internal use only)
  */
 export const setAccessToken = (token) => {
-  _accessToken = token;
-};
+  _accessToken = token
+}
 
 /**
  * Get the current access token (for debugging only)
  */
-export const getAccessToken = () => _accessToken;
+export const getAccessToken = () => _accessToken
 
 /**
  * Clear the access token
  */
 export const clearAccessToken = () => {
-  _accessToken = null;
-};
+  _accessToken = null
+}
 
 /**
  * Bootstrap authentication on app load
@@ -43,23 +43,23 @@ export async function bootstrapAuth() {
       headers: {
         'Content-Type': 'application/json',
       },
-    });
+    })
 
     if (response.ok) {
-      const data = await response.json();
-      setAccessToken(data.access_token);
-      return { success: true, user: data.user };
+      const data = await response.json()
+      setAccessToken(data.access_token)
+      return { success: true, user: data.user }
     }
 
     if (response.status === 401) {
-      return { success: false, error: 'Not authenticated' };
+      return { success: false, error: 'Not authenticated' }
     }
 
-    const errorData = await response.json().catch(() => ({}));
-    return { success: false, error: errorData.error || 'Authentication failed' };
+    const errorData = await response.json().catch(() => ({}))
+    return { success: false, error: errorData.error || 'Authentication failed' }
   } catch (error) {
-    console.error('Bootstrap auth error:', error);
-    return { success: false, error: 'Network error' };
+    console.error('Bootstrap auth error:', error)
+    return { success: false, error: 'Network error' }
   }
 }
 
@@ -75,40 +75,40 @@ async function fetchWithAuth(url, options = {}) {
   const headers = {
     'Content-Type': 'application/json',
     ...options.headers,
-  };
+  }
 
   if (_accessToken) {
-    headers['Authorization'] = `Bearer ${_accessToken}`;
+    headers.Authorization = `Bearer ${_accessToken}`
   }
 
   const fetchOptions = {
     ...options,
     headers,
     credentials: 'include', // Always include cookies for refresh token
-  };
+  }
 
   // Make the request
-  let response = await fetch(url, fetchOptions);
+  const response = await fetch(url, fetchOptions)
 
   // If 401, try to refresh token and retry once
   if (response.status === 401 && !options._retry) {
-    console.log('Access token expired, attempting refresh...');
+    console.log('Access token expired, attempting refresh...')
 
-    const refreshResult = await bootstrapAuth();
+    const refreshResult = await bootstrapAuth()
 
     if (refreshResult.success) {
-      console.log('Token refreshed successfully, retrying request...');
+      console.log('Token refreshed successfully, retrying request...')
       // Retry the original request with new token
-      return fetchWithAuth(url, { ...options, _retry: true });
+      return fetchWithAuth(url, { ...options, _retry: true })
     } else {
-      console.log('Token refresh failed');
-      clearAccessToken();
+      console.log('Token refresh failed')
+      clearAccessToken()
       // Return the 401 response so the component can handle redirect
-      return response;
+      return response
     }
   }
 
-  return response;
+  return response
 }
 
 /**
@@ -121,28 +121,28 @@ async function fetchWithAuth(url, options = {}) {
 export async function login(username, password) {
   try {
     // Encode credentials for HTTP Basic Auth
-    const credentials = btoa(`${username}:${password}`);
+    const credentials = btoa(`${username}:${password}`)
 
     const response = await fetch(ROUTES.API.LOGIN, {
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${credentials}`,
+        Authorization: `Basic ${credentials}`,
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-    });
+    })
 
     if (response.ok) {
-      const data = await response.json();
-      setAccessToken(data.access_token);
-      return { success: true, user: data.user };
+      const data = await response.json()
+      setAccessToken(data.access_token)
+      return { success: true, user: data.user }
     }
 
-    const errorData = await response.json().catch(() => ({}));
-    return { success: false, error: errorData.error || 'Login failed' };
+    const errorData = await response.json().catch(() => ({}))
+    return { success: false, error: errorData.error || 'Login failed' }
   } catch (error) {
-    console.error('Login error:', error);
-    return { success: false, error: 'Network error' };
+    console.error('Login error:', error)
+    return { success: false, error: 'Network error' }
   }
 }
 
@@ -161,19 +161,19 @@ export async function loginWithGoogle(token) {
       },
       credentials: 'include',
       body: JSON.stringify({ token }),
-    });
+    })
 
     if (response.ok) {
-      const data = await response.json();
-      setAccessToken(data.access_token);
-      return { success: true, user: data.user };
+      const data = await response.json()
+      setAccessToken(data.access_token)
+      return { success: true, user: data.user }
     }
 
-    const errorData = await response.json().catch(() => ({}));
-    return { success: false, error: errorData.error || 'Google login failed' };
+    const errorData = await response.json().catch(() => ({}))
+    return { success: false, error: errorData.error || 'Google login failed' }
   } catch (error) {
-    console.error('Google login error:', error);
-    return { success: false, error: 'Network error' };
+    console.error('Google login error:', error)
+    return { success: false, error: 'Network error' }
   }
 }
 
@@ -187,13 +187,13 @@ export async function logout() {
     await fetch(ROUTES.API.LOGOUT, {
       method: 'POST',
       credentials: 'include',
-    });
-    clearAccessToken();
-    return { success: true };
+    })
+    clearAccessToken()
+    return { success: true }
   } catch (error) {
-    console.error('Logout error:', error);
-    clearAccessToken(); // Clear token even if request fails
-    return { success: true }; // Always return success for logout
+    console.error('Logout error:', error)
+    clearAccessToken() // Clear token even if request fails
+    return { success: true } // Always return success for logout
   }
 }
 
@@ -209,13 +209,13 @@ export const api = {
    */
   async get(endpoint, params = {}) {
     const queryString = Object.keys(params).length
-      ? '?' + new URLSearchParams(params).toString()
-      : '';
-    const response = await fetchWithAuth(`${endpoint}${queryString}`);
+      ? `?${new URLSearchParams(params).toString()}`
+      : ''
+    const response = await fetchWithAuth(`${endpoint}${queryString}`)
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    return response.json();
+    return response.json()
   },
 
   /**
@@ -228,11 +228,11 @@ export const api = {
     const response = await fetchWithAuth(endpoint, {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    return response.json();
+    return response.json()
   },
 
   /**
@@ -245,11 +245,11 @@ export const api = {
     const response = await fetchWithAuth(endpoint, {
       method: 'PATCH',
       body: JSON.stringify(data),
-    });
+    })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    return response.json();
+    return response.json()
   },
 
   /**
@@ -262,11 +262,11 @@ export const api = {
     const response = await fetchWithAuth(endpoint, {
       method: 'PUT',
       body: JSON.stringify(data),
-    });
+    })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    return response.json();
+    return response.json()
   },
 
   /**
@@ -277,10 +277,10 @@ export const api = {
   async delete(endpoint) {
     const response = await fetchWithAuth(endpoint, {
       method: 'DELETE',
-    });
+    })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
     }
-    return response.json();
+    return response.json()
   },
-};
+}

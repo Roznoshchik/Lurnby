@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import Optional
 from flask_login import current_user
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 
-from app.models.base import db
+from app import db
 
 
 class EventName(Enum):
     """Event name constants for tracking user actions"""
+
     ADDED_APPROVED_SENDER = "added approved sender"
     ADDED_ARTICLE = "added article"
     ADDED_HIGHLIGHT = "added highlight"
@@ -46,10 +46,8 @@ class EventName(Enum):
 
 
 class Event(db.Model):
-    __tablename__ = 'event'
-    __table_args__ = (
-        sa.Index('ix_event_user_name_date', 'user_id', 'name', 'date'),
-    )
+    __tablename__ = "event"
+    __table_args__ = (sa.Index("ix_event_user_name_date", "user_id", "name", "date"),)
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"))
@@ -71,8 +69,6 @@ class Event(db.Model):
         Raises:
             ValueError: If kind is a string that doesn't match any EventName value
         """
-        from app.models.user import User
-
         # Convert to EventName enum (raises ValueError if invalid)
         event_enum = EventName(kind)
         event_name = event_enum.value
@@ -105,12 +101,7 @@ class Event(db.Model):
             return ev
 
     @staticmethod
-    def count_events(
-        user_id: int,
-        event_names: list[EventName],
-        start_date: datetime,
-        end_date: datetime
-    ) -> int:
+    def count_events(user_id: int, event_names: list[EventName], start_date: datetime, end_date: datetime) -> int:
         """Count events by type, user, and date range
 
         Args:
@@ -125,11 +116,12 @@ class Event(db.Model):
         # Convert EventName enums to their string values
         name_values = [event.value for event in event_names]
 
-        stmt = sa.select(sa.func.count()).select_from(Event).where(
-            Event.user_id == user_id,
-            Event.name.in_(name_values),
-            Event.date >= start_date,
-            Event.date < end_date
+        stmt = (
+            sa.select(sa.func.count())
+            .select_from(Event)
+            .where(
+                Event.user_id == user_id, Event.name.in_(name_values), Event.date >= start_date, Event.date < end_date
+            )
         )
         count = db.session.scalar(stmt)
 
@@ -142,12 +134,7 @@ class Event(db.Model):
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
-        return Event.count_events(
-            user_id,
-            [EventName.REVIEWED_A_HIGHLIGHT],
-            month_start,
-            next_month
-        )
+        return Event.count_events(user_id, [EventName.REVIEWED_A_HIGHLIGHT], month_start, next_month)
 
     @staticmethod
     def count_articles_opened_this_month(user_id: int) -> int:
@@ -156,12 +143,7 @@ class Event(db.Model):
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
-        return Event.count_events(
-            user_id,
-            [EventName.OPENED_ARTICLE],
-            month_start,
-            next_month
-        )
+        return Event.count_events(user_id, [EventName.OPENED_ARTICLE], month_start, next_month)
 
     @staticmethod
     def count_highlights_added_this_month(user_id: int) -> int:
@@ -170,12 +152,7 @@ class Event(db.Model):
         month_start = datetime(now.year, now.month, 1, 0, 0)
         next_month = month_start.replace(month=now.month + 1) if now.month < 12 else datetime(now.year + 1, 1, 1)
 
-        return Event.count_events(
-            user_id,
-            [EventName.ADDED_HIGHLIGHT],
-            month_start,
-            next_month
-        )
+        return Event.count_events(user_id, [EventName.ADDED_HIGHLIGHT], month_start, next_month)
 
     def __repr__(self):
         return f'<User {self.user_id} {self.name} on {self.date.strftime("%b %d %Y %H:%M:%S")}>'
@@ -188,6 +165,4 @@ def update_user_last_action(action, user=current_user):
     logger = CustomLogger("MODELS")
     if current_user:
         logger.info(f"last action = {action}")
-        db.session.execute(
-            User.__table__.update().values(last_action=action).where(User.id == user.id)
-        )
+        db.session.execute(User.__table__.update().values(last_action=action).where(User.id == user.id))

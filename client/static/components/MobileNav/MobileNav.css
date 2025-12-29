@@ -63,7 +63,9 @@
 .mobile-dropdown {
   border-top: 1px solid var(--border);
   background-color: var(--card);
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 .mobile-dropdown nav {
@@ -91,7 +93,9 @@
   padding: var(--space-2) var(--space-3);
   color: var(--foreground);
   border-radius: var(--radius);
-  transition: background-color 150ms, color 150ms;
+  transition:
+    background-color 150ms,
+    color 150ms;
   text-decoration: none;
 }
 

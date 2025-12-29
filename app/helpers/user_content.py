@@ -13,9 +13,7 @@ def get_recent_highlights():
     logger.info("checking if highlights email needs to be sent out.")
     users = (
         User.query.join(Comms, (Comms.user_id == User.id))
-        .filter(
-            Comms.highlights == True, User.deleted == False, User.test_account == False
-        )
+        .filter(Comms.highlights == True, User.deleted == False, User.test_account == False)
         .all()
     )
     today = datetime.utcnow()
@@ -23,9 +21,7 @@ def get_recent_highlights():
 
     for u in users:
 
-        msg = u.messages.filter(
-            Message.name == "recent highlights", Message.date > last_week
-        ).first()
+        msg = u.messages.filter(Message.name == "recent highlights", Message.date > last_week).first()
         if not msg:
             highlights = (
                 u.highlights.order_by(Highlight.created_date.desc())
@@ -53,12 +49,8 @@ def get_recent_highlights():
                     "[Lurnby] Your recent highlights",
                     sender=current_app.config["ADMINS"][0],
                     recipients=[u.email],
-                    text_body=render_template(
-                        "email/content/recent_highlights.txt", highlights=recent
-                    ),
-                    html_body=render_template(
-                        "email/content/recent_highlights.html", highlights=recent
-                    ),
+                    text_body=render_template("email/content/recent_highlights.txt", highlights=recent),
+                    html_body=render_template("email/content/recent_highlights.html", highlights=recent),
                     sync=True,
                 )
                 msg = Message.add("recent highlights", u)
@@ -70,6 +62,4 @@ def get_recent_highlights():
 
 
 def highlights_urls(highlights):
-    print(
-        render_template("email/content/recent_highlights.html", highlights=highlights)
-    )
+    print(render_template("email/content/recent_highlights.html", highlights=highlights))

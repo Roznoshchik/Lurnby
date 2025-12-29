@@ -20,4 +20,4 @@ export const ROUTES = {
     LOGOUT: '/api/auth/logout',
     STATS: '/api/user/stats',
   },
-};
+}

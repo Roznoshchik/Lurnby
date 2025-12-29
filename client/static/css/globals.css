@@ -1,17 +1,17 @@
-@import './palette.css';
-@import './theme.css';
-@import './text.css';
-@import './sizing.css';
-@import './forms.css';
-@import './buttons.css';
+@import "./palette.css";
+@import "./theme.css";
+@import "./text.css";
+@import "./sizing.css";
+@import "./forms.css";
+@import "./buttons.css";
 
 :root {
-  --radius-sm: var(--space-0);    /* 0px */
-  --radius-md: var(--space-0-5);  /* 2px */
-  --radius-lg: var(--space-1);    /* 4px */
-  --radius-xl: var(--space-2);    /* 8px */
-  --radius-circle: 50%;           /* Fully circular */
-  --radius-pill: 999px;           /* pill shaped for tags */
+  --radius-sm: var(--space-0); /* 0px */
+  --radius-md: var(--space-0-5); /* 2px */
+  --radius-lg: var(--space-1); /* 4px */
+  --radius-xl: var(--space-2); /* 8px */
+  --radius-circle: 50%; /* Fully circular */
+  --radius-pill: 999px; /* pill shaped for tags */
 
   /* Default radius */
   --radius: var(--radius-md);
@@ -45,7 +45,7 @@ body {
 
 /* Subtle paper texture */
 body::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
@@ -53,12 +53,13 @@ body::before {
   height: 100%;
   opacity: 0.03;
   pointer-events: none;
-  background-image:
-    repeating-linear-gradient(0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 3px);
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 3px
+  );
   z-index: 1;
 }
 

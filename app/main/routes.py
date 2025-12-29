@@ -61,9 +61,7 @@ logger = CustomLogger("MAIN")
 @bp.route("/articles", methods=["GET", "POST"])
 @login_required
 def articles():
-    today_start = datetime(
-        datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0
-    )
+    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     today_end = today_start + timedelta(days=1)
     ev = Event.query.filter(
         Event.name == "visited platform",
@@ -184,16 +182,14 @@ def articles():
         if filtered_count < per_page:
             visible_count = f"0 to {filtered_count}"
         else:
-            visible_count = f"{(per_page * page) - per_page } to {per_page * page}"
+            visible_count = f"{(per_page * page) - per_page} to {per_page * page}"
 
         query = query.paginate(page=page, per_page=per_page, error_out=False)
         has_next = query.has_next if query.has_next else None
 
         return json.dumps(
             {
-                "html": render_template(
-                    "_all_articles.html", page=page, articles=query.items
-                ),
+                "html": render_template("_all_articles.html", page=page, articles=query.items),
                 "showing": f"Showing {visible_count} out of {filtered_count} articles.",
                 "has_next": has_next,
             }
@@ -236,15 +232,10 @@ def toggleDarkMode():
 @login_required
 def notifications():
     since = request.args.get("since", 0.0, type=float)
-    notifications = current_user.notifications.filter(
-        Notification.timestamp > since
-    ).order_by(Notification.timestamp.asc())
-    return jsonify(
-        [
-            {"name": n.name, "data": n.get_data(), "timestamp": n.timestamp}
-            for n in notifications
-        ]
+    notifications = current_user.notifications.filter(Notification.timestamp > since).order_by(
+        Notification.timestamp.asc()
     )
+    return jsonify([{"name": n.name, "data": n.get_data(), "timestamp": n.timestamp} for n in notifications])
 
 
 # ########################################################### #
@@ -283,11 +274,7 @@ def export_highlights():
         u = User.query.get(current_user.id)
 
         if "article_export" in data and data["article_export"]:
-            article_highlights = (
-                Article.query.get(data["article_id"])
-                .highlights.filter_by(archived=False)
-                .all()
-            )
+            article_highlights = Article.query.get(data["article_id"]).highlights.filter_by(archived=False).all()
             current_user.launch_task(
                 "export_legacy_highlights",
                 "Exporting highlights...",
@@ -373,9 +360,7 @@ def export_highlights():
             if not page:
                 page = 1
 
-            highlights = query.paginate(
-                page=page, per_page=per_page, error_out=False
-            ).items
+            highlights = query.paginate(page=page, per_page=per_page, error_out=False).items
 
             current_user.launch_task(
                 "export_legacy_highlights",
@@ -395,9 +380,7 @@ def export_highlights():
             )
     return (
         json.dumps(
-            {
-                "msg": "Your export is being prepared. You will receive an email with download instructions shortly!"
-            }
+            {"msg": "Your export is being prepared. You will receive an email with download instructions shortly!"}
         ),
         200,
         {"ContentType": "application/json"},
@@ -593,9 +576,7 @@ def user_dashboard():
 
     users = data_dashboard()
 
-    today_start = datetime(
-        datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0
-    )
+    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     month_start = datetime(datetime.utcnow().year, datetime.utcnow().month, 1, 0, 0)
     daily_active = (
         db.session.query(Event.user_id)
@@ -640,9 +621,7 @@ def suggestions_dashboard():
 
     suggestions = Suggestion.query.all()
 
-    return render_template(
-        "dashboard/suggestion_dash.html", form=form, suggestions=suggestions
-    )
+    return render_template("dashboard/suggestion_dash.html", form=form, suggestions=suggestions)
 
 
 # ########################## #
@@ -1051,9 +1030,7 @@ def download_image(id, resource):
     # print(id)
     # print(resource)
     """ resource: name of the file to download"""
-    url = s3.generate_presigned_url(
-        "get_object", Params={"Bucket": bucket, "Key": resource}, ExpiresIn=30
-    )
+    url = s3.generate_presigned_url("get_object", Params={"Bucket": bucket, "Key": resource}, ExpiresIn=30)
     return redirect(url, code=302)
 
 
@@ -1081,11 +1058,7 @@ def article(uuid):
 
         db.session.commit()
 
-        topics = (
-            Topic.query.filter_by(user_id=current_user.id, archived=False)
-            .order_by(Topic.last_used.desc())
-            .all()
-        )
+        topics = Topic.query.filter_by(user_id=current_user.id, archived=False).order_by(Topic.last_used.desc()).all()
         content = article.content
         title = article.title
         progress = article.progress
@@ -1454,9 +1427,7 @@ def addhighlight():
 
     db.session.commit()
     if newHighlight.prompt == "":
-        current_user.launch_task(
-            "create_recall_text", "Creating highlight recall text", newHighlight.id
-        )
+        current_user.launch_task("create_recall_text", "Creating highlight recall text", newHighlight.id)
 
     if newHighlight.topics.count() == 0:
         newHighlight.no_topics = True
@@ -1514,12 +1485,7 @@ def view_highlight(id):
         form.text.data = highlight.text
         form.note.data = highlight.note
         form.prompt.data = highlight.prompt
-        topics_list = [
-            t.title
-            for t in Topic.query.filter_by(
-                archived=False, user_id=current_user.id
-            ).all()
-        ]
+        topics_list = [t.title for t in Topic.query.filter_by(archived=False, user_id=current_user.id).all()]
         nonmember_list = [t.title for t in nonmember]
         html = render_template(
             "highlight.html",
@@ -1572,9 +1538,7 @@ def view_highlight(id):
 
         nonmembers = data["untopics"]
         for nonmember in nonmembers:
-            topic = Topic.query.filter_by(
-                title=nonmember, user_id=current_user.id
-            ).first()
+            topic = Topic.query.filter_by(title=nonmember, user_id=current_user.id).first()
             if topic:
                 highlight.RemoveFromTopic(topic)
 
@@ -1590,9 +1554,7 @@ def view_highlight(id):
 
         db.session.commit()
 
-        topics_list = [
-            t.title for t in current_user.topics.order_by(Topic.last_used.desc()).all()
-        ]
+        topics_list = [t.title for t in current_user.topics.order_by(Topic.last_used.desc()).all()]
 
         return (json.dumps({"success": True}), 200, {"ContentType": "application/json"})
 
@@ -1730,9 +1692,7 @@ def highlights():
     col = getattr(Highlight, "created_date")
     topic_sort = getattr(Topic, "last_used").desc()
 
-    highlights = (
-        query.order_by(col.desc()).paginate(page=1, per_page=15, error_out=False).items
-    )
+    highlights = query.order_by(col.desc()).paginate(page=1, per_page=15, error_out=False).items
 
     topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
 
@@ -1753,9 +1713,7 @@ def highlights():
         col = getattr(Highlight, "created_date")
         topic_sort = getattr(Topic, "last_used").desc()
 
-        all_user_topics = (
-            current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
-        )
+        all_user_topics = current_user.topics.filter_by(archived=False).order_by(topic_sort).all()
         # print(topics)
         # filter for topics
         if topics != []:
@@ -1821,9 +1779,7 @@ def highlights():
 
         data = {
             "topics": [topic.title for topic in all_user_topics],
-            "html": render_template(
-                "filter_highlights.html", highlights=highlights.items, page=page
-            ),
+            "html": render_template("filter_highlights.html", highlights=highlights.items, page=page),
             "filtered_count": filtered_count,
             "showing_count": showing_count,
             "has_next": highlights.has_next if highlights.has_next else None,
@@ -1849,9 +1805,7 @@ def review():
 
     col = getattr(Topic, "last_used").desc()
     topics = current_user.topics.filter_by(archived=False).order_by(col).all()
-    highlights = current_user.highlights.filter_by(
-        archived=False, do_not_review=False
-    ).all()
+    highlights = current_user.highlights.filter_by(archived=False, do_not_review=False).all()
     tiers = order_highlights(highlights)
     empty = True
     for i in range(8):
@@ -1890,9 +1844,7 @@ def review():
                     empty = False
                     break
         else:
-            highlights = current_user.highlights.filter_by(
-                archived=False, do_not_review=False
-            ).all()
+            highlights = current_user.highlights.filter_by(archived=False, do_not_review=False).all()
             tiers = order_highlights(highlights)
             empty = True
             for i in range(8):
@@ -1910,16 +1862,12 @@ def review():
         data = {
             "topics": [topic.title for topic in topics],
             "highlights": filtered,
-            "html": render_template(
-                "review/filter_review.html", tiers=tiers, days=days, empty=empty
-            ),
+            "html": render_template("review/filter_review.html", tiers=tiers, days=days, empty=empty),
         }
 
         return json.dumps(data)
 
-    return render_template(
-        "review/review.html", topics=topics, tiers=tiers, days=days, empty=empty
-    )
+    return render_template("review/review.html", topics=topics, tiers=tiers, days=days, empty=empty)
 
 
 @bp.route("/review/settings", methods=["POST"])
@@ -1936,9 +1884,7 @@ def update_review_settings():
 @bp.route("/tier/<id>", methods=["POST"])
 def tier(id):
 
-    today_start = datetime(
-        datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0
-    )
+    today_start = datetime(datetime.utcnow().year, datetime.utcnow().month, datetime.utcnow().day, 0, 0)
     today_end = today_start + timedelta(days=1)
     ev = Event.query.filter(
         Event.name == "reviewed highlights",
