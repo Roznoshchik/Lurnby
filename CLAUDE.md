@@ -8,10 +8,11 @@ Lurnby is a personal knowledge practice tool built with Flask that helps users r
 
 **Tech Stack:**
 - Backend: Flask, SQLAlchemy, PostgreSQL, Redis
-- Frontend: Preact + Vite (migrating from Jinja2 templates), JavaScript, SASS
+- Frontend: Preact + Vite (active migration from Jinja2 templates), JavaScript, CSS
 - Background Tasks: RQ (Redis Queue)
 - External Services: AWS S3 (epub images), Google OAuth, SendGrid (email)
 - Deployment: Heroku (via git push using Dockerfile)
+- Testing: pytest (backend), Vitest (frontend)
 
 ## Development Setup
 
@@ -68,17 +69,23 @@ cd client && npm start
 
 ### Testing
 ```bash
-# Run all tests
+# Run frontend tests only
+flask test
+
+# Run all tests (Python + frontend)
+flask test --all
+
+# Run Python tests only
 pytest
 
-# Run with coverage
+# Run Python tests with coverage
 pytest --cov=app
 
 # Run specific test file
 pytest tests/api/test_articles.py
 
-# Run tests with verbose output
-pytest -v
+# Run frontend tests with UI
+cd client && npm run test:ui
 ```
 
 ### Code Quality
@@ -88,7 +95,20 @@ flake8
 
 # Format with black
 black .
+
+# Run pre-commit hooks manually
+pre-commit run --all-files
+
+# Install pre-commit hooks (runs automatically on commit)
+pre-commit install
 ```
+
+**Pre-commit hooks include:**
+- Flake8 (serious errors only: syntax errors, undefined names)
+- Black (manual stage, for checking only)
+- Pytest (Python tests)
+- Vitest (frontend tests)
+- Trailing whitespace, end-of-file-fixer, check-yaml, etc.
 
 ## Architecture
 
@@ -99,7 +119,8 @@ The app uses Flask's application factory pattern with blueprints:
 - **`learnbetter.py`**: Entry point that creates the Flask app and registers shell context
 - **`config.py`**: Configuration management using environment variables
 - **`app/__init__.py`**: Application factory (`create_app()`) and extension initialization
-- **`app/models.py`**: SQLAlchemy models (User, Article, Highlight, Topic, Tag, Task, etc.)
+- **`app/models/`**: SQLAlchemy models split into separate files (user.py, article.py, highlight.py, event.py, tag.py, etc.)
+- **`app/cli.py`**: Custom Flask CLI commands (serve, build, test)
 
 ### Blueprints
 
@@ -107,9 +128,11 @@ The app uses Flask's application factory pattern with blueprints:
 2. **`app/main`**: Core user-facing routes for reading, highlighting, and reviewing content
 3. **`app/content`**: Content management routes
 4. **`app/settings`**: User settings and preferences
-5. **`app/api`**: RESTful API endpoints (articles, highlights, tags, users)
-6. **`app/dotcom`**: Marketing/landing page routes
-7. **`app/errors`**: Error handlers
+5. **`app/api`**: RESTful API endpoints (articles, highlights, tags, users, auth)
+6. **`app/client`**: Preact frontend routes (serves client-side rendered pages)
+7. **`app/dotcom`**: Marketing/landing page routes
+8. **`app/errors`**: Error handlers
+9. **`app/assets_blueprint`**: Asset resolution for dev/prod environments
 
 ### Key Components
 
@@ -153,7 +176,7 @@ Important model features:
 
 ### Database
 
-- **Development**: SQLite (`app.db`)
+- **Development**: PostgreSQL
 - **Production**: PostgreSQL
 - **Migrations**: Flask-Migrate (Alembic)
 
@@ -179,7 +202,6 @@ Located in `app/static/`:
 - `dist/` - Vite build output for Preact frontend (gitignored in dev)
 
 ### Preact Frontend Architecture
-Vite:
 
 **Structure:**
 - `client/` - Preact source code and Vite configuration
@@ -196,6 +218,13 @@ Vite:
 - Dev: Returns Vite dev server URLs (e.g., `http://localhost:5173/static/dist/main.jsx`)
 - Prod: Returns static file URLs from manifest (e.g., `/static/dist/bundled/main-[hash].js`)
 
+**Implemented Pages:**
+- Login page (`/client/login`) - Username/password authentication
+- Articles page (`/client/articles`) - Article list with stats, filtering planned
+- Shared components: Layout, Sidebar, MobileNav, ArticleCard, Button, Icon, Badge, Progress
+- Auth system: AuthContext, RequireAuth wrapper, API client with auto-retry
+- Design system: Light/dark themes, spacing scale, component library
+
 ### Browser Extensions
 
 The `extensions/` directory contains browser extensions for Chrome, Firefox, and Safari that integrate with the API to save articles from the browser.
@@ -203,10 +232,24 @@ The `extensions/` directory contains browser extensions for Chrome, Firefox, and
 ## Code Patterns
 
 ### API Authentication
-The API uses token-based authentication:
-- Token generation/validation in `app/api/auth.py` and `app/api/tokens.py`
-- Basic auth for token endpoint, bearer token for API routes
+The API uses modern token-based authentication:
+- **Access tokens** (15 min, in-memory) for API requests
+- **Refresh tokens** (30 days, HttpOnly cookie) for obtaining new access tokens
+- **API tokens** (30 days) for browser extensions (legacy, backward compatible)
+- Auth endpoints in `app/api/auth_routes.py` (/auth/login, /auth/refresh, /auth/logout, /auth/google)
+- Token validation in `app/api/auth.py` (@token_auth decorator)
+- Legacy token support in `app/api/tokens.py`
+- Basic auth for initial login, bearer token for all API routes
 - CSRF protection disabled for API blueprint
+
+### API Endpoints
+Key endpoint patterns:
+- `/api/articles` - Get current user's articles (token-based, no user ID needed)
+- `/api/highlights` - Get current user's highlights
+- `/api/tags` - Get current user's tags
+- `/api/user/stats` - Get current user's monthly activity stats
+- `/api/users/:id/...` - User-specific operations (requires matching user ID)
+- All endpoints use `@token_auth.login_required` and get user from token
 
 ### Forms
 - WTForms with Flask-WTF for CSRF protection
@@ -231,11 +274,23 @@ Test structure in `tests/`:
 - `tests/models/`: Model tests
 - `tests/mocks/`: Mock data for tests
 - `tests/tasks/`: Background task tests
+- `client/static/**/*.test.js`: Frontend unit tests (Vitest)
 
-Tests use:
+Python tests use:
 - In-memory SQLite database (`sqlite://`)
 - `TestConfig` class for test-specific configuration
 - Mock objects and patches for external services
+
+Frontend tests use:
+- Vitest with happy-dom
+- @testing-library/preact for component testing
+
+**CI/CD:**
+- GitHub Actions workflow (`.github/workflows/run_tests.yml`)
+- Runs on push/PR to main branch
+- Python job: pytest + flake8 on Python 3.12 with PostgreSQL
+- Node job: Vitest on Node 22
+- Both jobs run in parallel
 
 ## Environment Variables
 
@@ -278,22 +333,29 @@ The app uses a Dockerfile for containerized deployment. Heroku builds and deploy
 Obvious comments are not necessary and should only be added sparingly and if its necessary to understand what is happening.
 
 ## Commit messages
-Don't include attribution to Claude Code
+NO attribution to Claude code
+NO Generated by Claude code
+
+commit messages should largely focus on what was added / removed
+but they should be about the strategic and functional changes
+they shouldn't include random comments or the micro details of every file change
 
 ## Working state
 Explore the .local file for files of the following format
-claude-progress-*.md
-claude-tasks-*.json
+Check the branch name
+then check
+claude-progress-<branch name>.md
+claude-tasks-<branch name>.json
 
-The * should usually be some ticket number or task-name - sometimes this can be pulled from the branch name.
+If not found, look for any files in there and ask me which ones to use
 
 ### No working state
 If I say create task - <TASK NAME>
 Then we should create new files with that task name.
 
-You should also then ask me for a description of the task. And then we should discuss until we agree on the highlevel steps for the todo list and then you create one with the following structure. 
+You should also then ask me for a description of the task. And then we should discuss until we agree on the highlevel steps for the todo list and then you create one with the following structure.
 
-This is the structure of the claude-tasks-*.json file 
+This is the structure of the claude-tasks-*.json file
 [
   {
     "category": "functional",
@@ -314,11 +376,11 @@ This is the structure of the claude-tasks-*.json file
 
 ]
 
-The progress file is just a summary of the work that we did. 
+The progress file is just a summary of the work that we did.
 
 ### Existing working state
-I will say Status <task name> - look for files for that task and get the status of the work done. If it doesn't exist - create the files and per the instructions above. 
+I will say Status <task name> - look for files for that task and get the status of the work done. If it doesn't exist - create the files and per the instructions above.
 
 **important** - only work on a single task at a time
 
-Once the task is done, we commit the code. 
+Once the task is done, we commit the code.
