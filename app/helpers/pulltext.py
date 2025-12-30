@@ -12,7 +12,7 @@ from app.ReadabiliPy.readabilipy.simple_json import simple_json_from_html_string
 def pull_text(url):
 
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
+    response = requests.get(url, headers=headers, timeout=30)
     response.encoding = "utf-8"
     article = simple_json_from_html_string(
         response.text, content_digests=False, node_indexes=False, use_readability=True

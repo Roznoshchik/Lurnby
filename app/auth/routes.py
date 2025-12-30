@@ -74,7 +74,7 @@ def logout():
 
 
 def get_google_provider_cfg():
-    return requests.get(current_app.config["GOOGLE_DISCOVERY_URL"]).json()
+    return requests.get(current_app.config["GOOGLE_DISCOVERY_URL"], timeout=10).json()
 
 
 @bp.route("/google_login")
@@ -120,6 +120,7 @@ def callback():
             current_app.config["GOOGLE_CLIENT_ID"],
             current_app.config["GOOGLE_CLIENT_SECRET"],
         ),
+        timeout=10,
     )
 
     # Parse the tokens!
@@ -130,7 +131,7 @@ def callback():
     # including their Google Profile Image and Email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
+    userinfo_response = requests.get(uri, headers=headers, data=body, timeout=10)
 
     # We want to make sure their email is verified.
     # The user authenticated with Google, authorized our

@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 
 import boto3
 
+from sqlalchemy import text
+
 from app import db, bucket, CustomLogger
 from app.models import Event
 
@@ -18,20 +20,20 @@ def delete_user(u):
     senders = u.approved_senders.all()
     comms = u.comms
     for h in highlights:
-        db.session.execute(f"DELETE from highlights_topics where highlight_id={h.id}")
-        db.session.execute(f"DELETE from tags_highlights where highlight_id={h.id}")
+        db.session.execute(text("DELETE from highlights_topics where highlight_id=:id"), {"id": h.id})
+        db.session.execute(text("DELETE from tags_highlights where highlight_id=:id"), {"id": h.id})
         db.session.delete(h)
     for t in topics:
-        db.session.execute(f"DELETE from highlights_topics where topic_id={t.id}")
-        db.session.execute(f"DELETE from tags_topics where topic_id={t.id}")
+        db.session.execute(text("DELETE from highlights_topics where topic_id=:id"), {"id": t.id})
+        db.session.execute(text("DELETE from tags_topics where topic_id=:id"), {"id": t.id})
         db.session.delete(t)
     for t in tags:
-        db.session.execute(f"DELETE from tags_articles where tag_id={t.id}")
-        db.session.execute(f"DELETE from tags_highlights where tag_id={t.id}")
-        db.session.execute(f"DELETE from tags_topics where tag_id={t.id}")
+        db.session.execute(text("DELETE from tags_articles where tag_id=:id"), {"id": t.id})
+        db.session.execute(text("DELETE from tags_highlights where tag_id=:id"), {"id": t.id})
+        db.session.execute(text("DELETE from tags_topics where tag_id=:id"), {"id": t.id})
         db.session.delete(t)
     for a in articles:
-        db.session.execute(f"DELETE from tags_articles where article_id={a.id}")
+        db.session.execute(text("DELETE from tags_articles where article_id=:id"), {"id": a.id})
         db.session.delete(a)
     for s in senders:
         db.session.delete(s)
