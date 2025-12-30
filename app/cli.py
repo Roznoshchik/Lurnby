@@ -115,29 +115,32 @@ def register(app):
             raise subprocess.CalledProcessError(1, "lint")
 
     @app.cli.command()
-    @click.option("--all", is_flag=True, help="Run both pytest and npm tests")
-    def test(all):
-        """Run frontend tests with Vitest. Use --all to run both Python and frontend tests."""
+    @click.option("--python-only", is_flag=True, help="Run only Python tests")
+    @click.option("--client-only", is_flag=True, help="Run only client tests")
+    def test(python_only, client_only):
+        """Run all tests. Use --python-only or --client-only to run specific tests."""
         client_dir = os.path.join(os.getcwd(), "client")
 
-        if all:
-            # Run pytest first
+        if python_only or not client_only:
             print("Running Python tests with pytest...")
             try:
-                subprocess.run(["pytest"], check=True)  # nosec
+                subprocess.run(
+                    ["pytest", "--durations=0", "--durations-min=0.29"],
+                    check=True,
+                )  # nosec
                 print("Python tests complete!")
             except subprocess.CalledProcessError as e:
                 print(f"Python tests failed with error: {e}")
                 raise
 
-        # Run npm tests
-        print("Running frontend tests with Vitest...")
-        try:
-            subprocess.run(["npm", "run", "test:run"], cwd=client_dir, check=True)  # nosec
-            print("Frontend tests complete!")
-        except subprocess.CalledProcessError as e:
-            print(f"Frontend tests failed with error: {e}")
-            raise
+        if client_only or not python_only:
+            print("Running frontend tests with Vitest...")
+            try:
+                subprocess.run(["npm", "run", "test:run"], cwd=client_dir, check=True)  # nosec
+                print("Frontend tests complete!")
+            except subprocess.CalledProcessError as e:
+                print(f"Frontend tests failed with error: {e}")
+                raise
 
     @app.cli.command()
     @click.option("--prod", is_flag=True, help="Run in production mode (use built assets, no Vite dev server)")

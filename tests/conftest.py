@@ -7,13 +7,24 @@ from config import Config
 
 
 class TestConfig(Config):
-    """Test configuration using local postgres database"""
+    """Test configuration using local PostgreSQL database"""
 
     TESTING = True
-    # Use TEST_DATABASE_URL from environment (for CI) or default to local test db
     SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "postgresql://localhost/lurnby-test")
     WTF_CSRF_ENABLED = False
     REDIS_URL = "redis://"
+
+
+# Module-level app for reuse across tests (avoids repeated create_app overhead)
+_app = None
+
+
+def get_test_app():
+    """Get or create the test app (singleton per test session)"""
+    global _app
+    if _app is None:
+        _app = create_app(TestConfig)
+    return _app
 
 
 class BaseTestCase(unittest.TestCase):
@@ -21,22 +32,18 @@ class BaseTestCase(unittest.TestCase):
 
     def setUp(self):
         """Set up test app and database before each test"""
-        self.app = create_app(TestConfig)
+        self.app = get_test_app()
         self.app_context = self.app.app_context()
         self.app_context.push()
         self.client = self.app.test_client()
 
-        # Drop all tables first to ensure clean state
+        # Drop and recreate tables for clean state
         db.drop_all()
-        # Create all tables fresh
         db.create_all()
 
     def tearDown(self):
-        """Clean up database after each test for full isolation"""
-        # Rollback any uncommitted transactions
+        """Clean up database after each test"""
         db.session.rollback()
-        # Remove session
         db.session.remove()
-        # Drop all tables to ensure no data persists
         db.drop_all()
         self.app_context.pop()
