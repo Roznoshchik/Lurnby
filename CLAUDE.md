@@ -69,14 +69,14 @@ cd client && npm start
 
 ### Testing
 ```bash
-# Run frontend tests only
+# Run all tests (Python + frontend)
 flask test
 
-# Run all tests (Python + frontend)
-flask test --all
+# Run only Python tests
+flask test --python-only
 
-# Run Python tests only
-pytest
+# Run only frontend tests
+flask test --client-only
 
 # Run Python tests with coverage
 pytest --cov=app

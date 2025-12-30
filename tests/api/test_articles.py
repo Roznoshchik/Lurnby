@@ -29,9 +29,16 @@ class AddArticleApiTests(BaseTestCase):
     def tearDown(self):
         super().tearDown()
 
+    @patch("app.models.user.User.launch_task")
     @patch("app.models.User.check_token")
-    def test_add_supplied_epub_article(self, mock_check_token):
+    def test_add_supplied_epub_article(self, mock_check_token, mock_launch_task):
+        from app.models import Task
+
         mock_check_token.return_value = User.query.first()
+        mock_task = Task(id="mock-task-id", name="bg_add_article", user=User.query.first())
+        db.session.add(mock_task)
+        mock_launch_task.return_value = mock_task
+
         mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
         payload = {"tags": ["pikachu"]}
 
@@ -52,11 +59,17 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(tag.name, "pikachu")
         mock_file.close()
 
+    @patch("app.models.user.User.launch_task")
     @patch("app.models.User.check_token")
-    def test_add_supplied_pdf_article(self, mock_check_token):
+    def test_add_supplied_pdf_article(self, mock_check_token, mock_launch_task):
+        from app.models import Task
+
         mock_check_token.return_value = User.query.first()
+        mock_task = Task(id="mock-task-id", name="bg_add_article", user=User.query.first())
+        db.session.add(mock_task)
+        mock_launch_task.return_value = mock_task
+
         mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb")
-        # payload = {"tags": ["pikachu"]}
 
         res = self.client.post(
             "/api/articles",
@@ -73,21 +86,12 @@ class AddArticleApiTests(BaseTestCase):
         self.assertTrue(data["processing"])
         mock_file.close()
 
-    @patch("app.tasks.s3.download_file")
     @patch("app.api.helpers.add_article_methods.s3.generate_presigned_url")
     @patch("app.models.User.check_token")
-    def test_add_upload_article(self, mock_check_token, mock_s3, mock_s3_download):
+    def test_add_upload_article(self, mock_check_token, mock_s3):
         mock_check_token.return_value = User.query.first()
         mock_s3.return_value = "foo.com"
         payload = {"upload_file_ext": "pdf"}
-
-        pdf = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb")
-
-        def mock_download_file(bucket, article_uuid, file):
-            with open(file, "wb") as file:
-                file.write(pdf.read())
-
-        mock_s3_download.side_effect = mock_download_file
 
         res = self.client.post(
             "/api/articles",
@@ -105,7 +109,6 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(".pdf", data["upload_file_ext"])
         self.assertTrue("location" in data)
         self.assertTrue(data["processing"])
-        pdf.close()
 
     @patch("app.models.User.check_token")
     def test_add_manual_entry(self, mock_check_token):
@@ -137,17 +140,14 @@ class AddArticleApiTests(BaseTestCase):
         for tag in payload["tags"]:
             self.assertTrue(tag in tags)
 
-    @patch("app.helpers.pulltext.requests.get")
+    @patch("app.api.helpers.add_article_methods.pull_text")
     @patch("app.models.User.check_token")
-    def test_add_url_entry(self, mock_check_token, mock_get):
+    def test_add_url_entry(self, mock_check_token, mock_pull_text):
         mock_check_token.return_value = User.query.first()
-        with open(
-            f"{Path(os.path.dirname(__file__)).parent}/mocks/mock_html_req.txt",
-            "r",
-        ) as file:
-            html = file.read()
-
-        mock_get.return_value = MockResponse(html)
+        mock_pull_text.return_value = {
+            "title": "The coolest Title Ever",
+            "content": "<p>Is there anybody going to listen to my story?</p>",
+        }
 
         payload = {"url": "https://www.mock.com"}
 
@@ -186,17 +186,15 @@ class AddArticleApiTests(BaseTestCase):
         )
         self.assertEqual(res.json["message"], 'upload_file_ext query arg should be ".epub" or ".pdf"')
 
-    @patch("app.tasks.s3.download_file")
+    @patch("app.models.user.User.launch_task")
     @patch("app.models.User.check_token")
-    def test_article_uploaded_returns_task_id(self, mock_check_token, mock_s3):
+    def test_article_uploaded_returns_task_id(self, mock_check_token, mock_launch_task):
+        from app.models import Task
+
         mock_check_token.return_value = User.query.first()
-        epub = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
-
-        def mock_download_file(bucket, article_uuid, file):
-            with open(file, "wb") as file:
-                file.write(epub.read())
-
-        mock_s3.side_effect = mock_download_file
+        mock_task = Task(id="mock-task-id", name="bg_add_article", user=User.query.first())
+        db.session.add(mock_task)
+        mock_launch_task.return_value = mock_task
 
         article = Article(processing=True, user_id=User.query.first().id)
         db.session.add(article)
@@ -212,11 +210,13 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(res.json["article"]["id"], str(article.uuid))
         self.assertTrue("task_id" in res.json)
         self.assertTrue(res.json["processing"])
-        epub.close()
 
+    @patch("app.api.helpers.add_article_methods.pull_text")
     @patch("app.models.User.check_token")
-    def test_bad_data_returns_400(self, mock_check_token):
+    def test_bad_data_returns_400(self, mock_check_token, mock_pull_text):
         mock_check_token.return_value = User.query.first()
+        # Simulate URL that returns non-parseable content (like an image)
+        mock_pull_text.return_value = {"title": None, "content": None}
 
         # empty payload
         payload = {"tags": ["pikachu", "bulbasaur", "charmander"]}
@@ -231,7 +231,7 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual("No article to create. Check data and try again", data["message"])
 
-        # bad url
+        # bad url (fails validators.url check before pull_text is called)
         payload = {"url": "foo.bar"}
 
         res = self.client.post(
@@ -244,8 +244,8 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual("Can't validate url. Please check the data and try again", data["message"])
 
-        # bad url that passes validators check
-        payload = {"url": "https://www.lurnby.com/static/images/rrfeedback-40.png"}
+        # valid url format but content can't be parsed (e.g., image URL)
+        payload = {"url": "https://www.example.com/image.png"}
 
         res = self.client.post(
             "/api/articles",

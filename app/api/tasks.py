@@ -9,6 +9,15 @@ import time
 logger = CustomLogger("API")
 
 
+def poll_for_completion(task, max_seconds=10):
+    """Poll for task completion, checking once per second up to max_seconds."""
+    for _ in range(max_seconds):
+        time.sleep(1)
+        if task.complete:
+            return True
+    return False
+
+
 @bp.route("/tasks/<task_id>", methods=["GET"])
 @token_auth.login_required
 def get_task_status(task_id):
@@ -26,12 +35,10 @@ def get_task_status(task_id):
             logger.error("No Redis Instance")
             task.complete = True
 
-        for _ in range(10):
-            time.sleep(1)
-            if task.complete:
-                response = jsonify(processing=False, progress=100, task_id=task_id, location=location)
-                response.status_code = 200
-                return response
+        if poll_for_completion(task):
+            response = jsonify(processing=False, progress=100, task_id=task_id, location=location)
+            response.status_code = 200
+            return response
 
         response = jsonify(processing=True, progress=task.get_progress(), task_id=task_id)
         response.status_code = 200

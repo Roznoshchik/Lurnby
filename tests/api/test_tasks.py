@@ -1,14 +1,10 @@
 import json
-import os
-from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 from app import create_app, db
-from app.models import Article, User
+from app.models import Article, User, Task
 from config import Config
-
-from tests.mocks.mock_redis import MockRedis
 
 
 class TestConfig(Config):
@@ -16,14 +12,8 @@ class TestConfig(Config):
     SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
-class MockResponse:
-    def __init__(self, text) -> None:
-        self.text = text
-
-
 class TasksApiTests(unittest.TestCase):
     def setUp(self):
-        # os.environ["testing"] = "1"
         self.app = create_app(TestConfig)
         self.app_context = self.app.app_context()
         self.app_context.push()
@@ -40,38 +30,24 @@ class TasksApiTests(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    @patch("app.tasks.get_epub_title")
-    @patch("app.tasks.convert_epub")
-    @patch("app.tasks.s3.download_file")
-    @patch("app.api.tasks.current_app.redis")
+    @patch("app.api.tasks.poll_for_completion")
     @patch("app.models.User.check_token")
-    def test_article_uploaded_returns_error_without_query_args(
+    def test_task_status_returns_processing_when_incomplete(
         self,
         mock_check_token,
-        mock_redis,
-        mock_s3,
-        mock_epub_converted,
-        mock_epub_title,
+        mock_poll,
     ):
-        mock_redis.mock_implementation = MockRedis()
+        mock_poll.return_value = False  # Task still processing
         mock_check_token.return_value = User.query.first()
-        mock_epub_title.return_value = "FooBar"
-        mock_epub_converted.return_value = "Hello Old Friend"
 
-        epub = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
-
-        def mock_download_file(bucket, article_uuid, file):
-            with open(file, "wb") as file:
-                file.write(epub.read())
-
-        mock_s3.side_effect = mock_download_file
-        article = Article(user_id=User.query.first().id)
+        user = User.query.first()
+        article = Article(user_id=user.id)
         db.session.add(article)
         db.session.commit()
         article_uuid = str(article.uuid)
 
-        task = User.query.first().launch_task("bg_add_article", article_uuid=article_uuid, file_ext=".eoub", file=None)
-
+        task = Task(id="test-task-id", name="bg_add_article", user=user)
+        db.session.add(task)
         db.session.commit()
 
         args = {"article_id": article_uuid}
@@ -86,17 +62,36 @@ class TasksApiTests(unittest.TestCase):
         self.assertTrue(data["processing"])
         self.assertTrue("progress" in data)
         self.assertTrue("task_id" in data)
-        self.assertTrue("location" not in data)
+        self.assertNotIn("location", data)
 
-        task.complete = True
+    @patch("app.api.tasks.poll_for_completion")
+    @patch("app.models.User.check_token")
+    def test_task_status_returns_complete_with_location(
+        self,
+        mock_check_token,
+        mock_poll,
+    ):
+        mock_poll.return_value = True  # Task complete
+        mock_check_token.return_value = User.query.first()
+
+        user = User.query.first()
+        article = Article(user_id=user.id)
+        db.session.add(article)
+        db.session.commit()
+        article_uuid = str(article.uuid)
+
+        task = Task(id="test-task-id", name="bg_add_article", user=user, complete=True)
+        db.session.add(task)
         db.session.commit()
 
+        args = {"article_id": article_uuid}
         res = self.client.get(
             f"/api/tasks/{task.id}",
             query_string=args,
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
+
         self.assertEqual(res.status_code, 200)
         self.assertFalse(data["processing"])
-        self.assertTrue("location" in data)
+        self.assertIn("location", data)

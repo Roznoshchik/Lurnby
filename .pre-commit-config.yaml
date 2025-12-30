@@ -43,7 +43,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest
-        entry: bash -c '. venv/bin/activate && pytest'
+        entry: bash -c '. venv/bin/activate && pytest --durations=0 --durations-min=0.29'
         language: system
         pass_filenames: false
         types: [python]

@@ -152,7 +152,9 @@ class UserTest(BaseTestCase):
         self.assertEqual(data["preferences"], user.preferences)
         self.assertEqual(data["tos"], user.tos)
 
-    def test_from_dict(self):
+    @mock.patch("app.models.user.check_password_hash", return_value=True)
+    @mock.patch("app.models.user.generate_password_hash", return_value="hashed")
+    def test_from_dict(self, mock_hash, mock_check):
         user = User(
             id=1,
             username="johndoe",
@@ -168,6 +170,7 @@ class UserTest(BaseTestCase):
         user.from_dict(data)
         self.assertEqual(user.username, data["username"])
         self.assertEqual(user.email, data["email"])
+        mock_hash.assert_called_once_with("password")
         self.assertTrue(user.check_password(data["password"]))
 
     def test_get_token(self):

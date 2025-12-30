@@ -257,20 +257,32 @@ class Article(db.Model):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
             tag.article_count += 1
-            for h in self.highlights:
-                tag.highlight_count += 1
-                h.add_tag(tag)
+            if self.id and self.highlights.count() > 0:
+                for h in self.highlights:
+                    tag.highlight_count += 1
+                    h.add_tag(tag)
 
     def remove_tag(self, tag):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
             tag.article_count -= 1
-            for h in self.highlights:
-                tag.highlight_count -= 1
-                h.remove_tag(tag)
+            if self.id and self.highlights.count() > 0:
+                for h in self.highlights:
+                    tag.highlight_count -= 1
+                    h.remove_tag(tag)
 
     def is_added_tag(self, tag):
-        return self.tags.filter(tag.id == tags_articles.c.tag_id).count() > 0
+        # New article can't have tags yet
+        if not self.id:
+            return False
+        return db.session.query(
+            db.exists().where(
+                db.and_(
+                    tags_articles.c.tag_id == tag.id,
+                    tags_articles.c.article_id == self.id,
+                )
+            )
+        ).scalar()
 
     def not_added_tag(self):
         t_aid = tags_articles.c.article_id
