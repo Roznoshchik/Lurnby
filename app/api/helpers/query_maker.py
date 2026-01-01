@@ -3,6 +3,19 @@ import sqlalchemy as sa
 from app import db
 
 
+def get_total_count(stmt: sa.Select) -> int:
+    """Get total count for a select statement.
+
+    Args:
+        stmt: SQLAlchemy select statement
+    Returns:
+        Total count of matching rows
+    """
+    # Get the columns being selected and replace with count(*)
+    count_stmt = sa.select(sa.func.count()).select_from(stmt.subquery())
+    return db.session.scalar(count_stmt)
+
+
 def apply_pagination(stmt: sa.Select, page: str = "1", per_page: str = "15") -> tuple[list, bool]:
     """Apply pagination to a select statement.
 

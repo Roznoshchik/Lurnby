@@ -225,6 +225,7 @@ Located in `app/static/`:
   - `client/static/` - Preact components and entry points
   - `client/vite.config.js` - Build config (outputs to `app/static/dist/`)
   - `client/package.json` - Node.js dependencies
+  - `client/COMPONENTS.md` - Documentation for reusable UI components
 - `app/assets_blueprint.py` - Blueprint for dev/prod asset resolution
   - Dev mode: Proxies to Vite dev server on port 5173 with HMR
   - Prod mode: Serves built files from `app/static/dist/bundled/`

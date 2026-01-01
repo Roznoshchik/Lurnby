@@ -1,0 +1,20 @@
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.select-wrapper .select {
+  padding-right: var(--space-8);
+  appearance: none;
+  cursor: pointer;
+}
+
+.select-wrapper .select-icon {
+  position: absolute;
+  right: var(--space-2);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--muted-foreground);
+  font-size: 1.25rem;
+}

@@ -1,9 +1,10 @@
 import Badge from '../Badge/Badge'
+import Button from '../Button/Button'
 import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticleCard.css'
 
-export default function ArticleCard({ article, onClick }) {
+export default function ArticleCard({ article, onOpen, onEdit }) {
   const getStatusIcon = () => {
     if (article.done) {
       return <Icon name="check_circle" className="icon status-done" />
@@ -16,16 +17,8 @@ export default function ArticleCard({ article, onClick }) {
     }
   }
 
-  const handleKeyDown = (e) => {
-    // Space key and Enter key for accessibility
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault()
-      onClick()
-    }
-  }
-
   return (
-    <article onClick={onClick} onKeyDown={handleKeyDown} tabIndex={0} className="article-card">
+    <article className="article-card">
       <div className="article-card-content">
         {/* Header: Source and Status */}
         <div className="article-card-header">
@@ -56,7 +49,7 @@ export default function ArticleCard({ article, onClick }) {
           </div>
         )}
 
-        {/* Footer: Metadata */}
+        {/* Footer: Metadata and Actions */}
         <div className="article-footer">
           <div className="article-metadata">
             {article.read_time && (
@@ -71,6 +64,14 @@ export default function ArticleCard({ article, onClick }) {
                 <span>{article.highlights_count}</span>
               </div>
             )}
+          </div>
+          <div className="article-card-actions">
+            <Button variant="ghost" size="sm" onClick={onEdit} className="icon-button" aria-label="Edit article">
+              <Icon name="edit" />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={onOpen} className="icon-button" aria-label="Open article">
+              <Icon name="open_in_new" />
+            </Button>
           </div>
         </div>
       </div>

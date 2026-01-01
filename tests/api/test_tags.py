@@ -1,7 +1,5 @@
 import json
 import os
-
-import pytest
 from unittest.mock import patch
 
 from app import db
@@ -14,10 +12,6 @@ class MockResponse:
         self.text = text
 
 
-# TODO: Migrate tags API to SQLAlchemy 2.0 syntax, then remove this skip
-# See: app/api/tags.py get_tags() needs to use sa.select() pattern
-# like app/api/articles.py get_articles()
-@pytest.mark.skip(reason="Tags API needs SQLAlchemy 2.0 migration - see articles.py for pattern")
 class GetTagsApiTests(BaseTestCase):
     def setUp(self):
         super().setUp()

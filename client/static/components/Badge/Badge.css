@@ -55,40 +55,50 @@
   height: 0.875rem;
 }
 
-/* Tag color classes (computed from tag name hash) */
-.badge.tag-color-0 {
+/* Tag color classes (computed from tag name hash)
+   Higher specificity to override variant colors */
+.badge.variant-outline.tag-color-0 {
   color: var(--tag-color-0);
   border-color: var(--tag-color-0);
+  background-color: color-mix(in srgb, var(--tag-color-0) 15%, transparent);
 }
-.badge.tag-color-1 {
+.badge.variant-outline.tag-color-1 {
   color: var(--tag-color-1);
   border-color: var(--tag-color-1);
+  background-color: color-mix(in srgb, var(--tag-color-1) 15%, transparent);
 }
-.badge.tag-color-2 {
+.badge.variant-outline.tag-color-2 {
   color: var(--tag-color-2);
   border-color: var(--tag-color-2);
+  background-color: color-mix(in srgb, var(--tag-color-2) 15%, transparent);
 }
-.badge.tag-color-3 {
+.badge.variant-outline.tag-color-3 {
   color: var(--tag-color-3);
   border-color: var(--tag-color-3);
+  background-color: color-mix(in srgb, var(--tag-color-3) 15%, transparent);
 }
-.badge.tag-color-4 {
+.badge.variant-outline.tag-color-4 {
   color: var(--tag-color-4);
   border-color: var(--tag-color-4);
+  background-color: color-mix(in srgb, var(--tag-color-4) 15%, transparent);
 }
-.badge.tag-color-5 {
+.badge.variant-outline.tag-color-5 {
   color: var(--tag-color-5);
   border-color: var(--tag-color-5);
+  background-color: color-mix(in srgb, var(--tag-color-5) 15%, transparent);
 }
-.badge.tag-color-6 {
+.badge.variant-outline.tag-color-6 {
   color: var(--tag-color-6);
   border-color: var(--tag-color-6);
+  background-color: color-mix(in srgb, var(--tag-color-6) 15%, transparent);
 }
-.badge.tag-color-7 {
+.badge.variant-outline.tag-color-7 {
   color: var(--tag-color-7);
   border-color: var(--tag-color-7);
+  background-color: color-mix(in srgb, var(--tag-color-7) 15%, transparent);
 }
-.badge.tag-color-8 {
+.badge.variant-outline.tag-color-8 {
   color: var(--tag-color-8);
   border-color: var(--tag-color-8);
+  background-color: color-mix(in srgb, var(--tag-color-8) 15%, transparent);
 }

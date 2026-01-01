@@ -14,26 +14,26 @@ def filter_by_status(stmt: sa.Select, status: str) -> sa.Select:
         Modified select statement
     """
     if not status:
-        stmt = stmt.where(Article.archived == False)
+        stmt = stmt.where(Article.archived.is_(False))
     elif status.lower() == "archived":
-        stmt = stmt.where(Article.archived == True)
+        stmt = stmt.where(Article.archived.is_(True))
     elif status.lower() == "unread":
         stmt = stmt.where(
-            Article.unread == True,
-            Article.done == False,
-            Article.archived == False,
+            Article.unread.is_(True),
+            Article.done.is_(False),
+            Article.archived.is_(False),
         )
     elif status.lower() == "in_progress":
         stmt = stmt.where(
-            Article.unread == False,
-            Article.done == False,
-            Article.archived == False,
+            Article.unread.is_(False),
+            Article.done.is_(False),
+            Article.archived.is_(False),
         )
     elif status.lower() == "read":
         stmt = stmt.where(
-            Article.unread == False,
-            Article.done == True,
-            Article.archived == False,
+            Article.unread.is_(False),
+            Article.done.is_(True),
+            Article.archived.is_(False),
         )
 
     return stmt
@@ -130,8 +130,8 @@ def get_recent_articles(user_id: int, limit: int = 3) -> list[Article]:
         sa.select(Article)
         .where(
             Article.user_id == user_id,
-            Article.processing == False,
-            Article.archived == False,
+            Article.processing.isnot(True),  # Include NULL values
+            Article.archived.is_(False),
             Article.date_read.isnot(None),
         )
         .order_by(Article.date_read.desc())

@@ -6,7 +6,7 @@ from app.api.auth import token_auth
 from app.api.errors import LurnbyValueError
 
 import app.api.helpers.article_query_maker as aqm
-from app.api.helpers.query_maker import apply_pagination
+from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
@@ -71,20 +71,25 @@ def get_articles():
         recent = [article.to_dict() for article in recent_articles]
 
         # Build main query with SQLAlchemy 2.0 select
+        # Use .isnot(True) to include NULL processing values (old articles)
         stmt = sa.select(Article).where(
             Article.user_id == user.id,
-            Article.processing.is_(False),
+            Article.processing.isnot(True),
         )
         stmt = aqm.filter_by_status(stmt, status)
         stmt = aqm.filter_by_tags(stmt, tag_ids)
         stmt = aqm.filter_by_search_phrase(stmt, search_phrase)
+
+        # Get total count before sorting/pagination
+        total = get_total_count(stmt)
+
         stmt = aqm.apply_default_sorting(stmt)
 
         # Apply pagination
         article_list, has_next = apply_pagination(stmt, page, per_page)
         articles = [article.to_dict() for article in article_list]
 
-        response = jsonify(recent=recent, articles=articles, has_next=has_next)
+        response = jsonify(recent=recent, articles=articles, has_next=has_next, total=total)
         response.status_code = 200
         return response
     except Exception as e:
