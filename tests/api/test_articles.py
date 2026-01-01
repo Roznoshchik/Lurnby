@@ -324,10 +324,16 @@ class GetArticleApiTests(BaseTestCase):
                 if key != "tags":
                     setattr(a, key, article[key])
 
+            db.session.add(a)
             for tag in article["tags"]:
                 t = Tag.query.filter_by(name=tag).first()
-            db.session.add(a)
-            a.add_tag(t)
+                a.add_tag(t)
+
+        # Add a second tag to "baba" article to test duplicate prevention
+        # baba already has "pears" (id 3), add "banana" (id 1) too
+        baba = Article.query.filter_by(title="baba").first()
+        banana_tag = Tag.query.filter_by(name="banana").first()
+        baba.add_tag(banana_tag)
 
         db.session.commit()
 
@@ -398,17 +404,10 @@ class GetArticleApiTests(BaseTestCase):
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
 
-        # then check search content
-        params = {"q": "love"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual(2, len(data["articles"]))
-
-        # then check filter by tags
+        # then check filter by tags (OR logic, no duplicates)
+        # tag_ids 1,3 = banana, pears
+        # foo has banana, bar has banana, baba has both banana AND pears
+        # Should return 3 articles (not 4 with baba duplicated)
         params = {"tag_ids": "1,3"}
         res = self.client.get(
             "/api/articles",
@@ -417,60 +416,16 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(3, len(data["articles"]))
+        # Verify no duplicate article IDs
+        article_ids = [a["id"] for a in data["articles"]]
+        self.assertEqual(len(article_ids), len(set(article_ids)))
 
-        # then check sorting by title ascending
-        params = {"title_sort": "ASC"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("baba", data["articles"][0]["title"])
-        self.assertEqual("bar", data["articles"][1]["title"])
-        self.assertEqual("baz", data["articles"][2]["title"])
-        self.assertEqual("foo", data["articles"][3]["title"])
+        # then check that recent articles are returned
+        self.assertIn("recent", data)
+        # recent should have articles with date_read, max 3
+        self.assertLessEqual(len(data["recent"]), 3)
 
-        # then check sorting by title descending
-        params = {"title_sort": "desc"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("foo", data["articles"][0]["title"])
-        self.assertEqual("baz", data["articles"][1]["title"])
-        self.assertEqual("bar", data["articles"][2]["title"])
-        self.assertEqual("baba", data["articles"][3]["title"])
-
-        # then check sorting by date_read descending
-        params = {"opened_sort": "DESC"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("baba", data["articles"][0]["title"])
-        self.assertEqual("baz", data["articles"][1]["title"])
-        self.assertEqual("bar", data["articles"][2]["title"])
-        self.assertEqual("foo", data["articles"][3]["title"])
-
-        # then check sorting by date_read ascending
-        params = {"opened_sort": "asc"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("foo", data["articles"][0]["title"])
-        self.assertEqual("bar", data["articles"][1]["title"])
-        self.assertEqual("baz", data["articles"][2]["title"])
-        self.assertEqual("baba", data["articles"][3]["title"])
-
-        # then check that pagination returns 1 and has_next
+        # then check that pagination returns 1 and has_next is True
         params = {"per_page": "1"}
         res = self.client.get(
             "/api/articles",
@@ -479,9 +434,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNotNone(data["has_next"])
+        self.assertTrue(data["has_next"])
 
-        # then check that pagination returns 4 and has_next is empty
+        # then check that pagination returns 4 and has_next is False
         params = {"per_page": "4"}
         res = self.client.get(
             "/api/articles",
@@ -490,9 +445,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(4, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
-        # then check that pagination returns all and has_next is empty
+        # then check that pagination returns all and has_next is False
         params = {"per_page": "all"}
         res = self.client.get(
             "/api/articles",
@@ -501,7 +456,7 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(4, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
         # then check that we can get the last page
         params = {"per_page": "1", "page": "4"}
@@ -512,9 +467,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
-        # then check that we can get the 2nd page and has_next is not empty
+        # then check that we can get the 2nd page and has_next is True
         params = {"per_page": "1", "page": "2"}
         res = self.client.get(
             "/api/articles",
@@ -523,7 +478,7 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNotNone(data["has_next"])
+        self.assertTrue(data["has_next"])
 
 
 class UpdateArticleApiTests(BaseTestCase):

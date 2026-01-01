@@ -1,119 +1,141 @@
+import sqlalchemy as sa
+
 from app import db
 from app.models import Article, tags_articles
-from sqlalchemy import func
-from flask_sqlalchemy import query
 
 
-def filter_by_status(query: query.Query, status: str):
-    """
+def filter_by_status(stmt: sa.Select, status: str) -> sa.Select:
+    """Filter articles by status.
+
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        status (string): status to filter by
+        stmt: SQLAlchemy select statement
+        status: status to filter by (archived, unread, in_progress, read)
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
-
     if not status:
-        query = query.filter_by(archived=False)
+        stmt = stmt.where(Article.archived == False)
     elif status.lower() == "archived":
-        query = query.filter_by(archived=True)
+        stmt = stmt.where(Article.archived == True)
     elif status.lower() == "unread":
-        query = query.filter(Article.unread == True, Article.done == False, Article.archived == False)
+        stmt = stmt.where(
+            Article.unread == True,
+            Article.done == False,
+            Article.archived == False,
+        )
     elif status.lower() == "in_progress":
-        query = query.filter(Article.unread == False, Article.done == False, Article.archived == False)
+        stmt = stmt.where(
+            Article.unread == False,
+            Article.done == False,
+            Article.archived == False,
+        )
     elif status.lower() == "read":
-        query = query.filter(Article.unread == False, Article.done == True, Article.archived == False)
+        stmt = stmt.where(
+            Article.unread == False,
+            Article.done == True,
+            Article.archived == False,
+        )
 
-    return query
+    return stmt
 
 
-def filter_by_tags(query: query.Query, tag_ids: str):
-    """
+def filter_by_tags(stmt: sa.Select, tag_ids: str) -> sa.Select:
+    """Filter articles by tag IDs (OR logic - articles with any of the tags).
+
+    Uses EXISTS subquery to avoid duplicates when an article has multiple
+    matching tags, which is more compatible with ORDER BY than DISTINCT.
+
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        tag_ids (string): string of comma separated tag ids e.g. '1,53,23'
+        stmt: SQLAlchemy select statement
+        tag_ids: comma-separated tag IDs e.g. '1,53,23'
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
     if tag_ids is not None:
-        tag_ids = [int(tag) for tag in tag_ids.split(",")]
-        join_article_id = tags_articles.c.article_id
-        join_tag_id = tags_articles.c.tag_id
+        tag_id_list = [int(tag) for tag in tag_ids.split(",")]
+        # Use EXISTS subquery to avoid DISTINCT/ORDER BY conflict
+        tag_subq = (
+            sa.select(tags_articles.c.article_id)
+            .where(
+                tags_articles.c.article_id == Article.id,
+                tags_articles.c.tag_id.in_(tag_id_list),
+            )
+            .exists()
+        )
+        stmt = stmt.where(tag_subq)
 
-        # join tags
-        query = query.join(tags_articles, (join_article_id == Article.id))
-        # apply filter
-        query = query.filter(join_tag_id.in_(tag_ids))
-
-    return query
+    return stmt
 
 
-def filter_by_search_phrase(query: query.Query, search_phrase: str):
-    """filters by user supplied search phrase
+def filter_by_search_phrase(stmt: sa.Select, search_phrase: str) -> sa.Select:
+    """Filter articles by search phrase (searches title, source, source_url, notes).
 
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        search_phrase (str): e.g "I like bananas"
+        stmt: SQLAlchemy select statement
+        search_phrase: e.g "I like bananas"
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
     if search_phrase is not None:
-        query = query.filter(
-            db.or_(
+        stmt = stmt.where(
+            sa.or_(
                 Article.title.ilike(f"%{search_phrase}%"),
                 Article.source_url.ilike(f"%{search_phrase}%"),
                 Article.source.ilike(f"%{search_phrase}%"),
                 Article.notes.ilike(f"%{search_phrase}%"),
-                Article.content.ilike(f"%{search_phrase}%"),  # this might be too much
             )
         )
 
-    return query
+    return stmt
 
 
-def apply_sorting(query: query.Query, title_sort: str, opened_sort: str):
-    """_summary_
+def apply_default_sorting(stmt: sa.Select) -> sa.Select:
+    """Apply default sorting for articles list.
+
+    Sort order:
+    1. article_created_date DESC (newest first)
+    2. Status priority: in_progress (0) → unread (1) → done (2)
+    3. title ASC (alphabetical)
 
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        title_sort (str): Sort alphabetically by article title - "asc" or "desc"
-        opened_sort (str): Sort by last opened - "asc" or "desc"
+        stmt: SQLAlchemy select statement
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
-    # then prepare to sort
-    order = []
+    status_order = sa.case(
+        (sa.and_(Article.done == False, Article.unread == False), 0),  # in_progress
+        (Article.unread == True, 1),  # unread
+        else_=2,  # done
+    )
 
-    # first sort so read articles are last
-    if not title_sort and not opened_sort:
-        col = getattr(Article, "done")
-        order.append(col.asc())  # default order that done is last
+    stmt = stmt.order_by(
+        Article.article_created_date.desc(),
+        status_order.asc(),
+        sa.func.lower(Article.title).asc(),
+    )
 
-    # then sort by title
-    if title_sort is not None:
-        if title_sort.lower() == "desc":
-            col = getattr(Article, "title")
-            col = func.lower(col)  # lowercase title
-            col = col.desc()
-            order.append(col)
-        elif title_sort.lower() == "asc":
-            col = getattr(Article, "title")
-            col = func.lower(col)  # lowercase title
-            col = col.asc()
-            order.append(col)
+    return stmt
 
-    # then sort by date
-    if opened_sort is not None:
-        if opened_sort.lower() == "desc":
-            col = getattr(Article, "date_read")
-            col = col.desc()
-            order.append(col)
-        elif opened_sort.lower() == "asc":
-            col = getattr(Article, "date_read")
-            col = col.asc()
-            order.append(col)
 
-    # apply the sorting
-    query = query.order_by(*order)
+def get_recent_articles(user_id: int, limit: int = 3) -> list[Article]:
+    """Get most recently opened articles.
 
-    return query
+    Args:
+        user_id: User ID
+        limit: Number of articles to return (default 3)
+    Returns:
+        List of Article objects
+    """
+    stmt = (
+        sa.select(Article)
+        .where(
+            Article.user_id == user_id,
+            Article.processing == False,
+            Article.archived == False,
+            Article.date_read.isnot(None),
+        )
+        .order_by(Article.date_read.desc())
+        .limit(limit)
+    )
+
+    return list(db.session.scalars(stmt))

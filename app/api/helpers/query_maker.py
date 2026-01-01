@@ -1,20 +1,33 @@
-def apply_pagination(query, page="1", per_page="15"):
-    """applies pagination
+import sqlalchemy as sa
+
+from app import db
+
+
+def apply_pagination(stmt: sa.Select, page: str = "1", per_page: str = "15") -> tuple[list, bool]:
+    """Apply pagination to a select statement.
 
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        page (str): an int string for which page of results e.g "1"
-        per_page (str): "all" or int string e.g "15" or "30"
+        stmt: SQLAlchemy select statement
+        page: page number as string e.g "1"
+        per_page: "all" or int string e.g "15" or "30"
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Tuple of (items list, has_next boolean)
     """
-    # prepare to paginate results
-    result_count = query.count()
+    page_num = int(page)
+
     if per_page == "all":
-        per_page = result_count
-    else:
-        per_page = int(per_page)
+        items = list(db.session.scalars(stmt))
+        return items, False
 
-    query = query.paginate(page=int(page), per_page=per_page, error_out=False)
+    per_page_num = int(per_page)
+    offset = (page_num - 1) * per_page_num
 
-    return query
+    # Get one extra to check if there's a next page
+    paginated_stmt = stmt.offset(offset).limit(per_page_num + 1)
+    items = list(db.session.scalars(paginated_stmt))
+
+    has_next = len(items) > per_page_num
+    if has_next:
+        items = items[:per_page_num]
+
+    return items, has_next

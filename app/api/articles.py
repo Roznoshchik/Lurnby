@@ -1,3 +1,5 @@
+import sqlalchemy as sa
+
 from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
@@ -41,44 +43,48 @@ def get_articles():
         e.g. 1 || 2
     per_page : how many results to show per page default 15
         number e.g 15, 30, 50 || 'all'
-    title_sort : optional sorting for the article title
-        asc || desc
-    opened_sort : optional sorting by last opened date
-        asc || desc
     status : article status = defaults to all unarchived
         e.g. read || unread || in_progress || archived
     tag_ids : comma separated list of tag ids
         e.g. 1,5,71
     q : search query. This is applied after filtering by status and tags.
         e.g. hello old friend
+
+    Returns
+    -------
+    JSON with:
+        recent: 3 most recently opened articles
+        articles: paginated list of all articles
+        has_next: boolean indicating if there's a next page
     """
     try:
-
         user = token_auth.current_user()
 
         page = request.args.get("page", "1")
         per_page = request.args.get("per_page", "15")
-        title_sort = request.args.get("title_sort", None)
-        opened_sort = request.args.get("opened_sort", None)
         status = request.args.get("status", None)
         search_phrase = request.args.get("q", None)
         tag_ids = request.args.get("tag_ids", None)
 
-        # filter query
-        query = user.articles.filter_by(processing=False)
-        query = aqm.filter_by_status(
-            query,
-            status,
+        # Get recent articles (3 most recently opened)
+        recent_articles = aqm.get_recent_articles(user.id, limit=3)
+        recent = [article.to_dict() for article in recent_articles]
+
+        # Build main query with SQLAlchemy 2.0 select
+        stmt = sa.select(Article).where(
+            Article.user_id == user.id,
+            Article.processing.is_(False),
         )
-        query = aqm.filter_by_tags(query, tag_ids)
-        query = aqm.filter_by_search_phrase(query, search_phrase)
-        query = aqm.apply_sorting(query, title_sort, opened_sort)
-        query = apply_pagination(query, page, per_page)
+        stmt = aqm.filter_by_status(stmt, status)
+        stmt = aqm.filter_by_tags(stmt, tag_ids)
+        stmt = aqm.filter_by_search_phrase(stmt, search_phrase)
+        stmt = aqm.apply_default_sorting(stmt)
 
-        has_next = query.has_next if query.has_next else None
-        articles = [article.to_dict() for article in query.items]
+        # Apply pagination
+        article_list, has_next = apply_pagination(stmt, page, per_page)
+        articles = [article.to_dict() for article in article_list]
 
-        response = jsonify(has_next=has_next, articles=articles)
+        response = jsonify(recent=recent, articles=articles, has_next=has_next)
         response.status_code = 200
         return response
     except Exception as e:
