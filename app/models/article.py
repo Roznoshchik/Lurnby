@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import math
 
 from bs4 import BeautifulSoup
@@ -29,7 +29,7 @@ class Article(db.Model):
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
-    date_read = db.Column(db.DateTime, default=datetime.utcnow)
+    date_read = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     date_read_date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     highlights = db.relationship("Highlight", lazy="dynamic", backref="article")
@@ -42,7 +42,7 @@ class Article(db.Model):
     notes = db.Column(db.Text, default="")
     reflections = db.Column(db.Text, default="")
 
-    article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    article_created_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     read_time = db.Column(db.String)
     processing = db.Column(db.Boolean, default=False)
 

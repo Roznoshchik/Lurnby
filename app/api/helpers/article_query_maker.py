@@ -103,8 +103,8 @@ def apply_default_sorting(stmt: sa.Select) -> sa.Select:
         Modified select statement
     """
     status_order = sa.case(
-        (sa.and_(Article.done == False, Article.unread == False), 0),  # in_progress
-        (Article.unread == True, 1),  # unread
+        (sa.and_(Article.done.is_(False), Article.unread.is_(False)), 0),  # in_progress
+        (Article.unread.is_(True), 1),  # unread
         else_=2,  # done
     )
 
