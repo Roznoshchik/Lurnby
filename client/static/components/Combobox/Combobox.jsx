@@ -1,20 +1,8 @@
 import { useState, useRef, useEffect, useMemo } from 'preact/hooks'
 import Button from '../Button/Button'
 import Icon from '../Icon/Icon'
+import { getTagColorClass } from '../../utils/helpers'
 import './Combobox.css'
-
-// Simple hash function to convert string to number (same as Badge component)
-function hashString(str) {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i)
-    hash = (hash << 5) - hash + char
-    hash = hash & hash
-  }
-  return Math.abs(hash)
-}
-
-const TAG_COLOR_COUNT = 9
 
 export default function Combobox({ options, selected, onSelect, placeholder = 'Select...' }) {
   const [open, setOpen] = useState(false)
@@ -128,7 +116,6 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
               <div className="combobox-empty">No tags found.</div>
             ) : (
               filteredOptions.map((option, index) => {
-                const colorIndex = hashString(option.label.toLowerCase()) % TAG_COLOR_COUNT
                 const isHighlighted = index === highlightedIndex
                 return (
                   <div
@@ -145,7 +132,7 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
                       name="check"
                       className={`check-icon ${selected.includes(option.value) ? '' : 'hidden'}`}
                     />
-                    <span className={`tag-color-dot tag-color-${colorIndex}`} />
+                    <span className={`tag-color-dot ${getTagColorClass(option.label)}`} />
                     {option.label}
                   </div>
                 )

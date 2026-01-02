@@ -12,7 +12,7 @@
 }
 
 .combobox-trigger .material-symbols-outlined {
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
   color: var(--muted-foreground);
 }
 
@@ -63,7 +63,7 @@
 }
 
 .combobox-search .clear-icon {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--muted-foreground);
   cursor: pointer;
 }
@@ -102,8 +102,8 @@
 }
 
 .combobox-option .check-icon {
-  font-size: 1rem;
-  width: 1rem;
+  font-size: var(--font-size-base);
+  width: var(--font-size-base);
 }
 
 .combobox-option .check-icon.hidden {

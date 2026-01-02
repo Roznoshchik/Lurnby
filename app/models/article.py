@@ -161,7 +161,7 @@ class Article(db.Model):
         }
         return data
 
-    def to_dict(self, preview=True):
+    def to_dict(self, preview=True, with_content=False):
         # Handle None and NaN progress values
         progress = self.progress
         if progress is None:
@@ -176,7 +176,7 @@ class Article(db.Model):
             "source": self.source or self.source_url,
             "source_url": self.source_url,
             "title": self.title,
-            "content": self.content if not preview else None,
+            "content": self.content if with_content else None,
             "unread": self.unread,
             "archived": self.archived,
             "done": self.done,
