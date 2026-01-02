@@ -249,7 +249,7 @@
 }
 
 .filter-row .material-symbols-outlined {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--muted-foreground);
 }
 
@@ -266,7 +266,7 @@
 }
 
 .tag-filter-row .material-symbols-outlined {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--muted-foreground);
   margin-top: var(--space-1-5);
 }
@@ -371,7 +371,7 @@
 }
 
 .section-title .material-symbols-outlined {
-  font-size: 1.5rem;
+  font-size: var(--font-size-2xl);
   color: var(--muted-foreground);
 }
 
@@ -411,7 +411,7 @@
 
 .filter-icon {
   color: var(--muted-foreground);
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
 }
 
 .filter-controls {
@@ -459,7 +459,7 @@
 }
 
 .tag-badge .tag-remove {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   opacity: 0.7;
 }
 

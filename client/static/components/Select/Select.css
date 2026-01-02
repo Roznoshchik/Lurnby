@@ -16,5 +16,5 @@
   transform: translateY(-50%);
   pointer-events: none;
   color: var(--muted-foreground);
-  font-size: 1.25rem;
+  font-size: var(--font-size-xl);
 }
