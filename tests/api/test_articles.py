@@ -5,8 +5,12 @@ from pathlib import Path
 from uuid import uuid4, UUID
 from unittest.mock import patch
 
+import sqlalchemy as sa
+
 from app import db
 from app.models import Article, User, Tag
+from app.api.helpers.query_maker import get_total_count
+from app.api.helpers import article_query_maker as aqm
 from tests.conftest import BaseTestCase
 from tests.mocks.mocks import mock_articles, mock_tags
 
@@ -340,9 +344,18 @@ class GetArticleApiTests(BaseTestCase):
     def tearDown(self):
         super().tearDown()
 
+    @patch("app.api.articles.aqm.get_recent_articles")
+    @patch("app.api.articles.get_total_count")
     @patch("app.models.User.check_token")
-    def test_get_articles(self, mock_check_token):
+    def test_get_articles(self, mock_check_token, mock_total_count, mock_recent):
+        """Test article filtering and pagination.
+
+        Note: get_total_count and get_recent_articles are mocked here
+        and tested separately in test_get_total_count and test_get_recent_articles.
+        """
         mock_check_token.return_value = User.query.first()
+        mock_total_count.return_value = 4
+        mock_recent.return_value = []
 
         # first check default which should return 4 unarchived articles
         params = {}
@@ -420,11 +433,6 @@ class GetArticleApiTests(BaseTestCase):
         article_ids = [a["id"] for a in data["articles"]]
         self.assertEqual(len(article_ids), len(set(article_ids)))
 
-        # then check that recent articles are returned
-        self.assertIn("recent", data)
-        # recent should have articles with date_read, max 3
-        self.assertLessEqual(len(data["recent"]), 3)
-
         # then check that pagination returns 1 and has_next is True
         params = {"per_page": "1"}
         res = self.client.get(
@@ -479,6 +487,50 @@ class GetArticleApiTests(BaseTestCase):
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
         self.assertTrue(data["has_next"])
+
+    def test_get_total_count(self):
+        """Test that get_total_count returns correct count for filtered queries."""
+        user = User.query.first()
+
+        # Base query - should count 5 total articles
+        stmt = sa.select(Article).where(
+            Article.user_id == user.id,
+            Article.processing.isnot(True),
+        )
+        self.assertEqual(get_total_count(stmt), 5)
+
+        # With status filter - archived
+        filtered_stmt = aqm.filter_by_status(stmt, "archived")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+        # With status filter - unread
+        filtered_stmt = aqm.filter_by_status(stmt, "unread")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+        # With search filter
+        filtered_stmt = aqm.filter_by_search_phrase(stmt, "baz")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+    def test_get_recent_articles(self):
+        """Test that get_recent_articles returns most recently read articles."""
+        user = User.query.first()
+
+        # Should return up to 3 most recent articles with date_read set
+        recent = aqm.get_recent_articles(user.id, limit=3)
+        self.assertLessEqual(len(recent), 3)
+
+        # All returned articles should have date_read set
+        for article in recent:
+            self.assertIsNotNone(article.date_read)
+
+        # Should be ordered by date_read desc (most recent first)
+        if len(recent) > 1:
+            for i in range(len(recent) - 1):
+                self.assertGreaterEqual(recent[i].date_read, recent[i + 1].date_read)
+
+        # Should not include archived articles
+        for article in recent:
+            self.assertFalse(article.archived)
 
 
 class UpdateArticleApiTests(BaseTestCase):

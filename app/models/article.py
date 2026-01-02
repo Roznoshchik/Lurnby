@@ -29,7 +29,7 @@ class Article(db.Model):
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
-    date_read = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    date_read = db.Column(db.DateTime)
     date_read_date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     highlights = db.relationship("Highlight", lazy="dynamic", backref="article")

@@ -4,15 +4,8 @@ from app import db
 
 
 def get_total_count(stmt: sa.Select) -> int:
-    """Get total count for a select statement.
-
-    Args:
-        stmt: SQLAlchemy select statement
-    Returns:
-        Total count of matching rows
-    """
-    # Get the columns being selected and replace with count(*)
-    count_stmt = sa.select(sa.func.count()).select_from(stmt.subquery())
+    """Get total count for a select statement."""
+    count_stmt = stmt.with_only_columns(sa.func.count()).order_by(None)
     return db.session.scalar(count_stmt)
 
 
