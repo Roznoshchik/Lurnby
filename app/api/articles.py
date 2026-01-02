@@ -56,6 +56,7 @@ def get_articles():
         recent: 3 most recently opened articles
         articles: paginated list of all articles
         has_next: boolean indicating if there's a next page
+        total: total articles in the current query
     """
     try:
         user = token_auth.current_user()
