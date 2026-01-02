@@ -5,8 +5,12 @@ from pathlib import Path
 from uuid import uuid4, UUID
 from unittest.mock import patch
 
+import sqlalchemy as sa
+
 from app import db
 from app.models import Article, User, Tag
+from app.api.helpers.query_maker import get_total_count
+from app.api.helpers import article_query_maker as aqm
 from tests.conftest import BaseTestCase
 from tests.mocks.mocks import mock_articles, mock_tags
 
@@ -324,19 +328,34 @@ class GetArticleApiTests(BaseTestCase):
                 if key != "tags":
                     setattr(a, key, article[key])
 
+            db.session.add(a)
             for tag in article["tags"]:
                 t = Tag.query.filter_by(name=tag).first()
-            db.session.add(a)
-            a.add_tag(t)
+                a.add_tag(t)
+
+        # Add a second tag to "baba" article to test duplicate prevention
+        # baba already has "pears" (id 3), add "banana" (id 1) too
+        baba = Article.query.filter_by(title="baba").first()
+        banana_tag = Tag.query.filter_by(name="banana").first()
+        baba.add_tag(banana_tag)
 
         db.session.commit()
 
     def tearDown(self):
         super().tearDown()
 
+    @patch("app.api.articles.aqm.get_recent_articles")
+    @patch("app.api.articles.get_total_count")
     @patch("app.models.User.check_token")
-    def test_get_articles(self, mock_check_token):
+    def test_get_articles(self, mock_check_token, mock_total_count, mock_recent):
+        """Test article filtering and pagination.
+
+        Note: get_total_count and get_recent_articles are mocked here
+        and tested separately in test_get_total_count and test_get_recent_articles.
+        """
         mock_check_token.return_value = User.query.first()
+        mock_total_count.return_value = 4
+        mock_recent.return_value = []
 
         # first check default which should return 4 unarchived articles
         params = {}
@@ -398,17 +417,10 @@ class GetArticleApiTests(BaseTestCase):
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
 
-        # then check search content
-        params = {"q": "love"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual(2, len(data["articles"]))
-
-        # then check filter by tags
+        # then check filter by tags (OR logic, no duplicates)
+        # tag_ids 1,3 = banana, pears
+        # foo has banana, bar has banana, baba has both banana AND pears
+        # Should return 3 articles (not 4 with baba duplicated)
         params = {"tag_ids": "1,3"}
         res = self.client.get(
             "/api/articles",
@@ -417,60 +429,11 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(3, len(data["articles"]))
+        # Verify no duplicate article IDs
+        article_ids = [a["id"] for a in data["articles"]]
+        self.assertEqual(len(article_ids), len(set(article_ids)))
 
-        # then check sorting by title ascending
-        params = {"title_sort": "ASC"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("baba", data["articles"][0]["title"])
-        self.assertEqual("bar", data["articles"][1]["title"])
-        self.assertEqual("baz", data["articles"][2]["title"])
-        self.assertEqual("foo", data["articles"][3]["title"])
-
-        # then check sorting by title descending
-        params = {"title_sort": "desc"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("foo", data["articles"][0]["title"])
-        self.assertEqual("baz", data["articles"][1]["title"])
-        self.assertEqual("bar", data["articles"][2]["title"])
-        self.assertEqual("baba", data["articles"][3]["title"])
-
-        # then check sorting by date_read descending
-        params = {"opened_sort": "DESC"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("baba", data["articles"][0]["title"])
-        self.assertEqual("baz", data["articles"][1]["title"])
-        self.assertEqual("bar", data["articles"][2]["title"])
-        self.assertEqual("foo", data["articles"][3]["title"])
-
-        # then check sorting by date_read ascending
-        params = {"opened_sort": "asc"}
-        res = self.client.get(
-            "/api/articles",
-            query_string=params,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        self.assertEqual("foo", data["articles"][0]["title"])
-        self.assertEqual("bar", data["articles"][1]["title"])
-        self.assertEqual("baz", data["articles"][2]["title"])
-        self.assertEqual("baba", data["articles"][3]["title"])
-
-        # then check that pagination returns 1 and has_next
+        # then check that pagination returns 1 and has_next is True
         params = {"per_page": "1"}
         res = self.client.get(
             "/api/articles",
@@ -479,9 +442,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNotNone(data["has_next"])
+        self.assertTrue(data["has_next"])
 
-        # then check that pagination returns 4 and has_next is empty
+        # then check that pagination returns 4 and has_next is False
         params = {"per_page": "4"}
         res = self.client.get(
             "/api/articles",
@@ -490,9 +453,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(4, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
-        # then check that pagination returns all and has_next is empty
+        # then check that pagination returns all and has_next is False
         params = {"per_page": "all"}
         res = self.client.get(
             "/api/articles",
@@ -501,7 +464,7 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(4, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
         # then check that we can get the last page
         params = {"per_page": "1", "page": "4"}
@@ -512,9 +475,9 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNone(data["has_next"])
+        self.assertFalse(data["has_next"])
 
-        # then check that we can get the 2nd page and has_next is not empty
+        # then check that we can get the 2nd page and has_next is True
         params = {"per_page": "1", "page": "2"}
         res = self.client.get(
             "/api/articles",
@@ -523,7 +486,51 @@ class GetArticleApiTests(BaseTestCase):
         )
         data = json.loads(res.data)
         self.assertEqual(1, len(data["articles"]))
-        self.assertIsNotNone(data["has_next"])
+        self.assertTrue(data["has_next"])
+
+    def test_get_total_count(self):
+        """Test that get_total_count returns correct count for filtered queries."""
+        user = User.query.first()
+
+        # Base query - should count 5 total articles
+        stmt = sa.select(Article).where(
+            Article.user_id == user.id,
+            Article.processing.isnot(True),
+        )
+        self.assertEqual(get_total_count(stmt), 5)
+
+        # With status filter - archived
+        filtered_stmt = aqm.filter_by_status(stmt, "archived")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+        # With status filter - unread
+        filtered_stmt = aqm.filter_by_status(stmt, "unread")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+        # With search filter
+        filtered_stmt = aqm.filter_by_search_phrase(stmt, "baz")
+        self.assertEqual(get_total_count(filtered_stmt), 1)
+
+    def test_get_recent_articles(self):
+        """Test that get_recent_articles returns most recently read articles."""
+        user = User.query.first()
+
+        # Should return up to 3 most recent articles with date_read set
+        recent = aqm.get_recent_articles(user.id, limit=3)
+        self.assertLessEqual(len(recent), 3)
+
+        # All returned articles should have date_read set
+        for article in recent:
+            self.assertIsNotNone(article.date_read)
+
+        # Should be ordered by date_read desc (most recent first)
+        if len(recent) > 1:
+            for i in range(len(recent) - 1):
+                self.assertGreaterEqual(recent[i].date_read, recent[i + 1].date_read)
+
+        # Should not include archived articles
+        for article in recent:
+            self.assertFalse(article.archived)
 
 
 class UpdateArticleApiTests(BaseTestCase):

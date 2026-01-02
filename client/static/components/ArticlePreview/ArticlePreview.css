@@ -1,0 +1,109 @@
+.article-preview {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  transition: all 150ms ease;
+}
+
+.article-preview:hover {
+  border-color: var(--border-hover);
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.1),
+    0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.article-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.article-preview-title {
+  flex: 1;
+  margin: 0;
+  color: var(--foreground);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  line-height: 1.4;
+}
+
+.article-preview-status {
+  flex-shrink: 0;
+}
+
+.article-preview .status-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.article-preview .status-unread {
+  color: var(--secondary);
+}
+
+.article-preview .status-in-progress {
+  color: var(--in-progress);
+}
+
+.article-preview .status-done {
+  color: var(--success);
+}
+
+.article-preview .status-archived {
+  color: var(--muted-foreground);
+}
+
+.article-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-1);
+}
+
+.article-preview-progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5);
+}
+
+.article-preview .preview-progress-bar {
+  height: var(--space-1-5);
+}
+
+.article-preview .progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.article-preview-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-shrink: 0;
+}
+
+.article-preview .icon-button {
+  padding: var(--space-1-5);
+  min-width: auto;
+}
+
+.article-preview .icon-button .material-symbols-outlined {
+  font-size: 1.125rem;
+}
+
+@media (max-width: 640px) {
+  .article-preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

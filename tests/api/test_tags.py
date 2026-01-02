@@ -1,6 +1,7 @@
 import json
 import os
 from unittest.mock import patch
+
 from app import db
 from app.models import User, Tag
 from tests.conftest import BaseTestCase

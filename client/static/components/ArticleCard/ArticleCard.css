@@ -7,16 +7,11 @@
   border-radius: var(--radius);
   padding: var(--space-6);
   overflow: hidden;
-  cursor: pointer;
-  transition: all 200ms;
+  transition: border-color 200ms;
 }
 
 .article-card:hover {
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 0.1),
-    0 2px 4px -2px rgb(0 0 0 / 0.1);
-  border-color: var(--ring);
-  transform: translateY(-0.125rem);
+  border-color: var(--border-hover);
 }
 
 /* Notebook line accent */
@@ -98,17 +93,12 @@
   color: var(--foreground);
   font-size: var(--font-size-lg);
   font-weight: var(--font-weight-semibold);
-  transition: color 150ms;
   line-height: 1.375;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-.article-card:hover .article-title {
-  color: var(--primary);
 }
 
 /* ================================================================
@@ -170,4 +160,23 @@
 
 .metadata-item .icon {
   font-size: 1rem;
+}
+
+/* ================================================================
+   Actions Section
+   ================================================================ */
+
+.article-card-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.article-card .icon-button {
+  padding: var(--space-1-5);
+  min-width: auto;
+}
+
+.article-card .icon-button .material-symbols-outlined {
+  font-size: 1.125rem;
 }

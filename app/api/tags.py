@@ -1,3 +1,4 @@
+import sqlalchemy as sa
 from flask import request, jsonify
 import json
 import traceback
@@ -23,18 +24,19 @@ def get_tags():
         status = request.args.get("status", "unarchived")  # all / archived / unarchived
 
         user = token_auth.current_user()
-        query = user.tags
 
-        if status.lower() == "all":
-            pass
-        elif status.lower() == "archived":
-            query = query.filter_by(archived=True)
-        else:
-            query = query.filter_by(archived=False)
+        # Build query with SQLAlchemy 2.0 select
+        stmt = sa.select(Tag).where(Tag.user_id == user.id)
 
-        query = apply_pagination(query, page, per_page)
-        has_next = query.has_next if query.has_next else None
-        tags = [tag.to_dict() for tag in query.items]
+        if status.lower() == "archived":
+            stmt = stmt.where(Tag.archived.is_(True))
+        elif status.lower() != "all":
+            stmt = stmt.where(Tag.archived.is_(False))
+
+        stmt = stmt.order_by(Tag.name.asc())
+
+        tag_list, has_next = apply_pagination(stmt, page, per_page)
+        tags = [tag.to_dict() for tag in tag_list]
 
         return jsonify(tags=tags, has_next=has_next)
 

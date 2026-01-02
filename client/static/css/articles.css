@@ -249,7 +249,7 @@
 }
 
 .filter-row .material-symbols-outlined {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--muted-foreground);
 }
 
@@ -266,7 +266,7 @@
 }
 
 .tag-filter-row .material-symbols-outlined {
-  font-size: 1rem;
+  font-size: var(--font-size-base);
   color: var(--muted-foreground);
   margin-top: var(--space-1-5);
 }
@@ -348,4 +348,133 @@
 
 .pagination button {
   min-width: 2.5rem;
+}
+
+.pagination-info {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding: 0 var(--space-2);
+}
+
+/* ================================================================
+   Section Styles
+   ================================================================ */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  margin: 0 0 var(--space-4);
+}
+
+.section-title .material-symbols-outlined {
+  font-size: var(--font-size-2xl);
+  color: var(--muted-foreground);
+}
+
+/* ================================================================
+   Recent Section
+   ================================================================ */
+
+.recent-section {
+  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-8);
+  border-bottom: 1px solid var(--border);
+}
+
+.recent-previews {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .recent-previews {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ================================================================
+   All Articles Section
+   ================================================================ */
+
+.all-articles-section {
+  padding-bottom: var(--space-8);
+}
+
+/* ================================================================
+   Filters Section (expanded)
+   ================================================================ */
+
+.filter-icon {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-xl);
+}
+
+.filter-controls {
+  gap: var(--space-4);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-label {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px var(--ring-offset-background), 0 0 0 4px rgba(var(--ring-rgb), 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* Tag badges in filter display */
+.tag-badge {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.tag-badge .tag-remove {
+  font-size: var(--font-size-sm);
+  opacity: 0.7;
+}
+
+.tag-badge:hover .tag-remove {
+  opacity: 1;
+}
+
+/* ================================================================
+   Articles Count
+   ================================================================ */
+
+.articles-count {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding-top: var(--space-4);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--border);
 }

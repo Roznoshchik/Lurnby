@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 import math
 
 from bs4 import BeautifulSoup
@@ -29,7 +29,7 @@ class Article(db.Model):
     source = db.Column(db.String(500))
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
-    date_read = db.Column(db.DateTime, default=datetime.utcnow)
+    date_read = db.Column(db.DateTime)
     date_read_date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     highlights = db.relationship("Highlight", lazy="dynamic", backref="article")
@@ -42,7 +42,7 @@ class Article(db.Model):
     notes = db.Column(db.Text, default="")
     reflections = db.Column(db.Text, default="")
 
-    article_created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    article_created_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     read_time = db.Column(db.String)
     processing = db.Column(db.Boolean, default=False)
 
@@ -161,7 +161,7 @@ class Article(db.Model):
         }
         return data
 
-    def to_dict(self, preview=True):
+    def to_dict(self, preview=True, with_content=False):
         # Handle None and NaN progress values
         progress = self.progress
         if progress is None:
@@ -176,7 +176,7 @@ class Article(db.Model):
             "source": self.source or self.source_url,
             "source_url": self.source_url,
             "title": self.title,
-            "content": self.content if not preview else None,
+            "content": self.content if with_content else None,
             "unread": self.unread,
             "archived": self.archived,
             "done": self.done,
