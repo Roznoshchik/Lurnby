@@ -1,12 +1,15 @@
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 
 from app import db
-from app.models import Tag
+from app.models import Article, Tag, tags_articles, tags_highlights
 
 
 def update_tags(tag_ids, resource):
     """Updates an article's or highlight's tags and returns the updated resource.
     Fully replaces the tags on the resource to match the tag IDs passed in.
+
+    Works directly with the junction table to avoid unnecessary Tag object queries.
 
     Args:
         tag_ids (int[]): list of tag IDs
@@ -15,21 +18,36 @@ def update_tags(tag_ids, resource):
     Returns:
         resource: updated with tags
     """
-    current_tag_ids = resource.tag_ids
+    # Determine junction table and column names based on resource type
+    if isinstance(resource, Article):
+        junction = tags_articles
+        resource_col = junction.c.article_id
+    else:
+        junction = tags_highlights
+        resource_col = junction.c.highlight_id
 
-    # Remove tags that are no longer selected
-    for tag_id in current_tag_ids:
-        if tag_id not in tag_ids:
-            tag = db.session.get(Tag, tag_id)
-            if tag:
-                resource.remove_tag(tag)
+    current_tag_ids = set(resource.tag_ids)
+    new_tag_ids = set(tag_ids)
 
-    # Add newly selected tags
-    for tag_id in tag_ids:
-        if tag_id not in current_tag_ids:
-            stmt = select(Tag).where(Tag.id == tag_id, Tag.user_id == resource.user_id)
-            tag = db.session.execute(stmt).scalar()
-            if tag:
-                resource.add_tag(tag)
+    # Remove tags that are no longer selected (idempotent - no error if not found)
+    tags_to_remove = current_tag_ids - new_tag_ids
+    if tags_to_remove:
+        db.session.execute(junction.delete().where(resource_col == resource.id, junction.c.tag_id.in_(tags_to_remove)))
+
+    # Add newly selected tags (only if they belong to the user)
+    # We verify user_id ownership because tag_ids come from user input -
+    # without this check, users could add another user's tags to their resources
+    tags_to_add = new_tag_ids - current_tag_ids
+    if tags_to_add:
+        valid_tag_ids = db.session.scalars(
+            select(Tag.id).where(Tag.id.in_(tags_to_add), Tag.user_id == resource.user_id)
+        ).all()
+
+        for tag_id in valid_tag_ids:
+            try:
+                with db.session.begin_nested():
+                    db.session.execute(junction.insert().values(**{resource_col.name: resource.id, "tag_id": tag_id}))
+            except IntegrityError:
+                pass  # Tag already exists on resource, skip
 
     return resource
