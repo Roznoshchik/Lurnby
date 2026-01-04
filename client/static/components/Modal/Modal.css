@@ -1,0 +1,123 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100vh - var(--space-8));
+  background-color: var(--card);
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 150ms ease-out;
+}
+
+.modal-sm {
+  max-width: 400px;
+}
+
+.modal-md {
+  max-width: 600px;
+}
+
+.modal-lg {
+  max-width: 800px;
+}
+
+.modal-xl {
+  max-width: 1000px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  margin: 0;
+}
+
+.modal-close {
+  flex-shrink: 0;
+  margin-left: var(--space-4);
+}
+
+.modal-close.btn-sm .material-symbols-outlined,
+.modal-close.btn-sm .material-symbols-rounded,
+.modal-close.btn-sm .material-symbols-sharp {
+  font-size: var(--font-size-xl);
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+.modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .modal-overlay {
+    padding: var(--space-2);
+    align-items: flex-end;
+  }
+
+  .modal {
+    max-height: calc(100vh - var(--space-4));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
+  }
+}

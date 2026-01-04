@@ -165,3 +165,81 @@ import Combobox from './components/Combobox/Combobox'
   placeholder="Select tags..."
 />
 ```
+
+### QuillEditor
+Rich text editor using Quill.js. Uncontrolled component with ref for accessing Quill instance.
+
+```jsx
+import { useRef } from 'preact/hooks'
+import QuillEditor from './components/QuillEditor/QuillEditor'
+
+const editorRef = useRef(null)
+
+<QuillEditor
+  ref={editorRef}
+  defaultValue="<p>Initial content</p>"
+  placeholder="Start typing..."
+  onTextChange={(delta, oldDelta, source) => console.log('Changed')}
+/>
+
+// Access content: editorRef.current?.root.innerHTML
+```
+
+**Props:**
+- `defaultValue`: initial HTML content
+- `placeholder`: placeholder text
+- `readOnly`: boolean
+- `modules`: Quill modules config (toolbar, etc.)
+- `boundsRef`: ref to container element for tooltip positioning (prevents clipping in modals)
+- `onTextChange`: callback on content change
+- `onSelectionChange`: callback on selection change
+- `className`: additional CSS classes
+
+## Modal Components
+
+### Modal
+Reusable modal dialog with overlay, header, body, and footer.
+
+```jsx
+import Modal from './components/Modal/Modal'
+
+<Modal
+  isOpen={showModal}
+  onClose={() => setShowModal(false)}
+  title="Modal Title"
+  size="lg"
+  footer={<Button onClick={save}>Save</Button>}
+>
+  <p>Modal content goes here</p>
+</Modal>
+```
+
+**Props:**
+- `isOpen`: boolean - controls visibility
+- `onClose`: callback when modal should close
+- `title`: modal header title
+- `size`: 'sm' | 'md' | 'lg' | 'xl'
+- `footer`: JSX for footer actions
+- `className`: additional CSS classes
+
+### ArticleEditModal
+Modal for editing article metadata, notes, and content.
+
+```jsx
+import ArticleEditModal from './components/ArticleEditModal/ArticleEditModal'
+
+<ArticleEditModal
+  article={articleObj}
+  allTags={tagsArray}
+  isOpen={!!editingArticle}
+  onClose={() => setEditingArticle(null)}
+  onSave={(updatedArticle) => handleSave(updatedArticle)}
+/>
+```
+
+**Props:**
+- `article`: article object to edit
+- `allTags`: array of all available tags
+- `isOpen`: boolean - controls visibility
+- `onClose`: callback when modal closes
+- `onSave`: callback with updated article after save

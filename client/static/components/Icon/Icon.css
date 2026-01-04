@@ -25,17 +25,17 @@
 button .material-symbols-outlined,
 button .material-symbols-rounded,
 button .material-symbols-sharp {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg);
 }
 
 button.btn-sm .material-symbols-outlined,
 button.btn-sm .material-symbols-rounded,
 button.btn-sm .material-symbols-sharp {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm);
 }
 
 button.btn-lg .material-symbols-outlined,
 button.btn-lg .material-symbols-rounded,
 button.btn-lg .material-symbols-sharp {
-  font-size: var(--font-size-2xl);
+  font-size: var(--font-size-3xl);
 }

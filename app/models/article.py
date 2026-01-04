@@ -4,17 +4,19 @@ import math
 from bs4 import BeautifulSoup
 from flask import url_for
 from flask_login import current_user
-from sqlalchemy import desc, func, Index
+import sqlalchemy as sa
+from sqlalchemy import desc, func, Index, select
 from sqlalchemy_utils import UUIDType
 import uuid
 
 from app.models.base import db
 
 
-tags_articles = db.Table(
+tags_articles = sa.Table(
     "tags_articles",
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False),
-    db.Column("article_id", db.Integer, db.ForeignKey("article.id"), nullable=False),
+    db.metadata,
+    sa.Column("tag_id", sa.Integer, sa.ForeignKey("tag.id"), primary_key=True, nullable=False),
+    sa.Column("article_id", sa.Integer, sa.ForeignKey("article.id"), primary_key=True, nullable=False, index=True),
 )
 
 
@@ -68,6 +70,11 @@ class Article(db.Model):
     @property
     def tag_list(self):
         return [tag.name for tag in self.tags.all()]
+
+    @property
+    def tag_ids(self):
+        """Get tag IDs efficiently from junction table without loading Tag objects."""
+        return db.session.scalars(select(tags_articles.c.tag_id).where(tags_articles.c.article_id == self.id)).all()
 
     @classmethod
     def return_articles_with_count(cls):

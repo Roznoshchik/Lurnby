@@ -39,3 +39,19 @@ class Config(object):
     PREFERRED_URL_SCHEME = "https"
     WTF_CSRF_TIME_LIMIT = None
     DEV = os.environ.get("DEV")
+
+
+class TestConfig(Config):
+    """Test configuration - uses separate test database"""
+
+    TESTING = True
+    SQLALCHEMY_DATABASE_URI = os.environ.get("TEST_DATABASE_URL", "postgresql://localhost/lurnby-test")
+    WTF_CSRF_ENABLED = False
+    REDIS_URL = "redis://"
+
+
+def get_config():
+    """Return the appropriate config based on FLASK_ENV"""
+    if os.environ.get("FLASK_ENV") == "testing":
+        return TestConfig
+    return Config

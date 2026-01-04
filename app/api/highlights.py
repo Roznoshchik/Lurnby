@@ -149,7 +149,7 @@ def update_highlight(uuid):
                 setattr(highlight, key, value)
 
         if "tags" in data:
-            highlight = update_tags(tags=data["tags"], resource=highlight)
+            highlight = update_tags(tag_ids=data["tags"], resource=highlight)
 
         ev = Event.add(EventName.UPDATED_HIGHLIGHT, user=user)
         db.session.add(ev)
