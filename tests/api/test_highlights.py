@@ -564,21 +564,24 @@ class UpdateHighlightApiTests(BaseTestCase):
         mock_check_token.return_value = user
 
         highlight = Highlight(user_id=user.id, text="Foo", note="Bar", source="Baz")
-
         db.session.add(highlight)
+
+        # Create tags
+        tags = [Tag(name=name, user_id=user.id) for name in ["pikachu", "bulbasaur", "charmander"]]
+        db.session.add_all(tags)
         db.session.commit()
 
-        body = {"tags": ["pikachu", "bulbasaur", "charmander"]}
+        tag_ids = [t.id for t in tags]
 
         res = self.client.patch(
             f"/api/highlights/{highlight.uuid}",
-            json=body,
+            json={"tags": tag_ids},
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
         returned_highlight = data.get("highlight")
         self.assertCountEqual(highlight.to_dict().get("tags"), returned_highlight.get("tags"))
-        self.assertCountEqual(highlight.tag_list, body.get("tags"))
+        self.assertCountEqual(highlight.tag_list, ["pikachu", "bulbasaur", "charmander"])
 
     @patch("app.models.User.check_token")
     def test_update_highlight_errors(self, mock_check_token):

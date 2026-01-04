@@ -212,7 +212,7 @@ def update_article(article_uuid):
                 setattr(article, key, value)
 
         if "tags" in data:
-            article = update_tags(tags=data["tags"], resource=article)
+            article = update_tags(tag_ids=data["tags"], resource=article)
 
         ev = Event.add(EventName.UPDATED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)

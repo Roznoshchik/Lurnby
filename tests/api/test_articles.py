@@ -611,32 +611,35 @@ class UpdateArticleApiTests(BaseTestCase):
 
     @patch("app.models.User.check_token")
     def test_article_updates_tags(self, mock_check_token):
-        mock_check_token.return_value = User.query.first()
+        user = User.query.first()
+        mock_check_token.return_value = user
 
-        article = Article(user_id=User.query.first().id, title="Hello World")
+        article = Article(user_id=user.id, title="Hello World")
         db.session.add(article)
+
+        # Create all tags
+        tags = [Tag(name=name, user_id=user.id) for name in ["pikachu", "bulbasaur", "charmander", "squirtle"]]
+        db.session.add_all(tags)
         db.session.commit()
 
-        tags = ["pikachu", "bulbasaur", "charmander"]
-        for tag in tags:
-            new_tag = Tag(name=tag, user_id=User.query.first().id)
-            db.session.add(new_tag)
-            article.add_tag(new_tag)
-
+        # Add initial tags (pikachu, bulbasaur, charmander)
+        for tag in tags[:3]:
+            article.add_tag(tag)
         db.session.commit()
 
-        self.assertEqual(article.tag_list, tags)
+        self.assertCountEqual(article.tag_list, ["pikachu", "bulbasaur", "charmander"])
 
-        body = {"tags": ["charmander", "bulbasaur", "squirtle"]}
+        # Update tags using IDs (remove pikachu, keep bulbasaur & charmander, add squirtle)
+        new_tag_ids = [tags[2].id, tags[1].id, tags[3].id]  # charmander, bulbasaur, squirtle
 
         res = self.client.patch(
-            "/api/articles/" + str(article.uuid),
-            json=body,
+            f"/api/articles/{article.uuid}",
+            json={"tags": new_tag_ids},
             headers={"Authorization": "Bearer abc123"},
         )
 
         self.assertEqual(res.status_code, 200)
-        self.assertCountEqual(article.tag_list, body["tags"])
+        self.assertCountEqual(article.tag_list, ["charmander", "bulbasaur", "squirtle"])
 
 
 class DeleteArticleApiTests(BaseTestCase):

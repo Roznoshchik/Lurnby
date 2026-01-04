@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup
+from sqlalchemy import select
 
 from app.models.base import db, generate_str_id
 
@@ -90,6 +91,13 @@ class Highlight(db.Model):
     @property
     def tag_list(self):
         return [tag.name for tag in self.tags.all()]
+
+    @property
+    def tag_ids(self):
+        """Get tag IDs efficiently from junction table without loading Tag objects."""
+        return db.session.scalars(
+            select(tags_highlights.c.tag_id).where(tags_highlights.c.highlight_id == self.id)
+        ).all()
 
     @property
     def fields_that_can_be_updated(self):
