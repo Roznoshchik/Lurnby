@@ -3,41 +3,24 @@ import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup
+import sqlalchemy as sa
 from sqlalchemy import select
 
 from app.models.base import db, generate_str_id
 
 
-highlights_topics = db.Table(
+highlights_topics = sa.Table(
     "highlights_topics",
-    db.Column(
-        "highlight_id",
-        db.Integer,
-        db.ForeignKey("highlight.id"),
-        nullable=False,
-        primary_key=True,
-        index=True,
-    ),
-    db.Column(
-        "topic_id",
-        db.Integer,
-        db.ForeignKey("topic.id"),
-        nullable=False,
-        primary_key=True,
-        index=True,
-    ),
+    db.metadata,
+    sa.Column("highlight_id", sa.Integer, sa.ForeignKey("highlight.id"), primary_key=True, nullable=False, index=True),
+    sa.Column("topic_id", sa.Integer, sa.ForeignKey("topic.id"), primary_key=True, nullable=False),
 )
 
-tags_highlights = db.Table(
+tags_highlights = sa.Table(
     "tags_highlights",
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False, index=True),
-    db.Column(
-        "highlight_id",
-        db.Integer,
-        db.ForeignKey("highlight.id"),
-        index=True,
-        nullable=False,
-    ),
+    db.metadata,
+    sa.Column("tag_id", sa.Integer, sa.ForeignKey("tag.id"), primary_key=True, nullable=False),
+    sa.Column("highlight_id", sa.Integer, sa.ForeignKey("highlight.id"), primary_key=True, nullable=False, index=True),
 )
 
 
