@@ -52,7 +52,9 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
 
   const filteredOptions = useMemo(() => {
     if (!searchQuery) return options
-    return options.filter((option) => option.label.toLowerCase().includes(searchQuery.toLowerCase()))
+    return options.filter((option) =>
+      option.label.toLowerCase().includes(searchQuery.toLowerCase()),
+    )
   }, [options, searchQuery])
 
   const handleKeyDown = (e) => {
@@ -84,7 +86,9 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
   return (
     <div ref={containerRef} className="combobox-wrapper">
       <Button variant="outline" onClick={() => setOpen(!open)} className="combobox-trigger">
-        {selected.length > 0 ? `${selected.length} tag${selected.length > 1 ? 's' : ''} selected` : placeholder}
+        {selected.length > 0
+          ? `${selected.length} tag${selected.length > 1 ? 's' : ''} selected`
+          : placeholder}
         <Icon name="unfold_more" />
       </Button>
 
@@ -124,8 +128,15 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
                     onClick={() => {
                       onSelect(option.value)
                     }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        onSelect(option.value)
+                      }
+                    }}
                     onMouseEnter={() => setHighlightedIndex(index)}
                     role="option"
+                    tabIndex={0}
                     aria-selected={selected.includes(option.value)}
                   >
                     <Icon

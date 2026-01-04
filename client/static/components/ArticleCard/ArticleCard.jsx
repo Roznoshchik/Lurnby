@@ -66,11 +66,23 @@ export default function ArticleCard({ article, onOpen, onEdit }) {
             )}
           </div>
           <div className="article-card-actions">
-            <Button variant="ghost" size="sm" onClick={onEdit} className="icon-button" aria-label="Edit article">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onEdit}
+              className="icon-button"
+              aria-label="Edit article"
+            >
               <Icon name="edit" />
             </Button>
-            <Button variant="ghost" size="sm" onClick={onOpen} className="icon-button" aria-label="Open article">
-              <Icon name="open_in_new" />
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onOpen}
+              className="icon-button"
+              aria-label="Read article"
+            >
+              <Icon name="visibility" />
             </Button>
           </div>
         </div>

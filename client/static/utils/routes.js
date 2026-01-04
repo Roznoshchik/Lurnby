@@ -12,6 +12,8 @@ export const ROUTES = {
     REVIEW: '/client/review',
     TAGS: '/client/tags',
     SETTINGS: '/client/settings',
+    // Dynamic routes
+    article: (uuid) => `/client/article/${uuid}`,
   },
   API: {
     LOGIN: '/api/auth/login',
@@ -19,5 +21,9 @@ export const ROUTES = {
     REFRESH: '/api/auth/refresh',
     LOGOUT: '/api/auth/logout',
     STATS: '/api/user/stats',
+    ARTICLES: '/api/articles',
+    TAGS: '/api/tags',
+    // Dynamic routes
+    article: (uuid) => `/api/articles/${uuid}`,
   },
 }

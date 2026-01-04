@@ -31,7 +31,6 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
       </div>
 
       <div className="article-preview-footer">
-
         <div className="article-preview-actions">
           <Button
             variant="ghost"
@@ -53,9 +52,9 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
               onOpen()
             }}
             className="icon-button"
-            aria-label="Open article"
+            aria-label="Read article"
           >
-            <Icon name="open_in_new" />
+            <Icon name="visibility" />
           </Button>
         </div>
       </div>

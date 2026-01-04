@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo } from 'preact/hooks'
 import './css/globals.css'
 import './css/articles.css'
 import ArticleCard from './components/ArticleCard/ArticleCard'
+import ArticleEditModal from './components/ArticleEditModal/ArticleEditModal'
 import ArticlePreview from './components/ArticlePreview/ArticlePreview'
 import Badge from './components/Badge/Badge'
 import Button from './components/Button/Button'
@@ -57,6 +58,9 @@ function ArticlesList() {
     status: '',
     tag_ids: '',
   })
+
+  // Edit modal state
+  const [editingArticle, setEditingArticle] = useState(null)
 
   useEffect(() => {
     fetchTags()
@@ -126,7 +130,9 @@ function ArticlesList() {
   }
 
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) => (prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]))
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    )
   }
 
   const handlePerPageChange = (value) => {
@@ -140,22 +146,26 @@ function ArticlesList() {
         value: tag.id,
         label: tag.name,
       })),
-    [allTags]
+    [allTags],
   )
 
   const selectedTagObjects = useMemo(
     () => allTags.filter((tag) => selectedTags.includes(tag.id)),
-    [allTags, selectedTags]
+    [allTags, selectedTags],
   )
 
   const handleArticleOpen = (article) => {
-    // TODO: Navigate to article reader page
-    console.log('Open article:', article)
+    window.location.href = ROUTES.PAGES.article(article.id)
   }
 
   const handleArticleEdit = (article) => {
-    // TODO: Open edit modal
-    console.log('Edit article:', article)
+    setEditingArticle(article)
+  }
+
+  const handleArticleSaved = (updatedArticle) => {
+    // Update the article in both lists (API uses 'id' for the UUID string)
+    setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+    setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
   }
 
   return (
@@ -280,7 +290,11 @@ function ArticlesList() {
                 <div className="filter-group">
                   <Icon name="filter_alt" className="filter-icon" />
                   <span className="filter-label">Status:</span>
-                  <Select options={STATUS_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
+                  <Select
+                    options={STATUS_OPTIONS}
+                    value={statusFilter}
+                    onChange={setStatusFilter}
+                  />
                 </div>
 
                 {allTags.length > 0 && (
@@ -323,8 +337,8 @@ function ArticlesList() {
               {/* Articles Count */}
               {total > 0 && (
                 <div className="articles-count">
-                  Showing {(page - 1) * parseInt(perPage) + 1}-
-                  {Math.min(page * parseInt(perPage), total)} of {total} articles
+                  Showing {(page - 1) * parseInt(perPage, 10) + 1}-
+                  {Math.min(page * parseInt(perPage, 10), total)} of {total} articles
                 </div>
               )}
             </div>
@@ -357,10 +371,19 @@ function ArticlesList() {
                     <Icon name="chevron_left" />
                   </Button>
                   <span className="pagination-info">Page {page}</span>
-                  <Button variant="outline" size="sm" onClick={() => setPage((p) => p + 1)} disabled={!hasNext}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={!hasNext}
+                  >
                     <Icon name="chevron_right" />
                   </Button>
-                  <Select options={PER_PAGE_OPTIONS} value={perPage} onChange={handlePerPageChange} />
+                  <Select
+                    options={PER_PAGE_OPTIONS}
+                    value={perPage}
+                    onChange={handlePerPageChange}
+                  />
                 </div>
               </>
             ) : (
@@ -372,6 +395,17 @@ function ArticlesList() {
             )}
           </section>
         </div>
+      )}
+
+      {/* Edit Article Modal */}
+      {editingArticle && (
+        <ArticleEditModal
+          article={editingArticle}
+          allTags={allTags}
+          isOpen={!!editingArticle}
+          onClose={() => setEditingArticle(null)}
+          onSave={handleArticleSaved}
+        />
       )}
     </>
   )

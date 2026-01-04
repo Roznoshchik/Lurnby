@@ -1,0 +1,94 @@
+.quill-editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.quill-editor .ql-toolbar {
+  background-color: var(--input-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  font-family: inherit;
+}
+
+.quill-editor .ql-container {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  min-height: 120px;
+}
+
+.quill-editor .ql-editor {
+  min-height: 120px;
+  color: var(--foreground);
+  padding: var(--space-3);
+}
+
+.quill-editor .ql-editor.ql-blank::before {
+  color: var(--muted-foreground);
+  font-style: normal;
+  opacity: 0.6;
+}
+
+.quill-editor .ql-toolbar button {
+  color: var(--foreground);
+}
+
+.quill-editor .ql-toolbar button:hover {
+  color: var(--primary);
+}
+
+.quill-editor .ql-toolbar button.ql-active {
+  color: var(--primary);
+}
+
+.quill-editor .ql-toolbar .ql-stroke {
+  stroke: var(--foreground);
+}
+
+.quill-editor .ql-toolbar .ql-fill {
+  fill: var(--foreground);
+}
+
+.quill-editor .ql-toolbar button:hover .ql-stroke,
+.quill-editor .ql-toolbar button.ql-active .ql-stroke {
+  stroke: var(--primary);
+}
+
+.quill-editor .ql-toolbar button:hover .ql-fill,
+.quill-editor .ql-toolbar button.ql-active .ql-fill {
+  fill: var(--primary);
+}
+
+.quill-editor .ql-editor a {
+  color: var(--blue-500);
+  text-decoration: underline;
+}
+
+.quill-editor .ql-editor blockquote {
+  border-left: 3px solid var(--border);
+  color: var(--muted-foreground);
+  padding-left: var(--space-3);
+  margin: var(--space-2) 0;
+}
+
+.quill-editor .ql-editor pre.ql-syntax {
+  background-color: var(--secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  overflow-x: auto;
+}
+
+.dark .quill-editor .ql-toolbar {
+  background-color: var(--secondary);
+}
+
+.dark .quill-editor .ql-snow .ql-picker {
+  color: var(--foreground);
+}
+
+.dark .quill-editor .ql-snow .ql-picker-options {
+  background-color: var(--popover);
+  border-color: var(--border);
+}
