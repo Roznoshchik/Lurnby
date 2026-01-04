@@ -4,11 +4,10 @@ from random import randint
 import sys
 import json
 from rq import get_current_job
-from flask import render_template
+from flask import render_template, current_app
 from bs4 import BeautifulSoup
 import re
 import traceback
-from flask import current_app
 from redis import Redis
 from sqlalchemy import text
 
@@ -28,13 +27,12 @@ from app.helpers.export_helpers import (
 logger = CustomLogger("Tasks")
 
 try:
-    logger.info("Checking For Redis Connection")
-    REDIS_URL = os.environ.get("REDIS_URL") or "redis://"
-    redis_check = Redis.from_url(REDIS_URL)
-    redis_check.ping()
-
     app = create_app()
     app.app_context().push()
+
+    logger.info("Checking For Redis Connection")
+    redis_check = Redis.from_url(app.config["REDIS_URL"])
+    redis_check.ping()
 except Exception:
     logger.info("Redis connection not found, assuming in same thread")
     logger.error(traceback.print_exc())

@@ -4,7 +4,7 @@ from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 import sys
 
-from config import Config
+from config import get_config
 from flask import Flask
 from flask.logging import default_handler
 from flask_cors import CORS
@@ -84,7 +84,10 @@ csp = {
 }
 
 
-def create_app(config_class=Config):
+def create_app(config_class=None):
+    if config_class is None:
+        config_class = get_config()
+
     app = Flask(__name__)
     app.config.from_object(config_class)
     app.redis = Redis.from_url(app.config["REDIS_URL"])
