@@ -44,7 +44,7 @@ class AddArticleApiTests(BaseTestCase):
         mock_launch_task.return_value = mock_task
 
         mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
-        payload = {"tags": ["pikachu"]}
+        payload = {"new_tag_names": ["pikachu"]}
 
         res = self.client.post(
             "/api/articles",
@@ -124,7 +124,7 @@ class AddArticleApiTests(BaseTestCase):
                 "content": "This story was 25 years in the making",
                 "source": "Nintendo",
             },
-            "tags": ["pikachu", "bulbasaur", "charmander"],
+            "new_tag_names": ["pikachu", "bulbasaur", "charmander"],
             "notes": "Hello old friend!",
         }
 
@@ -141,7 +141,7 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual("Hello old friend!", article.notes)
         self.assertEqual("The road to being a master", article.title)
         self.assertTrue("This story was 25 years in the making" in article.content)
-        for tag in payload["tags"]:
+        for tag in payload["new_tag_names"]:
             self.assertTrue(tag in tags)
 
     @patch("app.api.helpers.add_article_methods.pull_text")
@@ -222,8 +222,8 @@ class AddArticleApiTests(BaseTestCase):
         # Simulate URL that returns non-parseable content (like an image)
         mock_pull_text.return_value = {"title": None, "content": None}
 
-        # empty payload
-        payload = {"tags": ["pikachu", "bulbasaur", "charmander"]}
+        # empty payload (only tags, no article content)
+        payload = {"new_tag_names": ["pikachu", "bulbasaur", "charmander"]}
 
         res = self.client.post(
             "/api/articles",
@@ -277,7 +277,7 @@ class AddArticleApiTests(BaseTestCase):
         # non pdf or no epub file
         mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mocks.py", "rb")
 
-        payload = {"tags": ["pikachu", "bulbasaur", "charmander"]}
+        payload = {"new_tag_names": ["pikachu", "bulbasaur", "charmander"]}
 
         res = self.client.post(
             "/api/articles",

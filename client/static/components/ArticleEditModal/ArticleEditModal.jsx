@@ -47,7 +47,9 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
     const fetchArticle = async () => {
       setLoading(true)
       try {
-        const response = await api.get(ROUTES.API.article(article.id))
+        const needsContent = article.filetype === 'manual' || article.filetype === 'email'
+        const params = needsContent ? { with_content: true } : {}
+        const response = await api.get(ROUTES.API.article(article.id), params)
         const data = response.article
         setFullArticle(data)
         setTitle(data.title || '')

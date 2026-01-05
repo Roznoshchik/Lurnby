@@ -183,6 +183,7 @@ class Article(db.Model):
             "source": self.source or self.source_url,
             "source_url": self.source_url,
             "title": self.title,
+            "filetype": self.filetype,
             "content": self.content if with_content else None,
             "unread": self.unread,
             "archived": self.archived,

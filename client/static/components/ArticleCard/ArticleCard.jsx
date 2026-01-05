@@ -1,5 +1,6 @@
 import Badge from '../Badge/Badge'
 import Button from '../Button/Button'
+import Card from '../Card/Card'
 import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticleCard.css'
@@ -18,7 +19,7 @@ export default function ArticleCard({ article, onOpen, onEdit }) {
   }
 
   return (
-    <article className="article-card">
+    <Card as="article" className="article-card" padding="lg">
       <div className="article-card-content">
         {/* Header: Source and Status */}
         <div className="article-card-header">
@@ -87,6 +88,6 @@ export default function ArticleCard({ article, onOpen, onEdit }) {
           </div>
         </div>
       </div>
-    </article>
+    </Card>
   )
 }

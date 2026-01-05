@@ -1,31 +1,5 @@
 /* Article Card Component Styles */
 
-.article-card {
-  position: relative;
-  background-color: var(--card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: var(--space-6);
-  overflow: hidden;
-  transition: border-color 200ms;
-}
-
-.article-card:hover {
-  border-color: var(--border-hover);
-}
-
-/* Notebook line accent */
-.article-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 2px;
-  height: 100%;
-  background-color: var(--border);
-  opacity: 0.5;
-}
-
 .article-card-content {
   display: flex;
   flex-direction: column;

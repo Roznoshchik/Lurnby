@@ -96,13 +96,12 @@
   cursor: pointer;
 }
 
-.editor-notes .ql-container,
-.editor-reflections .ql-container {
+.editor-notes .ql-editor,
+.editor-reflections .ql-editor,
+.editor-content .ql-editor {
   min-height: 100px;
-}
-
-.editor-content .ql-container {
-  min-height: 200px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
 }
 
 .modal-footer .archive-btn,

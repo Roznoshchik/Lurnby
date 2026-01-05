@@ -1,4 +1,5 @@
 import Button from '../Button/Button'
+import Card from '../Card/Card'
 import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticlePreview.css'
@@ -19,7 +20,7 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
   const progress = Math.round(article.progress ?? 0)
 
   return (
-    <div className="article-preview">
+    <Card className="article-preview" padding="md">
       <div className="article-preview-header">
         <h3 className="article-preview-title">{article.title}</h3>
         <div className="article-preview-status">{getStatusIcon()}</div>
@@ -58,6 +59,6 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
           </Button>
         </div>
       </div>
-    </div>
+    </Card>
   )
 }
