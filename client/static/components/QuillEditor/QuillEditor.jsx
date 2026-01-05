@@ -63,7 +63,7 @@ const QuillEditor = forwardRef(
       }
 
       if (defaultValueRef.current) {
-        quill.root.innerHTML = defaultValueRef.current
+        quill.clipboard.dangerouslyPasteHTML(defaultValueRef.current)
       }
 
       quill.on(Quill.events.TEXT_CHANGE, (...args) => {

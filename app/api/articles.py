@@ -178,7 +178,8 @@ def get_article(article_uuid):
         if not article or article.user_id != token_auth.current_user().id:
             return bad_request("The resource can't be found")
 
-        response = jsonify(article=article.to_dict(preview=False))
+        with_content = request.args.get("with_content", "").lower() == "true"
+        response = jsonify(article=article.to_dict(preview=False, with_content=with_content))
         response.status_code = 200
         return response
 
