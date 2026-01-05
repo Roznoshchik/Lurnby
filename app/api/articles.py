@@ -10,7 +10,6 @@ from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
-    add_tags,
     process_file,
     process_file_upload,
 )
@@ -116,7 +115,8 @@ def add_article():
     manual_entry = data.get("manual_entry", None)
     url = data.get("url", None)
     upload_file_ext = data.get("upload_file_ext", None)
-    tags = data.get("tags", [])
+    tag_ids = data.get("tag_ids", [])
+    new_tag_names = data.get("new_tag_names", [])
     if not manual_entry and not url and not upload_file_ext and not file:
         return bad_request("No article to create. Check data and try again")
 
@@ -129,7 +129,7 @@ def add_article():
         if url:
             article = process_url_entry(article, url)
 
-        article = add_tags(article=article, user_id=token_auth.current_user().id, tags=tags)
+        update_tags(article, tag_ids=tag_ids, new_tag_names=new_tag_names)
 
         article.processing = True
         db.session.commit()

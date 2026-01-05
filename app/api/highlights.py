@@ -11,7 +11,6 @@ from app.api.errors import bad_request, LurnbyValueError, error_response
 import app.api.helpers.highlight_query_maker as hqm
 from app.api.helpers.add_highlight_methods import (
     validate_request,
-    add_tags,
     populate_highlight,
 )
 from app.api.helpers.query_maker import apply_pagination
@@ -96,7 +95,11 @@ def create_highlight():
         db.session.add(highlight)
 
         highlight = populate_highlight(highlight, data)
-        highlight = add_tags(highlight, data.get("tags", []))
+        update_tags(
+            highlight,
+            tag_ids=data.get("tag_ids", []),
+            new_tag_names=data.get("new_tag_names", []),
+        )
 
         ev = Event.add(EventName.ADDED_HIGHLIGHT, user=user)
         db.session.add(ev)

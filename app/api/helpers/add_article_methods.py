@@ -5,7 +5,6 @@ import validators
 from app import db, CustomLogger, s3, bucket
 from app.api.errors import LurnbyValueError
 from app.helpers.pulltext import pull_text
-from app.models import Tag
 
 logger = CustomLogger("API")
 
@@ -65,29 +64,6 @@ def process_url_entry(article, url):
     article.title = title
     article.content = content
     article.source_url = url
-
-    return article
-
-
-def add_tags(article, user_id, tags=[]):
-    """creates tags if they don't exist and adds them to the article
-
-    Args:
-        article (class 'app.models.Article'): Instantiated article
-        user_id (int): id for the current user
-        tags (list): list of tag names. Defaults to [].
-
-    Returns:
-        article (class 'app.models.Article'): Updated with tags
-    """
-
-    for tag_name in tags:
-        tag = Tag.query.filter_by(name=tag_name.lower(), user_id=user_id).first()
-        if not tag:
-            tag = Tag(user_id=user_id, name=tag_name.lower())
-            db.session.add(tag)
-
-        article.add_tag(tag)
 
     return article
 

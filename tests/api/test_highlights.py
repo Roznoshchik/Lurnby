@@ -395,7 +395,7 @@ class AddHighlightApiTests(BaseTestCase):
             "text": "hello old friend",
             "note": "this is super fun",
             "source": "my favorite friend!",
-            "tags": ["pikachu", "bulbasaur", "charmander"],
+            "new_tag_names": ["pikachu", "bulbasaur", "charmander"],
         }
 
         res = self.client.post(
@@ -406,7 +406,7 @@ class AddHighlightApiTests(BaseTestCase):
         data = json.loads(res.data)
         highlight = data.get("highlight")
 
-        self.assertCountEqual([tag.get("name") for tag in highlight.get("tags")], body.get("tags"))
+        self.assertCountEqual([tag.get("name") for tag in highlight.get("tags")], body.get("new_tag_names"))
 
     @patch("app.models.User.check_token")
     def test_add_new_highlight_fails_with_bad_data(self, mock_check_token):
