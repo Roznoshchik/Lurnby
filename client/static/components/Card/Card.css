@@ -1,0 +1,55 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition:
+    border-color 200ms,
+    box-shadow 200ms;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+}
+
+/* Variants */
+.card-default {
+  background-color: var(--card);
+}
+
+.card-outline {
+  background-color: transparent;
+}
+
+/* Padding */
+.card-padding-sm {
+  padding: var(--space-3);
+  gap: var(--space-2);
+}
+
+.card-padding-md {
+  padding: var(--space-4);
+  gap: var(--space-3);
+}
+
+.card-padding-lg {
+  padding: var(--space-6);
+  gap: var(--space-4);
+}
+
+/* Interactive - clickable cards */
+.card-interactive {
+  cursor: pointer;
+}
+
+.card-interactive:hover {
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.1),
+    0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.card-interactive:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}

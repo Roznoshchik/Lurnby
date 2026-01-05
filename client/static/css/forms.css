@@ -183,8 +183,9 @@ input[type="radio"]:disabled {
    Labels
    ================================================================ */
 
-label {
-  display: inline-block;
+label,
+.form-label {
+  display: block;
   font-size: var(--font-size-base);
   font-weight: var(--font-weight-medium);
   line-height: var(--line-height-normal);

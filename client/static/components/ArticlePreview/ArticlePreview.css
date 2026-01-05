@@ -1,19 +1,5 @@
 .article-preview {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  background-color: var(--card);
-  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  transition: all 150ms ease;
-}
-
-.article-preview:hover {
-  border-color: var(--border-hover);
-  box-shadow:
-    0 1px 3px 0 rgb(0 0 0 / 0.1),
-    0 1px 2px -1px rgb(0 0 0 / 0.1);
 }
 
 .article-preview-header {
