@@ -55,28 +55,26 @@ const ARTICLE_TYPES = [
 ]
 
 export default function ArticleAddModal({ isOpen, onClose }) {
-  const [articleType, setArticleType] = useState(null)
+  const [selectedType, setSelectedType] = useState(null)
   const [error, setError] = useState(null)
 
   const handleClose = () => {
-    setArticleType(null)
+    setSelectedType(null)
     setError(null)
     onClose()
   }
 
-  const handleTypeSelect = (typeId) => {
-    setArticleType(typeId)
+  const handleTypeSelect = (type) => {
+    setSelectedType(type)
     setError(null)
   }
 
   const handleBack = () => {
-    setArticleType(null)
+    setSelectedType(null)
     setError(null)
   }
 
-  const selectedType = ARTICLE_TYPES.find((t) => t.id === articleType)
-
-  const footer = articleType ? (
+  const footer = selectedType ? (
     <>
       <Button variant="ghost" onClick={handleBack}>
         Back
@@ -99,7 +97,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
         {error && <div className="error-banner">{error}</div>}
 
         {/* Article Type Selection */}
-        {!articleType && (
+        {!selectedType && (
           <div className="form-group">
             <span className="form-label">Choose article type:</span>
             <div className="article-type-cards">
@@ -110,7 +108,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
                   interactive
                   padding="xl"
                   className="type-card"
-                  onClick={() => handleTypeSelect(type.id)}
+                  onClick={() => handleTypeSelect(type)}
                 >
                   {type.badge && (
                     <Badge variant="outline" className="type-card-badge">
@@ -130,7 +128,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
         )}
 
         {/* Selected Article Type Display */}
-        {articleType && (
+        {selectedType && (
           <div className="form-group">
             <span className="form-label">Article type:</span>
             <div className="selected-type">
@@ -146,7 +144,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
         )}
 
         {/* Type-specific forms will go here */}
-        {articleType && (
+        {selectedType && (
           <div className="type-form-placeholder">
             <Icon name="construction" />
             <p>Form for {selectedType.title} coming soon...</p>
