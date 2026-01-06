@@ -123,7 +123,7 @@ import Card from './components/Card/Card'
 
 **Props:**
 - `variant`: 'default' | 'outline'
-- `padding`: 'sm' | 'md' | 'lg'
+- `padding`: 'sm' | 'md' | 'lg' | 'xl'
 - `interactive`: boolean - adds hover effects and cursor pointer
 - `as`: HTML element or component to render as ('div', 'button', 'article', etc.)
 - `onClick`: click handler (useful with interactive)
