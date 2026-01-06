@@ -30,12 +30,17 @@
 
 .card-padding-md {
   padding: var(--space-4);
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
 .card-padding-lg {
   padding: var(--space-6);
-  gap: var(--space-4);
+  gap: var(--space-2);
+}
+
+.card-padding-xl {
+  padding: var(--space-8);
+  gap: var(--space-2);
 }
 
 /* Interactive - clickable cards */

@@ -108,7 +108,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
                   key={type.id}
                   as="button"
                   interactive
-                  padding="md"
+                  padding="xl"
                   className="type-card"
                   onClick={() => handleTypeSelect(type.id)}
                 >
