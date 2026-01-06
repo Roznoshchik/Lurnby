@@ -2,6 +2,7 @@ import { render } from 'preact'
 import { useEffect, useState, useMemo } from 'preact/hooks'
 import './css/globals.css'
 import './css/articles.css'
+import ArticleAddModal from './components/ArticleAddModal/ArticleAddModal'
 import ArticleCard from './components/ArticleCard/ArticleCard'
 import ArticleEditModal from './components/ArticleEditModal/ArticleEditModal'
 import ArticlePreview from './components/ArticlePreview/ArticlePreview'
@@ -59,8 +60,9 @@ function ArticlesList() {
     tag_ids: '',
   })
 
-  // Edit modal state
+  // Modal states
   const [editingArticle, setEditingArticle] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   useEffect(() => {
     fetchTags()
@@ -179,7 +181,7 @@ function ArticlesList() {
               <h1>Articles</h1>
               <span className="page-header-subtitle">Your Reading Library</span>
             </div>
-            <Button variant="default" icon="add" onClick={() => console.log('Add new article')}>
+            <Button variant="default" icon="add" onClick={() => setShowAddModal(true)}>
               Add Article
             </Button>
           </div>
@@ -407,6 +409,9 @@ function ArticlesList() {
           onSave={handleArticleSaved}
         />
       )}
+
+      {/* Add Article Modal */}
+      <ArticleAddModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
     </>
   )
 }

@@ -108,6 +108,27 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'
 </ErrorBoundary>
 ```
 
+### Card
+Base card component with variants and padding options.
+
+```jsx
+import Card from './components/Card/Card'
+
+<Card>Default card</Card>
+<Card variant="outline">Outline card</Card>
+<Card padding="lg">Large padding</Card>
+<Card as="button" interactive onClick={handleClick}>Clickable card</Card>
+<Card as="article" className="article-card">Semantic card</Card>
+```
+
+**Props:**
+- `variant`: 'default' | 'outline'
+- `padding`: 'sm' | 'md' | 'lg'
+- `interactive`: boolean - adds hover effects and cursor pointer
+- `as`: HTML element or component to render as ('div', 'button', 'article', etc.)
+- `onClick`: click handler (useful with interactive)
+- `className`: additional CSS classes
+
 ## Content Components
 
 ### ArticleCard
