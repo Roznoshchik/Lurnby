@@ -34,71 +34,41 @@ cp .env.example .env
 
 ### Running the Application
 
-**Recommended (one command):**
 ```bash
-# Development mode with HMR
-export FLASK_DEBUG=1
-flask serve
-# This starts: Redis → RQ worker → Vite dev server → Flask
-
-# Production mode (tests built assets)
-flask serve --prod
-# This starts: Redis → RQ worker → Flask
-# Automatically builds assets first
+just serve        # Dev mode: Redis → RQ → Vite → Flask
+just serve-prod   # Prod mode: builds assets first
 ```
 
 ### Testing
 ```bash
-# Run all tests (Python + frontend)
-flask test
+just test         # Run all tests (Python + frontend)
+just test-python  # Run only Python tests
+just test-client  # Run only frontend tests
 
-# Run only Python tests
-flask test --python-only
-
-# Run only frontend tests
-flask test --client-only
-
-# Run Python tests with coverage
-pytest --cov=app
-
-# Run specific test file
-pytest tests/api/test_articles.py
-
-# Run frontend tests with UI
-cd client && npm t
+# Additional options
+pytest --cov=app                    # Python tests with coverage
+pytest tests/api/test_articles.py   # Specific test file
+cd client && npm t                  # Frontend tests with UI
 ```
 
 ### Code Quality
 ```bash
-# Format code (both Python and client)
-flask format
+just format         # Format all code (Python + client)
+just format-python  # Format only Python files
+just format-client  # Format only client files
 
-# Format only Python files
-flask format --python-only
+just lint           # Lint all code (Python + client)
+just lint-python    # Lint only Python files
+just lint-client    # Lint only client files
 
-# Format only client files
-flask format --client-only
-
-# Lint code (both Python and client)
-flask lint
-
-# Lint only Python files
-flask lint --python-only
-
-# Lint only client files
-flask lint --client-only
-
-# Run pre-commit hooks manually
-pre-commit run --all-files
-
-# Install pre-commit hooks (runs automatically on commit)
-pre-commit install
+# Pre-commit hooks
+pre-commit run --all-files  # Run manually
+pre-commit install          # Install hooks
 ```
 
-**Flask format and lint commands:**
-- Format: Uses Black for Python, Biome for client (JavaScript/JSX)
-- Lint: Uses Flake8 for Python, Biome for client
-- Automatically excludes ReadabiliPy, migrations, and other configured directories
+**Tools used:**
+- Format: Black (Python), Biome (JavaScript/JSX)
+- Lint: Flake8 (Python), Biome (client)
 
 **Pre-commit hooks include:**
 - Flake8 (serious errors only: syntax errors, undefined names)
