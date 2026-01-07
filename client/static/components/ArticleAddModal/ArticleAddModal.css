@@ -1,7 +1,18 @@
+/* Modal sizing for combobox dropdown */
+.article-add-modal .modal {
+  min-height: 600px;
+}
+
 .article-add-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+}
+
+.article-add-form .ql-editor {
+  min-height: 100px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
 }
 
 .error-banner {
@@ -73,6 +84,17 @@
   }
 }
 
+/* Type + Tags Row */
+.type-tags-row {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.type-tags-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
 /* Selected Type Display */
 .selected-type {
   display: flex;
@@ -90,26 +112,33 @@
   font-size: var(--font-size-lg);
 }
 
-/* Placeholder for type-specific forms */
-.type-form-placeholder {
+/* File Upload Area */
+.file-upload-area {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: var(--space-3);
-  padding: var(--space-8);
-  text-align: center;
-  color: var(--muted-foreground);
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
   background-color: var(--muted);
   border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
 }
 
-.type-form-placeholder .material-symbols-outlined {
-  font-size: var(--font-size-3xl);
+.selected-file .material-symbols-outlined {
+  font-size: var(--font-size-lg);
+  color: var(--primary);
 }
 
-.type-form-placeholder p {
-  margin: 0;
+.selected-file span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Responsive */
@@ -120,5 +149,10 @@
 
   .type-card {
     min-height: auto;
+  }
+
+  .type-tags-row {
+    flex-direction: column;
+    gap: var(--space-4);
   }
 }

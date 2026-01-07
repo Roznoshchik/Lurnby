@@ -10,7 +10,6 @@ from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
-    process_file,
     process_file_upload,
 )
 from app.models import Article, Event
@@ -108,16 +107,14 @@ def get_articles():
 @bp.route("/articles", methods=["POST"])
 @token_auth.login_required
 def add_article():
-    file = request.files.get("file")
-    if data := request.form.get("data", {}):
-        data = json.loads(data)
+    data = request.json or {}
 
     manual_entry = data.get("manual_entry", None)
     url = data.get("url", None)
     upload_file_ext = data.get("upload_file_ext", None)
     tag_ids = data.get("tag_ids", [])
     new_tag_names = data.get("new_tag_names", [])
-    if not manual_entry and not url and not upload_file_ext and not file:
+    if not manual_entry and not url and not upload_file_ext:
         return bad_request("No article to create. Check data and try again")
 
     article = Article(user_id=token_auth.current_user().id, notes=data.get("notes", ""))
@@ -134,11 +131,7 @@ def add_article():
         article.processing = True
         db.session.commit()
 
-        if file:
-            response = process_file(article, file, token_auth.current_user())
-            return response
-
-        elif upload_file_ext:
+        if upload_file_ext:
             response = process_file_upload(article, upload_file_ext)
             return response
 

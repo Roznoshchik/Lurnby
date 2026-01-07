@@ -33,63 +33,6 @@ class AddArticleApiTests(BaseTestCase):
     def tearDown(self):
         super().tearDown()
 
-    @patch("app.models.user.User.launch_task")
-    @patch("app.models.User.check_token")
-    def test_add_supplied_epub_article(self, mock_check_token, mock_launch_task):
-        from app.models import Task
-
-        mock_check_token.return_value = User.query.first()
-        mock_task = Task(id="mock-task-id", name="bg_add_article", user=User.query.first())
-        db.session.add(mock_task)
-        mock_launch_task.return_value = mock_task
-
-        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.epub", "rb")
-        payload = {"new_tag_names": ["pikachu"]}
-
-        res = self.client.post(
-            "/api/articles",
-            data={"file": mock_file, "data": json.dumps(payload)},
-            headers={"Authorization": "Bearer abc123"},
-        )
-
-        data = res.json
-        article = Article.query.filter_by(id=1).first()
-        tag = article.tags.all()[0]
-
-        self.assertEqual(res.status_code, 201)
-        self.assertEqual(str(article.uuid), data["article"]["id"])
-        self.assertTrue("task_id" in data)
-        self.assertTrue(data["processing"])
-        self.assertEqual(tag.name, "pikachu")
-        mock_file.close()
-
-    @patch("app.models.user.User.launch_task")
-    @patch("app.models.User.check_token")
-    def test_add_supplied_pdf_article(self, mock_check_token, mock_launch_task):
-        from app.models import Task
-
-        mock_check_token.return_value = User.query.first()
-        mock_task = Task(id="mock-task-id", name="bg_add_article", user=User.query.first())
-        db.session.add(mock_task)
-        mock_launch_task.return_value = mock_task
-
-        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mock.pdf", "rb")
-
-        res = self.client.post(
-            "/api/articles",
-            data={"file": mock_file},
-            headers={"Authorization": "Bearer abc123"},
-        )
-
-        data = res.json
-        article = Article.query.filter_by(id=1).first()
-
-        self.assertEqual(res.status_code, 201)
-        self.assertEqual(str(article.uuid), data["article"]["id"])
-        self.assertTrue("task_id" in data)
-        self.assertTrue(data["processing"])
-        mock_file.close()
-
     @patch("app.api.helpers.add_article_methods.s3.generate_presigned_url")
     @patch("app.models.User.check_token")
     def test_add_upload_article(self, mock_check_token, mock_s3):
@@ -99,7 +42,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 
@@ -130,7 +73,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
         article = Article.query.filter_by(id=1).first()
@@ -157,7 +100,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
         article = Article.query.filter_by(id=1).first()
@@ -227,7 +170,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 
@@ -240,7 +183,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 
@@ -253,7 +196,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 
@@ -266,7 +209,7 @@ class AddArticleApiTests(BaseTestCase):
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 
@@ -274,28 +217,13 @@ class AddArticleApiTests(BaseTestCase):
         self.assertEqual(res.status_code, 400)
         self.assertEqual("Missing Title or Content", data["message"])
 
-        # non pdf or no epub file
-        mock_file = open(f"{Path(os.path.dirname(__file__)).parent}/mocks/mocks.py", "rb")
-
-        payload = {"new_tag_names": ["pikachu", "bulbasaur", "charmander"]}
-
-        res = self.client.post(
-            "/api/articles",
-            data={"file": mock_file, "data": json.dumps(payload)},
-            headers={"Authorization": "Bearer abc123"},
-        )
-
-        data = res.json
-        self.assertEqual(res.status_code, 400)
-        self.assertEqual("File must be pdf or epub", data["message"])
-
-        # non pdf or no epub file for upload
+        # invalid upload_file_ext
 
         payload = {"upload_file_ext": "txt"}
 
         res = self.client.post(
             "/api/articles",
-            data={"data": json.dumps(payload)},
+            json=payload,
             headers={"Authorization": "Bearer abc123"},
         )
 

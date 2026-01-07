@@ -411,7 +411,21 @@ function ArticlesList() {
       )}
 
       {/* Add Article Modal */}
-      <ArticleAddModal isOpen={showAddModal} onClose={() => setShowAddModal(false)} />
+      <ArticleAddModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        tags={allTags}
+        onSuccess={(article, processing) => {
+          setShowAddModal(false)
+          if (!processing) {
+            // Article is ready, add to list
+            setArticles((prev) => [article, ...prev])
+            setTotal((prev) => prev + 1)
+          }
+          // TODO: If processing, could show a toast or poll for completion
+          fetchArticles()
+        }}
+      />
     </>
   )
 }

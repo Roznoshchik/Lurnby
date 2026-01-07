@@ -78,7 +78,7 @@ def process_file(article=None, file=None, user=None):
         user (class 'app.models.User'): User from token_auth.current_user()
 
     Returns:
-        response object: status_code = 201, json={task_id:str, article_id: int, processing:bool}
+        response object: status_code = 201, jpson={task_id:str, article_id: int, processing:bool}
     """
     if not article or not file or not user:
         raise LurnbyValueError("Bad request")

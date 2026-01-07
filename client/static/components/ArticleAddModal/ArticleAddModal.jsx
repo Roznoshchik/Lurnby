@@ -1,9 +1,13 @@
-import { useState } from 'preact/hooks'
+import { useState, useRef } from 'preact/hooks'
 import Badge from '../Badge/Badge'
 import Button from '../Button/Button'
 import Card from '../Card/Card'
+import Combobox from '../Combobox/Combobox'
 import Icon from '../Icon/Icon'
 import Modal from '../Modal/Modal'
+import QuillEditor from '../QuillEditor/QuillEditor'
+import { api } from '../../utils/api'
+import { ROUTES } from '../../utils/routes'
 import './ArticleAddModal.css'
 
 const webDescription = (
@@ -54,13 +58,46 @@ const ARTICLE_TYPES = [
   },
 ]
 
-export default function ArticleAddModal({ isOpen, onClose }) {
+export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] }) {
   const [selectedType, setSelectedType] = useState(null)
   const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleClose = () => {
+  // Form state
+  const [url, setUrl] = useState('')
+  const [title, setTitle] = useState('')
+  const [source, setSource] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [selectedTagIds, setSelectedTagIds] = useState([])
+
+  // Content editor ref and state for re-render trigger
+  const contentRef = useRef(null)
+  const [hasContentState, setHasContentState] = useState(false)
+
+  const resetForm = () => {
     setSelectedType(null)
     setError(null)
+    setUrl('')
+    setTitle('')
+    setSource('')
+    setSelectedFile(null)
+    setSelectedTagIds([])
+    setIsSubmitting(false)
+    setHasContentState(false)
+    if (contentRef.current) {
+      contentRef.current.setText('')
+    }
+  }
+
+  const handleContentChange = () => {
+    if (contentRef.current) {
+      const text = contentRef.current.getText().trim()
+      setHasContentState(text.length > 0)
+    }
+  }
+
+  const handleClose = () => {
+    resetForm()
     onClose()
   }
 
@@ -74,13 +111,108 @@ export default function ArticleAddModal({ isOpen, onClose }) {
     setError(null)
   }
 
+  const handleTagSelect = (tagId) => {
+    setSelectedTagIds((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    )
+  }
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setSelectedFile(file)
+      setError(null)
+    }
+  }
+
+  const getContent = () => {
+    if (!contentRef.current) return ''
+    return contentRef.current.root.innerHTML
+  }
+
+  const hasContent = () => hasContentState
+
+  const isFormValid = () => {
+    if (!selectedType) return false
+
+    switch (selectedType.id) {
+      case 'web':
+        return url.trim().length > 0
+      case 'manual':
+        return title.trim().length > 0 && hasContent()
+      case 'epub':
+      case 'pdf':
+        return selectedFile !== null
+      default:
+        return false
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!isFormValid()) return
+
+    setIsSubmitting(true)
+    setError(null)
+
+    try {
+      let data = { tag_ids: selectedTagIds }
+
+      switch (selectedType.id) {
+        case 'web':
+          data.url = url.trim()
+          break
+        case 'manual':
+          data.manual_entry = {
+            title: title.trim(),
+            content: getContent(),
+            source: source.trim() || null,
+          }
+          break
+        case 'epub':
+          data.upload_file_ext = '.epub'
+          break
+        case 'pdf':
+          data.upload_file_ext = '.pdf'
+          break
+      }
+
+      const response = await api.post(ROUTES.API.ARTICLES, data)
+
+      // For file uploads, we get a presigned URL
+      if (response.upload_url && selectedFile) {
+        await fetch(response.upload_url, {
+          method: 'PUT',
+          body: selectedFile,
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
+        })
+
+        // Notify server that upload is complete (GET with upload_file_ext param)
+        await api.get(response.location, { upload_file_ext: response.upload_file_ext })
+      }
+
+      resetForm()
+      onSuccess?.(response.article, response.processing)
+    } catch (err) {
+      setError(err.message || 'Failed to add article')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const tagOptions = tags.map((tag) => ({
+    value: tag.id,
+    label: tag.name,
+  }))
+
   const footer = selectedType ? (
     <>
-      <Button variant="ghost" onClick={handleBack}>
+      <Button variant="ghost" onClick={handleBack} disabled={isSubmitting}>
         Back
       </Button>
-      <Button variant="default" disabled>
-        Add Article
+      <Button variant="default" onClick={handleSubmit} disabled={!isFormValid() || isSubmitting}>
+        {isSubmitting ? 'Adding...' : 'Add Article'}
       </Button>
     </>
   ) : null
@@ -92,6 +224,7 @@ export default function ArticleAddModal({ isOpen, onClose }) {
       title="Add a new article"
       size="lg"
       footer={footer}
+      overlayClassName="article-add-modal"
     >
       <div className="article-add-form">
         {error && <div className="error-banner">{error}</div>}
@@ -127,29 +260,126 @@ export default function ArticleAddModal({ isOpen, onClose }) {
           </div>
         )}
 
-        {/* Selected Article Type Display */}
+        {/* Selected Article Type + Tags Row */}
         {selectedType && (
-          <div className="form-group">
-            <span className="form-label">Article type:</span>
-            <div className="selected-type">
-              <Badge variant="outline" className="type-badge">
-                <Icon name={selectedType.icon} />
-                {selectedType.title}
-              </Badge>
-              <Button variant="ghost" size="sm" onClick={handleBack}>
-                Change
-              </Button>
+          <div className="type-tags-row">
+            <div className="form-group">
+              <span className="form-label">Article type:</span>
+              <div className="selected-type">
+                <Badge variant="outline" className="type-badge">
+                  <Icon name={selectedType.icon} />
+                  {selectedType.title}
+                </Badge>
+                <Button variant="ghost" size="sm" onClick={handleBack} disabled={isSubmitting}>
+                  Change
+                </Button>
+              </div>
+            </div>
+            <div className="form-group">
+              <label>Tags</label>
+              <Combobox
+                options={tagOptions}
+                selected={selectedTagIds}
+                onSelect={handleTagSelect}
+                placeholder="Select tags..."
+              />
             </div>
           </div>
         )}
 
-        {/* Type-specific forms will go here */}
-        {selectedType && (
-          <div className="type-form-placeholder">
-            <Icon name="construction" />
-            <p>Form for {selectedType.title} coming soon...</p>
+        {/* Web Article Form */}
+        {selectedType?.id === 'web' && (
+          <div className="form-group">
+            <label htmlFor="url" className="required">
+              URL
+            </label>
+            <input
+              type="url"
+              id="url"
+              value={url}
+              onInput={(e) => setUrl(e.target.value)}
+              placeholder="https://example.com/article"
+              disabled={isSubmitting}
+              autoFocus
+            />
+            <span className="help-text">
+              Enter the full URL of the article you want to save
+            </span>
           </div>
         )}
+
+        {/* Manual Entry Form */}
+        {selectedType?.id === 'manual' && (
+          <>
+            <div className="form-group">
+              <label htmlFor="title" className="required">
+                Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={title}
+                onInput={(e) => setTitle(e.target.value)}
+                placeholder="Article title"
+                disabled={isSubmitting}
+                autoFocus
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="source">Source</label>
+              <input
+                type="text"
+                id="source"
+                value={source}
+                onInput={(e) => setSource(e.target.value)}
+                placeholder="Optional: book name, author, website, etc."
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="form-group">
+              <label className="required">Content</label>
+              <QuillEditor
+                ref={contentRef}
+                placeholder="Paste or write your content here..."
+                readOnly={isSubmitting}
+                onTextChange={handleContentChange}
+              />
+            </div>
+          </>
+        )}
+
+        {/* File Upload Form (EPUB/PDF) */}
+        {(selectedType?.id === 'epub' || selectedType?.id === 'pdf') && (
+          <div className="form-group">
+            <label htmlFor="file" className="required">
+              {selectedType.id === 'epub' ? 'EPUB File' : 'PDF File'}
+            </label>
+            <div className="file-upload-area">
+              <input
+                type="file"
+                id="file"
+                accept={selectedType.id === 'epub' ? '.epub' : '.pdf'}
+                onChange={handleFileChange}
+                disabled={isSubmitting}
+              />
+              {selectedFile && (
+                <div className="selected-file">
+                  <Icon name="description" />
+                  <span>{selectedFile.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedFile(null)}
+                    disabled={isSubmitting}
+                  >
+                    <Icon name="close" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
       </div>
     </Modal>
   )

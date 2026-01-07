@@ -11,6 +11,7 @@ export default function Modal({
   children,
   footer,
   className = '',
+  overlayClassName = '',
 }) {
   const modalRef = useRef(null)
 
@@ -44,7 +45,7 @@ export default function Modal({
 
   return (
     <div
-      className="modal-overlay"
+      className={`modal-overlay ${overlayClassName}`}
       onClick={handleOverlayClick}
       onKeyDown={handleOverlayKeyDown}
       role="presentation"
