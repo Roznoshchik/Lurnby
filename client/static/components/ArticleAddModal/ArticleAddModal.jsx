@@ -253,7 +253,7 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
                     <Icon name={type.icon} className="type-card-icon" />
                     <span className="type-card-title">{type.title}</span>
                   </div>
-                  <p className="type-card-description">{type.description}</p>
+                  <div className="type-card-description">{type.description}</div>
                 </Card>
               ))}
             </div>

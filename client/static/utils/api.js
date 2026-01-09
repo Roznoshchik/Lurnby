@@ -213,7 +213,9 @@ export const api = {
       : ''
     const response = await fetchWithAuth(`${endpoint}${queryString}`)
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+      error.status = response.status
+      throw error
     }
     return response.json()
   },
@@ -230,7 +232,9 @@ export const api = {
       body: JSON.stringify(data),
     })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+      error.status = response.status
+      throw error
     }
     return response.json()
   },
@@ -247,7 +251,9 @@ export const api = {
       body: JSON.stringify(data),
     })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+      error.status = response.status
+      throw error
     }
     return response.json()
   },
@@ -264,7 +270,9 @@ export const api = {
       body: JSON.stringify(data),
     })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+      error.status = response.status
+      throw error
     }
     return response.json()
   },
@@ -279,7 +287,9 @@ export const api = {
       method: 'DELETE',
     })
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
+      error.status = response.status
+      throw error
     }
     return response.json()
   },

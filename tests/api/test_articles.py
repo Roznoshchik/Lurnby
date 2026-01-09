@@ -49,7 +49,7 @@ class AddArticleApiTests(BaseTestCase):
         data = res.json
         article = Article.query.filter_by(id=1).first()
 
-        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.status_code, 202)  # 202 Accepted for file uploads
         self.assertEqual(str(article.uuid), data["article"]["id"])
         self.assertTrue("upload_url" in data)
         self.assertEqual(data["upload_url"], "foo.com")

@@ -110,12 +110,12 @@ def process_file_upload(article, upload_file_ext):
         upload_file_ext (str): .epub or .pdf
 
     Returns:
-        response object: status_code = 201,
+        response object: status_code = 202 (Accepted),
         json={
           upload_url:str,
           location: str,
           upload_file_ext:str,
-          article_id: int,
+          article: dict,
           processing:bool
           }
     """
@@ -139,5 +139,5 @@ def process_file_upload(article, upload_file_ext):
         location=url_for("api.file_uploaded", article_uuid=str(article.uuid)),
     )
 
-    response.status_code = 201
+    response.status_code = 202
     return response

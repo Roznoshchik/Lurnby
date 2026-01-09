@@ -1,5 +1,6 @@
 import { render } from 'preact'
 import { useEffect, useState, useMemo } from 'preact/hooks'
+import { Toaster, toast } from 'sonner'
 import './css/globals.css'
 import './css/articles.css'
 import ArticleAddModal from './components/ArticleAddModal/ArticleAddModal'
@@ -431,8 +432,45 @@ function ArticlesList() {
 }
 
 function ArticlesPage() {
+  // Test toast on mount
+  useEffect(() => {
+    setTimeout( () => toast.success('Sonner works with Preact!', {
+      description: "Hello old friend!!! It's really good to see you once again"
+    }), 2000)
+    setTimeout(() =>toast.warning('Sonner works with Preact!', {
+      description: "Hello old friend!!! It's really good to see you once again"
+    }), 4000)
+    setTimeout(() =>toast.error('Sonner works with Preact!', {
+      description: "Hello old friend!!! It's really good to see you once again"
+    }), 6000)
+    setTimeout(() =>toast.info('Sonner works with Preact!', {
+      description: "Hello old friend!!! It's really good to see you once again"
+    }), 8000)
+
+
+  }, [])
+
   return (
     <AuthProvider>
+      <Toaster
+          position="top-right"
+          swipeDirections={['left', 'right']}
+          toastOptions={{
+            unstyled: true,
+            classNames: {
+              toast: 'toast',
+              title: 'toast-title',
+              description: 'toast-description',
+              success: 'toast-success',
+              error: 'toast-error',
+              warning: 'toast-warning',
+              info: 'toast-info',
+              actionButton: 'toast-action',
+              cancelButton: 'toast-cancel',
+              closeButton: 'toast-close',
+            },
+          }}
+        />
       <RequireAuth>
         <Layout>
           <ArticlesList />
