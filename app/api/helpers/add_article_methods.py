@@ -1,4 +1,5 @@
 from flask import jsonify, url_for
+from http import HTTPStatus
 from pathlib import Path
 import validators
 
@@ -78,7 +79,7 @@ def process_file(article=None, file=None, user=None):
         user (class 'app.models.User'): User from token_auth.current_user()
 
     Returns:
-        response object: status_code = 201, jpson={task_id:str, article_id: int, processing:bool}
+        response object: status_code = 202, json={task_id:str, article_id: int, processing:bool}
     """
     if not article or not file or not user:
         raise LurnbyValueError("Bad request")
@@ -96,8 +97,7 @@ def process_file(article=None, file=None, user=None):
             file=file,
         )
         response = jsonify(processing=True, task_id=task.id, article=article.to_dict())
-        response.status_code = 201
-        return response
+        return response, HTTPStatus.ACCEPTED
 
 
 def process_file_upload(article, upload_file_ext):
@@ -139,5 +139,4 @@ def process_file_upload(article, upload_file_ext):
         location=url_for("api.file_uploaded", article_uuid=str(article.uuid)),
     )
 
-    response.status_code = 202
-    return response
+    return response, HTTPStatus.ACCEPTED
