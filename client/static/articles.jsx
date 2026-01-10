@@ -1,6 +1,6 @@
 import { render } from 'preact'
 import { useEffect, useState, useMemo } from 'preact/hooks'
-import { Toaster, toast } from 'sonner'
+import alert from './services/alertService'
 import './css/globals.css'
 import './css/articles.css'
 import ArticleAddModal from './components/ArticleAddModal/ArticleAddModal'
@@ -15,6 +15,7 @@ import Select from './components/Select/Select'
 import { Layout } from './components/Layout/Layout'
 import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
+import pollService from './services/pollService'
 import { api } from './utils/api'
 import { ROUTES } from './utils/routes'
 import { getReadableSource } from './utils/sourceFormatter'
@@ -87,7 +88,7 @@ function ArticlesList() {
         if (!params[key]) delete params[key]
       })
 
-      const data = await api.get('/api/articles', params)
+      const { data } = await api.get('/api/articles', params)
       setRecentArticles(data.recent || [])
       setArticles(data.articles || [])
       setHasNext(data.has_next || false)
@@ -103,7 +104,7 @@ function ArticlesList() {
 
   const fetchTags = async () => {
     try {
-      const data = await api.get('/api/tags', { per_page: 'all' })
+      const { data } = await api.get('/api/tags', { per_page: 'all' })
       setAllTags(data.tags || [])
     } catch (err) {
       console.error('Error fetching tags:', err)
@@ -112,7 +113,7 @@ function ArticlesList() {
 
   const fetchStats = async () => {
     try {
-      const data = await api.get(ROUTES.API.STATS)
+      const { data } = await api.get(ROUTES.API.STATS)
       setMonthlyStats({
         reviewEvents: data.reviews_this_month,
         articlesOpened: data.articles_opened_this_month,
@@ -416,15 +417,39 @@ function ArticlesList() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         tags={allTags}
-        onSuccess={(article, processing) => {
+        onSuccess={(response) => {
           setShowAddModal(false)
+          const { article, processing, task_id } = response
+          const articleTitle = article?.title || 'File'
+
           if (!processing) {
-            // Article is ready, add to list
-            setArticles((prev) => [article, ...prev])
-            setTotal((prev) => prev + 1)
+            alert.success(`"${articleTitle}" added`)
+            fetchArticles()
+            return
           }
-          // TODO: If processing, could show a toast or poll for completion
-          fetchArticles()
+
+          alert.info(`Processing "${articleTitle}"...`, {
+            description: 'This may take a moment',
+          })
+
+          pollService.poll({
+            taskName: task_id,
+            endpoint: ROUTES.API.task(task_id),
+            onDone: () => {
+              alert.success(`"${articleTitle}" is ready`)
+              fetchArticles()
+            },
+            onCancel: (reason) => {
+              alert.error('Processing failed', {
+                description: reason,
+              })
+            },
+            shouldCancel: [
+              pollService.stopAfterAttempts(60),
+              pollService.stopAfterTime(5 * 60 * 1000),
+            ],
+            frequency: 3000,
+          })
         }}
       />
     </>
@@ -432,45 +457,8 @@ function ArticlesList() {
 }
 
 function ArticlesPage() {
-  // Test toast on mount
-  useEffect(() => {
-    setTimeout( () => toast.success('Sonner works with Preact!', {
-      description: "Hello old friend!!! It's really good to see you once again"
-    }), 2000)
-    setTimeout(() =>toast.warning('Sonner works with Preact!', {
-      description: "Hello old friend!!! It's really good to see you once again"
-    }), 4000)
-    setTimeout(() =>toast.error('Sonner works with Preact!', {
-      description: "Hello old friend!!! It's really good to see you once again"
-    }), 6000)
-    setTimeout(() =>toast.info('Sonner works with Preact!', {
-      description: "Hello old friend!!! It's really good to see you once again"
-    }), 8000)
-
-
-  }, [])
-
   return (
     <AuthProvider>
-      <Toaster
-          position="top-right"
-          swipeDirections={['left', 'right']}
-          toastOptions={{
-            unstyled: true,
-            classNames: {
-              toast: 'toast',
-              title: 'toast-title',
-              description: 'toast-description',
-              success: 'toast-success',
-              error: 'toast-error',
-              warning: 'toast-warning',
-              info: 'toast-info',
-              actionButton: 'toast-action',
-              cancelButton: 'toast-cancel',
-              closeButton: 'toast-close',
-            },
-          }}
-        />
       <RequireAuth>
         <Layout>
           <ArticlesList />

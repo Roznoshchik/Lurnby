@@ -112,12 +112,19 @@ def add_article():
     manual_entry = data.get("manual_entry", None)
     url = data.get("url", None)
     upload_file_ext = data.get("upload_file_ext", None)
+    filename = data.get("filename", None)
     tag_ids = data.get("tag_ids", [])
     new_tag_names = data.get("new_tag_names", [])
     if not manual_entry and not url and not upload_file_ext:
         return bad_request("No article to create. Check data and try again")
 
-    article = Article(user_id=token_auth.current_user().id, notes=data.get("notes", ""))
+    # Use filename as temporary title for file uploads (will be replaced after processing)
+    initial_title = filename if filename else None
+    article = Article(
+        user_id=token_auth.current_user().id,
+        notes=data.get("notes", ""),
+        title=initial_title,
+    )
     db.session.add(article)
     try:
         if manual_entry:

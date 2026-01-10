@@ -155,7 +155,7 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     setError(null)
 
     try {
-      let data = { tag_ids: selectedTagIds }
+      const data = { tag_ids: selectedTagIds }
 
       switch (selectedType.id) {
         case 'web':
@@ -170,30 +170,48 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
           break
         case 'epub':
           data.upload_file_ext = '.epub'
+          data.filename = selectedFile?.name
           break
         case 'pdf':
           data.upload_file_ext = '.pdf'
+          data.filename = selectedFile?.name
           break
       }
 
-      const response = await api.post(ROUTES.API.ARTICLES, data)
+      const { data: response } = await api.post(ROUTES.API.ARTICLES, data)
 
       // For file uploads, we get a presigned URL
       if (response.upload_url && selectedFile) {
-        await fetch(response.upload_url, {
-          method: 'PUT',
-          body: selectedFile,
-          headers: {
-            'Content-Type': 'application/octet-stream',
-          },
-        })
+        try {
+          const uploadResponse = await fetch(response.upload_url, {
+            method: 'PUT',
+            body: selectedFile,
+          })
+          if (!uploadResponse.ok) {
+            throw new Error(`Upload failed: ${uploadResponse.status}`)
+          }
 
-        // Notify server that upload is complete (GET with upload_file_ext param)
-        await api.get(response.location, { upload_file_ext: response.upload_file_ext })
+          // Notify server that upload is complete - this starts the background task
+          const { data: taskData } = await api.get(response.location, {
+            upload_file_ext: response.upload_file_ext,
+          })
+
+          resetForm()
+          onSuccess?.(taskData)
+          return
+        } catch (uploadErr) {
+          // Clean up orphaned article if upload fails
+          try {
+            await api.delete(`/api/articles/${response.article.id}`)
+          } catch {
+            // Ignore cleanup errors
+          }
+          throw uploadErr
+        }
       }
 
       resetForm()
-      onSuccess?.(response.article, response.processing)
+      onSuccess?.({ article: response.article, processing: false })
     } catch (err) {
       setError(err.message || 'Failed to add article')
     } finally {
@@ -276,7 +294,7 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
               </div>
             </div>
             <div className="form-group">
-              <label>Tags</label>
+              <span className="form-label">Tags</span>
               <Combobox
                 options={tagOptions}
                 selected={selectedTagIds}
@@ -300,11 +318,8 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
               onInput={(e) => setUrl(e.target.value)}
               placeholder="https://example.com/article"
               disabled={isSubmitting}
-              autoFocus
             />
-            <span className="help-text">
-              Enter the full URL of the article you want to save
-            </span>
+            <span className="help-text">Enter the full URL of the article you want to save</span>
           </div>
         )}
 
@@ -322,7 +337,6 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
                 onInput={(e) => setTitle(e.target.value)}
                 placeholder="Article title"
                 disabled={isSubmitting}
-                autoFocus
               />
             </div>
             <div className="form-group">
@@ -337,7 +351,7 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
               />
             </div>
             <div className="form-group">
-              <label className="required">Content</label>
+              <span className="form-label required">Content</span>
               <QuillEditor
                 ref={contentRef}
                 placeholder="Paste or write your content here..."
@@ -379,7 +393,6 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
             </div>
           </div>
         )}
-
       </div>
     </Modal>
   )
