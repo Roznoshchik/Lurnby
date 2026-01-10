@@ -74,6 +74,9 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
   const contentRef = useRef(null)
   const [hasContentState, setHasContentState] = useState(false)
 
+  // Notes editor ref (optional for all types)
+  const notesRef = useRef(null)
+
   const resetForm = () => {
     setSelectedType(null)
     setError(null)
@@ -86,6 +89,9 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     setHasContentState(false)
     if (contentRef.current) {
       contentRef.current.setText('')
+    }
+    if (notesRef.current) {
+      notesRef.current.setText('')
     }
   }
 
@@ -130,6 +136,13 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     return contentRef.current.root.innerHTML
   }
 
+  const getNotes = () => {
+    if (!notesRef.current) return ''
+    const text = notesRef.current.getText().trim()
+    if (!text) return ''
+    return notesRef.current.root.innerHTML
+  }
+
   const hasContent = () => hasContentState
 
   const isFormValid = () => {
@@ -155,7 +168,11 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     setError(null)
 
     try {
+      const notes = getNotes()
       const data = { tag_ids: selectedTagIds }
+      if (notes) {
+        data.notes = notes
+      }
 
       switch (selectedType.id) {
         case 'web':
@@ -213,7 +230,13 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
       resetForm()
       onSuccess?.({ article: response.article, processing: false })
     } catch (err) {
-      setError(err.message || 'Failed to add article')
+      let message = 'Failed to add article. Please try again.'
+      if (err.status === 400) {
+        message = 'Invalid request. Please check your input and try again.'
+      } else if (err.status === 413) {
+        message = 'File is too large. Please try a smaller file.'
+      }
+      setError(message)
     } finally {
       setIsSubmitting(false)
     }
@@ -391,6 +414,18 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* Notes (optional, all article types) */}
+        {selectedType && (
+          <div className="form-group">
+            <span className="form-label">Notes</span>
+            <QuillEditor
+              ref={notesRef}
+              placeholder="Add personal notes about this article..."
+              readOnly={isSubmitting}
+            />
           </div>
         )}
       </div>

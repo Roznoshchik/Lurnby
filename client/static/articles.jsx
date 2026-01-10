@@ -167,9 +167,18 @@ function ArticlesList() {
   }
 
   const handleArticleSaved = (updatedArticle) => {
-    // Update the article in both lists (API uses 'id' for the UUID string)
-    setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
-    setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+    const isViewingArchived = appliedFilters.status === 'archived'
+    const articleIsArchived = updatedArticle.archived
+
+    // If archive status doesn't match current filter, remove from list
+    if (isViewingArchived !== articleIsArchived) {
+      setArticles((prev) => prev.filter((a) => a.id !== updatedArticle.id))
+      setRecentArticles((prev) => prev.filter((a) => a.id !== updatedArticle.id))
+    } else {
+      // Update the article in both lists
+      setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+      setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+    }
   }
 
   return (
