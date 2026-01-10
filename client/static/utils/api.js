@@ -205,7 +205,7 @@ export const api = {
    * GET request
    * @param {string} endpoint - API endpoint (e.g., '/api/articles')
    * @param {object} params - Query parameters
-   * @returns {Promise<object>} Parsed JSON response
+   * @returns {Promise<{status: number, data: object}>}
    */
   async get(endpoint, params = {}) {
     const queryString = Object.keys(params).length
@@ -217,70 +217,74 @@ export const api = {
       error.status = response.status
       throw error
     }
-    return response.json()
+    const data = await response.json()
+    return { status: response.status, data }
   },
 
   /**
    * POST request
    * @param {string} endpoint - API endpoint
-   * @param {object} data - Request body
-   * @returns {Promise<object>} Parsed JSON response
+   * @param {object} body - Request body
+   * @returns {Promise<{status: number, data: object}>}
    */
-  async post(endpoint, data = {}) {
+  async post(endpoint, body = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     })
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
       error.status = response.status
       throw error
     }
-    return response.json()
+    const data = await response.json()
+    return { status: response.status, data }
   },
 
   /**
    * PATCH request
    * @param {string} endpoint - API endpoint
-   * @param {object} data - Request body
-   * @returns {Promise<object>} Parsed JSON response
+   * @param {object} body - Request body
+   * @returns {Promise<{status: number, data: object}>}
    */
-  async patch(endpoint, data = {}) {
+  async patch(endpoint, body = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'PATCH',
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     })
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
       error.status = response.status
       throw error
     }
-    return response.json()
+    const data = await response.json()
+    return { status: response.status, data }
   },
 
   /**
    * PUT request
    * @param {string} endpoint - API endpoint
-   * @param {object} data - Request body
-   * @returns {Promise<object>} Parsed JSON response
+   * @param {object} body - Request body
+   * @returns {Promise<{status: number, data: object}>}
    */
-  async put(endpoint, data = {}) {
+  async put(endpoint, body = {}) {
     const response = await fetchWithAuth(endpoint, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify(body),
     })
     if (!response.ok) {
       const error = new Error(`HTTP ${response.status}: ${response.statusText}`)
       error.status = response.status
       throw error
     }
-    return response.json()
+    const data = await response.json()
+    return { status: response.status, data }
   },
 
   /**
    * DELETE request
    * @param {string} endpoint - API endpoint
-   * @returns {Promise<object>} Parsed JSON response
+   * @returns {Promise<{status: number, data: object}>}
    */
   async delete(endpoint) {
     const response = await fetchWithAuth(endpoint, {
@@ -291,6 +295,7 @@ export const api = {
       error.status = response.status
       throw error
     }
-    return response.json()
+    const data = await response.json()
+    return { status: response.status, data }
   },
 }
