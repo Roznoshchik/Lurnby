@@ -35,29 +35,41 @@ describe('pollService', () => {
       expect(() => poll({})).toThrow('taskName is required')
       expect(() => poll({ taskName: 'test' })).toThrow('endpoint is required')
       expect(() => poll({ taskName: 'test', endpoint: '/api/task' })).toThrow('onDone is required')
-      expect(() =>
-        poll({ taskName: 'test', endpoint: '/api/task', onDone: () => {} }),
-      ).toThrow('isDone is required')
     })
 
-    it('calls onDone when isDone returns true', async () => {
+    it('calls onDone when status is 200 (default isDone)', async () => {
       const onDone = vi.fn()
-      api.get.mockResolvedValue({ status: 'complete' })
+      api.get.mockResolvedValue({ status: 200, data: { result: 'complete' } })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone,
-        isDone: (res) => res.status === 'complete',
       })
 
       await vi.runAllTimersAsync()
 
-      expect(onDone).toHaveBeenCalledWith({ status: 'complete' })
+      expect(onDone).toHaveBeenCalledWith({ result: 'complete' })
       expect(api.get).toHaveBeenCalledWith('/api/task/123')
     })
 
-    it('continues polling when isDone returns false', async () => {
+    it('calls onDone when custom isDone returns true', async () => {
+      const onDone = vi.fn()
+      api.get.mockResolvedValue({ status: 202, data: { customField: 'done' } })
+
+      poll({
+        taskName: 'test',
+        endpoint: '/api/task/123',
+        onDone,
+        isDone: ({ data }) => data.customField === 'done',
+      })
+
+      await vi.runAllTimersAsync()
+
+      expect(onDone).toHaveBeenCalledWith({ customField: 'done' })
+    })
+
+    it('continues polling when status is 202', async () => {
       const onDone = vi.fn()
       const onProgress = vi.fn()
       let callCount = 0
@@ -65,9 +77,9 @@ describe('pollService', () => {
       api.get.mockImplementation(() => {
         callCount++
         if (callCount >= 3) {
-          return Promise.resolve({ status: 'complete' })
+          return Promise.resolve({ status: 200, data: { result: 'complete' } })
         }
-        return Promise.resolve({ status: 'processing', progress: callCount * 30 })
+        return Promise.resolve({ status: 202, data: { progress: callCount * 30 } })
       })
 
       poll({
@@ -75,34 +87,33 @@ describe('pollService', () => {
         endpoint: '/api/task/123',
         onDone,
         onProgress,
-        isDone: (res) => res.status === 'complete',
         frequency: 1000,
       })
 
-      // First poll (immediate)
+      // First poll (immediate) - 202
       await vi.advanceTimersByTimeAsync(0)
-      expect(onProgress).toHaveBeenCalledWith({ status: 'processing', progress: 30 })
+      expect(onProgress).toHaveBeenCalledWith({ progress: 30 })
 
-      // Second poll
+      // Second poll - 202
       await vi.advanceTimersByTimeAsync(1000)
-      expect(onProgress).toHaveBeenCalledWith({ status: 'processing', progress: 60 })
+      expect(onProgress).toHaveBeenCalledWith({ progress: 60 })
 
-      // Third poll - completes
+      // Third poll - 200 completes
       await vi.advanceTimersByTimeAsync(1000)
-      expect(onDone).toHaveBeenCalledWith({ status: 'complete' })
+      expect(onDone).toHaveBeenCalledWith({ result: 'complete' })
       expect(api.get).toHaveBeenCalledTimes(3)
     })
 
     it('cancels existing poll with same taskName', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       poll({
         taskName: 'same-task',
         endpoint: '/api/task/1',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       // Start second poll with same name
@@ -110,7 +121,7 @@ describe('pollService', () => {
         taskName: 'same-task',
         endpoint: '/api/task/2',
         onDone: () => {},
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       expect(onCancel).toHaveBeenCalledWith('Manually cancelled', expect.any(Object))
@@ -118,14 +129,14 @@ describe('pollService', () => {
 
     it('returns cancel function that stops polling', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       const cancel = poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         frequency: 1000,
       })
 
@@ -150,7 +161,7 @@ describe('pollService', () => {
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       await vi.runAllTimersAsync()
@@ -171,7 +182,7 @@ describe('pollService', () => {
         onDone: () => {},
         onCancel,
         onError,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         frequency: 1000,
       })
 
@@ -200,41 +211,41 @@ describe('pollService', () => {
           return Promise.reject(error)
         }
         if (callCount === 3 || callCount === 4) {
-          return Promise.resolve({ status: 'processing' })
+          return Promise.resolve({ status: 202, data: { processing: true } })
         }
-        return Promise.resolve({ status: 'complete' })
+        return Promise.resolve({ status: 200, data: { result: 'complete' } })
       })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone,
-        isDone: (res) => res.status === 'complete',
+        isDone: ({ status }) => status === 200,
         frequency: 1000,
       })
 
       // 2 errors, then success, should continue
       await vi.advanceTimersByTimeAsync(0) // error 1
       await vi.advanceTimersByTimeAsync(1000) // error 2
-      await vi.advanceTimersByTimeAsync(1000) // success (resets counter)
-      await vi.advanceTimersByTimeAsync(1000) // success
-      await vi.advanceTimersByTimeAsync(1000) // complete
+      await vi.advanceTimersByTimeAsync(1000) // 202 success (resets counter)
+      await vi.advanceTimersByTimeAsync(1000) // 202 success
+      await vi.advanceTimersByTimeAsync(1000) // 200 complete
 
-      expect(onDone).toHaveBeenCalledWith({ status: 'complete' })
+      expect(onDone).toHaveBeenCalledWith({ result: 'complete' })
     })
   })
 
   describe('stopAfterAttempts', () => {
     it('cancels after max attempts', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         shouldCancel: [stopAfterAttempts(3)],
         frequency: 1000,
       })
@@ -251,14 +262,14 @@ describe('pollService', () => {
   describe('stopAfterTime', () => {
     it('cancels after elapsed time', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         shouldCancel: [stopAfterTime(2500)],
         frequency: 1000,
       })
@@ -284,7 +295,7 @@ describe('pollService', () => {
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         shouldCancel: [stopOnErrorCodes([502, 503, 504])],
       })
 
@@ -297,15 +308,18 @@ describe('pollService', () => {
   describe('stopOnCustom', () => {
     it('cancels when custom predicate returns true', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'failed', error: 'Something broke' })
+      api.get.mockResolvedValue({
+        status: 202,
+        data: { taskStatus: 'failed', error: 'Something broke' },
+      })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
-        shouldCancel: [stopOnCustom((res) => res?.status === 'failed')],
+        isDone: ({ status }) => status === 200,
+        shouldCancel: [stopOnCustom((data) => data?.taskStatus === 'failed')],
       })
 
       await vi.runAllTimersAsync()
@@ -315,18 +329,18 @@ describe('pollService', () => {
 
     it('cancels when custom predicate returns object with reason', async () => {
       const onCancel = vi.fn()
-      api.get.mockResolvedValue({ status: 'failed', error: 'Disk full' })
+      api.get.mockResolvedValue({ status: 202, data: { taskStatus: 'failed', error: 'Disk full' } })
 
       poll({
         taskName: 'test',
         endpoint: '/api/task/123',
         onDone: () => {},
         onCancel,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
         shouldCancel: [
-          stopOnCustom((res) => {
-            if (res?.status === 'failed') {
-              return { reason: `Task failed: ${res.error}` }
+          stopOnCustom((data) => {
+            if (data?.taskStatus === 'failed') {
+              return { reason: `Task failed: ${data.error}` }
             }
             return false
           }),
@@ -341,13 +355,13 @@ describe('pollService', () => {
 
   describe('isPolling', () => {
     it('returns true for active polls', () => {
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       poll({
         taskName: 'active-poll',
         endpoint: '/api/task/123',
         onDone: () => {},
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       expect(isPolling('active-poll')).toBe(true)
@@ -355,13 +369,13 @@ describe('pollService', () => {
     })
 
     it('returns false after poll completes', async () => {
-      api.get.mockResolvedValue({ status: 'complete' })
+      api.get.mockResolvedValue({ status: 200, data: { result: 'complete' } })
 
       poll({
         taskName: 'completed-poll',
         endpoint: '/api/task/123',
         onDone: () => {},
-        isDone: () => true,
+        isDone: ({ status }) => status === 200,
       })
 
       await vi.runAllTimersAsync()
@@ -374,14 +388,14 @@ describe('pollService', () => {
     it('cancels all active polls', async () => {
       const onCancel1 = vi.fn()
       const onCancel2 = vi.fn()
-      api.get.mockResolvedValue({ status: 'processing' })
+      api.get.mockResolvedValue({ status: 202, data: { processing: true } })
 
       poll({
         taskName: 'poll-1',
         endpoint: '/api/task/1',
         onDone: () => {},
         onCancel: onCancel1,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       poll({
@@ -389,7 +403,7 @@ describe('pollService', () => {
         endpoint: '/api/task/2',
         onDone: () => {},
         onCancel: onCancel2,
-        isDone: () => false,
+        isDone: ({ status }) => status === 200,
       })
 
       cancelAll()

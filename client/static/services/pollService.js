@@ -28,9 +28,9 @@ const MAX_CONSECUTIVE_ERRORS = 3
  * @param {object} config - Poll configuration
  * @param {string} config.taskName - Unique identifier for this poll task (required)
  * @param {string} config.endpoint - URL to poll (required)
- * @param {function} config.onDone - Callback when isDone returns true: (response) => void (required)
- * @param {function} config.isDone - Predicate to check completion: (response) => boolean (required)
- * @param {function} [config.onProgress] - Optional callback on each successful poll: (response) => void
+ * @param {function} config.onDone - Callback when complete: (data) => void (required)
+ * @param {function} [config.isDone] - Custom completion check: ({status, data}) => boolean. Defaults to status === 200
+ * @param {function} [config.onProgress] - Optional callback on each poll while processing: (data) => void
  * @param {function} [config.onCancel] - Optional callback when polling is cancelled: (reason, context) => void
  * @param {function} [config.onError] - Optional callback on retryable errors: (error, context) => void
  * @param {Array<function>} [config.shouldCancel] - Array of additional cancel predicates
@@ -42,7 +42,7 @@ export function poll(config) {
     taskName,
     endpoint,
     onDone,
-    isDone,
+    isDone = ({ status }) => status === 200,
     onProgress,
     onCancel,
     onError,
@@ -59,9 +59,6 @@ export function poll(config) {
   }
   if (!onDone) {
     throw new Error('pollService: onDone is required')
-  }
-  if (!isDone) {
-    throw new Error('pollService: isDone is required')
   }
 
   // Cancel any existing poll with the same name
@@ -106,28 +103,28 @@ export function poll(config) {
     const context = createContext()
 
     try {
-      const response = await api.get(endpoint)
+      const { status, data } = await api.get(endpoint)
 
       if (cancelled) return
 
       // Reset consecutive errors on success
       consecutiveErrors = 0
 
-      // Check if done
-      if (isDone(response)) {
+      // Check if done (defaults to status === 200)
+      if (isDone({ status, data })) {
         cleanup()
-        onDone(response)
+        onDone(data)
         return
       }
 
-      // Call progress callback (only if not done)
+      // Still processing - call progress callback
       if (onProgress) {
-        onProgress(response)
+        onProgress(data)
       }
 
       // Check user-provided cancel conditions
       for (const cancelFn of shouldCancel) {
-        const cancelResult = cancelFn(response, context)
+        const cancelResult = cancelFn(data, context)
         if (cancelResult) {
           cancel(cancelResult.reason || 'Cancel condition met')
           return
