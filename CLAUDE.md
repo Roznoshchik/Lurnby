@@ -195,7 +195,10 @@ The API uses modern token-based authentication:
 - CSRF protection disabled for API blueprint
 
 ### Preact app
-We use reusable ui components where possible, docs for those are at`client/COMPONENTS.md`
+We use reusable UI components and services where possible:
+- Component docs: `client/COMPONENTS.md`
+- Service docs: `client/SERVICES.md`
+
 We have a solid css system with tokens for colors, sizes, etc entry point at `client/css/globals.css`
 palette.css defines colors - but we use the variables in theme.css
 sizes use size variables e.g `--space-*` and font-size uses font-size variables e.g. `--font-size-*`
