@@ -62,8 +62,9 @@ export function poll(config) {
   }
 
   // Cancel any existing poll with the same name
-  if (activePolls.has(taskName)) {
-    activePolls.get(taskName)()
+  const existingCancel = activePolls.get(taskName)
+  if (existingCancel) {
+    existingCancel()
   }
 
   let cancelled = false
