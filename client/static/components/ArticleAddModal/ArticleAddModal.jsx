@@ -6,8 +6,8 @@ import Combobox from '../Combobox/Combobox'
 import Icon from '../Icon/Icon'
 import Modal from '../Modal/Modal'
 import QuillEditor from '../QuillEditor/QuillEditor'
-import { api } from '../../utils/api'
-import { ROUTES } from '../../utils/routes'
+import { api } from '../../services/api'
+import { ROUTES } from '../../services/routes'
 import './ArticleAddModal.css'
 
 const webDescription = (

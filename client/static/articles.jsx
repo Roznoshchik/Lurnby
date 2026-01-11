@@ -16,8 +16,8 @@ import { Layout } from './components/Layout/Layout'
 import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import pollService from './services/pollService'
-import { api } from './utils/api'
-import { ROUTES } from './utils/routes'
+import { api } from './services/api'
+import { ROUTES } from './services/routes'
 import { getReadableSource } from './utils/sourceFormatter'
 
 const STATUS_OPTIONS = [

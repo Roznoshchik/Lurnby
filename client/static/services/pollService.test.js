@@ -10,13 +10,13 @@ import {
 } from './pollService.js'
 
 // Mock the api module
-vi.mock('../utils/api.js', () => ({
+vi.mock('./api.js', () => ({
   api: {
     get: vi.fn(),
   },
 }))
 
-import { api } from '../utils/api.js'
+import { api } from './api.js'
 
 describe('pollService', () => {
   beforeEach(() => {

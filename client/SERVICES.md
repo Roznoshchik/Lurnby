@@ -83,3 +83,83 @@ cancel()
 **Utilities:**
 - `cancelAll()` - Cancel all active polls
 - `isPolling(taskName)` - Check if a poll is active
+
+## apiService
+
+Authenticated API client with automatic access-token refresh.
+
+Owns the full auth lifecycle on the frontend. Access tokens are kept in module scope and never exposed to consumers.
+
+### Responsibilities
+- Attach `Authorization: Bearer` headers
+- Refresh expired access tokens via HttpOnly cookie
+- Retry failed requests once after refresh
+- Centralize login, logout, and bootstrap auth logic
+
+---
+
+### Public API
+
+#### `bootstrapAuth()`
+Initializes authentication on app load by refreshing the access token.
+
+- Uses refresh token from HttpOnly cookie
+- Sets access token internally on success
+- Returns `{ success, user?, error? }`
+
+#### `login(username, password)`
+Authenticates using HTTP Basic Auth.
+
+- Stores access token on success
+- Returns `{ success, user?, error? }`
+
+#### `loginWithGoogle(token)`
+Authenticates via Google OAuth token.
+
+- Stores access token on success
+- Returns `{ success, user?, error? }`
+
+#### `logout()`
+Revokes refresh token and clears access token.
+
+- Always clears local auth state
+- Always resolves successfully
+
+---
+
+### `api` Client
+
+Thin wrapper around `fetch` with auth handling.
+
+All methods:
+- Automatically include credentials
+- Retry once on `401` after token refresh
+- Throw on non-OK responses
+
+**Methods:**
+- `api.get(endpoint, params?)`
+- `api.post(endpoint, body?)`
+- `api.patch(endpoint, body?)`
+- `api.put(endpoint, body?)`
+- `api.delete(endpoint)`
+
+Each returns `{ status, data }` or throws an error with `error.status`.
+
+---
+
+### Auth Behavior
+
+- Access token stored privately in module scope
+- Refresh attempted once per request on `401`
+- Refresh failure clears auth state and bubbles `401`
+- Multiple concurrent calls may trigger a single refresh per request
+
+---
+
+### Non-Public Internals
+
+Not for external use:
+- `fetchWithAuth`
+- `setAccessToken`
+- `getAccessToken`
+- `clearAccessToken`

@@ -8,8 +8,8 @@ import Select from '../Select/Select'
 import Combobox from '../Combobox/Combobox'
 import Progress from '../Progress/Progress'
 import QuillEditor from '../QuillEditor/QuillEditor'
-import { api } from '../../utils/api'
-import { ROUTES } from '../../utils/routes'
+import { api } from '../../services/api'
+import { ROUTES } from '../../services/routes'
 import './ArticleEditModal.css'
 
 const STATUS_OPTIONS = [

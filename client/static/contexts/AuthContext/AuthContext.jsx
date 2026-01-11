@@ -1,6 +1,6 @@
 import { createContext } from 'preact'
 import { useContext, useEffect, useState } from 'preact/hooks'
-import { logout as apiLogout, bootstrapAuth } from '../../utils/api.js'
+import { logout as apiLogout, bootstrapAuth } from '../../services/api.js'
 
 /**
  * Auth Context
