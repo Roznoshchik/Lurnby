@@ -1,0 +1,158 @@
+/* Modal sizing for combobox dropdown */
+.article-add-modal .modal {
+  min-height: 600px;
+}
+
+.article-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.article-add-form .ql-editor {
+  min-height: 100px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
+}
+
+.error-banner {
+  padding: var(--space-3) var(--space-4);
+  background-color: color-mix(in oklch, var(--destructive) 15%, transparent);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-md);
+  color: var(--destructive);
+  font-size: var(--font-size-sm);
+}
+
+/* Type Selection Cards Grid */
+.article-type-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+/* Type Card */
+.type-card {
+  position: relative;
+  height: 100%;
+}
+
+.type-card-badge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: var(--font-size-xs);
+  gap: var(--space-1);
+  background-color: var(--input-background);
+}
+
+.type-card-badge .material-symbols-outlined {
+  font-size: var(--font-size-sm);
+}
+
+.type-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.type-card-icon {
+  font-size: var(--font-size-2xl);
+  color: var(--primary);
+}
+
+.type-card-title {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+}
+
+.type-card-description {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  line-height: var(--line-height-loose);
+  margin: 0;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+
+  p {
+    margin-bottom: var(--space-3);
+  }
+}
+
+/* Type + Tags Row */
+.type-tags-row {
+  display: flex;
+  gap: var(--space-6);
+}
+
+.type-tags-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+/* Selected Type Display */
+.selected-type {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.type-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.type-badge .material-symbols-outlined {
+  font-size: var(--font-size-lg);
+}
+
+/* File Upload Area */
+.file-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--muted);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}
+
+.selected-file .material-symbols-outlined {
+  font-size: var(--font-size-lg);
+  color: var(--primary);
+}
+
+.selected-file span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .article-type-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .type-card {
+    min-height: auto;
+  }
+
+  .type-tags-row {
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+}

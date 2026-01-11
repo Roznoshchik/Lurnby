@@ -58,7 +58,7 @@ class TasksApiTests(unittest.TestCase):
         )
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.status_code, 202)  # 202 Accepted while processing
         self.assertTrue(data["processing"])
         self.assertTrue("progress" in data)
         self.assertTrue("task_id" in data)

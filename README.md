@@ -1,5 +1,5 @@
 # Lurnby
-A tool for building a personal knowledge practice. Lurnby helps you read and remember more. It works with web articles and epubs, allowing you to highlight, categorize, and review your content with active recall and spaced reptition tools. 
+A tool for building a personal knowledge practice. Lurnby helps you read and remember more. It works with web articles and epubs, allowing you to highlight, categorize, and review your content with active recall and spaced reptition tools.
 
 [![codecov](https://codecov.io/gh/roznoshchik/lurnby/branch/main/graph/badge.svg)](https://codecov.io/gh/roznoshchik/lurnby/branch/main)
 
@@ -20,12 +20,15 @@ A tool for building a personal knowledge practice. Lurnby helps you read and rem
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
 <img style="background-color:white" src="https://jinja.palletsprojects.com/en/3.1.x/_images/jinja-logo.png" height="28px">
 
+- [Reusable Components](./client/COMPONENTS.md)
+- [Frontend Services](./client/SERVICES.md)
+
 ## Screenshots
 ![Mobile](./app/static/images/lurnbyMobileScreens.png)
 ![Desktop](./app/static/images/lurnbyDesktop.png)
 
 ## Getting Started
-Instructions for getting the app up and running are documented in the [Install.md](./install.md) script. 
+Instructions for getting the app up and running are documented in the [Install.md](./install.md) script.
 
 ## Contributing
-Contributions are welcome. Features and issues are documented in the [github issues](https://github.com/Roznoshchik/Lurnby/issues) tab. Fork the repo and submit a pull request for review. 
+Contributions are welcome. Features and issues are documented in the [github issues](https://github.com/Roznoshchik/Lurnby/issues) tab. Fork the repo and submit a pull request for review.

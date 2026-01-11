@@ -1,8 +1,4 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Overview
+# Project Overview
 
 Lurnby is a personal knowledge practice tool built with Flask that helps users read and remember more through active recall and spaced repetition. It supports web articles and epubs with highlighting, categorization, and review features.
 
@@ -38,87 +34,41 @@ cp .env.example .env
 
 ### Running the Application
 
-**Recommended (one command):**
 ```bash
-# Development mode with HMR
-export FLASK_DEBUG=1
-flask serve
-# This starts: Redis → RQ worker → Vite dev server → Flask
-
-# Production mode (tests built assets)
-flask serve --prod
-# This starts: Redis → RQ worker → Flask
-# Automatically builds assets first
-```
-
-**Manual (old method, multiple terminals):**
-```bash
-# Terminal 1: Flask server
-flask run
-
-# Terminal 2: Redis server
-redis-server
-
-# Terminal 3: Background task worker
-. venv/bin/activate
-rq worker lurnby-tasks
-
-# Terminal 4: Vite dev server (for Preact frontend)
-cd client && npm start
+just serve        # Dev mode: Redis → RQ → Vite → Flask
+just serve-prod   # Prod mode: builds assets first
 ```
 
 ### Testing
 ```bash
-# Run all tests (Python + frontend)
-flask test
+just test         # Run all tests (Python + frontend)
+just test-python  # Run only Python tests
+just test-client  # Run only frontend tests
 
-# Run only Python tests
-flask test --python-only
-
-# Run only frontend tests
-flask test --client-only
-
-# Run Python tests with coverage
-pytest --cov=app
-
-# Run specific test file
-pytest tests/api/test_articles.py
-
-# Run frontend tests with UI
-cd client && npm run test:ui
+# Additional options
+pytest --cov=app                    # Python tests with coverage
+pytest tests/api/test_articles.py   # Specific test file
+cd client && npm t                  # Frontend tests with UI
 ```
 
 ### Code Quality
 ```bash
-# Format code (both Python and client)
-flask format
+just format         # Format all code (Python + client)
+just format-python  # Format only Python files
+just format-client  # Format only client files
 
-# Format only Python files
-flask format --python-only
+just lint           # Lint all code (Python + client)
+just lint-python    # Lint only Python files
+just lint-client    # Lint only client files
 
-# Format only client files
-flask format --client-only
-
-# Lint code (both Python and client)
-flask lint
-
-# Lint only Python files
-flask lint --python-only
-
-# Lint only client files
-flask lint --client-only
-
-# Run pre-commit hooks manually
-pre-commit run --all-files
-
-# Install pre-commit hooks (runs automatically on commit)
-pre-commit install
+# Pre-commit hooks
+pre-commit run --all-files  # Run manually
+pre-commit install          # Install hooks
 ```
 
-**Flask format and lint commands:**
-- Format: Uses Black for Python, Biome for client (JavaScript/JSX)
-- Lint: Uses Flake8 for Python, Biome for client
-- Automatically excludes ReadabiliPy, migrations, and other configured directories
+**Tools used:**
+- Format: Black (Python), Biome (JavaScript/JSX)
+- Lint: Flake8 (Python), Biome (client)
 
 **Pre-commit hooks include:**
 - Flake8 (serious errors only: syntax errors, undefined names)
@@ -130,6 +80,8 @@ pre-commit install
 ## Architecture
 
 ### Application Structure
+#### Legacy app being retired
+A legacy app that uses jinja templates, wtforms, and inline js + scss is being refactored to a preact frontend using an api as the backend.
 
 The app uses Flask's application factory pattern with blueprints:
 
@@ -159,7 +111,7 @@ The app uses Flask's application factory pattern with blueprints:
 - Tasks update progress via Redis for UI feedback
 
 **Content Processing:**
-- **ReadabiliPy**: Mozilla Readability.js wrapper for extracting clean article content from web pages
+- **ReadabiliPy**: Mozilla Readability.js wrapper for extracting clean article content from web pages (requires node)
 - **EbookLib + PyMuPDF**: EPUB and PDF processing
 - **BeautifulSoup + lxml**: HTML parsing and manipulation
 - Web article text extraction in `app/helpers/pulltext.py`
@@ -197,18 +149,6 @@ Important model features:
 - **Production**: PostgreSQL
 - **Migrations**: Flask-Migrate (Alembic)
 
-Migration commands:
-```bash
-# Create migration after model changes
-flask db migrate -m "description"
-
-# Apply migrations
-flask db upgrade
-
-# Rollback
-flask db downgrade
-```
-
 ### Static Assets
 
 Located in `app/static/`:
@@ -225,7 +165,6 @@ Located in `app/static/`:
   - `client/static/` - Preact components and entry points
   - `client/vite.config.js` - Build config (outputs to `app/static/dist/`)
   - `client/package.json` - Node.js dependencies
-  - `client/COMPONENTS.md` - Documentation for reusable UI components
 - `app/assets_blueprint.py` - Blueprint for dev/prod asset resolution
   - Dev mode: Proxies to Vite dev server on port 5173 with HMR
   - Prod mode: Serves built files from `app/static/dist/bundled/`
@@ -236,12 +175,6 @@ Located in `app/static/`:
 - Dev: Returns Vite dev server URLs (e.g., `http://localhost:5173/static/dist/main.jsx`)
 - Prod: Returns static file URLs from manifest (e.g., `/static/dist/bundled/main-[hash].js`)
 
-**Implemented Pages:**
-- Login page (`/client/login`) - Username/password authentication
-- Articles page (`/client/articles`) - Article list with stats, filtering planned
-- Shared components: Layout, Sidebar, MobileNav, ArticleCard, Button, Icon, Badge, Progress
-- Auth system: AuthContext, RequireAuth wrapper, API client with auto-retry
-- Design system: Light/dark themes, spacing scale, component library
 
 ### Browser Extensions
 
@@ -250,6 +183,7 @@ The `extensions/` directory contains browser extensions for Chrome, Firefox, and
 ## Code Patterns
 
 ### API Authentication
+A refactor in progress to switch to an api: `/api`
 The API uses modern token-based authentication:
 - **Access tokens** (15 min, in-memory) for API requests
 - **Refresh tokens** (30 days, HttpOnly cookie) for obtaining new access tokens
@@ -260,71 +194,17 @@ The API uses modern token-based authentication:
 - Basic auth for initial login, bearer token for all API routes
 - CSRF protection disabled for API blueprint
 
-### API Endpoints
-Key endpoint patterns:
-- `/api/articles` - Get current user's articles (token-based, no user ID needed)
-- `/api/highlights` - Get current user's highlights
-- `/api/tags` - Get current user's tags
-- `/api/user/stats` - Get current user's monthly activity stats
-- `/api/users/:id/...` - User-specific operations (requires matching user ID)
-- All endpoints use `@token_auth.login_required` and get user from token
+### Preact app
+We use reusable UI components and services where possible:
+- Component docs: `client/COMPONENTS.md`
+- Service docs: `client/SERVICES.md`
 
-### Forms
-- WTForms with Flask-WTF for CSRF protection
-- Custom validators using WTForms-Components
-- Form classes in `forms.py` files within each blueprint
-
-### Error Handling
-- Custom error handlers in `app/errors/` blueprint
-- JSON responses for API errors
-- HTML templates for web errors
-
-### Logging
-- Custom logger class (`CustomLogger`) in `app/__init__.py`
-- Logs to stdout in production (Heroku-friendly) or rotating files locally
-- Error emails via SMTP in production
-
-## Testing
-
-Test structure in `tests/`:
-- `tests/api/`: API endpoint tests
-- `tests/helpers/`: Helper function tests
-- `tests/models/`: Model tests
-- `tests/mocks/`: Mock data for tests
-- `tests/tasks/`: Background task tests
-- `client/static/**/*.test.js`: Frontend unit tests (Vitest)
-
-Python tests use:
-- In-memory SQLite database (`sqlite://`)
-- `TestConfig` class for test-specific configuration
-- Mock objects and patches for external services
-
-Frontend tests use:
-- Vitest with happy-dom
-- @testing-library/preact for component testing
-
-**CI/CD:**
-- GitHub Actions workflow (`.github/workflows/run_tests.yml`)
-- Runs on push/PR to main branch
-- Python job: pytest + flake8 on Python 3.12 with PostgreSQL
-- Node job: Vitest on Node 22
-- Both jobs run in parallel
-
-## Environment Variables
-
-Required for full functionality (see `.env.example`):
-- `SECRET_KEY`: Flask session security
-- `DATABASE_URL`: PostgreSQL connection string
-- `REDIS_URL`: Redis connection string
-- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: OAuth
-- `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_BUCKET`: S3 storage
-- `MAIL_PASSWORD`, `MAIL_DEFAULT_SENDER`: SendGrid email
-- `SERVER_NAME`: For generating URLs in background tasks
+We have a solid css system with tokens for colors, sizes, etc entry point at `client/css/globals.css`
+palette.css defines colors - but we use the variables in theme.css
+sizes use size variables e.g `--space-*` and font-size uses font-size variables e.g. `--font-size-*`
 
 ## Deployment
-
 **Platform:** Heroku
-
 **Method:** Git push deployment using Dockerfile
 ```bash
 git push heroku main
@@ -334,18 +214,8 @@ The app uses a Dockerfile for containerized deployment. Heroku builds and deploy
 
 **Important for Preact frontend:**
 - Production builds must be generated before deployment
-- Vite build output (`app/static/dist/`) should be committed or built during deployment
+- Vite build output (`app/static/dist/`) should be built during deployment
 - Set `FLASK_DEBUG=0` in production environment variables
-
-## Common Gotchas
-
-1. **PostgreSQL URL format**: The config automatically converts `postgres://` to `postgresql://` for SQLAlchemy compatibility
-2. **Node.js required**: ReadabiliPy requires Node.js >=11.0.0 for the jsdom dependency
-3. **Redis required**: Background tasks require Redis server to be running
-4. **Migrations**: The app excludes ReadabiliPy and other directories from flake8 checks
-5. **CSRF**: API routes are exempt from CSRF protection, but web routes require CSRF tokens
-6. **Boolean comparisons**: Some files have flake8 exceptions for explicit boolean comparisons (E712) where they're intentional
-7. **Vite build artifacts**: The `app/static/dist/` directory is in `.gitignore` to avoid committing build artifacts during development
 
 ## Code comments
 Obvious comments are not necessary and should only be added sparingly and if its necessary to understand what is happening.
@@ -359,17 +229,16 @@ but they should be about the strategic and functional changes
 they shouldn't include random comments or the micro details of every file change
 
 ## Working state
+If I say status task - <TASK NAME>
+
 Explore the .local file for files of the following format
-Check the branch name
+Check the task name or if no task name then the branch name
 then check
 claude-progress-<branch name>.md
 claude-tasks-<branch name>.json
 
-If not found, look for any files in there and ask me which ones to use
 
-### No working state
-If I say create task - <TASK NAME>
-Then we should create new files with that task name.
+Then we should check for or create new files with that task name.
 
 You should also then ask me for a description of the task. And then we should discuss until we agree on the highlevel steps for the todo list and then you create one with the following structure.
 

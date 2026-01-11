@@ -1,4 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'preact/hooks'
+import alert from '../../services/alertService'
 import Modal from '../Modal/Modal'
 import Button from '../Button/Button'
 import Icon from '../Icon/Icon'
@@ -7,8 +8,8 @@ import Select from '../Select/Select'
 import Combobox from '../Combobox/Combobox'
 import Progress from '../Progress/Progress'
 import QuillEditor from '../QuillEditor/QuillEditor'
-import { api } from '../../utils/api'
-import { ROUTES } from '../../utils/routes'
+import { api } from '../../services/api'
+import { ROUTES } from '../../services/routes'
 import './ArticleEditModal.css'
 
 const STATUS_OPTIONS = [
@@ -49,7 +50,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
       try {
         const needsContent = article.filetype === 'manual' || article.filetype === 'email'
         const params = needsContent ? { with_content: true } : {}
-        const response = await api.get(ROUTES.API.article(article.id), params)
+        const { data: response } = await api.get(ROUTES.API.article(article.id), params)
         const data = response.article
         setFullArticle(data)
         setTitle(data.title || '')
@@ -136,11 +137,13 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
         data.unread = false
       }
 
-      const response = await api.patch(ROUTES.API.article(article.id), data)
+      const { data: response } = await api.patch(ROUTES.API.article(article.id), data)
       onSave?.(response.article)
+      alert.success('Article updated')
       onClose()
     } catch (err) {
       console.error('Error saving article:', err)
+      alert.error('Failed to save changes')
       setError('Failed to save changes. Please try again.')
     } finally {
       setSaving(false)
@@ -153,13 +156,15 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
 
     const isArchived = fullArticle?.archived || article?.archived
     try {
-      const response = await api.patch(ROUTES.API.article(article.id), {
+      const { data: response } = await api.patch(ROUTES.API.article(article.id), {
         archived: !isArchived,
       })
       onSave?.(response.article)
+      alert.success(isArchived ? 'Article unarchived' : 'Article archived')
       onClose()
     } catch (err) {
       console.error('Error updating archive status:', err)
+      alert.error(`Failed to ${isArchived ? 'unarchive' : 'archive'} article`)
       setError(`Failed to ${isArchived ? 'unarchive' : 'archive'} article. Please try again.`)
     } finally {
       setSaving(false)

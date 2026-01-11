@@ -25,5 +25,6 @@ export const ROUTES = {
     TAGS: '/api/tags',
     // Dynamic routes
     article: (uuid) => `/api/articles/${uuid}`,
+    task: (taskId) => `/api/tasks/${taskId}`,
   },
 }

@@ -1,0 +1,21 @@
+version = 0.1
+
+
+[default]
+[default.global.parameters]
+stack_name = "lurnby-sandbox"
+
+[default.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+parameter_overrides = "LurnbyMediaBucketName=lurnby-media-sandbox"
+
+
+[prod]
+[prod.global.parameters]
+stack_name = "lurnby-prod"
+
+[prod.deploy.parameters]
+capabilities = "CAPABILITY_IAM"
+confirm_changeset = true
+parameter_overrides = "LurnbyMediaBucketName=lurnby-media-prod"

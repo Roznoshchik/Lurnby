@@ -1,7 +1,9 @@
 import { render } from 'preact'
 import { useEffect, useState, useMemo } from 'preact/hooks'
+import alert from './services/alertService'
 import './css/globals.css'
 import './css/articles.css'
+import ArticleAddModal from './components/ArticleAddModal/ArticleAddModal'
 import ArticleCard from './components/ArticleCard/ArticleCard'
 import ArticleEditModal from './components/ArticleEditModal/ArticleEditModal'
 import ArticlePreview from './components/ArticlePreview/ArticlePreview'
@@ -13,8 +15,9 @@ import Select from './components/Select/Select'
 import { Layout } from './components/Layout/Layout'
 import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
-import { api } from './utils/api'
-import { ROUTES } from './utils/routes'
+import pollService from './services/pollService'
+import { api } from './services/api'
+import { ROUTES } from './services/routes'
 import { getReadableSource } from './utils/sourceFormatter'
 
 const STATUS_OPTIONS = [
@@ -59,8 +62,9 @@ function ArticlesList() {
     tag_ids: '',
   })
 
-  // Edit modal state
+  // Modal states
   const [editingArticle, setEditingArticle] = useState(null)
+  const [showAddModal, setShowAddModal] = useState(false)
 
   useEffect(() => {
     fetchTags()
@@ -84,7 +88,7 @@ function ArticlesList() {
         if (!params[key]) delete params[key]
       })
 
-      const data = await api.get('/api/articles', params)
+      const { data } = await api.get('/api/articles', params)
       setRecentArticles(data.recent || [])
       setArticles(data.articles || [])
       setHasNext(data.has_next || false)
@@ -100,7 +104,7 @@ function ArticlesList() {
 
   const fetchTags = async () => {
     try {
-      const data = await api.get('/api/tags', { per_page: 'all' })
+      const { data } = await api.get('/api/tags', { per_page: 'all' })
       setAllTags(data.tags || [])
     } catch (err) {
       console.error('Error fetching tags:', err)
@@ -109,7 +113,7 @@ function ArticlesList() {
 
   const fetchStats = async () => {
     try {
-      const data = await api.get(ROUTES.API.STATS)
+      const { data } = await api.get(ROUTES.API.STATS)
       setMonthlyStats({
         reviewEvents: data.reviews_this_month,
         articlesOpened: data.articles_opened_this_month,
@@ -163,9 +167,18 @@ function ArticlesList() {
   }
 
   const handleArticleSaved = (updatedArticle) => {
-    // Update the article in both lists (API uses 'id' for the UUID string)
-    setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
-    setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+    const isViewingArchived = appliedFilters.status === 'archived'
+    const articleIsArchived = updatedArticle.archived
+
+    // If archive status doesn't match current filter, remove from list
+    if (isViewingArchived !== articleIsArchived) {
+      setArticles((prev) => prev.filter((a) => a.id !== updatedArticle.id))
+      setRecentArticles((prev) => prev.filter((a) => a.id !== updatedArticle.id))
+    } else {
+      // Update the article in both lists
+      setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+      setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+    }
   }
 
   return (
@@ -179,7 +192,7 @@ function ArticlesList() {
               <h1>Articles</h1>
               <span className="page-header-subtitle">Your Reading Library</span>
             </div>
-            <Button variant="default" icon="add" onClick={() => console.log('Add new article')}>
+            <Button variant="default" icon="add" onClick={() => setShowAddModal(true)}>
               Add Article
             </Button>
           </div>
@@ -407,6 +420,47 @@ function ArticlesList() {
           onSave={handleArticleSaved}
         />
       )}
+
+      {/* Add Article Modal */}
+      <ArticleAddModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        tags={allTags}
+        onSuccess={(response) => {
+          setShowAddModal(false)
+          const { article, processing, task_id } = response
+          const articleTitle = article?.title || 'File'
+
+          if (!processing) {
+            alert.success(`"${articleTitle}" added`)
+            fetchArticles()
+            return
+          }
+
+          alert.info(`Processing "${articleTitle}"...`, {
+            description: 'This may take a moment',
+          })
+
+          pollService.poll({
+            taskName: task_id,
+            endpoint: ROUTES.API.task(task_id),
+            onDone: () => {
+              alert.success(`"${articleTitle}" is ready`)
+              fetchArticles()
+            },
+            onCancel: (reason) => {
+              alert.error('Processing failed', {
+                description: reason,
+              })
+            },
+            shouldCancel: [
+              pollService.stopAfterAttempts(60),
+              pollService.stopAfterTime(5 * 60 * 1000),
+            ],
+            frequency: 3000,
+          })
+        }}
+      />
     </>
   )
 }

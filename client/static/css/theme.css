@@ -76,6 +76,7 @@
   --background-secondary: var(--neutral-800);
   --card: var(--neutral-800);
   --popover: var(--neutral-800);
+  --input-background: var(--neutral-700);
   --secondary: var(--neutral-700);
   --accent: var(--neutral-700);
   --muted: var(--neutral-700);

@@ -1,41 +1,45 @@
 # Installing locally
-To run the following things should be installed on the system. 
+To run the following things should be installed on the system.
 
 - Python
 - Redis-server
 - node (used by ReadabiliPy to access Mozilla's readability.js)
+- [just](https://github.com/casey/just) (command runner)
 
 ## Installing on a mac
 1. Clone the repo
 1. `cd` into directory
 1. `python3 -m venv venv` // isolates and creates a virtual env
 1. `. venv/bin/activate` // activate venv
-1. `pip install -r requirements.txt` // installs Python requirements
-1. `cd client && npm install && cd ..` // installs Node.js requirements for Preact frontend
+1. `just install` // installs Python and Node.js dependencies
 1. `flask db upgrade` // creates the db
 1. `cp .env.example .env` // create env file and edit with your credentials
 
 ### Running the development server
 
-**Easy way (recommended):** One command starts everything
 ```bash
-export FLASK_DEBUG=1
-flask serve
+just serve
 ```
-This automatically starts:
-- Redis server
-- RQ worker (for background tasks)
-- Vite dev server (for frontend with HMR)
-- Flask server
+This automatically starts Redis, RQ worker, Vite dev server, and Flask.
 
-**Manual way (old):** Multiple terminals
-1. Terminal 1: `flask run` // starts the flask server
-1. Terminal 2: `redis-server` // start redis server
-1. Terminal 3: `. venv/bin/activate && rq worker lurnby-tasks` // start listening for bg tasks
-1. Terminal 4: `cd client && npm start` // start Vite dev server
+For production mode (builds assets first):
+```bash
+just serve-prod
+```
+
+### Other commands
+```bash
+just              # list all available commands
+just test         # run all tests
+just test-python  # run Python tests only
+just test-client  # run client tests only
+just format       # format all code
+just lint         # lint all code
+just build        # build frontend assets
+```
 
 ## apis
-The app also uses some apis to do what it needs to do. 
+The app also uses some apis to do what it needs to do.
 - amazon s3 for storing images from epubs
 - google for auth
 - sendgrid for sending emails.
@@ -43,4 +47,3 @@ The app also uses some apis to do what it needs to do.
 These need to be set in a .env file, see the .env.example file.
 
 Some more details for mac are in [mac-install-notes.md](./mac-install-notes.md).
-

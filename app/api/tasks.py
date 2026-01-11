@@ -1,4 +1,6 @@
 from flask import current_app, request, url_for, jsonify
+from http import HTTPStatus
+
 from app import CustomLogger
 from app.models import Task
 from app.api import bp
@@ -36,13 +38,9 @@ def get_task_status(task_id):
             task.complete = True
 
         if poll_for_completion(task):
-            response = jsonify(processing=False, progress=100, task_id=task_id, location=location)
-            response.status_code = 200
-            return response
+            return jsonify(processing=False, progress=100, task_id=task_id, location=location), HTTPStatus.OK
 
-        response = jsonify(processing=True, progress=task.get_progress(), task_id=task_id)
-        response.status_code = 200
-        return response
+        return jsonify(processing=True, progress=task.get_progress(), task_id=task_id), HTTPStatus.ACCEPTED
 
     except Exception as e:
         if hasattr(e, "msg"):
