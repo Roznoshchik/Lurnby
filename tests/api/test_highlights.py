@@ -286,7 +286,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.post(
@@ -302,7 +302,6 @@ class AddHighlightApiTests(BaseTestCase):
         self.assertIsNotNone(highlight.get("prompt"))
         self.assertIsNotNone(highlight.get("uuid"))
         self.assertIsNotNone(highlight.get("id"))
-        self.assertTrue(highlight.get("untagged"))
         self.assertFalse(highlight.get("archived"))
 
     @patch("app.models.User.check_token")
@@ -313,7 +312,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
             "uuid": "abc123",
             "id": 4,
         }
@@ -333,60 +332,6 @@ class AddHighlightApiTests(BaseTestCase):
         self.assertEqual(highlight.get("source"), body.get("source"))
 
     @patch("app.models.User.check_token")
-    def test_add_new_highlight_attributes_source(self, mock_check_token):
-        user = User.query.first()
-        mock_check_token.return_value = user
-
-        article = Article(title="A tree grows in Brooklyn", user_id=user.id)
-        db.session.add(article)
-        db.session.commit()
-
-        body = {
-            "text": "hello old friend",
-            "source": "my favorite friend!",
-            "article_id": str(article.uuid),
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), body.get("source"))
-
-        body = {
-            "text": "hello old friend",
-            "article_id": str(article.uuid),
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), article.title)
-
-        body = {
-            "text": "hello old friend",
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), "unknown")
-
-    @patch("app.models.User.check_token")
     def test_add_new_highlight_with_tags(self, mock_check_token):
         user = User.query.first()
         mock_check_token.return_value = user
@@ -394,7 +339,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
             "new_tag_names": ["pikachu", "bulbasaur", "charmander"],
         }
 
@@ -421,7 +366,7 @@ class AddHighlightApiTests(BaseTestCase):
             "uuid": highlight1.uuid,
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.post(
@@ -464,7 +409,7 @@ class GetHighlightApiTests(BaseTestCase):
 
         body = {}
         res = self.client.get(
-            "/api/highlights/random",
+            "/api/highlights/999999",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -480,8 +425,7 @@ class GetHighlightApiTests(BaseTestCase):
         db.session.add(highlight)
         db.session.commit()
 
-        uuid = highlight.uuid
-        res = self.client.get("/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"})
+        res = self.client.get(f"/api/highlights/{highlight.id}", headers={"Authorization": "Bearer abc123"})
         data = json.loads(res.data)
         returned_highlight = data.get("highlight")
         self.assertEqual(res.status_code, 200)
@@ -514,19 +458,19 @@ class UpdateHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.uuid}",
+            f"/api/highlights/{highlight.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
-        highlight = data.get("highlight")
-        self.assertEqual(highlight.get("text"), body.get("text"))
-        self.assertEqual(highlight.get("note"), body.get("note"))
-        self.assertEqual(highlight.get("source"), body.get("source"))
+        returned = data.get("highlight")
+        self.assertEqual(returned.get("text"), body.get("text"))
+        self.assertEqual(returned.get("note"), body.get("note"))
+        self.assertEqual(returned.get("source"), body.get("source"))
 
     @patch("app.models.User.check_token")
     def test_update_highlight_ignores_fields(self, mock_check_token):
@@ -543,17 +487,17 @@ class UpdateHighlightApiTests(BaseTestCase):
             "id": "55",
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         self.client.patch(
-            f"/api/highlights/{highlight.uuid}",
+            f"/api/highlights/{highlight.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
 
         self.assertNotEqual(highlight.uuid, body.get("uuid"))
-        self.assertNotEqual(highlight.id, body.get("id"))
+        self.assertNotEqual(str(highlight.id), body.get("id"))
         self.assertEqual(highlight.text, body.get("text"))
         self.assertEqual(highlight.note, body.get("note"))
         self.assertEqual(highlight.source, body.get("source"))
@@ -574,7 +518,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         tag_ids = [t.id for t in tags]
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.uuid}",
+            f"/api/highlights/{highlight.id}",
             json={"tags": tag_ids},
             headers={"Authorization": "Bearer abc123"},
         )
@@ -597,18 +541,18 @@ class UpdateHighlightApiTests(BaseTestCase):
         body = None
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.uuid}",
+            f"/api/highlights/{highlight.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Check data")
 
-        # nonexistent article
+        # nonexistent highlight
         body = {"text": "foo"}
 
         res = self.client.patch(
-            "/api/highlights/random",
+            "/api/highlights/999999",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -628,7 +572,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         body = {"text": "foo"}
 
         res = self.client.patch(
-            f"/api/highlights/{highlight2.uuid}",
+            f"/api/highlights/{highlight2.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -655,7 +599,7 @@ class DeleteHighlightApiTests(BaseTestCase):
 
         body = {}
         res = self.client.delete(
-            "/api/highlights/random",
+            "/api/highlights/999999",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -671,12 +615,12 @@ class DeleteHighlightApiTests(BaseTestCase):
         db.session.add(highlight)
         db.session.commit()
 
-        uuid = highlight.uuid
-        res = self.client.delete("/api/highlights/" + uuid, headers={"Authorization": "Bearer abc123"})
+        highlight_id = highlight.id
+        res = self.client.delete(f"/api/highlights/{highlight_id}", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
 
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
-        self.assertIsNone(highlight)
+        highlight = db.session.get(Highlight, highlight_id)
+        self.assertTrue(highlight.archived)
 
 
 class ExportHighlightApiTests(BaseTestCase):

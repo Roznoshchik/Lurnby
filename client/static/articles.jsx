@@ -11,6 +11,7 @@ import Badge from './components/Badge/Badge'
 import Button from './components/Button/Button'
 import Combobox from './components/Combobox/Combobox'
 import Icon from './components/Icon/Icon'
+import PageHeader from './components/PageHeader/PageHeader'
 import Select from './components/Select/Select'
 import { Layout } from './components/Layout/Layout'
 import RequireAuth from './components/RequireAuth/RequireAuth'
@@ -44,11 +45,6 @@ function ArticlesList() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(1)
   const [perPage, setPerPage] = useState('15')
-  const [monthlyStats, setMonthlyStats] = useState({
-    reviewEvents: 0,
-    articlesOpened: 0,
-    highlightsAdded: 0,
-  })
 
   // Filter state (local, applied on button click)
   const [searchQuery, setSearchQuery] = useState('')
@@ -68,7 +64,6 @@ function ArticlesList() {
 
   useEffect(() => {
     fetchTags()
-    fetchStats()
   }, [])
 
   useEffect(() => {
@@ -111,19 +106,6 @@ function ArticlesList() {
     }
   }
 
-  const fetchStats = async () => {
-    try {
-      const { data } = await api.get(ROUTES.API.STATS)
-      setMonthlyStats({
-        reviewEvents: data.reviews_this_month,
-        articlesOpened: data.articles_opened_this_month,
-        highlightsAdded: data.highlights_added_this_month,
-      })
-    } catch (err) {
-      console.error('Error fetching stats:', err)
-    }
-  }
-
   const applyFilters = () => {
     setPage(1)
     setAppliedFilters({
@@ -159,7 +141,7 @@ function ArticlesList() {
   )
 
   const handleArticleOpen = (article) => {
-    window.location.href = ROUTES.PAGES.article(article.id)
+    window.location.href = ROUTES.PAGES.reader(article.uuid)
   }
 
   const handleArticleEdit = (article) => {
@@ -183,57 +165,16 @@ function ArticlesList() {
 
   return (
     <>
-      {/* Page Header */}
-      <header className="page-header">
-        <div className="page-header-content">
-          <div className="page-header-top">
-            <div className="page-header-title">
-              <Icon name="menu_book" />
-              <h1>Articles</h1>
-              <span className="page-header-subtitle">Your Reading Library</span>
-            </div>
-            <Button variant="default" icon="add" onClick={() => setShowAddModal(true)}>
-              Add Article
-            </Button>
-          </div>
-
-          {/* Monthly Stats */}
-          <div className="stats-grid">
-            <div className="stat-card stat-reviews">
-              <div className="stat-icon">
-                <Icon name="rotate_left" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">{monthlyStats.reviewEvents}</div>
-                <div className="stat-label">Review Events</div>
-                <div className="stat-period">This Month</div>
-              </div>
-            </div>
-
-            <div className="stat-card stat-articles">
-              <div className="stat-icon">
-                <Icon name="book" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">{monthlyStats.articlesOpened}</div>
-                <div className="stat-label">Articles Opened</div>
-                <div className="stat-period">This Month</div>
-              </div>
-            </div>
-
-            <div className="stat-card stat-highlights">
-              <div className="stat-icon">
-                <Icon name="ink_highlighter" />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">{monthlyStats.highlightsAdded}</div>
-                <div className="stat-label">Highlights Added</div>
-                <div className="stat-period">This Month</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+      <PageHeader
+        title="Articles"
+        icon="menu_book"
+        subtitle="Your Reading Library"
+        action={
+          <Button variant="default" icon="add" onClick={() => setShowAddModal(true)}>
+            Add Article
+          </Button>
+        }
+      />
 
       {loading && (
         <div className="content-container">

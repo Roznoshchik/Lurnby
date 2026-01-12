@@ -283,18 +283,18 @@ class UpdateTagApiTests(BaseTestCase):
         body = None
 
         res = self.client.patch(
-            f"/api/highlights/{tag.uuid}",
+            f"/api/tags/{tag.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
         data = json.loads(res.data)
         self.assertEqual(data.get("message"), "Check data")
 
-        # nonexistent article
-        body = {"text": "foo"}
+        # nonexistent tag
+        body = {"name": "foo"}
 
         res = self.client.patch(
-            "/api/highlights/random",
+            "/api/tags/999999",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -306,15 +306,15 @@ class UpdateTagApiTests(BaseTestCase):
         db.session.add(user2)
         db.session.commit()
 
-        tag2 = Tag(user_id=user2.id)
+        tag2 = Tag(user_id=user2.id, name="Bar")
         db.session.add(tag2)
         db.session.commit()
 
         # wrong user
-        body = {"text": "foo"}
+        body = {"name": "foo"}
 
         res = self.client.patch(
-            f"/api/highlights/{tag2.uuid}",
+            f"/api/tags/{tag2.id}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )

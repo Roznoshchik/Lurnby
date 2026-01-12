@@ -1,0 +1,337 @@
+import { render } from 'preact'
+import { useEffect, useState, useMemo } from 'preact/hooks'
+import './css/globals.css'
+import './css/highlights.css'
+import Badge from './components/Badge/Badge'
+import Button from './components/Button/Button'
+import Combobox from './components/Combobox/Combobox'
+import HighlightCard from './components/HighlightCard/HighlightCard'
+import HighlightEditModal from './components/HighlightEditModal/HighlightEditModal'
+import Icon from './components/Icon/Icon'
+import PageHeader from './components/PageHeader/PageHeader'
+import Select from './components/Select/Select'
+import { Layout } from './components/Layout/Layout'
+import RequireAuth from './components/RequireAuth/RequireAuth'
+import { AuthProvider } from './contexts/AuthContext/AuthContext'
+import { api } from './services/api'
+import { ROUTES } from './services/routes'
+import { getReadableSource } from './utils/sourceFormatter'
+
+const TAG_STATUS_OPTIONS = [
+  { value: '', label: 'All' },
+  { value: 'tagged', label: 'With Tags' },
+  { value: 'untagged', label: 'Without Tags' },
+]
+
+const PER_PAGE_OPTIONS = [
+  { value: '15', label: '15 per page' },
+  { value: '30', label: '30 per page' },
+  { value: '50', label: '50 per page' },
+]
+
+function HighlightsList() {
+  const [highlights, setHighlights] = useState([])
+  const [allTags, setAllTags] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [hasNext, setHasNext] = useState(false)
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [perPage, setPerPage] = useState('15')
+
+  // Filter state (local, applied on button click)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [tagStatusFilter, setTagStatusFilter] = useState('')
+  const [selectedTags, setSelectedTags] = useState([])
+
+  // Applied filters (sent to server)
+  const [appliedFilters, setAppliedFilters] = useState({
+    q: '',
+    tag_status: '',
+    tag_ids: '',
+  })
+
+  // Modal states
+  const [editingHighlight, setEditingHighlight] = useState(null)
+
+  useEffect(() => {
+    fetchTags()
+  }, [])
+
+  useEffect(() => {
+    fetchHighlights()
+  }, [page, perPage, appliedFilters])
+
+  const fetchHighlights = async () => {
+    try {
+      setLoading(true)
+      const params = {
+        page,
+        per_page: perPage,
+        ...appliedFilters,
+      }
+      // Remove empty params
+      Object.keys(params).forEach((key) => {
+        if (!params[key]) delete params[key]
+      })
+
+      const { data } = await api.get(ROUTES.API.HIGHLIGHTS, params)
+      setHighlights(data.highlights || [])
+      setHasNext(data.has_next || false)
+      setTotal(data.total || 0)
+      setError(null)
+    } catch (err) {
+      console.error('Error fetching highlights:', err)
+      setError('Failed to load highlights')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchTags = async () => {
+    try {
+      const { data } = await api.get('/api/tags', { per_page: 'all' })
+      setAllTags(data.tags || [])
+    } catch (err) {
+      console.error('Error fetching tags:', err)
+    }
+  }
+
+  const applyFilters = () => {
+    setPage(1)
+    setAppliedFilters({
+      q: searchQuery,
+      tag_status: tagStatusFilter,
+      tag_ids: selectedTags.join(','),
+    })
+  }
+
+  const toggleTag = (tagId) => {
+    setSelectedTags((prev) =>
+      prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
+    )
+  }
+
+  const handlePerPageChange = (value) => {
+    setPerPage(value)
+    setPage(1)
+  }
+
+  const tagOptions = useMemo(
+    () =>
+      allTags.map((tag) => ({
+        value: tag.id,
+        label: tag.name,
+      })),
+    [allTags],
+  )
+
+  const selectedTagObjects = useMemo(
+    () => allTags.filter((tag) => selectedTags.includes(tag.id)),
+    [allTags, selectedTags],
+  )
+
+  const handleHighlightEdit = (highlight) => {
+    setEditingHighlight(highlight)
+  }
+
+  const handleViewInArticle = (highlight) => {
+    if (highlight.id) {
+      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, highlight.id)
+    }
+  }
+
+  const handleHighlightSaved = (updatedHighlight) => {
+    const isViewingArchived = appliedFilters.status === 'archived'
+    const highlightIsArchived = updatedHighlight.archived
+
+    // If archive status doesn't match current filter, remove from list
+    if (isViewingArchived !== highlightIsArchived) {
+      setHighlights((prev) => prev.filter((h) => h.id !== updatedHighlight.id))
+    } else {
+      // Update the highlight in the list
+      setHighlights((prev) =>
+        prev.map((h) => (h.id === updatedHighlight.id ? updatedHighlight : h)),
+      )
+    }
+  }
+
+  return (
+    <>
+      <PageHeader
+        title="Highlights"
+        icon="ink_highlighter"
+        subtitle="Your Knowledge Library"
+      />
+
+      {loading && (
+        <div className="content-container">
+          <div className="loading-state">
+            <p>Loading highlights...</p>
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div className="content-container">
+          <div className="error-state">
+            <p>{error}</p>
+            <Button onClick={fetchHighlights}>Retry</Button>
+          </div>
+        </div>
+      )}
+
+      {!loading && !error && (
+        <div className="content-container">
+          {/* Filters */}
+          <div className="filters-section">
+            {/* Search Bar */}
+            <div className="filter-row">
+              <Icon name="search" className="filter-icon" />
+              <input
+                type="text"
+                placeholder="Search highlights by text, note, or article..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+            </div>
+
+            {/* Tag Status and Tags Filter */}
+            <div className="filter-row filter-controls">
+              <div className="filter-group">
+                <Icon name="filter_alt" className="filter-icon" />
+                <span className="filter-label">Filter:</span>
+                <Select
+                  options={TAG_STATUS_OPTIONS}
+                  value={tagStatusFilter}
+                  onChange={setTagStatusFilter}
+                />
+              </div>
+
+              {allTags.length > 0 && (
+                <div className="filter-group">
+                  <Icon name="sell" className="filter-icon" />
+                  <span className="filter-label">Tags:</span>
+                  <Combobox
+                    options={tagOptions}
+                    selected={selectedTags}
+                    onSelect={toggleTag}
+                    placeholder="Select tags..."
+                  />
+                </div>
+              )}
+
+              <Button variant="default" size="sm" onClick={applyFilters}>
+                <Icon name="check" />
+                Apply
+              </Button>
+            </div>
+
+            {/* Selected Tags Display */}
+            {selectedTagObjects.length > 0 && (
+              <div className="selected-tags">
+                {selectedTagObjects.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant="outline"
+                    value={tag.name}
+                    className="tag-badge"
+                    onClick={() => toggleTag(tag.id)}
+                  >
+                    {tag.name}
+                    <Icon name="close" className="tag-remove" />
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {/* Highlights Count */}
+            {total > 0 && (
+              <div className="highlights-count">
+                Showing {(page - 1) * parseInt(perPage, 10) + 1}-
+                {Math.min(page * parseInt(perPage, 10), total)} of {total} highlights
+              </div>
+            )}
+          </div>
+
+          {/* Highlights Grid */}
+          {highlights.length > 0 ? (
+            <>
+              <div className="highlights-grid">
+                {highlights.map((highlight) => (
+                  <HighlightCard
+                    key={highlight.id}
+                    highlight={{
+                      ...highlight,
+                      source: getReadableSource(highlight.source),
+                    }}
+                    onEdit={() => handleHighlightEdit(highlight)}
+                    onViewInArticle={() => handleViewInArticle(highlight)}
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <div className="pagination">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  <Icon name="chevron_left" />
+                </Button>
+                <span className="pagination-info">Page {page}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!hasNext}
+                >
+                  <Icon name="chevron_right" />
+                </Button>
+                <Select
+                  options={PER_PAGE_OPTIONS}
+                  value={perPage}
+                  onChange={handlePerPageChange}
+                />
+              </div>
+            </>
+          ) : (
+            <div className="empty-state">
+              <Icon name="ink_highlighter" />
+              <h3>No highlights found</h3>
+              <p>Try adjusting your search or filters</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Edit Highlight Modal */}
+      {editingHighlight && (
+        <HighlightEditModal
+          highlight={editingHighlight}
+          allTags={allTags}
+          isOpen={!!editingHighlight}
+          onClose={() => setEditingHighlight(null)}
+          onSave={handleHighlightSaved}
+        />
+      )}
+    </>
+  )
+}
+
+function HighlightsPage() {
+  return (
+    <AuthProvider>
+      <RequireAuth>
+        <Layout>
+          <HighlightsList />
+        </Layout>
+      </RequireAuth>
+    </AuthProvider>
+  )
+}
+
+render(<HighlightsPage />, document.getElementById('app'))

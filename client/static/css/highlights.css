@@ -1,4 +1,4 @@
-/* Articles Page Styles */
+/* Highlights Page Styles */
 
 /* ================================================================
    Content Container
@@ -63,29 +63,29 @@
 }
 
 /* ================================================================
-   Articles Grid
+   Highlights Grid
    ================================================================ */
 
-.articles-grid {
+.highlights-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--space-6);
 }
 
 @media (min-width: 768px) {
-  .articles-grid {
+  .highlights-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .articles-grid {
+  .highlights-grid {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 /* ================================================================
-   Filters Section (for future use)
+   Filters Section
    ================================================================ */
 
 .filters-section {
@@ -108,6 +108,7 @@
 }
 
 .filter-label {
+  font-size: var(--font-size-sm);
   color: var(--muted-foreground);
   margin-right: var(--space-2);
 }
@@ -142,127 +143,6 @@
   flex-wrap: wrap;
 }
 
-/* ================================================================
-   Results Header (for future use)
-   ================================================================ */
-
-.results-header {
-  margin-bottom: var(--space-4);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-4);
-}
-
-.results-count {
-  color: var(--muted-foreground);
-  margin: 0;
-}
-
-.sort-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.sort-controls .filter-label {
-  margin-right: var(--space-2);
-}
-
-/* ================================================================
-   Pagination (for future use)
-   ================================================================ */
-
-.pagination {
-  margin-top: var(--space-8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding-bottom: var(--space-20);
-}
-
-@media (min-width: 768px) {
-  .pagination {
-    padding-bottom: 0;
-  }
-}
-
-.pagination-pages {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.pagination-ellipsis {
-  padding: 0 var(--space-2);
-  color: var(--muted-foreground);
-}
-
-.pagination button {
-  min-width: 2.5rem;
-}
-
-.pagination-info {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  padding: 0 var(--space-2);
-}
-
-/* ================================================================
-   Section Styles
-   ================================================================ */
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--foreground);
-  margin: 0 0 var(--space-4);
-}
-
-.section-title .material-symbols-outlined {
-  font-size: var(--font-size-2xl);
-  color: var(--muted-foreground);
-}
-
-/* ================================================================
-   Recent Section
-   ================================================================ */
-
-.recent-section {
-  margin-bottom: var(--space-8);
-  padding-bottom: var(--space-8);
-  border-bottom: 1px solid var(--border);
-}
-
-.recent-previews {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--space-4);
-}
-
-@media (min-width: 640px) {
-  .recent-previews {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* ================================================================
-   All Articles Section
-   ================================================================ */
-
-.all-articles-section {
-  padding-bottom: var(--space-8);
-}
-
-/* ================================================================
-   Filters Section (expanded)
-   ================================================================ */
-
 .filter-icon {
   color: var(--muted-foreground);
   font-size: var(--font-size-xl);
@@ -276,11 +156,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-}
-
-.filter-label {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
 }
 
 .search-input {
@@ -306,6 +181,72 @@
   color: var(--muted-foreground);
 }
 
+/* ================================================================
+   Section Styles
+   ================================================================ */
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--foreground);
+  margin: 0 0 var(--space-4);
+}
+
+.section-title .material-symbols-outlined {
+  font-size: var(--font-size-2xl);
+  color: var(--muted-foreground);
+}
+
+/* ================================================================
+   Pagination
+   ================================================================ */
+
+.pagination {
+  margin-top: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-20);
+}
+
+@media (min-width: 768px) {
+  .pagination {
+    padding-bottom: 0;
+  }
+}
+
+.pagination-pages {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.pagination button {
+  min-width: 2.5rem;
+}
+
+.pagination-info {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding: 0 var(--space-2);
+}
+
+/* ================================================================
+   Highlights Count
+   ================================================================ */
+
+.highlights-count {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding-top: var(--space-4);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}
+
 /* Tag badges in filter display */
 .tag-badge {
   cursor: pointer;
@@ -321,16 +262,4 @@
 
 .tag-badge:hover .tag-remove {
   opacity: 1;
-}
-
-/* ================================================================
-   Articles Count
-   ================================================================ */
-
-.articles-count {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-  padding-top: var(--space-4);
-  margin-top: var(--space-2);
-  border-top: 1px solid var(--border);
 }

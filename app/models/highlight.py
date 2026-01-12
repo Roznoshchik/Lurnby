@@ -41,7 +41,6 @@ class Highlight(db.Model):
 
     archived = db.Column(db.Boolean, index=True, default=False)
     no_topics = db.Column(db.Boolean, default=True, index=True)
-    untagged = db.Column(db.Boolean, default=True)
     note = db.Column(db.String, index=True)
     tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic")
     position = db.Column(db.String)
@@ -51,7 +50,7 @@ class Highlight(db.Model):
     do_not_review = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
-        source = self.source or (self.article.title if self.article else "unknown")
+        source = self.article.source or self.article.source_url if self.article else "unknown"
 
         return {
             "id": self.id,
@@ -61,13 +60,14 @@ class Highlight(db.Model):
             "note": self.note,
             "prompt": self.prompt,
             "article_id": self.article_id,
+            "article_title": self.article.title if self.article else None,
+            "article_uuid": self.article.uuid if self.article else None,
             "user_id": self.user_id,
             "created_date": self.created_date,
             "review_date": self.review_date,
             "review_schedule": self.review_schedule,
             "do_not_review": self.do_not_review,
             "archived": self.archived,
-            "untagged": self.untagged,
             "tags": [tag.to_dict() for tag in self.tags.all()],
         }
 
@@ -115,15 +115,12 @@ class Highlight(db.Model):
     def add_tag(self, tag):
         if not self.is_tagged_with(tag) and tag.user_id == self.user_id:
             self.tags.append(tag)
-            self.untagged = False
             tag.highlight_count += 1
 
     def remove_tag(self, tag):
         if self.is_tagged_with(tag):
             self.tags.remove(tag)
             tag.highlight_count -= 1
-            if self.tags.count() == 0:
-                self.untagged = True
 
     def RemoveFromTopic(self, topic):
         if self.is_added_topic(topic) and topic.user_id == self.user_id:

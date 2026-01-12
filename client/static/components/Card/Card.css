@@ -4,6 +4,7 @@
   background-color: var(--card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
+  min-width: 0;
   transition:
     border-color 200ms,
     box-shadow 200ms;

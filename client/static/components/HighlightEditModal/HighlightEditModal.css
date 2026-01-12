@@ -1,10 +1,10 @@
-.article-edit-form {
+.highlight-edit-form {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
 
-.article-edit-form .loading-state {
+.highlight-edit-form .loading-state {
   padding: var(--space-8);
   text-align: center;
   color: var(--muted-foreground);
@@ -31,56 +31,19 @@
   font-size: var(--font-size-sm);
 }
 
-.form-row {
-  display: flex;
-  gap: var(--space-4);
-}
-
-.form-group-half {
-  flex: 1;
-}
-
-.progress-display {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.edit-progress-bar {
-  height: 8px;
-}
-
-.progress-text {
-  font-size: var(--font-size-sm);
-  color: var(--muted-foreground);
-}
-
-.source-display {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
+.article-info {
   padding: var(--space-2) var(--space-3);
-  background-color: var(--input-background);
+  background-color: var(--muted);
   border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.source-link {
-  flex: 1;
-  color: var(--primary);
-  text-decoration: none;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-size: var(--font-size-sm);
+  color: var(--foreground);
 }
 
-.source-link:hover {
-  text-decoration: underline;
-}
-
-.copy-btn {
-  flex-shrink: 0;
+.editor-content .ql-editor,
+.editor-prompt .ql-editor {
+  min-height: 80px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
 }
 
 .selected-tags {
@@ -96,9 +59,7 @@
   cursor: pointer;
 }
 
-.editor-notes .ql-editor,
-.editor-reflections .ql-editor,
-.editor-content .ql-editor {
+.editor-note .ql-editor {
   min-height: 100px;
   max-height: calc(100vh - (var(--space-30) * 2));
   overflow-y: auto;
@@ -122,15 +83,6 @@
 }
 
 @media (max-width: 640px) {
-  .form-row {
-    flex-direction: column;
-    gap: var(--space-4);
-  }
-
-  .form-group-half {
-    width: 100%;
-  }
-
   .modal-footer {
     flex-wrap: wrap;
   }
