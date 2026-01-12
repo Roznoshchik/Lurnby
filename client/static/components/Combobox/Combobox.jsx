@@ -70,7 +70,6 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
         setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : filteredOptions.length - 1))
         break
       case 'Enter':
-      case ' ':
         e.preventDefault()
         if (filteredOptions[highlightedIndex]) {
           onSelect(filteredOptions[highlightedIndex].value)
