@@ -264,7 +264,7 @@ function HighlightsList() {
                     key={highlight.id}
                     highlight={{
                       ...highlight,
-                      source: getReadableSource(highlight.article_source),
+                      source: getReadableSource(highlight.source),
                     }}
                     onEdit={() => handleHighlightEdit(highlight)}
                     onViewInArticle={() => handleViewInArticle(highlight)}

@@ -50,7 +50,7 @@ class Highlight(db.Model):
     do_not_review = db.Column(db.Boolean, default=False)
 
     def to_dict(self):
-        source = self.source or (self.article.title if self.article else "unknown")
+        source = self.article.source or self.article.source_url if self.article else "unknown"
 
         return {
             "id": self.id,
@@ -60,7 +60,6 @@ class Highlight(db.Model):
             "note": self.note,
             "prompt": self.prompt,
             "article_id": self.article_id,
-            "article_source": self.article.source or self.article.source_url if self.article else None,
             "article_title": self.article.title if self.article else None,
             "article_uuid": self.article.uuid if self.article else None,
             "user_id": self.user_id,

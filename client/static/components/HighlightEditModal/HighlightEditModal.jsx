@@ -28,7 +28,6 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
 
   // Fetch full highlight data when modal opens
   useEffect(() => {
-    console.log("user effect running for highlight??", highlight)
     if (!isOpen || !highlight?.id) return
 
     const fetchHighlight = async () => {

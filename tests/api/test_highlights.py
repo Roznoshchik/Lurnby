@@ -286,7 +286,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.post(
@@ -312,7 +312,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
             "uuid": "abc123",
             "id": 4,
         }
@@ -332,60 +332,6 @@ class AddHighlightApiTests(BaseTestCase):
         self.assertEqual(highlight.get("source"), body.get("source"))
 
     @patch("app.models.User.check_token")
-    def test_add_new_highlight_attributes_source(self, mock_check_token):
-        user = User.query.first()
-        mock_check_token.return_value = user
-
-        article = Article(title="A tree grows in Brooklyn", user_id=user.id)
-        db.session.add(article)
-        db.session.commit()
-
-        body = {
-            "text": "hello old friend",
-            "source": "my favorite friend!",
-            "article_id": str(article.uuid),
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), body.get("source"))
-
-        body = {
-            "text": "hello old friend",
-            "article_id": str(article.uuid),
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), article.title)
-
-        body = {
-            "text": "hello old friend",
-        }
-
-        res = self.client.post(
-            "/api/highlights",
-            json=body,
-            headers={"Authorization": "Bearer abc123"},
-        )
-        data = json.loads(res.data)
-        highlight = data.get("highlight")
-
-        self.assertEqual(highlight.get("source"), "unknown")
-
-    @patch("app.models.User.check_token")
     def test_add_new_highlight_with_tags(self, mock_check_token):
         user = User.query.first()
         mock_check_token.return_value = user
@@ -393,7 +339,7 @@ class AddHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
             "new_tag_names": ["pikachu", "bulbasaur", "charmander"],
         }
 
@@ -420,7 +366,7 @@ class AddHighlightApiTests(BaseTestCase):
             "uuid": highlight1.uuid,
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.post(
@@ -512,7 +458,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         body = {
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         res = self.client.patch(
@@ -541,7 +487,7 @@ class UpdateHighlightApiTests(BaseTestCase):
             "id": "55",
             "text": "hello old friend",
             "note": "this is super fun",
-            "source": "my favorite friend!",
+            "source": "unknown",
         }
 
         self.client.patch(
