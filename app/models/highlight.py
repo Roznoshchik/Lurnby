@@ -7,21 +7,8 @@ import sqlalchemy as sa
 from sqlalchemy import select
 
 from app.models.base import db, generate_str_id
-
-
-highlights_topics = sa.Table(
-    "highlights_topics",
-    db.metadata,
-    sa.Column("highlight_id", sa.Integer, sa.ForeignKey("highlight.id"), primary_key=True, nullable=False, index=True),
-    sa.Column("topic_id", sa.Integer, sa.ForeignKey("topic.id"), primary_key=True, nullable=False),
-)
-
-tags_highlights = sa.Table(
-    "tags_highlights",
-    db.metadata,
-    sa.Column("tag_id", sa.Integer, sa.ForeignKey("tag.id"), primary_key=True, nullable=False),
-    sa.Column("highlight_id", sa.Integer, sa.ForeignKey("highlight.id"), primary_key=True, nullable=False, index=True),
-)
+from app.models.associations import highlights_topics, tags_highlights
+from app.models.tag import Tag
 
 
 class Highlight(db.Model):
@@ -111,6 +98,10 @@ class Highlight(db.Model):
         if not self.is_added_topic(topic) and topic.user_id == self.user_id:
             self.topics.append(topic)
             self.no_topics = True
+            # Dual-write: also add to corresponding Tag
+            tag = self._get_or_create_tag_for_topic(topic)
+            if tag:
+                self.add_tag(tag)
 
     def add_tag(self, tag):
         if not self.is_tagged_with(tag) and tag.user_id == self.user_id:
@@ -127,9 +118,40 @@ class Highlight(db.Model):
             self.topics.remove(topic)
             if self.topics.count() == 0:
                 self.no_topics = True
+            # Dual-write: also remove from corresponding Tag
+            tag = self._get_tag_for_topic(topic)
+            if tag:
+                self.remove_tag(tag)
 
     def is_added_topic(self, topic):
         return self.topics.filter(topic.id == highlights_topics.c.topic_id).count() > 0
+
+    def _get_or_create_tag_for_topic(self, topic):
+        """Get or create a Tag matching a Topic by normalized name."""
+        normalized_name = topic.title.strip().lower()
+        stmt = select(Tag).where(
+            Tag.user_id == topic.user_id, sa.func.lower(sa.func.trim(Tag.name)) == normalized_name
+        )
+        tag = db.session.scalar(stmt)
+
+        if not tag:
+            tag = Tag(
+                user_id=topic.user_id,
+                name=topic.title.strip(),
+                archived=topic.archived or False,
+                last_used=topic.last_used,
+            )
+            db.session.add(tag)
+
+        return tag
+
+    def _get_tag_for_topic(self, topic):
+        """Get the Tag matching a Topic by normalized name (don't create)."""
+        normalized_name = topic.title.strip().lower()
+        stmt = select(Tag).where(
+            Tag.user_id == topic.user_id, sa.func.lower(sa.func.trim(Tag.name)) == normalized_name
+        )
+        return db.session.scalar(stmt)
 
     def is_added_tag(self, tag):
         return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0

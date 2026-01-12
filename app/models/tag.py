@@ -1,9 +1,9 @@
+from datetime import datetime
+
 from sqlalchemy import func
 
 from app.models.base import db, generate_str_id
-from app.models.article import tags_articles
-from app.models.highlight import tags_highlights
-from app.models.topic import tags_topics
+from app.models.associations import tags_articles, tags_highlights, tags_topics
 
 
 class Tag(db.Model):
@@ -15,6 +15,7 @@ class Tag(db.Model):
     goal = db.Column(db.String(512))
     highlight_count = db.Column(db.Integer, default=0)
     article_count = db.Column(db.Integer, default=0)
+    last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
     articles = db.relationship("Article", secondary=tags_articles, back_populates="tags", lazy="dynamic")
 

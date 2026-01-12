@@ -4,20 +4,12 @@ import math
 from bs4 import BeautifulSoup
 from flask import url_for
 from flask_login import current_user
-import sqlalchemy as sa
 from sqlalchemy import desc, func, Index, select
 from sqlalchemy_utils import UUIDType
 import uuid
 
 from app.models.base import db
-
-
-tags_articles = sa.Table(
-    "tags_articles",
-    db.metadata,
-    sa.Column("tag_id", sa.Integer, sa.ForeignKey("tag.id"), primary_key=True, nullable=False),
-    sa.Column("article_id", sa.Integer, sa.ForeignKey("article.id"), primary_key=True, nullable=False, index=True),
-)
+from app.models.associations import tags_articles
 
 
 class Article(db.Model):
