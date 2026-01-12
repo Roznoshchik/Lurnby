@@ -61,8 +61,8 @@
 
 .highlight-text img,
 .highlight-note img {
-  max-width: 100% !important;
-  height: auto !important;
+  max-width: 100%;
+  height: auto;
 }
 
 .highlight-text pre {
@@ -71,6 +71,7 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
 
 /* ================================================================
    Note Section
