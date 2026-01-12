@@ -1,4 +1,5 @@
 .local/
+.claude/
 
 node_modules
 
@@ -15,7 +16,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-*.pyc 
+*.pyc
 
 app/__pycache__/*
 
@@ -30,7 +31,7 @@ app/main/temp
 # redis stuff. Does it need to be committed?
 *.rdb
 
-#ssl stuff - not sure this should be added here or not. 
+#ssl stuff - not sure this should be added here or not.
 *.pem
 
 #not sure the db should be stored as it holds google unique ids
