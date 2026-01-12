@@ -15,8 +15,13 @@ def articles():
     return render_template("client/articles.html")
 
 
-@bp.get("/articles/<uuid>")
 @bp.get("/highlights")
+def highlights():
+    """Highlights list page"""
+    return render_template("client/highlights.html")
+
+
+@bp.get("/articles/<uuid>")
 @bp.get("/review")
 @bp.get("/settings")
 def client_app(uuid=None):

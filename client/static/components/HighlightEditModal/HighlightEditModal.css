@@ -1,0 +1,99 @@
+.highlight-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.highlight-edit-form .loading-state {
+  padding: var(--space-8);
+  text-align: center;
+  color: var(--muted-foreground);
+}
+
+.error-banner {
+  padding: var(--space-3) var(--space-4);
+  background-color: color-mix(in oklch, var(--destructive) 15%, transparent);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-md);
+  color: var(--destructive);
+  font-size: var(--font-size-sm);
+}
+
+.archived-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background-color: color-mix(in oklch, var(--muted-foreground) 15%, transparent);
+  border: 1px solid var(--muted-foreground);
+  border-radius: var(--radius-md);
+  color: var(--muted-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.article-info {
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--muted);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.editor-content .ql-editor,
+.editor-prompt .ql-editor {
+  min-height: 80px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
+}
+
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.selected-tags .tag-remove {
+  font-size: 14px;
+  margin-left: var(--space-1);
+  cursor: pointer;
+}
+
+.editor-note .ql-editor {
+  min-height: 100px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
+}
+
+.modal-footer .archive-btn,
+.modal-footer .unarchive-btn {
+  color: var(--muted-foreground);
+}
+
+.modal-footer .archive-btn:hover {
+  color: var(--destructive);
+}
+
+.modal-footer .unarchive-btn:hover {
+  color: var(--success);
+}
+
+.modal-footer .footer-spacer {
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .modal-footer {
+    flex-wrap: wrap;
+  }
+
+  .modal-footer .footer-spacer {
+    display: none;
+  }
+
+  .modal-footer .archive-btn {
+    order: 10;
+    width: 100%;
+    margin-top: var(--space-2);
+  }
+}

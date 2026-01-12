@@ -14,6 +14,11 @@ export const ROUTES = {
     SETTINGS: '/client/settings',
     // Dynamic routes
     article: (uuid) => `/client/article/${uuid}`,
+    // Legacy reader page (Preact reader not yet built)
+    reader: (articleUuid, highlightId = null) =>
+      highlightId
+        ? `/app/article/${articleUuid}?highlight_id=highlight${highlightId}`
+        : `/app/article/${articleUuid}`,
   },
   API: {
     LOGIN: '/api/auth/login',
@@ -22,9 +27,11 @@ export const ROUTES = {
     LOGOUT: '/api/auth/logout',
     STATS: '/api/user/stats',
     ARTICLES: '/api/articles',
+    HIGHLIGHTS: '/api/highlights',
     TAGS: '/api/tags',
     // Dynamic routes
     article: (uuid) => `/api/articles/${uuid}`,
+    highlight: (uuid) => `/api/highlights/${uuid}`,
     task: (taskId) => `/api/tasks/${taskId}`,
   },
 }

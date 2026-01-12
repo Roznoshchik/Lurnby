@@ -1,7 +1,8 @@
+import sqlalchemy as sa
+
 from flask import request, jsonify, url_for
 import json
 import traceback
-from uuid import UUID
 
 from app import db, CustomLogger
 from app.api import bp
@@ -13,16 +14,16 @@ from app.api.helpers.add_highlight_methods import (
     validate_request,
     populate_highlight,
 )
-from app.api.helpers.query_maker import apply_pagination
+from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.update_tags import update_tags
-from app.models import Article, Highlight, Event
+from app.models import Highlight, Event
 from app.models.event import EventName
 
 
 logger = CustomLogger("API")
 
 
-@bp.route("/highlights", methods=["GET"])
+@bp.get("/highlights")
 @token_auth.login_required
 def get_highlights():
     """
@@ -32,7 +33,6 @@ def get_highlights():
         e.g. 1 || 2
     per_page : how many results to show per page default 15
         number e.g 15, 30, 50 || 'all'
-    article_id: id of the article for which highlights should be returned
     created_sort : optional sorting by created date
         asc || desc
     status : unarchived (default) || archived || all
@@ -43,34 +43,45 @@ def get_highlights():
         defaults to all
     q : search query. This is applied after filtering by status and tags.
         e.g. hello old friend
+
+    Returns
+    -------
+    JSON with:
+        highlights: paginated list of highlights
+        has_next: boolean indicating if there's a next page
+        total: total highlights in the current query
     """
     try:
         user = token_auth.current_user()
 
         page = request.args.get("page", "1")
         per_page = request.args.get("per_page", "15")
-        article_id = request.args.get("article_id", None)
         search_phrase = request.args.get("q", None)
         created_sort = request.args.get("created_sort")
         status = request.args.get("status", None)
         tag_status = request.args.get("tag_status", None)
         tag_ids = request.args.get("tag_ids", None)
 
-        # filter query
-        article = Article.query.filter_by(uuid=UUID(article_id)).first() if article_id else None
-        if article:
-            query = Article.highlights
-        else:
-            query = user.highlights
+        # Build query with SQLAlchemy 2.0 select
+        stmt = sa.select(Highlight).where(Highlight.user_id == user.id)
 
-        query = hqm.apply_all_filters(query, status, tag_status, tag_ids, search_phrase)
-        query = hqm.apply_sorting(query, created_sort)
-        query = apply_pagination(query, page, per_page)
+        # Apply filters
+        stmt = hqm.filter_by_status(stmt, status)
+        stmt = hqm.filter_by_tag_status(stmt, tag_status)
+        stmt = hqm.filter_by_tags(stmt, tag_ids)
+        stmt = hqm.filter_by_search_phrase(stmt, search_phrase)
 
-        has_next = query.has_next if query.has_next else None
-        highlights = [highlight.to_dict() for highlight in query.items]
+        # Get total count before sorting/pagination
+        total = get_total_count(stmt)
 
-        response = jsonify(has_next=has_next, highlights=highlights)
+        # Apply sorting
+        stmt = hqm.apply_default_sorting(stmt, created_sort)
+
+        # Apply pagination
+        highlight_list, has_next = apply_pagination(stmt, page, per_page)
+        highlights = [highlight.to_dict() for highlight in highlight_list]
+
+        response = jsonify(has_next=has_next, highlights=highlights, total=total)
         response.status_code = 200
         return response
     except Exception as e:
@@ -81,7 +92,7 @@ def get_highlights():
             return bad_request("Something went wrong.")
 
 
-@bp.route("/highlights", methods=["POST"])
+@bp.post("/highlights")
 @token_auth.login_required
 def create_highlight():
     try:
@@ -117,12 +128,12 @@ def create_highlight():
             return bad_request("Something went wrong")
 
 
-@bp.route("/highlights/<uuid>", methods=["GET"])
+@bp.get("/highlights/<id>")
 @token_auth.login_required
-def get_highlight(uuid):
+def get_highlight(id):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.get(Highlight, id)
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
@@ -136,12 +147,12 @@ def get_highlight(uuid):
             return bad_request("Something went wrong")
 
 
-@bp.route("/highlights/<uuid>", methods=["PATCH"])
+@bp.patch("/highlights/<id>")
 @token_auth.login_required
-def update_highlight(uuid):
+def update_highlight(id):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.get(Highlight, id)
         data = json.loads(request.data)
 
         if not highlight or highlight.user_id != user.id:
@@ -171,16 +182,17 @@ def update_highlight(uuid):
             return bad_request("Something went wrong")
 
 
-@bp.route("/highlights/<uuid>", methods=["DELETE"])
+@bp.delete("/highlights/<id>")
 @token_auth.login_required
-def delete_highlight(uuid):
+def delete_highlight(id):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.get(Highlight, id)
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
-        db.session.delete(highlight)
+        highlight.archived = True
+
         ev = Event.add(EventName.DELETED_HIGHLIGHT, user=user)
         db.session.add(ev)
 
@@ -233,21 +245,20 @@ def get_highlights_for_review():
 def export_highlights():
     try:
         user = token_auth.current_user()
-        article_id = request.args.get("article_id", None)
         search_phrase = request.args.get("q", None)
         status = request.args.get("status", None)
         tag_status = request.args.get("tag_status", None)
         tag_ids = request.args.get("tag_ids", None)
         export_file_ext = request.args.get("export_file_ext", "csv")
 
-        # filter query
-        article = Article.query.filter_by(uuid=UUID(article_id)).first() if article_id else None
-        if article:
-            highlights = Article.highlights
-        else:
-            highlights = user.highlights
+        # Build query
+        stmt = sa.select(Highlight).where(Highlight.user_id == user.id)
+        stmt = hqm.filter_by_status(stmt, status)
+        stmt = hqm.filter_by_tag_status(stmt, tag_status)
+        stmt = hqm.filter_by_tags(stmt, tag_ids)
+        stmt = hqm.filter_by_search_phrase(stmt, search_phrase)
 
-        highlights = hqm.apply_all_filters(highlights, status, tag_status, tag_ids, search_phrase)
+        highlights = list(db.session.scalars(stmt))
         task = user.launch_task("export_highlights", highlights=highlights, ext=export_file_ext)
         ev = Event.add(EventName.EXPORTED_HIGHLIGHTS, user=user)
         db.session.add(ev)

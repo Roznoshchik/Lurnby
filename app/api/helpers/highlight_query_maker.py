@@ -1,116 +1,113 @@
-from app import db
+import sqlalchemy as sa
+
 from app.models import Article, Highlight, tags_highlights
-from flask_sqlalchemy import query
 
 
-def apply_all_filters(query, status, tag_status, tag_ids, search_phrase):
-    query = filter_by_status(query, status)
-    query = filter_by_tag_status(query, tag_status)
-    query = filter_by_tags(query, tag_ids)
-    query = filter_by_search_phrase(query, search_phrase)
+def filter_by_status(stmt: sa.Select, status: str) -> sa.Select:
+    """Filter highlights by archive status.
 
-    return query
-
-
-def filter_by_status(query: query.Query, status: str):
-    """
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        status (string): status to filter by
+        stmt: SQLAlchemy select statement
+        status: status to filter by (unarchived, archived, all)
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
-
     if not status or status.lower() == "unarchived":
-        query = query.filter_by(archived=False)
-    elif status.lower() == "all":
-        pass
+        stmt = stmt.where(Highlight.archived.is_(False))
     elif status.lower() == "archived":
-        query = query.filter_by(archived=True)
-    return query
+        stmt = stmt.where(Highlight.archived.is_(True))
+    # "all" returns everything, no filter applied
+
+    return stmt
 
 
-def filter_by_tag_status(query: query.Query, tag_status: str):
-    """
+def filter_by_tag_status(stmt: sa.Select, tag_status: str) -> sa.Select:
+    """Filter highlights by tag status.
+
+    Uses EXISTS subquery on junction table to determine if highlight has tags.
+
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        tag_status (string): status to filter by: Tagged || Untagged
+        stmt: SQLAlchemy select statement
+        tag_status: 'tagged' or 'untagged'
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
-
     if not tag_status:
-        pass
-    elif tag_status.lower() == "tagged":
-        query = query.filter_by(untagged=False)
+        return stmt
+
+    has_tags_subq = (
+        sa.select(tags_highlights.c.highlight_id).where(tags_highlights.c.highlight_id == Highlight.id).exists()
+    )
+
+    if tag_status.lower() == "tagged":
+        stmt = stmt.where(has_tags_subq)
     elif tag_status.lower() == "untagged":
-        query = query.filter_by(untagged=True)
-    return query
+        stmt = stmt.where(~has_tags_subq)
+
+    return stmt
 
 
-def filter_by_tags(query: query.Query, tag_ids: str):
-    """
+def filter_by_tags(stmt: sa.Select, tag_ids: str) -> sa.Select:
+    """Filter highlights by tag IDs (OR logic - highlights with any of the tags).
+
+    Uses EXISTS subquery to avoid duplicates when a highlight has multiple
+    matching tags, which is more compatible with ORDER BY than DISTINCT.
+
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        tag_ids (string): string of comma separated tag ids e.g. '1,53,23'
+        stmt: SQLAlchemy select statement
+        tag_ids: comma-separated tag IDs e.g. '1,53,23'
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
     if tag_ids is not None:
-        tag_ids = [int(tag) for tag in tag_ids.split(",")]
-        join_highlight_id = tags_highlights.c.highlight_id
-        join_tag_id = tags_highlights.c.tag_id
+        tag_id_list = [int(tag) for tag in tag_ids.split(",")]
+        tag_subq = (
+            sa.select(tags_highlights.c.highlight_id)
+            .where(
+                tags_highlights.c.highlight_id == Highlight.id,
+                tags_highlights.c.tag_id.in_(tag_id_list),
+            )
+            .exists()
+        )
+        stmt = stmt.where(tag_subq)
 
-        # join tags
-        query = query.join(tags_highlights, (join_highlight_id == Highlight.id))
-        # apply filter
-        query = query.filter(join_tag_id.in_(tag_ids))
-    return query
+    return stmt
 
 
-def filter_by_search_phrase(query: query.Query, search_phrase: str):
-    """filters by user supplied search phrase
+def filter_by_search_phrase(stmt: sa.Select, search_phrase: str) -> sa.Select:
+    """Filter highlights by search phrase (searches text, note, article title).
 
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        search_phrase (str): e.g "I like bananas"
+        stmt: SQLAlchemy select statement
+        search_phrase: e.g "I like bananas"
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
     if search_phrase is not None:
-        query = query.outerjoin(Article, Highlight.article_id == Article.id)
-        query = query.filter(
-            db.or_(
+        stmt = stmt.join(Article, Highlight.article_id == Article.id, isouter=True)
+        stmt = stmt.where(
+            sa.or_(
                 Highlight.text.ilike(f"%{search_phrase}%"),
                 Highlight.note.ilike(f"%{search_phrase}%"),
                 Article.title.ilike(f"%{search_phrase}%"),
             )
         )
-    return query
+
+    return stmt
 
 
-def apply_sorting(query: query.Query, created_sort: str):
-    """_summary_
+def apply_default_sorting(stmt: sa.Select, created_sort: str = None) -> sa.Select:
+    """Apply sorting for highlights list.
 
     Args:
-        query (flask_sqlalchemy.query.Query): base query object
-        created_sort (str): Sort by created_date - "asc" or "desc"
+        stmt: SQLAlchemy select statement
+        created_sort: 'asc' or 'desc' (default: desc)
     Returns:
-        query (flask_sqlalchemy.query.Query): updated query object
+        Modified select statement
     """
-    # then prepare to sort
-    order = []
+    if created_sort and created_sort.lower() == "asc":
+        stmt = stmt.order_by(Highlight.created_date.asc())
+    else:
+        stmt = stmt.order_by(Highlight.created_date.desc())
 
-    if not created_sort or created_sort.lower() == "desc":
-        col = getattr(Highlight, "created_date")
-        col = col.desc()
-        order.append(col)
-    elif created_sort.lower() == "asc":
-        col = getattr(Highlight, "created_date")
-        col = col.asc()
-        order.append(col)
-
-    # apply the sorting
-    query = query.order_by(*order)
-
-    return query
+    return stmt
