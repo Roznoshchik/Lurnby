@@ -231,7 +231,7 @@ they shouldn't include random comments or the micro details of every file change
 ## Working state
 If I say status task - <TASK NAME>
 
-Explore the .local file for files of the following format
+Explore the .claude folder for files of the following format
 Check the task name or if no task name then the branch name
 then check
 claude-progress-<branch name>.md
