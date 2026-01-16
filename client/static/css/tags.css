@@ -1,0 +1,199 @@
+/* Tags Page Styles */
+
+/* ================================================================
+   Content Container
+   ================================================================ */
+
+.content-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .content-container {
+    padding-left: var(--space-6);
+    padding-right: var(--space-6);
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-container {
+    padding-left: var(--space-8);
+    padding-right: var(--space-8);
+  }
+}
+
+/* ================================================================
+   State Styles (Empty, Loading, Error)
+   ================================================================ */
+
+.empty-state,
+.loading-state,
+.error-state {
+  text-align: center;
+  padding: var(--space-12) 0;
+}
+
+.empty-state .material-symbols-outlined {
+  font-size: 4rem;
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  display: block;
+  margin: 0 auto var(--space-4);
+}
+
+.empty-state h3 {
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-2);
+}
+
+.empty-state p {
+  color: var(--muted-foreground);
+  margin: 0 0 var(--space-4);
+}
+
+.loading-state {
+  color: var(--muted-foreground);
+}
+
+.error-state p {
+  color: var(--destructive);
+  margin-bottom: var(--space-4);
+}
+
+/* ================================================================
+   Tags Grid
+   ================================================================ */
+
+.tags-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+  .tags-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 768px) {
+  .tags-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tags-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ================================================================
+   Filters Section
+   ================================================================ */
+
+.filters-section {
+  margin-bottom: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filter-row .material-symbols-outlined {
+  font-size: var(--font-size-base);
+  color: var(--muted-foreground);
+}
+
+.filter-label {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  margin-right: var(--space-2);
+}
+
+.filter-icon {
+  color: var(--muted-foreground);
+  font-size: var(--font-size-xl);
+}
+
+.filter-controls {
+  gap: var(--space-4);
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--ring);
+  box-shadow:
+    0 0 0 2px var(--ring-offset-background),
+    0 0 0 4px rgba(var(--ring-rgb), 0.2);
+}
+
+.search-input::placeholder {
+  color: var(--muted-foreground);
+}
+
+/* ================================================================
+   Pagination
+   ================================================================ */
+
+.pagination {
+  margin-top: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding-bottom: var(--space-20);
+}
+
+@media (min-width: 768px) {
+  .pagination {
+    padding-bottom: 0;
+  }
+}
+
+.pagination button {
+  min-width: 2.5rem;
+}
+
+.pagination-info {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding: 0 var(--space-2);
+}
+
+/* ================================================================
+   Tags Count
+   ================================================================ */
+
+.tags-count {
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+  padding-top: var(--space-4);
+  margin-top: var(--space-2);
+  border-top: 1px solid var(--border);
+}

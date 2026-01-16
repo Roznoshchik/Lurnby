@@ -21,6 +21,12 @@ def highlights():
     return render_template("client/highlights.html")
 
 
+@bp.get("/tags")
+def tags():
+    """Tags management page"""
+    return render_template("client/tags.html")
+
+
 @bp.get("/articles/<uuid>")
 @bp.get("/review")
 @bp.get("/settings")
