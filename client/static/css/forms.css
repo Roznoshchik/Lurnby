@@ -179,6 +179,42 @@ input[type="radio"]:disabled {
 }
 
 /* ================================================================
+   Toggle Switch (checkbox styled as toggle)
+   ================================================================ */
+
+input[type="checkbox"].toggle {
+  width: var(--space-9);
+  height: var(--space-5);
+  border-radius: var(--radius-pill);
+  background-color: var(--muted);
+  border: none;
+  position: relative;
+  transition: background-color 150ms ease;
+}
+
+input[type="checkbox"].toggle::after {
+  content: "";
+  position: absolute;
+  top: var(--space-0-5);
+  left: var(--space-0-5);
+  width: var(--space-4);
+  height: var(--space-4);
+  background-color: var(--background);
+  border-radius: var(--radius-circle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 150ms ease;
+}
+
+input[type="checkbox"].toggle:checked {
+  background-color: var(--primary);
+}
+
+input[type="checkbox"].toggle:checked::after {
+  transform: translateX(var(--space-4));
+  border: none;
+}
+
+/* ================================================================
    Labels
    ================================================================ */
 
