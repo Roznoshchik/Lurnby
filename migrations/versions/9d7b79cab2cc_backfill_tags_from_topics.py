@@ -6,6 +6,8 @@ Create Date: 2026-01-12 12:00:00.000000
 
 """
 
+import uuid as uuid_lib
+
 from alembic import op
 from sqlalchemy import text
 
@@ -17,10 +19,15 @@ branch_labels = None
 depends_on = None
 
 
+def generate_uuid():
+    return uuid_lib.uuid4().hex[:16]
+
+
 def upgrade():
     """
     For each Topic, create a Tag if one doesn't exist with matching normalized name.
     Uses lower(trim(name)) for matching.
+    If tag exists but has no uuid, generate one.
     """
     conn = op.get_bind()
 
@@ -45,7 +52,7 @@ def upgrade():
         existing = conn.execute(
             text(
                 """
-            SELECT id FROM tag
+            SELECT id, uuid FROM tag
             WHERE user_id = :user_id
             AND lower(trim(name)) = :normalized_name
         """
@@ -54,24 +61,40 @@ def upgrade():
         ).fetchone()
 
         if existing:
+            tag_id, tag_uuid = existing
             # Update last_used if topic's is more recent
-            conn.execute(
-                text(
-                    """
-                UPDATE tag
-                SET last_used = GREATEST(COALESCE(last_used, :last_used), COALESCE(:last_used, last_used))
-                WHERE id = :tag_id
-            """
-                ),
-                {"tag_id": existing[0], "last_used": last_used},
-            )
+            # Also set uuid if tag doesn't have one
+            if tag_uuid:
+                conn.execute(
+                    text(
+                        """
+                    UPDATE tag
+                    SET last_used = GREATEST(COALESCE(last_used, :last_used), COALESCE(:last_used, last_used))
+                    WHERE id = :tag_id
+                """
+                    ),
+                    {"tag_id": tag_id, "last_used": last_used},
+                )
+            else:
+                # Tag has no uuid - generate one
+                conn.execute(
+                    text(
+                        """
+                    UPDATE tag
+                    SET last_used = GREATEST(COALESCE(last_used, :last_used), COALESCE(:last_used, last_used)),
+                        uuid = :uuid
+                    WHERE id = :tag_id
+                """
+                    ),
+                    {"tag_id": tag_id, "last_used": last_used, "uuid": generate_uuid()},
+                )
         else:
-            # Create new tag
+            # Create new tag with generated uuid
             conn.execute(
                 text(
                     """
-                INSERT INTO tag (name, user_id, archived, last_used)
-                VALUES (:name, :user_id, :archived, :last_used)
+                INSERT INTO tag (name, user_id, archived, last_used, uuid)
+                VALUES (:name, :user_id, :archived, :last_used, :uuid)
             """
                 ),
                 {
@@ -79,6 +102,7 @@ def upgrade():
                     "user_id": user_id,
                     "archived": archived or False,
                     "last_used": last_used,
+                    "uuid": generate_uuid(),
                 },
             )
 
