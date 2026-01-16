@@ -128,12 +128,12 @@ def create_highlight():
             return bad_request("Something went wrong")
 
 
-@bp.get("/highlights/<id>")
+@bp.get("/highlights/<uuid>")
 @token_auth.login_required
-def get_highlight(id):
+def get_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
@@ -147,12 +147,12 @@ def get_highlight(id):
             return bad_request("Something went wrong")
 
 
-@bp.patch("/highlights/<id>")
+@bp.patch("/highlights/<uuid>")
 @token_auth.login_required
-def update_highlight(id):
+def update_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
         data = json.loads(request.data)
 
         if not highlight or highlight.user_id != user.id:
@@ -182,12 +182,12 @@ def update_highlight(id):
             return bad_request("Something went wrong")
 
 
-@bp.delete("/highlights/<id>")
+@bp.delete("/highlights/<uuid>")
 @token_auth.login_required
-def delete_highlight(id):
+def delete_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = Highlight.query.filter_by(uuid=uuid).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 

@@ -425,7 +425,7 @@ class GetHighlightApiTests(BaseTestCase):
         db.session.add(highlight)
         db.session.commit()
 
-        res = self.client.get(f"/api/highlights/{highlight.id}", headers={"Authorization": "Bearer abc123"})
+        res = self.client.get(f"/api/highlights/{highlight.uuid}", headers={"Authorization": "Bearer abc123"})
         data = json.loads(res.data)
         returned_highlight = data.get("highlight")
         self.assertEqual(res.status_code, 200)
@@ -462,7 +462,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         }
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.id}",
+            f"/api/highlights/{highlight.uuid}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -491,7 +491,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         }
 
         self.client.patch(
-            f"/api/highlights/{highlight.id}",
+            f"/api/highlights/{highlight.uuid}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -518,7 +518,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         tag_ids = [t.id for t in tags]
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.id}",
+            f"/api/highlights/{highlight.uuid}",
             json={"tags": tag_ids},
             headers={"Authorization": "Bearer abc123"},
         )
@@ -541,7 +541,7 @@ class UpdateHighlightApiTests(BaseTestCase):
         body = None
 
         res = self.client.patch(
-            f"/api/highlights/{highlight.id}",
+            f"/api/highlights/{highlight.uuid}",
             json=body,
             headers={"Authorization": "Bearer abc123"},
         )
@@ -615,11 +615,10 @@ class DeleteHighlightApiTests(BaseTestCase):
         db.session.add(highlight)
         db.session.commit()
 
-        highlight_id = highlight.id
-        res = self.client.delete(f"/api/highlights/{highlight_id}", headers={"Authorization": "Bearer abc123"})
+        res = self.client.delete(f"/api/highlights/{highlight.uuid}", headers={"Authorization": "Bearer abc123"})
         self.assertEqual(res.status_code, 200)
 
-        highlight = db.session.get(Highlight, highlight_id)
+        highlight = db.session.get(Highlight, highlight.id)
         self.assertTrue(highlight.archived)
 
 

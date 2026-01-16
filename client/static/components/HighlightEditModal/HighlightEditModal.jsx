@@ -33,7 +33,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     const fetchHighlight = async () => {
       setLoading(true)
       try {
-        const { data: response } = await api.get(ROUTES.API.highlight(highlight.id))
+        const { data: response } = await api.get(ROUTES.API.highlight(highlight.uuid))
         const data = response.highlight
         setFullHighlight(data)
         setText(data.text || '')
@@ -85,7 +85,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
         tags: selectedTagIds,
       }
 
-      const { data: response } = await api.patch(ROUTES.API.highlight(highlight.id), data)
+      const { data: response } = await api.patch(ROUTES.API.highlight(highlight.uuid), data)
       onSave?.(response.highlight)
       alert.success('Highlight updated')
       onClose()
@@ -103,7 +103,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     setError(null)
 
     try {
-      const { data: response } = await api.delete(ROUTES.API.highlight(highlight.id))
+      const { data: response } = await api.delete(ROUTES.API.highlight(highlight.uuid))
       onSave?.(response.highlight)
       alert.success('Highlight archived')
       onClose()
