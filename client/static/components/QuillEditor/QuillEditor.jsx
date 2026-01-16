@@ -1,11 +1,14 @@
 import { useRef, useEffect, useLayoutEffect } from 'preact/hooks'
 import { forwardRef } from 'preact/compat'
 import Quill from 'quill'
+import QuillMarkdown from 'quilljs-markdown'
 import 'quill/dist/quill.snow.css'
+import 'quilljs-markdown/dist/quilljs-markdown-common-style.css'
 import './QuillEditor.css'
 
 const DEFAULT_MODULES = {
   toolbar: [
+    [{ header: [1, 2, 3, 4, 5, 6, false] }],
     ['bold', 'italic', 'underline', 'strike'],
     ['blockquote', 'code-block'],
     [{ list: 'ordered' }, { list: 'bullet' }],
@@ -57,6 +60,9 @@ const QuillEditor = forwardRef(
         modules,
         bounds: boundsElement,
       })
+
+      // Enable markdown shortcuts
+      new QuillMarkdown(quill)
 
       if (ref) {
         ref.current = quill
