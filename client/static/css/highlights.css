@@ -172,9 +172,7 @@
 .search-input:focus {
   outline: none;
   border-color: var(--ring);
-  box-shadow:
-    0 0 0 2px var(--ring-offset-background),
-    0 0 0 4px rgba(var(--ring-rgb), 0.2);
+  box-shadow: 0 0 0 2px var(--ring);
 }
 
 .search-input::placeholder {
