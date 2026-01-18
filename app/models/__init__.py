@@ -4,11 +4,12 @@ from app.models.event import Event, update_user_last_action
 from app.models.approved_sender import Approved_Sender
 from app.models.notification import Notification
 from app.models.task import Task
-from app.models.article import Article, tags_articles, articles_lower_title_key
+from app.models.article import Article, articles_lower_title_key
 from app.models.message import Message
 from app.models.suggestion import Suggestion
-from app.models.highlight import Highlight, highlights_topics, tags_highlights
-from app.models.topic import Topic, tags_topics
+from app.models.associations import highlights_topics, tags_highlights, tags_articles, tags_topics
+from app.models.highlight import Highlight
+from app.models.topic import Topic
 from app.models.tag import Tag
 
 __all__ = [

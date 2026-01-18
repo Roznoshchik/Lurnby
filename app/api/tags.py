@@ -7,8 +7,9 @@ from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
 from app.api.errors import bad_request, LurnbyValueError, error_response
-from app.api.helpers.query_maker import apply_pagination
+from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.models import Event, Tag
+from app.models.associations import tags_highlights, tags_articles
 from app.models.event import EventName
 
 
@@ -22,23 +23,58 @@ def get_tags():
         page = request.args.get("page", "1")
         per_page = request.args.get("per_page", "150")
         status = request.args.get("status", "unarchived")  # all / archived / unarchived
+        search = request.args.get("q", "").strip()
 
         user = token_auth.current_user()
 
-        # Build query with SQLAlchemy 2.0 select
-        stmt = sa.select(Tag).where(Tag.user_id == user.id)
+        # Build query with computed counts
+        stmt = (
+            sa.select(
+                Tag,
+                sa.func.count(sa.distinct(tags_highlights.c.highlight_id)).label("h_count"),
+                sa.func.count(sa.distinct(tags_articles.c.article_id)).label("a_count"),
+            )
+            .outerjoin(tags_highlights, tags_highlights.c.tag_id == Tag.id)
+            .outerjoin(tags_articles, tags_articles.c.tag_id == Tag.id)
+            .where(Tag.user_id == user.id)
+            .group_by(Tag.id)
+        )
 
         if status.lower() == "archived":
             stmt = stmt.where(Tag.archived.is_(True))
         elif status.lower() != "all":
             stmt = stmt.where(Tag.archived.is_(False))
 
+        if search:
+            stmt = stmt.where(Tag.name.ilike(f"%{search}%"))
+
         stmt = stmt.order_by(Tag.name.asc())
 
-        tag_list, has_next = apply_pagination(stmt, page, per_page)
-        tags = [tag.to_dict() for tag in tag_list]
+        # Get total count before pagination
+        count_stmt = sa.select(Tag).where(Tag.user_id == user.id)
+        if status.lower() == "archived":
+            count_stmt = count_stmt.where(Tag.archived.is_(True))
+        elif status.lower() != "all":
+            count_stmt = count_stmt.where(Tag.archived.is_(False))
+        if search:
+            count_stmt = count_stmt.where(Tag.name.ilike(f"%{search}%"))
+        total = get_total_count(count_stmt)
 
-        return jsonify(tags=tags, has_next=has_next)
+        rows, has_next = apply_pagination(
+            stmt,
+            page=page,
+            per_page=per_page,
+            scalars=False,
+        )
+
+        tags = []
+        for tag, h_count, a_count in rows:
+            tag_dict = tag.to_dict()
+            tag_dict["highlight_count"] = h_count
+            tag_dict["article_count"] = a_count
+            tags.append(tag_dict)
+
+        return jsonify(tags=tags, has_next=has_next, total=total)
 
     except Exception as e:
         if isinstance(e, LurnbyValueError):
@@ -50,14 +86,33 @@ def get_tags():
 
 @bp.route("/tags", methods=["POST"])
 @token_auth.login_required
-def tag():
+def create_tag():
     try:
         user = token_auth.current_user()
         data = json.loads(request.data) if request.data else None
         if not data or not data.get("name"):
             raise LurnbyValueError("Missing data in payload")
 
-        tag = Tag(user_id=user.id, name=data.get("name"))
+        name = data.get("name").strip()
+
+        # Check if a tag with this name already exists
+        existing_tag = Tag.query.filter(
+            Tag.user_id == user.id,
+            sa.func.lower(Tag.name) == name.lower(),
+        ).first()
+
+        if existing_tag:
+            if existing_tag.archived:
+                # Unarchive the existing tag
+                existing_tag.archived = False
+                ev = Event.add(EventName.UPDATED_TAG, user=user)
+                db.session.add(ev)
+                db.session.commit()
+                return jsonify(tag=existing_tag.to_dict()), 200
+            else:
+                raise LurnbyValueError("A tag with this name already exists")
+
+        tag = Tag(user_id=user.id, name=name)
         if uuid := data.get("uuid"):
             tag.uuid = uuid
         db.session.add(tag)

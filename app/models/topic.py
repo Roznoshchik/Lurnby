@@ -3,14 +3,7 @@ from datetime import datetime
 from sqlalchemy import func
 
 from app.models.base import db
-from app.models.highlight import highlights_topics
-
-
-tags_topics = db.Table(
-    "tags_topics",
-    db.Column("tag_id", db.Integer, db.ForeignKey("tag.id"), nullable=False),
-    db.Column("topic_id", db.Integer, db.ForeignKey("topic.id"), nullable=False),
-)
+from app.models.associations import highlights_topics, tags_topics
 
 
 class Topic(db.Model):

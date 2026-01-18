@@ -1,4 +1,4 @@
-/* Highlights Page Styles */
+/* Tags Page Styles */
 
 /* ================================================================
    Content Container
@@ -50,7 +50,7 @@
 
 .empty-state p {
   color: var(--muted-foreground);
-  margin: 0;
+  margin: 0 0 var(--space-4);
 }
 
 .loading-state {
@@ -63,24 +63,30 @@
 }
 
 /* ================================================================
-   Highlights Grid
+   Tags Grid
    ================================================================ */
 
-.highlights-grid {
+.tags-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: var(--space-6);
+  gap: var(--space-4);
 }
 
-@media (min-width: 768px) {
-  .highlights-grid {
+@media (min-width: 640px) {
+  .tags-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-@media (min-width: 1024px) {
-  .highlights-grid {
+@media (min-width: 768px) {
+  .tags-grid {
     grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .tags-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -111,36 +117,6 @@
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
   margin-right: var(--space-2);
-}
-
-.tag-filter-row {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.tag-filter-row .material-symbols-outlined {
-  font-size: var(--font-size-base);
-  color: var(--muted-foreground);
-  margin-top: var(--space-1-5);
-}
-
-.tag-filter-row .filter-label {
-  margin-top: var(--space-1);
-}
-
-.tag-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
-
-.selected-tags {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
 }
 
 .filter-icon {
@@ -180,25 +156,6 @@
 }
 
 /* ================================================================
-   Section Styles
-   ================================================================ */
-
-.section-title {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-  color: var(--foreground);
-  margin: 0 0 var(--space-4);
-}
-
-.section-title .material-symbols-outlined {
-  font-size: var(--font-size-2xl);
-  color: var(--muted-foreground);
-}
-
-/* ================================================================
    Pagination
    ================================================================ */
 
@@ -217,12 +174,6 @@
   }
 }
 
-.pagination-pages {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
 .pagination button {
   min-width: 2.5rem;
 }
@@ -234,30 +185,13 @@
 }
 
 /* ================================================================
-   Highlights Count
+   Tags Count
    ================================================================ */
 
-.highlights-count {
+.tags-count {
   font-size: var(--font-size-sm);
   color: var(--muted-foreground);
   padding-top: var(--space-4);
   margin-top: var(--space-2);
   border-top: 1px solid var(--border);
-}
-
-/* Tag badges in filter display */
-.tag-badge {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.tag-badge .tag-remove {
-  font-size: var(--font-size-sm);
-  opacity: 0.7;
-}
-
-.tag-badge:hover .tag-remove {
-  opacity: 1;
 }

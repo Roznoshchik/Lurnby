@@ -4,7 +4,13 @@ import Icon from '../Icon/Icon'
 import { getTagColorClass } from '../../utils/helpers'
 import './Combobox.css'
 
-export default function Combobox({ options, selected, onSelect, placeholder = 'Select...' }) {
+export default function Combobox({
+  options,
+  selected,
+  onSelect,
+  placeholder = 'Select...',
+  onCreate,
+}) {
   const [open, setOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [highlightedIndex, setHighlightedIndex] = useState(0)
@@ -57,29 +63,49 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
     )
   }, [options, searchQuery])
 
+  // Show "Create" option when onCreate is provided and no exact match exists
+  const trimmedQuery = searchQuery.trim()
+  const showCreateOption =
+    onCreate &&
+    trimmedQuery &&
+    !options.some((opt) => opt.label.toLowerCase() === trimmedQuery.toLowerCase())
+
+  // Total navigable items (filtered options + create option if shown)
+  const totalItems = filteredOptions.length + (showCreateOption ? 1 : 0)
+
   const handleKeyDown = (e) => {
     if (!open) return
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setHighlightedIndex((prev) => (prev < filteredOptions.length - 1 ? prev + 1 : 0))
+        setHighlightedIndex((prev) => (prev < totalItems - 1 ? prev + 1 : 0))
         break
       case 'ArrowUp':
         e.preventDefault()
-        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : filteredOptions.length - 1))
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : totalItems - 1))
         break
       case 'Enter':
-      case ' ':
         e.preventDefault()
-        if (filteredOptions[highlightedIndex]) {
+        // Create option is at the end (index = filteredOptions.length)
+        if (showCreateOption && highlightedIndex === filteredOptions.length) {
+          handleCreate()
+        } else if (filteredOptions[highlightedIndex]) {
           onSelect(filteredOptions[highlightedIndex].value)
         }
         break
       case 'Escape':
         e.preventDefault()
+        e.stopPropagation()
         setOpen(false)
         break
+    }
+  }
+
+  const handleCreate = () => {
+    if (onCreate && searchQuery.trim()) {
+      onCreate(searchQuery.trim())
+      setSearchQuery('')
     }
   }
 
@@ -107,7 +133,10 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
               <Icon
                 name="close"
                 className="clear-icon"
-                onClick={() => setSearchQuery('')}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSearchQuery('')
+                }}
                 onKeyDown={(e) => e.key === 'Enter' && setSearchQuery('')}
                 role="button"
                 tabIndex={0}
@@ -116,38 +145,58 @@ export default function Combobox({ options, selected, onSelect, placeholder = 'S
           </div>
 
           <div ref={optionsRef} className="combobox-options">
-            {filteredOptions.length === 0 ? (
+            {filteredOptions.length === 0 && !showCreateOption ? (
               <div className="combobox-empty">No tags found.</div>
             ) : (
-              filteredOptions.map((option, index) => {
-                const isHighlighted = index === highlightedIndex
-                return (
-                  <div
-                    key={option.value}
-                    className={`combobox-option ${isHighlighted ? 'highlighted' : ''}`}
-                    onClick={() => {
-                      onSelect(option.value)
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault()
+              <>
+                {filteredOptions.map((option, index) => {
+                  const isHighlighted = index === highlightedIndex
+                  return (
+                    <div
+                      key={option.value}
+                      className={`combobox-option ${isHighlighted ? 'highlighted' : ''}`}
+                      onClick={() => {
                         onSelect(option.value)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          onSelect(option.value)
+                        }
+                      }}
+                      onMouseEnter={() => setHighlightedIndex(index)}
+                      role="option"
+                      tabIndex={0}
+                      aria-selected={selected.includes(option.value)}
+                    >
+                      <Icon
+                        name="check"
+                        className={`check-icon ${selected.includes(option.value) ? '' : 'hidden'}`}
+                      />
+                      <span className={`tag-color-dot ${getTagColorClass(option.label)}`} />
+                      {option.label}
+                    </div>
+                  )
+                })}
+                {showCreateOption && (
+                  <div
+                    className={`combobox-option combobox-create-option ${highlightedIndex === filteredOptions.length ? 'highlighted' : ''}`}
+                    onClick={handleCreate}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleCreate()
                       }
                     }}
-                    onMouseEnter={() => setHighlightedIndex(index)}
+                    onMouseEnter={() => setHighlightedIndex(filteredOptions.length)}
                     role="option"
                     tabIndex={0}
-                    aria-selected={selected.includes(option.value)}
                   >
-                    <Icon
-                      name="check"
-                      className={`check-icon ${selected.includes(option.value) ? '' : 'hidden'}`}
-                    />
-                    <span className={`tag-color-dot ${getTagColorClass(option.label)}`} />
-                    {option.label}
+                    <Icon name="add" className="create-icon" />
+                    Create "{searchQuery.trim()}"
                   </div>
-                )
-              })
+                )}
+              </>
             )}
           </div>
         </div>

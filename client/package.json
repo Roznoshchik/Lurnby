@@ -16,6 +16,7 @@
   "dependencies": {
     "preact": "^10.19.3",
     "quill": "^2.0.3",
+    "quilljs-markdown": "^1.2.0",
     "sonner": "^2.0.7"
   },
   "devDependencies": {

@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import selectinload
 
 from app import db, CustomLogger
 from app.api import bp
@@ -12,7 +13,7 @@ from app.api.helpers.add_article_methods import (
     process_url_entry,
     process_file_upload,
 )
-from app.models import Article, Event
+from app.models import Article, Event, Tag
 from app.models.event import EventName
 from app.api.errors import bad_request, error_response
 from app.api.helpers.update_tags import update_tags
@@ -71,9 +72,17 @@ def get_articles():
 
         # Build main query with SQLAlchemy 2.0 select
         # Use .isnot(True) to include NULL processing values (old articles)
-        stmt = sa.select(Article).where(
-            Article.user_id == user.id,
-            Article.processing.isnot(True),
+        # Eager load tags and highlights to avoid N+1 queries
+        stmt = (
+            sa.select(Article)
+            .where(
+                Article.user_id == user.id,
+                Article.processing.isnot(True),
+            )
+            .options(
+                selectinload(Article.tags.and_(Tag.archived.is_(False))),
+                selectinload(Article.highlights),
+            )
         )
         stmt = aqm.filter_by_status(stmt, status)
         stmt = aqm.filter_by_tags(stmt, tag_ids)

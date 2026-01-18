@@ -29,7 +29,7 @@ def create_zip_file_for_article(article: Article, path: str, ext: str):
         zip_path = os.path.join(path, f"{zip_title}.zip")
 
         article_dict = create_plain_text_article_dict(article)
-        article_highlights = create_list_of_highlight_dicts(article.highlights.all())
+        article_highlights = create_list_of_highlight_dicts(list(article.highlights))
 
         if ext == "csv":
             article_path, highlights_path = export_to_csv(path, article_dict, article_highlights)
@@ -183,7 +183,7 @@ def create_list_of_highlight_dicts(highlights):
                 "note": make_plain_text(highlight.note) if highlight.note else None,
                 "prompt": make_plain_text(highlight.prompt) if highlight.prompt else None,
                 "source": highlight.source,
-                "tags": ", ".join([tag.name for tag in highlight.tags.all()]),
+                "tags": ", ".join([tag.name for tag in highlight.tags]),
                 "topics": ", ".join([topic.title for topic in highlight.topics.all()]),
             }
         )

@@ -1,6 +1,6 @@
 import { useState } from 'preact/hooks'
-import { login } from '../../utils/api'
-import { ROUTES } from '../../utils/routes'
+import { login } from '../../services/api'
+import { ROUTES } from '../../services/routes'
 import Button from '../Button/Button'
 import './Login.css'
 

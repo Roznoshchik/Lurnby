@@ -1,0 +1,84 @@
+.tag-card {
+  height: 100%;
+}
+
+.tag-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+}
+
+.tag-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tag-color-indicator {
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.tag-color-indicator.tag-color-0 {
+  background-color: var(--tag-color-0);
+}
+.tag-color-indicator.tag-color-1 {
+  background-color: var(--tag-color-1);
+}
+.tag-color-indicator.tag-color-2 {
+  background-color: var(--tag-color-2);
+}
+.tag-color-indicator.tag-color-3 {
+  background-color: var(--tag-color-3);
+}
+.tag-color-indicator.tag-color-4 {
+  background-color: var(--tag-color-4);
+}
+.tag-color-indicator.tag-color-5 {
+  background-color: var(--tag-color-5);
+}
+.tag-color-indicator.tag-color-6 {
+  background-color: var(--tag-color-6);
+}
+.tag-color-indicator.tag-color-7 {
+  background-color: var(--tag-color-7);
+}
+.tag-color-indicator.tag-color-8 {
+  background-color: var(--tag-color-8);
+}
+
+.tag-name {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  color: var(--foreground);
+  margin: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.archived-badge {
+  flex-shrink: 0;
+}
+
+.tag-stats {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.tag-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--muted-foreground);
+}
+
+.tag-stat .icon {
+  font-size: var(--font-size-base);
+}

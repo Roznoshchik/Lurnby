@@ -10,7 +10,14 @@ import { api } from '../../services/api'
 import { ROUTES } from '../../services/routes'
 import './HighlightEditModal.css'
 
-export default function HighlightEditModal({ highlight, allTags, isOpen, onClose, onSave }) {
+export default function HighlightEditModal({
+  highlight,
+  allTags,
+  isOpen,
+  onClose,
+  onSave,
+  onTagCreate,
+}) {
   const [loading, setLoading] = useState(true)
   const [fullHighlight, setFullHighlight] = useState(null)
   const [text, setText] = useState('')
@@ -33,7 +40,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     const fetchHighlight = async () => {
       setLoading(true)
       try {
-        const { data: response } = await api.get(ROUTES.API.highlight(highlight.id))
+        const { data: response } = await api.get(ROUTES.API.highlight(highlight.uuid))
         const data = response.highlight
         setFullHighlight(data)
         setText(data.text || '')
@@ -72,6 +79,18 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     )
   }
 
+  const handleTagCreate = async (name) => {
+    try {
+      const { data } = await api.post(ROUTES.API.TAGS, { name })
+      const newTag = data.tag
+      onTagCreate?.(newTag)
+      setSelectedTagIds((prev) => [...prev, newTag.id])
+    } catch (err) {
+      console.error('Error creating tag:', err)
+      alert.error('Failed to create tag')
+    }
+  }
+
   const handleSave = async () => {
     setSaving(true)
     setError(null)
@@ -85,7 +104,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
         tags: selectedTagIds,
       }
 
-      const { data: response } = await api.patch(ROUTES.API.highlight(highlight.id), data)
+      const { data: response } = await api.patch(ROUTES.API.highlight(highlight.uuid), data)
       onSave?.(response.highlight)
       alert.success('Highlight updated')
       onClose()
@@ -103,7 +122,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     setError(null)
 
     try {
-      const { data: response } = await api.delete(ROUTES.API.highlight(highlight.id))
+      const { data: response } = await api.delete(ROUTES.API.highlight(highlight.uuid))
       onSave?.(response.highlight)
       alert.success('Highlight archived')
       onClose()
@@ -132,9 +151,9 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
         variant="ghost"
         onClick={handleArchive}
         disabled={saving || loading}
-        className='archive-btn'
+        className="archive-btn"
       >
-        <Icon name='archive' />
+        <Icon name="archive" />
         'Archive'
       </Button>
       <div className="footer-spacer" />
@@ -223,6 +242,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
                 selected={selectedTagIds}
                 onSelect={handleTagToggle}
                 placeholder="Select tags..."
+                onCreate={handleTagCreate}
               />
               {selectedTagObjects.length > 0 && (
                 <div className="selected-tags">

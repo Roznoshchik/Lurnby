@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import selectinload
 
 from flask import request, jsonify, url_for
 import json
@@ -16,7 +17,7 @@ from app.api.helpers.add_highlight_methods import (
 )
 from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.update_tags import update_tags
-from app.models import Highlight, Event
+from app.models import Highlight, Event, Tag
 from app.models.event import EventName
 
 
@@ -63,7 +64,12 @@ def get_highlights():
         tag_ids = request.args.get("tag_ids", None)
 
         # Build query with SQLAlchemy 2.0 select
-        stmt = sa.select(Highlight).where(Highlight.user_id == user.id)
+        # Eager load non-archived tags to avoid N+1 queries
+        stmt = (
+            sa.select(Highlight)
+            .where(Highlight.user_id == user.id)
+            .options(selectinload(Highlight.tags.and_(Tag.archived.is_(False))))
+        )
 
         # Apply filters
         stmt = hqm.filter_by_status(stmt, status)
@@ -128,12 +134,12 @@ def create_highlight():
             return bad_request("Something went wrong")
 
 
-@bp.get("/highlights/<id>")
+@bp.get("/highlights/<uuid>")
 @token_auth.login_required
-def get_highlight(id):
+def get_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
@@ -147,12 +153,12 @@ def get_highlight(id):
             return bad_request("Something went wrong")
 
 
-@bp.patch("/highlights/<id>")
+@bp.patch("/highlights/<uuid>")
 @token_auth.login_required
-def update_highlight(id):
+def update_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         data = json.loads(request.data)
 
         if not highlight or highlight.user_id != user.id:
@@ -182,12 +188,12 @@ def update_highlight(id):
             return bad_request("Something went wrong")
 
 
-@bp.delete("/highlights/<id>")
+@bp.delete("/highlights/<uuid>")
 @token_auth.login_required
-def delete_highlight(id):
+def delete_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = db.session.get(Highlight, id)
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 

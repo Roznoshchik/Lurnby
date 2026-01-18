@@ -11,7 +11,7 @@
  * - 5xx (server errors): retries up to 3 consecutive failures
  */
 
-import { api } from "./api.js";
+import { api } from './api.js'
 
 // Track active polls for cleanup
 const activePolls = new Map()

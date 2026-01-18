@@ -159,7 +159,9 @@ function ArticlesList() {
     } else {
       // Update the article in both lists
       setArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
-      setRecentArticles((prev) => prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)))
+      setRecentArticles((prev) =>
+        prev.map((a) => (a.id === updatedArticle.id ? updatedArticle : a)),
+      )
     }
   }
 
@@ -359,6 +361,7 @@ function ArticlesList() {
           isOpen={!!editingArticle}
           onClose={() => setEditingArticle(null)}
           onSave={handleArticleSaved}
+          onTagCreate={(tag) => setAllTags((prev) => [...prev, tag])}
         />
       )}
 
@@ -367,6 +370,7 @@ function ArticlesList() {
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         tags={allTags}
+        onTagCreate={(tag) => setAllTags((prev) => [...prev, tag])}
         onSuccess={(response) => {
           setShowAddModal(false)
           const { article, processing, task_id } = response

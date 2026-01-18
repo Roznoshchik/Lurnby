@@ -50,7 +50,7 @@ class AddArticleApiTests(BaseTestCase):
         article = Article.query.filter_by(id=1).first()
 
         self.assertEqual(res.status_code, 202)  # 202 Accepted for file uploads
-        self.assertEqual(str(article.uuid), data["article"]["id"])
+        self.assertEqual(str(article.uuid), data["article"]["uuid"])
         self.assertTrue("upload_url" in data)
         self.assertEqual(data["upload_url"], "foo.com")
         self.assertEqual(".pdf", data["upload_file_ext"])
@@ -77,10 +77,10 @@ class AddArticleApiTests(BaseTestCase):
             headers={"Authorization": "Bearer abc123"},
         )
         article = Article.query.filter_by(id=1).first()
-        tags = [tag.name for tag in article.tags.all()]
+        tags = [tag.name for tag in article.tags]
 
         self.assertEqual(res.status_code, 201)
-        self.assertEqual(str(article.uuid), res.json.get("article")["id"])
+        self.assertEqual(str(article.uuid), res.json.get("article")["uuid"])
         self.assertEqual("Hello old friend!", article.notes)
         self.assertEqual("The road to being a master", article.title)
         self.assertTrue("This story was 25 years in the making" in article.content)
@@ -154,7 +154,7 @@ class AddArticleApiTests(BaseTestCase):
             headers={"Authorization": "Bearer abc123"},
         )
 
-        self.assertEqual(res.json["article"]["id"], str(article.uuid))
+        self.assertEqual(res.json["article"]["uuid"], str(article.uuid))
         self.assertTrue("task_id" in res.json)
         self.assertTrue(res.json["processing"])
 
