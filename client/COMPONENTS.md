@@ -20,6 +20,7 @@ import Icon from './components/Icon/Icon'
 - `variant`: 'outlined' (default) | 'rounded' | 'sharp'
 - `filled`: boolean - use filled variant
 - `className`: additional CSS classes
+- `...props`: additional props passed through (onClick, etc.)
 
 ### Button
 Styled button with variants.
@@ -65,6 +66,52 @@ import Progress from './components/Progress/Progress'
 - `value`: 0-100 percentage
 - `className`: additional CSS classes
 
+### Card
+Base card component with variants and padding options.
+
+```jsx
+import Card from './components/Card/Card'
+
+<Card>Default card</Card>
+<Card variant="outline">Outline card</Card>
+<Card padding="lg">Large padding</Card>
+<Card as="button" interactive onClick={handleClick}>Clickable card</Card>
+<Card as="article" className="article-card">Semantic card</Card>
+```
+
+**Props:**
+- `variant`: 'default' | 'outline'
+- `padding`: 'sm' | 'md' | 'lg' | 'xl'
+- `interactive`: boolean - adds hover effects and cursor pointer
+- `as`: HTML element or component to render as ('div', 'button', 'article', etc.)
+- `onClick`: click handler (useful with interactive)
+- `className`: additional CSS classes
+
+### Modal
+Reusable modal dialog with overlay, header, body, and footer.
+
+```jsx
+import Modal from './components/Modal/Modal'
+
+<Modal
+  isOpen={showModal}
+  onClose={() => setShowModal(false)}
+  title="Modal Title"
+  size="lg"
+  footer={<Button onClick={save}>Save</Button>}
+>
+  <p>Modal content goes here</p>
+</Modal>
+```
+
+**Props:**
+- `isOpen`: boolean - controls visibility
+- `onClose`: callback when modal should close
+- `title`: modal header title
+- `size`: 'sm' | 'md' | 'lg' | 'xl'
+- `footer`: JSX for footer actions
+- `className`: additional CSS classes
+
 ## Layout Components
 
 ### Layout
@@ -108,55 +155,6 @@ import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary'
 </ErrorBoundary>
 ```
 
-### Card
-Base card component with variants and padding options.
-
-```jsx
-import Card from './components/Card/Card'
-
-<Card>Default card</Card>
-<Card variant="outline">Outline card</Card>
-<Card padding="lg">Large padding</Card>
-<Card as="button" interactive onClick={handleClick}>Clickable card</Card>
-<Card as="article" className="article-card">Semantic card</Card>
-```
-
-**Props:**
-- `variant`: 'default' | 'outline'
-- `padding`: 'sm' | 'md' | 'lg' | 'xl'
-- `interactive`: boolean - adds hover effects and cursor pointer
-- `as`: HTML element or component to render as ('div', 'button', 'article', etc.)
-- `onClick`: click handler (useful with interactive)
-- `className`: additional CSS classes
-
-## Content Components
-
-### ArticleCard
-Full article card for articles grid.
-
-```jsx
-import ArticleCard from './components/ArticleCard/ArticleCard'
-
-<ArticleCard
-  article={articleObj}
-  onOpen={() => openArticle(article)}
-  onEdit={() => editArticle(article)}
-/>
-```
-
-### ArticlePreview
-Compact article card for "Recently Opened" section.
-
-```jsx
-import ArticlePreview from './components/ArticlePreview/ArticlePreview'
-
-<ArticlePreview
-  article={articleObj}
-  onOpen={() => openArticle(article)}
-  onEdit={() => editArticle(article)}
-/>
-```
-
 ## Form Components
 
 ### Select
@@ -174,7 +172,7 @@ import Select from './components/Select/Select'
 ```
 
 ### Combobox
-Multi-select dropdown with search.
+Multi-select dropdown with search and optional inline creation.
 
 ```jsx
 import Combobox from './components/Combobox/Combobox'
@@ -184,8 +182,16 @@ import Combobox from './components/Combobox/Combobox'
   selected={selectedTags}
   onSelect={toggleTag}
   placeholder="Select tags..."
+  onCreate={(name) => createTag(name)}
 />
 ```
+
+**Props:**
+- `options`: array of `{ value, label }` objects
+- `selected`: array of selected values
+- `onSelect`: callback when option is selected/deselected
+- `placeholder`: placeholder text
+- `onCreate`: callback to create new item (shows "Create [query]" option when provided)
 
 ### QuillEditor
 Rich text editor using Quill.js. Uncontrolled component with ref for accessing Quill instance.
@@ -215,52 +221,3 @@ const editorRef = useRef(null)
 - `onTextChange`: callback on content change
 - `onSelectionChange`: callback on selection change
 - `className`: additional CSS classes
-
-## Modal Components
-
-### Modal
-Reusable modal dialog with overlay, header, body, and footer.
-
-```jsx
-import Modal from './components/Modal/Modal'
-
-<Modal
-  isOpen={showModal}
-  onClose={() => setShowModal(false)}
-  title="Modal Title"
-  size="lg"
-  footer={<Button onClick={save}>Save</Button>}
->
-  <p>Modal content goes here</p>
-</Modal>
-```
-
-**Props:**
-- `isOpen`: boolean - controls visibility
-- `onClose`: callback when modal should close
-- `title`: modal header title
-- `size`: 'sm' | 'md' | 'lg' | 'xl'
-- `footer`: JSX for footer actions
-- `className`: additional CSS classes
-
-### ArticleEditModal
-Modal for editing article metadata, notes, and content.
-
-```jsx
-import ArticleEditModal from './components/ArticleEditModal/ArticleEditModal'
-
-<ArticleEditModal
-  article={articleObj}
-  allTags={tagsArray}
-  isOpen={!!editingArticle}
-  onClose={() => setEditingArticle(null)}
-  onSave={(updatedArticle) => handleSave(updatedArticle)}
-/>
-```
-
-**Props:**
-- `article`: article object to edit
-- `allTags`: array of all available tags
-- `isOpen`: boolean - controls visibility
-- `onClose`: callback when modal closes
-- `onSave`: callback with updated article after save
