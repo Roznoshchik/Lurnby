@@ -139,7 +139,7 @@ def create_highlight():
 def get_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
@@ -158,7 +158,7 @@ def get_highlight(uuid):
 def update_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         data = json.loads(request.data)
 
         if not highlight or highlight.user_id != user.id:
@@ -193,7 +193,7 @@ def update_highlight(uuid):
 def delete_highlight(uuid):
     try:
         user = token_auth.current_user()
-        highlight = Highlight.query.filter_by(uuid=uuid).first()
+        highlight = db.session.scalars(db.select(Highlight).where(Highlight.uuid == uuid)).first()
         if not highlight or highlight.user_id != user.id:
             return error_response(404, "Resource not found")
 
