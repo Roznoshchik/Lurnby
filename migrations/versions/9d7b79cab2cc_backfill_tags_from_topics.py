@@ -106,6 +106,18 @@ def upgrade():
                 },
             )
 
+    # Backfill uuid for any remaining tags that don't have one
+    # Include id to guarantee uniqueness
+    conn.execute(
+        text(
+            """
+        UPDATE tag
+        SET uuid = substr(md5(random()::text || id::text || clock_timestamp()::text), 1, 16)
+        WHERE uuid IS NULL
+    """
+        )
+    )
+
 
 def downgrade():
     # Data migration - no automatic downgrade

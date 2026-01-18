@@ -232,14 +232,8 @@ function TagsList() {
               <p>
                 {appliedFilters.q
                   ? 'Try a different search term'
-                  : 'Create your first tag to get started'}
+                  : 'Create tags when adding highlights or articles'}
               </p>
-              {!appliedFilters.q && (
-                <Button variant="default" onClick={() => setShowCreateModal(true)}>
-                  <Icon name="add" />
-                  Create Tag
-                </Button>
-              )}
             </div>
           )}
         </div>
