@@ -60,21 +60,15 @@ def get_tags():
             count_stmt = count_stmt.where(Tag.name.ilike(f"%{search}%"))
         total = get_total_count(count_stmt)
 
-        # Apply pagination manually since we have a complex query
-        if per_page.lower() == "all":
-            results = db.session.execute(stmt).all()
-            has_next = False
-        else:
-            page_int = int(page)
-            per_page_int = int(per_page)
-            offset = (page_int - 1) * per_page_int
-            paginated_stmt = stmt.offset(offset).limit(per_page_int + 1)
-            results = db.session.execute(paginated_stmt).all()
-            has_next = len(results) > per_page_int
-            results = results[:per_page_int]
+        rows, has_next = apply_pagination(
+            stmt,
+            page=page,
+            per_page=per_page,
+            scalars=False,
+        )
 
         tags = []
-        for tag, h_count, a_count in results:
+        for tag, h_count, a_count in rows:
             tag_dict = tag.to_dict()
             tag_dict["highlight_count"] = h_count
             tag_dict["article_count"] = a_count
