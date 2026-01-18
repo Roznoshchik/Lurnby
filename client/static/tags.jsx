@@ -48,7 +48,6 @@ function TagsList() {
 
   // Modal states
   const [editingTag, setEditingTag] = useState(null)
-  const [showCreateModal, setShowCreateModal] = useState(false)
 
   useEffect(() => {
     fetchTags()
@@ -269,13 +268,6 @@ function TagsList() {
         />
       )}
 
-      {/* Create Tag Modal */}
-      <TagEditModal
-        tag={null}
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSave={handleTagSaved}
-      />
     </>
   )
 }

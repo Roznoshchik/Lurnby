@@ -13,16 +13,10 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
-  const isNew = !tag?.id
-
   useEffect(() => {
     if (isOpen && tag) {
       setName(tag.name || '')
       setArchived(tag.archived || false)
-      setError(null)
-    } else if (isOpen && !tag) {
-      setName('')
-      setArchived(false)
       setError(null)
     }
   }, [isOpen, tag])
@@ -37,22 +31,16 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
     setError(null)
 
     try {
-      let response
-      if (isNew) {
-        response = await api.post(ROUTES.API.TAGS, { name: name.trim() })
-        alert.success('Tag created')
-      } else {
-        response = await api.patch(`${ROUTES.API.TAGS}/${tag.uuid}`, {
-          name: name.trim(),
-          archived,
-        })
-        alert.success('Tag updated')
-      }
+      const response = await api.patch(`${ROUTES.API.TAGS}/${tag.uuid}`, {
+        name: name.trim(),
+        archived,
+      })
+      alert.success('Tag updated')
       onSave?.(response.data.tag)
       onClose()
     } catch (err) {
       console.error('Error saving tag:', err)
-      alert.error(isNew ? 'Failed to create tag' : 'Failed to save changes')
+      alert.error('Failed to save changes')
       setError('Failed to save. Please try again.')
     } finally {
       setSaving(false)
@@ -83,30 +71,22 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
 
   const footer = (
     <>
-      {!isNew && (
-        <Button variant="ghost" onClick={handleDelete} disabled={saving} className="delete-btn">
-          <Icon name="delete" />
-          Delete
-        </Button>
-      )}
+      <Button variant="ghost" onClick={handleDelete} disabled={saving} className="delete-btn">
+        <Icon name="delete" />
+        Delete
+      </Button>
       <div className="footer-spacer" />
       <Button variant="outline" onClick={onClose} disabled={saving}>
         Cancel
       </Button>
       <Button variant="default" onClick={handleSave} disabled={saving || !name.trim()}>
-        {saving ? 'Saving...' : isNew ? 'Create' : 'Save changes'}
+        {saving ? 'Saving...' : 'Save changes'}
       </Button>
     </>
   )
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      title={isNew ? 'Create Tag' : 'Edit Tag'}
-      size="sm"
-      footer={footer}
-    >
+    <Modal isOpen={isOpen} onClose={onClose} title="Edit Tag" size="sm" footer={footer}>
       <div className="tag-edit-form">
         {error && <div className="error-banner">{error}</div>}
 
@@ -122,22 +102,20 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
           />
         </div>
 
-        {!isNew && (
-          <div className="form-group toggle-group">
-            <label>
-              <input
-                type="checkbox"
-                className="toggle"
-                checked={archived}
-                onChange={(e) => setArchived(e.target.checked)}
-              />
-              <span>Archived</span>
-            </label>
-            <p className="help-text">Archived tags won't appear in selection lists</p>
-          </div>
-        )}
+        <div className="form-group toggle-group">
+          <label>
+            <input
+              type="checkbox"
+              className="toggle"
+              checked={archived}
+              onChange={(e) => setArchived(e.target.checked)}
+            />
+            <span>Archived</span>
+          </label>
+          <p className="help-text">Archived tags won't appear in selection lists</p>
+        </div>
 
-        {!isNew && tag && (
+        {tag && (
           <div className="tag-stats-info">
             <div className="stat-item">
               <Icon name="ink_highlighter" className="icon" />
