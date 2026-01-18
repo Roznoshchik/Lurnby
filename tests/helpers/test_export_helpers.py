@@ -105,7 +105,7 @@ class ExportArticleTests(unittest.TestCase):
     def test_export_to_json(self):
         article = Article.query.first()
         article_dict = create_plain_text_article_dict(article)
-        article_highlights = create_list_of_highlight_dicts(article.highlights.all())
+        article_highlights = create_list_of_highlight_dicts(article.highlights)
 
         basedir = os.path.abspath(os.path.dirname(__file__))
         path = os.path.join(basedir, "temp")
@@ -123,7 +123,7 @@ class ExportArticleTests(unittest.TestCase):
 
         self.assertEqual(loaded_article["title"], article.title)
         self.assertTrue(loaded_article["notes"] in article.notes)
-        self.assertTrue(len(loaded_highlights) == len(article.highlights.all()))
+        self.assertTrue(len(loaded_highlights) == len(article.highlights))
         self.assertTrue(os.path.exists(article_path))
         self.assertTrue(os.path.exists(highlights_path))
 
@@ -133,7 +133,7 @@ class ExportArticleTests(unittest.TestCase):
     def test_export_to_text(self):
         article = Article.query.first()
         article_dict = create_plain_text_article_dict(article)
-        article_highlights = create_list_of_highlight_dicts(article.highlights.all())
+        article_highlights = create_list_of_highlight_dicts(article.highlights)
 
         basedir = os.path.abspath(os.path.dirname(__file__))
         path = os.path.join(basedir, "temp")
@@ -152,7 +152,7 @@ class ExportArticleTests(unittest.TestCase):
     def test_export_to_csv(self):
         article = Article.query.first()
         article_dict = create_plain_text_article_dict(article)
-        article_highlights = create_list_of_highlight_dicts(article.highlights.all())
+        article_highlights = create_list_of_highlight_dicts(article.highlights)
 
         basedir = os.path.abspath(os.path.dirname(__file__))
         path = os.path.join(basedir, "temp")
