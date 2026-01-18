@@ -147,7 +147,12 @@ function TagsList() {
 
   return (
     <>
-      <PageHeader title="Tags" icon="sell" subtitle="Organize your content" actions={headerActions} />
+      <PageHeader
+        title="Tags"
+        icon="sell"
+        subtitle="Organize your content"
+        actions={headerActions}
+      />
 
       {loading && (
         <div className="content-container">
@@ -207,45 +212,41 @@ function TagsList() {
             <>
               <div className="tags-grid">
                 {tags.map((tag) => (
-                  <TagCard
-                    key={tag.id}
-                    tag={tag}
-                    onEdit={() => handleTagEdit(tag)}
-                  />
+                  <TagCard key={tag.id} tag={tag} onEdit={() => handleTagEdit(tag)} />
                 ))}
               </div>
 
               {/* Pagination */}
               <div className="pagination">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    <Icon name="chevron_left" />
-                  </Button>
-                  <span className="pagination-info">Page {page}</span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={!hasNext}
-                  >
-                    <Icon name="chevron_right" />
-                  </Button>
-                  <Select
-                    options={PER_PAGE_OPTIONS}
-                    value={perPage}
-                    onChange={handlePerPageChange}
-                  />
-                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                >
+                  <Icon name="chevron_left" />
+                </Button>
+                <span className="pagination-info">Page {page}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={!hasNext}
+                >
+                  <Icon name="chevron_right" />
+                </Button>
+                <Select options={PER_PAGE_OPTIONS} value={perPage} onChange={handlePerPageChange} />
+              </div>
             </>
           ) : (
             <div className="empty-state">
               <Icon name="sell" />
               <h3>No tags found</h3>
-              <p>{appliedFilters.q ? 'Try a different search term' : 'Create your first tag to get started'}</p>
+              <p>
+                {appliedFilters.q
+                  ? 'Try a different search term'
+                  : 'Create your first tag to get started'}
+              </p>
               {!appliedFilters.q && (
                 <Button variant="default" onClick={() => setShowCreateModal(true)}>
                   <Icon name="add" />

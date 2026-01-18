@@ -1,26 +1,26 @@
-import path from "node:path";
-import preact from "@preact/preset-vite";
-import { defineConfig } from "vite";
+import path from 'node:path'
+import preact from '@preact/preset-vite'
+import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [preact()],
-  root: path.join(__dirname, "./static/"),
-  base: "/static/dist/",
+  root: path.join(__dirname, './static/'),
+  base: '/static/dist/',
   server: {
-    origin: "http://localhost:5173",
+    origin: 'http://localhost:5173',
     cors: true,
   },
   build: {
-    outDir: path.join(__dirname, "../app/static/dist/"),
-    manifest: "manifest.json",
-    assetsDir: "bundled",
+    outDir: path.join(__dirname, '../app/static/dist/'),
+    manifest: 'manifest.json',
+    assetsDir: 'bundled',
     rollupOptions: {
       input: [
-        "./static/login.jsx",
-        "./static/articles.jsx",
-        "./static/highlights.jsx",
-        "./static/tags.jsx",
-        "./static/style.css",
+        './static/login.jsx',
+        './static/articles.jsx',
+        './static/highlights.jsx',
+        './static/tags.jsx',
+        './static/style.css',
       ],
     },
     emptyOutDir: true,
@@ -28,7 +28,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    environment: "happy-dom",
-    setupFiles: "./test-setup.js",
+    environment: 'happy-dom',
+    setupFiles: './test-setup.js',
   },
-});
+})

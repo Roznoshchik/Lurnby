@@ -22,15 +22,33 @@
   flex-shrink: 0;
 }
 
-.tag-color-indicator.tag-color-0 { background-color: var(--tag-color-0); }
-.tag-color-indicator.tag-color-1 { background-color: var(--tag-color-1); }
-.tag-color-indicator.tag-color-2 { background-color: var(--tag-color-2); }
-.tag-color-indicator.tag-color-3 { background-color: var(--tag-color-3); }
-.tag-color-indicator.tag-color-4 { background-color: var(--tag-color-4); }
-.tag-color-indicator.tag-color-5 { background-color: var(--tag-color-5); }
-.tag-color-indicator.tag-color-6 { background-color: var(--tag-color-6); }
-.tag-color-indicator.tag-color-7 { background-color: var(--tag-color-7); }
-.tag-color-indicator.tag-color-8 { background-color: var(--tag-color-8); }
+.tag-color-indicator.tag-color-0 {
+  background-color: var(--tag-color-0);
+}
+.tag-color-indicator.tag-color-1 {
+  background-color: var(--tag-color-1);
+}
+.tag-color-indicator.tag-color-2 {
+  background-color: var(--tag-color-2);
+}
+.tag-color-indicator.tag-color-3 {
+  background-color: var(--tag-color-3);
+}
+.tag-color-indicator.tag-color-4 {
+  background-color: var(--tag-color-4);
+}
+.tag-color-indicator.tag-color-5 {
+  background-color: var(--tag-color-5);
+}
+.tag-color-indicator.tag-color-6 {
+  background-color: var(--tag-color-6);
+}
+.tag-color-indicator.tag-color-7 {
+  background-color: var(--tag-color-7);
+}
+.tag-color-indicator.tag-color-8 {
+  background-color: var(--tag-color-8);
+}
 
 .tag-name {
   font-size: var(--font-size-base);

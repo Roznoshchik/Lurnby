@@ -84,12 +84,7 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
   const footer = (
     <>
       {!isNew && (
-        <Button
-          variant="ghost"
-          onClick={handleDelete}
-          disabled={saving}
-          className="delete-btn"
-        >
+        <Button variant="ghost" onClick={handleDelete} disabled={saving} className="delete-btn">
           <Icon name="delete" />
           Delete
         </Button>
