@@ -137,21 +137,9 @@ function TagsList() {
     setTags((prev) => prev.filter((t) => t.id !== deletedTag.id))
   }
 
-  const headerActions = (
-    <Button variant="default" onClick={() => setShowCreateModal(true)}>
-      <Icon name="add" />
-      New Tag
-    </Button>
-  )
-
   return (
     <>
-      <PageHeader
-        title="Tags"
-        icon="sell"
-        subtitle="Organize your content"
-        actions={headerActions}
-      />
+      <PageHeader title="Tags" icon="sell" subtitle="Organize your content" />
 
       {loading && (
         <div className="content-container">
