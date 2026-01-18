@@ -75,7 +75,7 @@
 
 .error-banner {
   padding: var(--space-3);
-  background-color: rgba(var(--destructive-rgb), 0.1);
+  background-color: color-mix(in oklch, var(--destructive) 15%, transparent);
   border: 1px solid var(--destructive);
   border-radius: var(--radius-md);
   color: var(--destructive);
@@ -91,5 +91,5 @@
 }
 
 .delete-btn:hover {
-  background-color: rgba(var(--destructive-rgb), 0.1);
+  background-color: color-mix(in oklch, var(--destructive) 15%, transparent);
 }
