@@ -144,3 +144,15 @@
 .tag-color-dot.tag-color-8 {
   background-color: var(--tag-color-8);
 }
+
+.combobox-create-option {
+  border-top: 1px solid var(--border);
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  color: var(--primary);
+}
+
+.combobox-create-option .create-icon {
+  font-size: var(--font-size-base);
+  width: var(--font-size-base);
+}

@@ -24,7 +24,14 @@ function getArticleStatus(article) {
   return 'in_progress'
 }
 
-export default function ArticleEditModal({ article, allTags, isOpen, onClose, onSave }) {
+export default function ArticleEditModal({
+  article,
+  allTags,
+  isOpen,
+  onClose,
+  onSave,
+  onTagCreate,
+}) {
   const [loading, setLoading] = useState(true)
   const [fullArticle, setFullArticle] = useState(null)
   const [title, setTitle] = useState('')
@@ -50,7 +57,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
       try {
         const needsContent = article.filetype === 'manual' || article.filetype === 'email'
         const params = needsContent ? { with_content: true } : {}
-        const { data: response } = await api.get(ROUTES.API.article(article.id), params)
+        const { data: response } = await api.get(ROUTES.API.article(article.uuid), params)
         const data = response.article
         setFullArticle(data)
         setTitle(data.title || '')
@@ -92,6 +99,18 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
     setSelectedTagIds((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
     )
+  }
+
+  const handleTagCreate = async (name) => {
+    try {
+      const { data } = await api.post(ROUTES.API.TAGS, { name })
+      const newTag = data.tag
+      onTagCreate?.(newTag)
+      setSelectedTagIds((prev) => [...prev, newTag.id])
+    } catch (err) {
+      console.error('Error creating tag:', err)
+      alert.error('Failed to create tag')
+    }
   }
 
   const copySourceUrl = async () => {
@@ -137,7 +156,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
         data.unread = false
       }
 
-      const { data: response } = await api.patch(ROUTES.API.article(article.id), data)
+      const { data: response } = await api.patch(ROUTES.API.article(article.uuid), data)
       onSave?.(response.article)
       alert.success('Article updated')
       onClose()
@@ -156,7 +175,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
 
     const isArchived = fullArticle?.archived || article?.archived
     try {
-      const { data: response } = await api.patch(ROUTES.API.article(article.id), {
+      const { data: response } = await api.patch(ROUTES.API.article(article.uuid), {
         archived: !isArchived,
       })
       onSave?.(response.article)
@@ -174,7 +193,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
   const isArchived = fullArticle?.archived || article?.archived
 
   const handleStartReading = () => {
-    window.location.href = ROUTES.PAGES.article(article.id)
+    window.location.href = ROUTES.PAGES.article(article.uuid)
   }
 
   const footer = (
@@ -291,6 +310,7 @@ export default function ArticleEditModal({ article, allTags, isOpen, onClose, on
                 selected={selectedTagIds}
                 onSelect={handleTagToggle}
                 placeholder="Select tags..."
+                onCreate={handleTagCreate}
               />
               {selectedTagObjects.length > 0 && (
                 <div className="selected-tags">

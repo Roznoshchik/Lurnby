@@ -112,6 +112,20 @@
   font-size: var(--font-size-lg);
 }
 
+/* Selected Tags */
+.selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.selected-tags .tag-remove {
+  font-size: var(--font-size-sm);
+  margin-left: var(--space-1);
+  cursor: pointer;
+}
+
 /* File Upload Area */
 .file-upload-area {
   display: flex;

@@ -158,11 +158,7 @@ function HighlightsList() {
 
   return (
     <>
-      <PageHeader
-        title="Highlights"
-        icon="ink_highlighter"
-        subtitle="Your Knowledge Library"
-      />
+      <PageHeader title="Highlights" icon="ink_highlighter" subtitle="Your Knowledge Library" />
 
       {loading && (
         <div className="content-container">
@@ -291,11 +287,7 @@ function HighlightsList() {
                 >
                   <Icon name="chevron_right" />
                 </Button>
-                <Select
-                  options={PER_PAGE_OPTIONS}
-                  value={perPage}
-                  onChange={handlePerPageChange}
-                />
+                <Select options={PER_PAGE_OPTIONS} value={perPage} onChange={handlePerPageChange} />
               </div>
             </>
           ) : (
@@ -316,6 +308,7 @@ function HighlightsList() {
           isOpen={!!editingHighlight}
           onClose={() => setEditingHighlight(null)}
           onSave={handleHighlightSaved}
+          onTagCreate={(tag) => setAllTags((prev) => [...prev, tag])}
         />
       )}
     </>

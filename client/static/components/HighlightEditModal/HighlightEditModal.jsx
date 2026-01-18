@@ -10,7 +10,14 @@ import { api } from '../../services/api'
 import { ROUTES } from '../../services/routes'
 import './HighlightEditModal.css'
 
-export default function HighlightEditModal({ highlight, allTags, isOpen, onClose, onSave }) {
+export default function HighlightEditModal({
+  highlight,
+  allTags,
+  isOpen,
+  onClose,
+  onSave,
+  onTagCreate,
+}) {
   const [loading, setLoading] = useState(true)
   const [fullHighlight, setFullHighlight] = useState(null)
   const [text, setText] = useState('')
@@ -70,6 +77,18 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
     setSelectedTagIds((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
     )
+  }
+
+  const handleTagCreate = async (name) => {
+    try {
+      const { data } = await api.post(ROUTES.API.TAGS, { name })
+      const newTag = data.tag
+      onTagCreate?.(newTag)
+      setSelectedTagIds((prev) => [...prev, newTag.id])
+    } catch (err) {
+      console.error('Error creating tag:', err)
+      alert.error('Failed to create tag')
+    }
   }
 
   const handleSave = async () => {
@@ -132,9 +151,9 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
         variant="ghost"
         onClick={handleArchive}
         disabled={saving || loading}
-        className='archive-btn'
+        className="archive-btn"
       >
-        <Icon name='archive' />
+        <Icon name="archive" />
         'Archive'
       </Button>
       <div className="footer-spacer" />
@@ -223,6 +242,7 @@ export default function HighlightEditModal({ highlight, allTags, isOpen, onClose
                 selected={selectedTagIds}
                 onSelect={handleTagToggle}
                 placeholder="Select tags..."
+                onCreate={handleTagCreate}
               />
               {selectedTagObjects.length > 0 && (
                 <div className="selected-tags">

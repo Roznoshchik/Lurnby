@@ -1,4 +1,5 @@
-import { useState, useRef } from 'preact/hooks'
+import { useState, useRef, useMemo } from 'preact/hooks'
+import alert from '../../services/alertService'
 import Badge from '../Badge/Badge'
 import Button from '../Button/Button'
 import Card from '../Card/Card'
@@ -58,7 +59,7 @@ const ARTICLE_TYPES = [
   },
 ]
 
-export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] }) {
+export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [], onTagCreate }) {
   const [selectedType, setSelectedType] = useState(null)
   const [error, setError] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -121,6 +122,18 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     setSelectedTagIds((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId],
     )
+  }
+
+  const handleTagCreate = async (name) => {
+    try {
+      const { data } = await api.post(ROUTES.API.TAGS, { name })
+      const newTag = data.tag
+      onTagCreate?.(newTag)
+      setSelectedTagIds((prev) => [...prev, newTag.id])
+    } catch (err) {
+      console.error('Error creating tag:', err)
+      alert.error('Failed to create tag')
+    }
   }
 
   const handleFileChange = (e) => {
@@ -247,6 +260,11 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
     label: tag.name,
   }))
 
+  const selectedTagObjects = useMemo(
+    () => tags.filter((tag) => selectedTagIds.includes(tag.id)),
+    [tags, selectedTagIds],
+  )
+
   const footer = selectedType ? (
     <>
       <Button variant="ghost" onClick={handleBack} disabled={isSubmitting}>
@@ -323,7 +341,23 @@ export default function ArticleAddModal({ isOpen, onClose, onSuccess, tags = [] 
                 selected={selectedTagIds}
                 onSelect={handleTagSelect}
                 placeholder="Select tags..."
+                onCreate={handleTagCreate}
               />
+              {selectedTagObjects.length > 0 && (
+                <div className="selected-tags">
+                  {selectedTagObjects.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant="outline"
+                      value={tag.name}
+                      onClick={() => handleTagSelect(tag.id)}
+                    >
+                      {tag.name}
+                      <Icon name="close" className="tag-remove" />
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}
