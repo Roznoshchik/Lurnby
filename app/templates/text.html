@@ -363,7 +363,7 @@ aria-labelledby="finishArticleModalLabel" aria-hidden="true">
         <h6 class="inline-block"> Tags:</h6>
         <div class="inline-block lurnby-filter">
           <span id="NewTagMembers" class="topics-group">
-            {% for tag in article.tags.all() %}
+            {% for tag in article.tags %}
             <span id="member-tag{{tag.name}}" class="topic tagMember">{{tag.name}}</span>
             {% endfor%}
           </span>
@@ -440,8 +440,8 @@ aria-labelledby="AddHighlightModalLabel" aria-hidden="true">
     </div>
     <div class="modal-footer">
       <button type="button" class="main-button cancel" onclick="resetHighlightForm()" data-dismiss="modal">Cancel</button>
-      <button 
-        id="newHighlightSubmit" type="button" onclick="SubmitHighlight()" 
+      <button
+        id="newHighlightSubmit" type="button" onclick="SubmitHighlight()"
         class="main-button add-highlight save">Add</button>
     </div>
   </div>
@@ -559,12 +559,12 @@ const finishArticle = () => {
 function set_position(progress) {
   var $window = $(window);
 
-  // var h = document.documentElement, 
+  // var h = document.documentElement,
   // b = document.body,
   // st = 'scrollTop',
   // sh = 'scrollHeight';
 
-  // var position = (progress / 100) * (h[sh] || b[sh])    
+  // var position = (progress / 100) * (h[sh] || b[sh])
 
   // $window.scrollTop(position);
 
@@ -578,7 +578,7 @@ function set_position(progress) {
 
 };
 
-// removed because safari is resizing the window when the browser bar comes up. 
+// removed because safari is resizing the window when the browser bar comes up.
 // window.addEventListener('resize', function(){
 //   console.log('screen resized')
 //   set_position(current_progress)
@@ -594,7 +594,7 @@ var highlight_position = byId('{{highlight_id}}')
 highlight_position.scrollIntoView()
 {% endif %}
 
-/* store scroll position 
+/* store scroll position
   hat tip -  https://stackoverflow.com/questions/2387136/cross-browser-method-to-determine-vertical-scroll-percentage-in-javascript
   */
 
@@ -603,7 +603,7 @@ var timer, timer2;
 function getScrollPercent() {
 
   // console.log('getting scroll')
-  // var h = document.documentElement, 
+  // var h = document.documentElement,
   // b = document.body,
   // st = 'scrollTop',
   // sh = 'scrollHeight';
@@ -675,7 +675,7 @@ for (let i = 0; i < tables.length; i++) {
 
 
 <script>
-// enable highlighting      
+// enable highlighting
 var sandbox = document.getElementById('content');
 //var article_id = $("#article_id").val()
 var article_uuid = '{{article_uuid}}'
@@ -803,19 +803,19 @@ function FailedToAddHighlight() {
 function NewTopic() {
   $('#CreateTopic').html(`
     <br>
-    <form method="" action="" novalidate> 
+    <form method="" action="" novalidate>
       <div class = "form-row align-items-center">
         <div class="col-sm-6 my-1">
           <input autofocus="" class="form-control" id="addtopicinput" name="title" placeholder="Topic title..." required="" type="text" value="">
           </input>
-        </div> 
-        <div class="col-auto my-1"> 
-          <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button> 
-        </div>  
-        <div class="col-auto my-1"> 
-          <button id = "submit_new_topic" onclick="NewTopicSubmit()" type="button" class="main-button save">add</button> 
-        </div> 
-      </div> 
+        </div>
+        <div class="col-auto my-1">
+          <button type="button" onclick="CancelNewTopic()" class="main-button cancel">cancel</button>
+        </div>
+        <div class="col-auto my-1">
+          <button id = "submit_new_topic" onclick="NewTopicSubmit()" type="button" class="main-button save">add</button>
+        </div>
+      </div>
     </form>`);
 
   input = document.getElementById('addtopicinput')

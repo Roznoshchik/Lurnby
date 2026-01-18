@@ -26,10 +26,10 @@ class Article(db.Model):
     date_read = db.Column(db.DateTime)
     date_read_date = db.Column(db.Date)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
-    highlights = db.relationship("Highlight", lazy="dynamic", backref="article")
+    highlights = db.relationship("Highlight", backref="article")
     archived = db.Column(db.Boolean, index=True, default=False)
     highlightedText = db.Column(db.String, default="")
-    tags = db.relationship("Tag", secondary=tags_articles, back_populates="articles", lazy="dynamic")
+    tags = db.relationship("Tag", secondary=tags_articles, back_populates="articles")
     progress = db.Column(db.Float, index=True, default=0.0)
     bookmarks = db.Column(db.String)
     done = db.Column(db.Boolean, default=False)
@@ -61,7 +61,7 @@ class Article(db.Model):
 
     @property
     def tag_list(self):
-        return [tag.name for tag in self.tags.all()]
+        return [tag.name for tag in self.tags]
 
     @property
     def tag_ids(self):
@@ -169,8 +169,8 @@ class Article(db.Model):
             progress = 0.0
 
         data = {
-            "_id": self.id,
-            "id": str(self.uuid),
+            "id": self.id,
+            "uuid": self.uuid,
             "user_id": self.user_id,
             "source": self.source or self.source_url,
             "source_url": self.source_url,
@@ -186,8 +186,8 @@ class Article(db.Model):
             "read_time": self.read_time,
             "progress": progress,
             "created_at": self.article_created_date,
-            "highlights_count": self.highlights.count(),
-            "tags": [tag.to_dict() for tag in self.tags.all()],
+            "highlights_count": len(self.highlights),
+            "tags": [tag.to_dict() for tag in self.tags],
         }
         return data
 
@@ -257,7 +257,7 @@ class Article(db.Model):
         if not self.is_added_tag(tag):
             self.tags.append(tag)
             tag.article_count += 1
-            if self.id and self.highlights.count() > 0:
+            if self.id and len(self.highlights) > 0:
                 for h in self.highlights:
                     tag.highlight_count += 1
                     h.add_tag(tag)
@@ -266,7 +266,7 @@ class Article(db.Model):
         if self.is_added_tag(tag):
             self.tags.remove(tag)
             tag.article_count -= 1
-            if self.id and self.highlights.count() > 0:
+            if self.id and len(self.highlights) > 0:
                 for h in self.highlights:
                     tag.highlight_count -= 1
                     h.remove_tag(tag)

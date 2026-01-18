@@ -17,25 +17,22 @@ class Tag(db.Model):
     article_count = db.Column(db.Integer, default=0)
     last_used = db.Column(db.DateTime, default=datetime.utcnow)
 
-    articles = db.relationship("Article", secondary=tags_articles, back_populates="tags", lazy="dynamic")
-
-    highlights = db.relationship("Highlight", secondary=tags_highlights, back_populates="tags", lazy="dynamic")
-
-    topics = db.relationship("Topic", secondary=tags_topics, back_populates="tags", lazy="dynamic")
+    articles = db.relationship("Article", secondary=tags_articles, back_populates="tags")
+    highlights = db.relationship("Highlight", secondary=tags_highlights, back_populates="tags")
+    topics = db.relationship("Topic", secondary=tags_topics, back_populates="tags")
 
     @property
     def fields_that_can_be_updated(self):
         return ["name", "archived"]
 
     def is_added_highlight(self, highlight):
-        h_id = tags_highlights.c.highlight_id
-        return self.highlights.filter(highlight.id == h_id).count() > 0
+        return highlight in self.highlights
 
     def is_added_topic(self, topic):
-        return self.topics.filter(topic.id == tags_topics.c.topic_id).count() > 0
+        return topic in self.topics
 
     def is_added_article(self, article):
-        return self.articles.filter(article.id == tags_articles.c.article_id).count() > 0
+        return article in self.articles
 
     def __repr__(self) -> str:
         return f"{self.id}: {self.name}"

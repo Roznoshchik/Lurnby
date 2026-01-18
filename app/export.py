@@ -68,7 +68,7 @@ def article_export(user, articles, ext):
                     f.write(a.source_url)
                     f.write("\n")
                 f.write("\n")
-                tags = [t.name for t in a.tags.all()]
+                tags = [t.name for t in a.tags]
                 f.write(", ".join(tags))
                 f.write("\n\n")
                 f.write(notes)
@@ -104,7 +104,7 @@ def article_export(user, articles, ext):
             data["Title"] = "".join([c for c in a.title if c.isalpha() or c.isdigit()]).rstrip()
             data["Source"] = a.source_url if a.source_url else a.source
             data["Notes"] = a.notes
-            data["Tags"] = [t.name for t in a.tags.filter_by(archived=False).all()]
+            data["Tags"] = [t.name for t in a.tags if not t.archived]
             a_highlights = a.highlights.filter_by(archived=False).all()
             highlights = []
             for h in a_highlights:

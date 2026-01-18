@@ -29,7 +29,7 @@ class Highlight(db.Model):
     archived = db.Column(db.Boolean, index=True, default=False)
     no_topics = db.Column(db.Boolean, default=True, index=True)
     note = db.Column(db.String, index=True)
-    tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights", lazy="dynamic")
+    tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights")
     position = db.Column(db.String)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     review_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -55,12 +55,12 @@ class Highlight(db.Model):
             "review_schedule": self.review_schedule,
             "do_not_review": self.do_not_review,
             "archived": self.archived,
-            "tags": [tag.to_dict() for tag in self.tags.all()],
+            "tags": [tag.to_dict() for tag in self.tags],
         }
 
     @property
     def tag_list(self):
-        return [tag.name for tag in self.tags.all()]
+        return [tag.name for tag in self.tags]
 
     @property
     def tag_ids(self):
@@ -154,10 +154,10 @@ class Highlight(db.Model):
         return db.session.scalar(stmt)
 
     def is_added_tag(self, tag):
-        return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
+        return tag in self.tags
 
     def is_tagged_with(self, tag):
-        return self.tags.filter(tag.id == tags_highlights.c.tag_id).count() > 0
+        return tag in self.tags
 
     def not_added_topic(self):
 

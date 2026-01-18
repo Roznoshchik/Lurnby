@@ -1,7 +1,8 @@
 import sqlalchemy as sa
+from sqlalchemy.orm import selectinload
 
 from app import db
-from app.models import Article, tags_articles
+from app.models import Article, Tag, tags_articles
 
 
 def filter_by_status(stmt: sa.Select, status: str) -> sa.Select:
@@ -133,6 +134,10 @@ def get_recent_articles(user_id: int, limit: int = 3) -> list[Article]:
             Article.processing.isnot(True),  # Include NULL values
             Article.archived.is_(False),
             Article.date_read.isnot(None),
+        )
+        .options(
+            selectinload(Article.tags.and_(Tag.archived == False)),
+            selectinload(Article.highlights),
         )
         .order_by(Article.date_read.desc())
         .limit(limit)
