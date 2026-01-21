@@ -1,0 +1,161 @@
+/* Reader Content Styles */
+
+.reader-content {
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Progress bar - fixed at top */
+.reader-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 0;
+  z-index: 50;
+}
+
+.reader-progress-bar .progress-indicator {
+  transition: none;
+}
+
+/* Article content */
+.reader-article {
+  max-width: 50rem;
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-4);
+  padding-bottom: var(--space-20);
+}
+
+.reader-article h1,
+.reader-article[class*="size-"] h1 {
+  font-size: var(--font-size-3xl);
+  margin-bottom: var(--space-4);
+}
+
+.reader-article h2,
+.reader-article[class*="size-"] h2 {
+  font-size: var(--font-size-2xl);
+  margin-top: var(--space-8);
+  margin-bottom: var(--space-3);
+}
+
+.reader-article h3,
+.reader-article[class*="size-"] h3 {
+  font-size: var(--font-size-xl);
+  margin-top: var(--space-6);
+  margin-bottom: var(--space-2);
+}
+
+.reader-article p {
+  margin-bottom: var(--space-4);
+}
+
+.reader-article img {
+  max-width: 100%;
+  height: auto;
+}
+
+.reader-article blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: var(--space-4);
+  margin: var(--space-4) 0;
+  color: var(--muted-foreground);
+}
+
+.reader-article pre {
+  background-color: var(--muted);
+  padding: var(--space-4);
+  border-radius: var(--radius);
+  overflow-x: auto;
+}
+
+.reader-article code {
+  background-color: var(--muted);
+  padding: var(--space-0-5) var(--space-1);
+  border-radius: var(--radius-sm);
+  font-size: 0.9em;
+}
+
+.reader-article pre code {
+  background: none;
+  padding: 0;
+}
+
+/* Font settings */
+.reader-article.sans-serif {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.reader-article.serif {
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+/* Size settings (1-15 scale) */
+.reader-article.size-1, .reader-article.size-1 * { font-size: 0.75rem; }
+.reader-article.size-2, .reader-article.size-2 * { font-size: 0.825rem; }
+.reader-article.size-3, .reader-article.size-3 * { font-size: 0.9rem; }
+.reader-article.size-4, .reader-article.size-4 * { font-size: 1rem; }
+.reader-article.size-5, .reader-article.size-5 * { font-size: 1.1rem; }
+.reader-article.size-6, .reader-article.size-6 * { font-size: 1.2rem; }
+.reader-article.size-7, .reader-article.size-7 * { font-size: 1.3rem; }
+.reader-article.size-8, .reader-article.size-8 * { font-size: 1.4rem; }
+.reader-article.size-9, .reader-article.size-9 * { font-size: 1.5rem; }
+.reader-article.size-10, .reader-article.size-10 * { font-size: 1.6rem; }
+.reader-article.size-11, .reader-article.size-11 * { font-size: 1.7rem; }
+.reader-article.size-12, .reader-article.size-12 * { font-size: 1.8rem; }
+.reader-article.size-13, .reader-article.size-13 * { font-size: 1.9rem; }
+.reader-article.size-14, .reader-article.size-14 * { font-size: 2rem; }
+.reader-article.size-15, .reader-article.size-15 * { font-size: 2.1rem; }
+
+/* Line height settings */
+.reader-article.line-height-min, .reader-article.line-height-min * { line-height: 1.4; }
+.reader-article.line-height-mid, .reader-article.line-height-mid * { line-height: 1.6; }
+.reader-article.line-height-max, .reader-article.line-height-max * { line-height: 1.9; }
+
+/* Bottom bar - fixed at bottom */
+.reader-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--card);
+  border-top: 1px solid var(--border);
+  font-size: var(--font-size-sm);
+  z-index: 40;
+}
+
+.reader-bottom-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted-foreground);
+}
+
+.reader-bottom-progress {
+  margin-left: var(--space-4);
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+/* Adjust for sidebar on desktop */
+@media (min-width: 768px) {
+  .reader-progress-bar {
+    left: 4rem;
+  }
+
+  .reader-bottom-bar {
+    left: 4rem;
+  }
+
+  .sidebar-expanded ~ .main-content .reader-progress-bar,
+  .sidebar-expanded ~ .main-content .reader-bottom-bar {
+    left: 16rem;
+  }
+}

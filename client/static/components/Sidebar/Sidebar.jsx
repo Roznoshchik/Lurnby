@@ -10,6 +10,7 @@ export function Sidebar({
   showAppDashboard = false,
   isExpanded = false,
   onToggle,
+  sidebarContent = null,
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -62,6 +63,15 @@ export function Sidebar({
           ))}
         </ul>
       </nav>
+
+      {/* Custom sidebar content (e.g., reader actions) */}
+      {sidebarContent && (
+        <div className="sidebar-content">
+          {typeof sidebarContent === 'function'
+            ? sidebarContent({ isExpanded })
+            : sidebarContent}
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="sidebar-bottom">

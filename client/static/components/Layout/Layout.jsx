@@ -4,17 +4,21 @@ import { MobileNav } from '../MobileNav/MobileNav'
 import { Sidebar } from '../Sidebar/Sidebar'
 import './Layout.css'
 
-export function Layout({ children, showAppDashboard = false }) {
-  const [darkMode, setDarkMode] = useState(false)
+export function Layout({ children, showAppDashboard = false, sidebarContent = null }) {
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode')
+    return saved === 'true'
+  })
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
 
-  // Apply dark mode class to document root
+  // Apply dark mode class to document root and persist
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark')
     } else {
       document.documentElement.classList.remove('dark')
     }
+    localStorage.setItem('darkMode', darkMode)
   }, [darkMode])
 
   return (
@@ -38,12 +42,14 @@ export function Layout({ children, showAppDashboard = false }) {
           },
         }}
       />
+
       <Sidebar
         darkMode={darkMode}
         onDarkModeToggle={() => setDarkMode(!darkMode)}
         showAppDashboard={showAppDashboard}
         isExpanded={sidebarExpanded}
         onToggle={() => setSidebarExpanded(!sidebarExpanded)}
+        sidebarContent={sidebarContent}
       />
 
       <MobileNav
