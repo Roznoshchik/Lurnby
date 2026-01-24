@@ -89,30 +89,84 @@
 }
 
 .reader-article.serif {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 /* Size settings (1-15 scale) */
-.reader-article.size-1, .reader-article.size-1 * { font-size: 0.75rem; }
-.reader-article.size-2, .reader-article.size-2 * { font-size: 0.825rem; }
-.reader-article.size-3, .reader-article.size-3 * { font-size: 0.9rem; }
-.reader-article.size-4, .reader-article.size-4 * { font-size: 1rem; }
-.reader-article.size-5, .reader-article.size-5 * { font-size: 1.1rem; }
-.reader-article.size-6, .reader-article.size-6 * { font-size: 1.2rem; }
-.reader-article.size-7, .reader-article.size-7 * { font-size: 1.3rem; }
-.reader-article.size-8, .reader-article.size-8 * { font-size: 1.4rem; }
-.reader-article.size-9, .reader-article.size-9 * { font-size: 1.5rem; }
-.reader-article.size-10, .reader-article.size-10 * { font-size: 1.6rem; }
-.reader-article.size-11, .reader-article.size-11 * { font-size: 1.7rem; }
-.reader-article.size-12, .reader-article.size-12 * { font-size: 1.8rem; }
-.reader-article.size-13, .reader-article.size-13 * { font-size: 1.9rem; }
-.reader-article.size-14, .reader-article.size-14 * { font-size: 2rem; }
-.reader-article.size-15, .reader-article.size-15 * { font-size: 2.1rem; }
+.reader-article.size-1,
+.reader-article.size-1 * {
+  font-size: 0.75rem;
+}
+.reader-article.size-2,
+.reader-article.size-2 * {
+  font-size: 0.825rem;
+}
+.reader-article.size-3,
+.reader-article.size-3 * {
+  font-size: 0.9rem;
+}
+.reader-article.size-4,
+.reader-article.size-4 * {
+  font-size: 1rem;
+}
+.reader-article.size-5,
+.reader-article.size-5 * {
+  font-size: 1.1rem;
+}
+.reader-article.size-6,
+.reader-article.size-6 * {
+  font-size: 1.2rem;
+}
+.reader-article.size-7,
+.reader-article.size-7 * {
+  font-size: 1.3rem;
+}
+.reader-article.size-8,
+.reader-article.size-8 * {
+  font-size: 1.4rem;
+}
+.reader-article.size-9,
+.reader-article.size-9 * {
+  font-size: 1.5rem;
+}
+.reader-article.size-10,
+.reader-article.size-10 * {
+  font-size: 1.6rem;
+}
+.reader-article.size-11,
+.reader-article.size-11 * {
+  font-size: 1.7rem;
+}
+.reader-article.size-12,
+.reader-article.size-12 * {
+  font-size: 1.8rem;
+}
+.reader-article.size-13,
+.reader-article.size-13 * {
+  font-size: 1.9rem;
+}
+.reader-article.size-14,
+.reader-article.size-14 * {
+  font-size: 2rem;
+}
+.reader-article.size-15,
+.reader-article.size-15 * {
+  font-size: 2.1rem;
+}
 
 /* Line height settings */
-.reader-article.line-height-min, .reader-article.line-height-min * { line-height: 1.4; }
-.reader-article.line-height-mid, .reader-article.line-height-mid * { line-height: 1.6; }
-.reader-article.line-height-max, .reader-article.line-height-max * { line-height: 1.9; }
+.reader-article.line-height-min,
+.reader-article.line-height-min * {
+  line-height: 1.4;
+}
+.reader-article.line-height-mid,
+.reader-article.line-height-mid * {
+  line-height: 1.6;
+}
+.reader-article.line-height-max,
+.reader-article.line-height-max * {
+  line-height: 1.9;
+}
 
 /* Bottom bar - fixed at bottom */
 .reader-bottom-bar {
