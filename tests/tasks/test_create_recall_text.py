@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
 from app import db, create_app
-from app.models import Highlight
+from app.models import Highlight, User
 from app.tasks import create_recall_text
 from config import Config
 
@@ -32,7 +32,11 @@ class RecallTextCase(unittest.TestCase):
 
     def test_highlight_found(self):
         # Test the case where the highlight exists
-        highlight = Highlight(text="Alan Walker went to Tokyo for his honeymoon.")
+        user = User(username="testuser")
+        db.session.add(user)
+        db.session.commit()
+
+        highlight = Highlight(text="Alan Walker went to Tokyo for his honeymoon.", user_id=user.id)
         db.session.add(highlight)
         db.session.commit()
         create_recall_text(highlight.id)
@@ -43,7 +47,7 @@ class RecallTextCase(unittest.TestCase):
         self.assertTrue("for" in highlight.prompt)
         self.assertTrue("his" in highlight.prompt)
 
-        highlight2 = Highlight(text="stop right this minute.")
+        highlight2 = Highlight(text="stop right this minute.", user_id=user.id)
         db.session.add(highlight2)
         db.session.commit()
         create_recall_text(highlight2.id)

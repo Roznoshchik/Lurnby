@@ -8,6 +8,7 @@ class TagModelCase(BaseTestCase):
     def test_add_removing_tags(self):
         u = User(username="john")
         db.session.add(u)
+        db.session.commit()
 
         h1 = Highlight(text="this is a highlight", user_id=u.id, archived=False)
         h2 = Highlight(text="This is a second highlight", user_id=u.id, archived=False)

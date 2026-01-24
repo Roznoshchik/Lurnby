@@ -1388,7 +1388,6 @@ def addhighlight():
     newHighlight = Highlight(
         user_id=current_user.id,
         article_id=article.id,
-        position=data["position"],
         text=data["text"],
         do_not_review=data["do_not_review"],
         note=data["notes"],
@@ -1434,7 +1433,6 @@ def addhighlight():
     else:
         newHighlight.no_topics = False
 
-    newHighlight.position = "#" + str(newHighlight.id)
     db.session.commit()
 
     article_url = url_for("main.article", uuid=article.uuid)
