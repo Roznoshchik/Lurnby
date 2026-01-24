@@ -43,7 +43,7 @@ export default function PageHeader({ title, icon, subtitle, action }) {
         <div className="stats-grid">
           <div className="stat-card stat-reviews">
             <div className="stat-icon">
-              <Icon name="rotate_left" />
+              <Icon name="exercise" />
             </div>
             <div className="stat-content">
               <div className="stat-value">{monthlyStats.reviewEvents}</div>

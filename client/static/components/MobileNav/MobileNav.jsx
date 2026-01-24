@@ -10,7 +10,7 @@ export function MobileNav({ darkMode = false, onDarkModeToggle, showAppDashboard
   const mainNavItems = [
     { href: '/client/articles', icon: 'book', label: 'Articles' },
     { href: '/client/highlights', icon: 'ink_highlighter', label: 'Highlights' },
-    { href: '/client/review', icon: 'rotate_left', label: 'Review' },
+    { href: '/client/review', icon: 'exercise', label: 'Review' },
     { href: '/client/tags', icon: 'sell', label: 'Tags' },
   ]
 

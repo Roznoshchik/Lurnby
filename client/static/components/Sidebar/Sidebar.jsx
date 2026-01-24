@@ -17,7 +17,7 @@ export function Sidebar({
   const mainNavItems = [
     { href: '/client/articles', icon: 'book', label: 'Articles' },
     { href: '/client/highlights', icon: 'ink_highlighter', label: 'Highlights' },
-    { href: '/client/review', icon: 'rotate_left', label: 'Review' },
+    { href: '/client/review', icon: 'exercise', label: 'Review' },
     { href: '/client/tags', icon: 'sell', label: 'Tags' },
   ]
 
@@ -67,9 +67,7 @@ export function Sidebar({
       {/* Custom sidebar content (e.g., reader actions) */}
       {sidebarContent && (
         <div className="sidebar-content">
-          {typeof sidebarContent === 'function'
-            ? sidebarContent({ isExpanded })
-            : sidebarContent}
+          {typeof sidebarContent === 'function' ? sidebarContent({ isExpanded }) : sidebarContent}
         </div>
       )}
 
