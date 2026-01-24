@@ -13,7 +13,6 @@ import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import { api } from './services/api'
 import { ROUTES } from './services/routes'
-import alert from './services/alertService'
 
 const STATUS_OPTIONS = [
   { value: 'unarchived', label: 'Active' },
@@ -94,21 +93,6 @@ function TagsList() {
 
   const handleTagEdit = (tag) => {
     setEditingTag(tag)
-  }
-
-  const handleTagDelete = async (tag) => {
-    if (!confirm(`Are you sure you want to delete "${tag.name}"? This cannot be undone.`)) {
-      return
-    }
-
-    try {
-      await api.delete(`${ROUTES.API.TAGS}/${tag.uuid}`)
-      alert.success('Tag deleted')
-      setTags((prev) => prev.filter((t) => t.id !== tag.id))
-    } catch (err) {
-      console.error('Error deleting tag:', err)
-      alert.error('Failed to delete tag')
-    }
   }
 
   const handleTagSaved = (savedTag) => {
@@ -249,7 +233,6 @@ function TagsList() {
           onDelete={handleTagDeleted}
         />
       )}
-
     </>
   )
 }

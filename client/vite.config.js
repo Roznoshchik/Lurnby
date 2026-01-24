@@ -20,6 +20,7 @@ export default defineConfig({
         './static/articles.jsx',
         './static/highlights.jsx',
         './static/tags.jsx',
+        './static/reader.jsx',
         './static/style.css',
       ],
     },

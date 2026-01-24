@@ -98,7 +98,6 @@ export default function TagEditModal({ tag, isOpen, onClose, onSave, onDelete })
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Tag name..."
-            autoFocus
           />
         </div>
 

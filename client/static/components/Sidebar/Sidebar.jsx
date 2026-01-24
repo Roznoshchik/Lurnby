@@ -10,13 +10,14 @@ export function Sidebar({
   showAppDashboard = false,
   isExpanded = false,
   onToggle,
+  sidebarContent = null,
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
   const mainNavItems = [
     { href: '/client/articles', icon: 'book', label: 'Articles' },
     { href: '/client/highlights', icon: 'ink_highlighter', label: 'Highlights' },
-    { href: '/client/review', icon: 'rotate_left', label: 'Review' },
+    { href: '/client/review', icon: 'exercise', label: 'Review' },
     { href: '/client/tags', icon: 'sell', label: 'Tags' },
   ]
 
@@ -62,6 +63,13 @@ export function Sidebar({
           ))}
         </ul>
       </nav>
+
+      {/* Custom sidebar content (e.g., reader actions) */}
+      {sidebarContent && (
+        <div className="sidebar-content">
+          {typeof sidebarContent === 'function' ? sidebarContent({ isExpanded }) : sidebarContent}
+        </div>
+      )}
 
       {/* Bottom Navigation */}
       <div className="sidebar-bottom">

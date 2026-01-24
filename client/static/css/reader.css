@@ -1,0 +1,318 @@
+/* Reader Page Styles */
+
+.reader-loading,
+.reader-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: var(--space-4);
+}
+
+.reader-error button {
+  padding: var(--space-2) var(--space-4);
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+/* Reader wrapper - handles side-by-side layout with notes */
+.reader-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Full-width mode when notes are closed */
+.reader-wrapper:not(.with-notes) .reader-content {
+  width: 100%;
+}
+
+.reader-wrapper:not(.with-notes) .reader-article {
+  padding-left: var(--space-8);
+  padding-right: var(--space-8);
+}
+
+/* Side-by-side mode when notes are open */
+.reader-wrapper.with-notes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.reader-wrapper.with-notes > * {
+  min-height: 0;
+}
+
+.reader-wrapper.with-notes .reader-article {
+  max-width: none;
+  padding-left: var(--space-4);
+  padding-right: var(--space-4);
+}
+
+/* Mobile: Stack notes below content */
+@media (max-width: 1024px) {
+  .reader-wrapper.with-notes {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+/* Sidebar popout wrapper */
+.sidebar-popout-wrapper {
+  position: relative;
+}
+
+/* Settings popout */
+.reader-settings-popout {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: var(--space-2);
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-width: 240px;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  z-index: 50;
+}
+
+.settings-group {
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-2) 0;
+}
+
+.settings-group:first-child {
+  padding-top: 0;
+}
+
+.settings-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--foreground);
+}
+
+.settings-btn:hover {
+  background-color: var(--accent);
+}
+
+.settings-btn.active {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Font buttons */
+.font-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.font-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  height: auto;
+}
+
+.font-btn.sans-serif {
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.font-btn.serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.font-label {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+  margin-bottom: var(--space-1);
+}
+
+.font-btn.active .font-label {
+  color: var(--primary-foreground);
+}
+
+.font-preview {
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+/* Size buttons */
+.size-buttons {
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.size-btn {
+  width: var(--space-8);
+  height: var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  border: 1px solid var(--border);
+}
+
+.settings-value {
+  min-width: var(--space-8);
+  text-align: center;
+  font-size: var(--font-size-base);
+}
+
+/* Spacing buttons */
+.spacing-buttons {
+  justify-content: space-around;
+}
+
+.spacing-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+}
+
+.spacing-btn svg {
+  width: 38px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Active state for sidebar buttons */
+.sidebar-content .btn-ghost.active {
+  background-color: var(--accent);
+}
+
+/* Bookmarks popout */
+.reader-bookmarks-popout {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: var(--space-2);
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-width: 240px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  z-index: 50;
+}
+
+.bookmarks-add {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.bookmarks-add input {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--input-background);
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+}
+
+.bookmarks-add input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: var(--radius);
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--foreground);
+  width: 100%;
+}
+
+.bookmark-item:hover {
+  background-color: var(--accent);
+}
+
+.bookmark-name {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  padding: var(--space-2);
+}
+
+.bookmark-name:hover {
+  background-color: var(--accent);
+}
+
+.bookmark-position {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+}
+
+.bookmark-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+}
+
+.bookmark-delete:hover {
+  color: var(--destructive);
+  background-color: var(--accent);
+}
+
+.bookmark-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+}
+
+.bookmark-reset:hover {
+  color: var(--foreground);
+  background-color: var(--accent);
+}

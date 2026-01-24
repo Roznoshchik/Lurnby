@@ -13,12 +13,11 @@ export const ROUTES = {
     TAGS: '/client/tags',
     SETTINGS: '/client/settings',
     // Dynamic routes
-    article: (uuid) => `/client/article/${uuid}`,
-    // Legacy reader page (Preact reader not yet built)
+    article: (uuid) => `/client/articles/${uuid}`,
     reader: (articleUuid, highlightId = null) =>
       highlightId
-        ? `/app/article/${articleUuid}?highlight_id=highlight${highlightId}`
-        : `/app/article/${articleUuid}`,
+        ? `/client/articles/${articleUuid}?highlight_id=highlight${highlightId}`
+        : `/client/articles/${articleUuid}`,
   },
   API: {
     LOGIN: '/api/auth/login',
