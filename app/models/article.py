@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
+import json
 import math
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString, Tag
 from flask import url_for
 from flask_login import current_user
 from sqlalchemy import desc, func, Index, select
@@ -39,6 +40,7 @@ class Article(db.Model):
     article_created_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     read_time = db.Column(db.String)
     processing = db.Column(db.Boolean, default=False)
+    content_tree = db.Column(db.JSON)
 
     def __repr__(self):
         return f"<{self.id}: {self.title}>"
@@ -177,6 +179,7 @@ class Article(db.Model):
             "title": self.title,
             "filetype": self.filetype,
             "content": self.content if with_content else None,
+            "content_tree": self.content_tree if with_content else None,
             "unread": self.unread,
             "archived": self.archived,
             "done": self.done,
@@ -185,6 +188,7 @@ class Article(db.Model):
             "reflections": self.reflections if not preview else None,
             "read_time": self.read_time,
             "progress": progress,
+            "bookmarks": json.loads(self.bookmarks) if self.bookmarks else [],
             "created_at": self.article_created_date,
             "highlights_count": len(self.highlights),
             "tags": [tag.to_dict() for tag in self.tags],
@@ -252,6 +256,74 @@ class Article(db.Model):
             low = f"{low}min"
 
         self.read_time = f"{high}-{low} read"
+
+    def build_content_tree(self):
+        """Build a content tree with text offsets for highlighting and bookmarking."""
+        VOID_ELEMENTS = {"br", "hr"}
+        ANCHOR_ELEMENTS = {"img"}
+        BLOCK_CONTENT = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "figcaption"}
+
+        soup = BeautifulSoup(self.content or "", "lxml")
+        offset = 0
+
+        def process(node):
+            nonlocal offset
+
+            if isinstance(node, NavigableString):
+                text = str(node)
+                if not text.strip():
+                    return None
+                start = offset
+                offset += len(text)
+                return {"type": "text", "text": text, "start": start, "length": len(text)}
+
+            if isinstance(node, Tag):
+                if node.name in VOID_ELEMENTS:
+                    start = offset
+                    offset += 1
+                    return {"type": "void", "tag": node.name, "start": start, "length": 1}
+
+                if node.name in ANCHOR_ELEMENTS:
+                    start = offset
+                    offset += 1
+                    return {
+                        "type": "anchor",
+                        "tag": node.name,
+                        "src": node.get("src"),
+                        "alt": node.get("alt"),
+                        "start": start,
+                        "length": 1,
+                    }
+
+                children = []
+                for child in node.children:
+                    child_node = process(child)
+                    if child_node:
+                        children.append(child_node)
+
+                if not children:
+                    return None
+
+                if node.name in BLOCK_CONTENT:
+                    children.append({"type": "text", "text": "\n", "start": offset, "length": 1})
+                    offset += 1
+
+                first = children[0]
+                last = children[-1]
+                end = last["end"] if "end" in last else last["start"] + last["length"]
+
+                return {"type": "element", "tag": node.name, "children": children, "start": first["start"], "end": end}
+
+            return None
+
+        tree = []
+        root = soup.body or soup
+        for child in root.children:
+            node = process(child)
+            if node:
+                tree.append(node)
+
+        self.content_tree = tree
 
     def add_tag(self, tag):
         if not self.is_added_tag(tag):
