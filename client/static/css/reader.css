@@ -61,6 +61,11 @@
   }
 }
 
+/* Sidebar popout wrapper */
+.sidebar-popout-wrapper {
+  position: relative;
+}
+
 /* Settings popout */
 .reader-settings-popout {
   position: absolute;
@@ -136,7 +141,7 @@
 }
 
 .font-btn.serif {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 .font-label {
@@ -196,5 +201,118 @@
 
 /* Active state for sidebar buttons */
 .sidebar-content .btn-ghost.active {
+  background-color: var(--accent);
+}
+
+/* Bookmarks popout */
+.reader-bookmarks-popout {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  margin-left: var(--space-2);
+  background-color: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-3);
+  min-width: 240px;
+  max-height: 400px;
+  overflow-y: auto;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+  z-index: 50;
+}
+
+.bookmarks-add {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.bookmarks-add input {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--input-background);
+  color: var(--foreground);
+  font-size: var(--font-size-sm);
+}
+
+.bookmarks-add input::placeholder {
+  color: var(--muted-foreground);
+}
+
+.bookmarks-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: var(--radius);
+  background: none;
+  border: none;
+  text-align: left;
+  color: var(--foreground);
+  width: 100%;
+}
+
+.bookmark-item:hover {
+  background-color: var(--accent);
+}
+
+.bookmark-name {
+  flex: 1;
+  font-size: var(--font-size-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  text-align: left;
+  padding: var(--space-2);
+}
+
+.bookmark-name:hover {
+  background-color: var(--accent);
+}
+
+.bookmark-position {
+  font-size: var(--font-size-xs);
+  color: var(--muted-foreground);
+}
+
+.bookmark-delete {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+}
+
+.bookmark-delete:hover {
+  color: var(--destructive);
+  background-color: var(--accent);
+}
+
+.bookmark-reset {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted-foreground);
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+}
+
+.bookmark-reset:hover {
+  color: var(--foreground);
   background-color: var(--accent);
 }
