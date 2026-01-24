@@ -4,7 +4,7 @@ from datetime import datetime
 
 from bs4 import BeautifulSoup
 import sqlalchemy as sa
-from sqlalchemy import select
+import sqlalchemy.orm as so
 
 from app.models.base import db, generate_str_id
 from app.models.associations import highlights_topics, tags_highlights
@@ -12,13 +12,13 @@ from app.models.tag import Tag
 
 
 class Highlight(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String, default=generate_str_id, unique=True)
-    text = db.Column(db.String)
-    prompt = db.Column(db.String)
-    source = db.Column(db.String)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
-    article_id = db.Column(db.Integer, db.ForeignKey("article.id"), index=True)
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    uuid: so.Mapped[str] = so.mapped_column(sa.String, default=generate_str_id, unique=True)
+    text: so.Mapped[str | None] = so.mapped_column(sa.String)
+    prompt: so.Mapped[str | None] = so.mapped_column(sa.String)
+    source: so.Mapped[str | None] = so.mapped_column(sa.String)
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"), index=True)
+    article_id: so.Mapped[int | None] = so.mapped_column(sa.ForeignKey("article.id"), index=True)
     topics = db.relationship(
         "Topic",
         secondary=highlights_topics,
@@ -26,15 +26,16 @@ class Highlight(db.Model):
         lazy="dynamic",
     )
 
-    archived = db.Column(db.Boolean, index=True, default=False)
-    no_topics = db.Column(db.Boolean, default=True, index=True)
-    note = db.Column(db.String, index=True)
+    archived: so.Mapped[bool] = so.mapped_column(sa.Boolean, index=True, default=False)
+    no_topics: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=True, index=True)
+    note: so.Mapped[str | None] = so.mapped_column(sa.String, index=True)
     tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights")
-    position = db.Column(db.String)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    review_date = db.Column(db.DateTime, default=datetime.utcnow)
-    review_schedule = db.Column(db.Integer, default=0)
-    do_not_review = db.Column(db.Boolean, default=False)
+    start: so.Mapped[int | None] = so.mapped_column(sa.Integer)
+    end: so.Mapped[int | None] = so.mapped_column(sa.Integer)
+    created_date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, default=datetime.utcnow)
+    review_date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, default=datetime.utcnow)
+    review_schedule: so.Mapped[int] = so.mapped_column(sa.Integer, default=0)
+    do_not_review: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
 
     def to_dict(self):
         source = self.article.source or self.article.source_url if self.article else "unknown"
@@ -50,6 +51,8 @@ class Highlight(db.Model):
             "article_title": self.article.title if self.article else None,
             "article_uuid": self.article.uuid if self.article else None,
             "user_id": self.user_id,
+            "start": self.start,
+            "end": self.end,
             "created_date": self.created_date,
             "review_date": self.review_date,
             "review_schedule": self.review_schedule,
@@ -66,7 +69,7 @@ class Highlight(db.Model):
     def tag_ids(self):
         """Get tag IDs efficiently from junction table without loading Tag objects."""
         return db.session.scalars(
-            select(tags_highlights.c.tag_id).where(tags_highlights.c.highlight_id == self.id)
+            sa.select(tags_highlights.c.tag_id).where(tags_highlights.c.highlight_id == self.id)
         ).all()
 
     @property
@@ -129,7 +132,7 @@ class Highlight(db.Model):
     def _get_or_create_tag_for_topic(self, topic):
         """Get or create a Tag matching a Topic by normalized name."""
         normalized_name = topic.title.strip().lower()
-        stmt = select(Tag).where(
+        stmt = sa.select(Tag).where(
             Tag.user_id == topic.user_id, sa.func.lower(sa.func.trim(Tag.name)) == normalized_name
         )
         tag = db.session.scalar(stmt)
@@ -148,7 +151,7 @@ class Highlight(db.Model):
     def _get_tag_for_topic(self, topic):
         """Get the Tag matching a Topic by normalized name (don't create)."""
         normalized_name = topic.title.strip().lower()
-        stmt = select(Tag).where(
+        stmt = sa.select(Tag).where(
             Tag.user_id == topic.user_id, sa.func.lower(sa.func.trim(Tag.name)) == normalized_name
         )
         return db.session.scalar(stmt)
