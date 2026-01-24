@@ -11,6 +11,9 @@ import Icon from './components/Icon/Icon'
 import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import { api } from './services/api'
+import { ROUTES } from './services/routes'
+import { useReaderProgress } from './hooks/useReaderProgress'
+import { useReaderBookmarks } from './hooks/useReaderBookmarks'
 
 function ReaderPage() {
   const [article, setArticle] = useState(null)
@@ -20,9 +23,9 @@ function ReaderPage() {
   // UI state
   const [notesOpen, setNotesOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [bookmarksOpen, setBookmarksOpen] = useState(false)
 
-  // Reader state
-  const [progress, setProgress] = useState(0)
+  // Reader settings
   const [readerSettings, setReaderSettings] = useState(() => {
     const saved = localStorage.getItem('readerSettings')
     if (saved) {
@@ -35,23 +38,40 @@ function ReaderPage() {
     return { font: 'sans-serif', size: 4, spacing: 'line-height-mid' }
   })
 
-  // Persist reader settings to localStorage
   useEffect(() => {
     localStorage.setItem('readerSettings', JSON.stringify(readerSettings))
   }, [readerSettings])
 
-  const saveTimeoutRef = useRef(null)
   const contentRef = useRef(null)
+  const bookmarkInputRef = useRef(null)
 
-  // Extract article UUID from URL
   const articleUuid = window.location.pathname.split('/').pop()
+  const hasContentTree = article?.content_tree && Array.isArray(article.content_tree)
+
+  // Hooks
+  const { progress } = useReaderProgress(contentRef, articleUuid, loading, article?.progress || 0)
+
+  const {
+    addBookmark,
+    deleteBookmark,
+    jumpToBookmark,
+    resetFurthest,
+    furthestBookmark,
+    userBookmarks,
+  } = useReaderBookmarks(
+    contentRef,
+    articleUuid,
+    loading,
+    hasContentTree,
+    article?.bookmarks,
+    setArticle,
+  )
 
   const fetchArticle = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get(`/api/articles/${articleUuid}`, { with_content: 'true' })
+      const { data } = await api.get(ROUTES.API.article(articleUuid), { with_content: 'true' })
       setArticle(data.article)
-      setProgress(data.article.progress || 0)
       setError(null)
     } catch (err) {
       console.error('Error fetching article:', err)
@@ -61,50 +81,14 @@ function ReaderPage() {
     }
   }
 
-  const saveProgress = useCallback(
-    (newProgress) => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current)
-      }
-
-      saveTimeoutRef.current = setTimeout(async () => {
-        try {
-          await api.patch(`/api/articles/${articleUuid}`, { progress: newProgress })
-        } catch (err) {
-          console.error('Error saving progress:', err)
-        }
-      }, 2000)
-    },
-    [articleUuid],
-  )
-
   useEffect(() => {
     fetchArticle()
   }, [articleUuid])
 
-  // Scroll tracking
-  useEffect(() => {
-    const container = contentRef.current
-    if (!container || loading) return
-
-    const handleScroll = () => {
-      const scrollTop = container.scrollTop
-      const scrollHeight = container.scrollHeight - container.clientHeight
-      const scrollPercent = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0
-      const newProgress = Math.min(100, Math.max(0, scrollPercent))
-
-      setProgress(newProgress)
-      saveProgress(newProgress)
-    }
-
-    container.addEventListener('scroll', handleScroll, { passive: true })
-    return () => container.removeEventListener('scroll', handleScroll)
-  }, [articleUuid, loading, saveProgress])
-
   const saveNotes = useCallback(
     async (notes) => {
       try {
-        await api.patch(`/api/articles/${articleUuid}`, { notes })
+        await api.patch(ROUTES.API.article(articleUuid), { notes })
         setArticle((prev) => ({ ...prev, notes }))
       } catch (err) {
         console.error('Error saving notes:', err)
@@ -113,6 +97,13 @@ function ReaderPage() {
     },
     [articleUuid],
   )
+
+  const handleAddBookmark = () => {
+    const name = bookmarkInputRef.current?.value?.trim()
+    if (addBookmark(name)) {
+      bookmarkInputRef.current.value = ''
+    }
+  }
 
   // Line height SVG icons
   const LineHeightIcon = ({ spacing }) => {
@@ -123,7 +114,15 @@ function ReaderPage() {
     }
     const y = positions[spacing]
     return (
-      <svg xmlns="http://www.w3.org/2000/svg" width="38" height="24" viewBox="0 0 38 24" fill="currentColor">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="38"
+        height="24"
+        viewBox="0 0 38 24"
+        fill="currentColor"
+        role="img"
+        aria-label="Line spacing"
+      >
         <rect x="0" y={y[0]} width="28" height="2" />
         <rect x="0" y={y[1]} width="38" height="2" />
         <rect x="0" y={y[2]} width="18" height="2" />
@@ -203,7 +202,65 @@ function ReaderPage() {
     </div>
   )
 
-  // Sidebar content for reader - render prop receives isExpanded
+  // Bookmarks popout component
+  const BookmarksPopout = () => (
+    <div className="reader-bookmarks-popout">
+      <div className="bookmarks-add">
+        <input
+          ref={bookmarkInputRef}
+          type="text"
+          placeholder="Bookmark name..."
+          onKeyDown={(e) => e.key === 'Enter' && handleAddBookmark()}
+        />
+        <Button variant="default" size="sm" onClick={handleAddBookmark}>
+          Add
+        </Button>
+      </div>
+
+      <div className="bookmarks-list">
+        {furthestBookmark && (
+          <div className="bookmark-item">
+            <button
+              type="button"
+              className="bookmark-name"
+              onClick={() => jumpToBookmark(furthestBookmark)}
+            >
+              Furthest read
+            </button>
+            <button
+              type="button"
+              className="bookmark-reset"
+              onClick={resetFurthest}
+              title="Reset to current position"
+            >
+              <Icon name="restart_alt" />
+            </button>
+          </div>
+        )}
+
+        {userBookmarks.map((bookmark) => (
+          <div key={bookmark.name} className="bookmark-item">
+            <button
+              type="button"
+              className="bookmark-name"
+              onClick={() => jumpToBookmark(bookmark)}
+            >
+              {bookmark.name}
+            </button>
+            <button
+              type="button"
+              className="bookmark-delete"
+              onClick={() => deleteBookmark(bookmark.name)}
+            >
+              <Icon name="close" />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  // Sidebar content for reader
   const sidebarContent = ({ isExpanded }) => (
     <>
       <button
@@ -211,6 +268,7 @@ function ReaderPage() {
         onClick={() => {
           setNotesOpen(!notesOpen)
           setSettingsOpen(false)
+          setBookmarksOpen(false)
         }}
         className={`nav-link ${!isExpanded ? 'centered' : ''} ${notesOpen ? 'active' : ''}`}
         title={!isExpanded ? 'Notes' : undefined}
@@ -219,12 +277,12 @@ function ReaderPage() {
         {isExpanded && <span>Notes</span>}
       </button>
 
-      <div style={{ position: 'relative' }}>
+      <div className="sidebar-popout-wrapper">
         <button
           type="button"
           onClick={() => {
             setSettingsOpen(!settingsOpen)
-            setNotesOpen(false)
+            setBookmarksOpen(false)
           }}
           className={`nav-link ${!isExpanded ? 'centered' : ''} ${settingsOpen ? 'active' : ''}`}
           title={!isExpanded ? 'Settings' : undefined}
@@ -234,6 +292,23 @@ function ReaderPage() {
         </button>
 
         {settingsOpen && <SettingsPopout />}
+      </div>
+
+      <div className="sidebar-popout-wrapper">
+        <button
+          type="button"
+          onClick={() => {
+            setBookmarksOpen(!bookmarksOpen)
+            setSettingsOpen(false)
+          }}
+          className={`nav-link ${!isExpanded ? 'centered' : ''} ${bookmarksOpen ? 'active' : ''}`}
+          title={!isExpanded ? 'Bookmarks' : undefined}
+        >
+          <Icon name="bookmarks" className="icon" />
+          {isExpanded && <span>Bookmarks</span>}
+        </button>
+
+        {bookmarksOpen && <BookmarksPopout />}
       </div>
 
       {article?.source_url && (
@@ -274,7 +349,13 @@ function ReaderPage() {
   return (
     <Layout sidebarContent={sidebarContent}>
       <div className={`reader-wrapper ${notesOpen ? 'with-notes' : ''}`}>
-        <ReaderContent ref={contentRef} article={article} progress={progress} settings={readerSettings} />
+        <ReaderContent
+          ref={contentRef}
+          article={article}
+          progress={progress}
+          settings={readerSettings}
+          bookmarks={article?.bookmarks || []}
+        />
 
         {notesOpen && (
           <NotesPanel
