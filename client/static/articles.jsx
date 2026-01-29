@@ -20,6 +20,7 @@ import pollService from './services/pollService'
 import { api } from './services/api'
 import { ROUTES } from './services/routes'
 import { getReadableSource } from './utils/sourceFormatter'
+import { useUrlParams } from './hooks/useUrlParams'
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All (non-archived)' },
@@ -43,20 +44,22 @@ function ArticlesList() {
   const [error, setError] = useState(null)
   const [hasNext, setHasNext] = useState(false)
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState('15')
 
-  // Filter state (local, applied on button click)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
-  const [selectedTags, setSelectedTags] = useState([])
-
-  // Applied filters (sent to server)
-  const [appliedFilters, setAppliedFilters] = useState({
+  // URL-synced pagination and filters
+  const [params, setParams] = useUrlParams({
+    page: 1,
+    perPage: '15',
     q: '',
     status: '',
     tag_ids: '',
   })
+
+  // Local filter state (for form inputs, applied on button click)
+  const [searchQuery, setSearchQuery] = useState(params.q)
+  const [statusFilter, setStatusFilter] = useState(params.status)
+  const [selectedTags, setSelectedTags] = useState(
+    params.tag_ids ? params.tag_ids.split(',').map(Number) : [],
+  )
 
   // Modal states
   const [editingArticle, setEditingArticle] = useState(null)
@@ -68,22 +71,24 @@ function ArticlesList() {
 
   useEffect(() => {
     fetchArticles()
-  }, [page, perPage, appliedFilters])
+  }, [params.page, params.perPage, params.q, params.status, params.tag_ids])
 
   const fetchArticles = async () => {
     try {
       setLoading(true)
-      const params = {
-        page,
-        per_page: perPage,
-        ...appliedFilters,
+      const queryParams = {
+        page: params.page,
+        per_page: params.perPage,
+        q: params.q,
+        status: params.status,
+        tag_ids: params.tag_ids,
       }
       // Remove empty params
-      Object.keys(params).forEach((key) => {
-        if (!params[key]) delete params[key]
+      Object.keys(queryParams).forEach((key) => {
+        if (!queryParams[key]) delete queryParams[key]
       })
 
-      const { data } = await api.get('/api/articles', params)
+      const { data } = await api.get('/api/articles', queryParams)
       setRecentArticles(data.recent || [])
       setArticles(data.articles || [])
       setHasNext(data.has_next || false)
@@ -107,8 +112,8 @@ function ArticlesList() {
   }
 
   const applyFilters = () => {
-    setPage(1)
-    setAppliedFilters({
+    setParams({
+      page: 1,
       q: searchQuery,
       status: statusFilter,
       tag_ids: selectedTags.join(','),
@@ -122,8 +127,7 @@ function ArticlesList() {
   }
 
   const handlePerPageChange = (value) => {
-    setPerPage(value)
-    setPage(1)
+    setParams({ perPage: value, page: 1 })
   }
 
   const tagOptions = useMemo(
@@ -153,7 +157,7 @@ function ArticlesList() {
   }
 
   const handleArticleSaved = (updatedArticle) => {
-    const isViewingArchived = appliedFilters.status === 'archived'
+    const isViewingArchived = params.status === 'archived'
     const articleIsArchived = updatedArticle.archived
 
     // If archive status doesn't match current filter, remove from list
@@ -297,8 +301,8 @@ function ArticlesList() {
               {/* Articles Count */}
               {total > 0 && (
                 <div className="articles-count">
-                  Showing {(page - 1) * parseInt(perPage, 10) + 1}-
-                  {Math.min(page * parseInt(perPage, 10), total)} of {total} articles
+                  Showing {(params.page - 1) * parseInt(params.perPage, 10) + 1}-
+                  {Math.min(params.page * parseInt(params.perPage, 10), total)} of {total} articles
                 </div>
               )}
             </div>
@@ -326,23 +330,23 @@ function ArticlesList() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
+                    onClick={() => setParams({ page: Math.max(1, params.page - 1) })}
+                    disabled={params.page === 1}
                   >
                     <Icon name="chevron_left" />
                   </Button>
-                  <span className="pagination-info">Page {page}</span>
+                  <span className="pagination-info">Page {params.page}</span>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setPage((p) => p + 1)}
+                    onClick={() => setParams({ page: params.page + 1 })}
                     disabled={!hasNext}
                   >
                     <Icon name="chevron_right" />
                   </Button>
                   <Select
                     options={PER_PAGE_OPTIONS}
-                    value={perPage}
+                    value={params.perPage}
                     onChange={handlePerPageChange}
                   />
                 </div>
