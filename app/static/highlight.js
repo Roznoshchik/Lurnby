@@ -12,7 +12,7 @@ let rangyHighlight;
 
 function textActions(event) {
 
-  // var h = document.documentElement, 
+  // var h = document.documentElement,
   // b = document.body,
   // st = 'scrollTop',
   // sh = 'scrollHeight';
@@ -114,8 +114,8 @@ $('#AddHighlightModal').on('show.bs.modal', function (event) {
   //$('#highlight_position').val(highlight_position);
   byId('message-text').value = '';
   byId('highlightPrompt').value = '';
-  var add_highlight_nonmember_list = Array.from(topics)
-  autocomplete(byId("new_highlight_topic_input"), add_highlight_nonmember_list, byId('NewHighlightMembers'), create = true, 'addhighlight');
+  // var add_highlight_nonmember_list = Array.from(topics)
+  // autocomplete(byId("new_highlight_topic_input"), add_highlight_nonmember_list, byId('NewHighlightMembers'), create = true, 'addhighlight');
 
   // var active = byClass('active')
   //   for (var i = active.length - 1; i>=0; i--){

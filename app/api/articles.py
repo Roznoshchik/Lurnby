@@ -224,6 +224,10 @@ def update_article(article_uuid):
         if "tags" in data:
             article = update_tags(tag_ids=data["tags"], resource=article)
 
+        if "content" in data:
+            article.build_content_tree()
+            article.reanchor_highlights()
+
         ev = Event.add(EventName.UPDATED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)
         db.session.commit()

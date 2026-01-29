@@ -1,0 +1,64 @@
+.popover {
+  position: fixed;
+  z-index: 1000;
+  background-color: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  animation: popoverIn 100ms ease-out;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Content wrapper for padding */
+.popover-content {
+  padding: var(--space-2);
+}
+
+/* Toolbar variant - horizontal button row */
+.popover-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1);
+}
+
+.popover-toolbar button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2);
+  border: none;
+  background: transparent;
+  color: var(--foreground);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color 100ms ease;
+}
+
+.popover-toolbar button:hover {
+  background-color: var(--muted);
+}
+
+.popover-toolbar button:active {
+  background-color: var(--accent);
+}
+
+/* Divider between button groups */
+.popover-divider {
+  width: 1px;
+  height: 24px;
+  background-color: var(--border);
+  margin: 0 var(--space-1);
+}

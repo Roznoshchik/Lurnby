@@ -196,6 +196,12 @@ export default function ArticleEditModal({
     window.location.href = ROUTES.PAGES.article(article.uuid)
   }
 
+  const handleViewHighlights = () => {
+    window.location.href = ROUTES.PAGES.articleHighlights(article.uuid)
+  }
+
+  const highlightsCount = fullArticle?.highlights_count || article?.highlights_count || 0
+
   const footer = (
     <>
       <Button
@@ -208,6 +214,12 @@ export default function ArticleEditModal({
         {isArchived ? 'Unarchive' : 'Archive'}
       </Button>
       <div className="footer-spacer" />
+      {highlightsCount > 0 && (
+        <Button variant="outline" onClick={handleViewHighlights}>
+          <Icon name="ink_highlighter" />
+          Highlights ({highlightsCount})
+        </Button>
+      )}
       <Button variant="outline" onClick={onClose} disabled={saving}>
         Cancel
       </Button>

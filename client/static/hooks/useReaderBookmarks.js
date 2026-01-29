@@ -6,7 +6,6 @@ export function useReaderBookmarks(
   contentRef,
   articleUuid,
   loading,
-  hasContentTree,
   bookmarks,
   setArticle,
 ) {
@@ -110,7 +109,7 @@ export function useReaderBookmarks(
   // Track furthest read position on scroll
   useEffect(() => {
     const container = contentRef.current?.contentContainer
-    if (!container || loading || !hasContentTree) return
+    if (!container || loading) return
 
     let debounceTimer = null
 
@@ -137,7 +136,7 @@ export function useReaderBookmarks(
       container.removeEventListener('scroll', handleScroll)
       if (debounceTimer) clearTimeout(debounceTimer)
     }
-  }, [contentRef, articleUuid, loading, hasContentTree, saveBookmarks])
+  }, [contentRef, articleUuid, loading, saveBookmarks])
 
   // Derived values for UI
   const furthestBookmark = bookmarks?.find((b) => b.name === 'furthest')

@@ -5,7 +5,7 @@ import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticleCard.css'
 
-export default function ArticleCard({ article, onOpen, onEdit }) {
+export default function ArticleCard({ article, onOpen, onEdit, onViewHighlights }) {
   const getStatusIcon = () => {
     if (article.done) {
       return <Icon name="check_circle" className="icon status-done" />
@@ -59,12 +59,6 @@ export default function ArticleCard({ article, onOpen, onEdit }) {
                 <span>{article.read_time} min</span>
               </div>
             )}
-            {article.highlights_count > 0 && (
-              <div className="metadata-item">
-                <Icon name="ink_highlighter" className="icon" />
-                <span>{article.highlights_count}</span>
-              </div>
-            )}
           </div>
           <div className="article-card-actions">
             <Button
@@ -74,8 +68,19 @@ export default function ArticleCard({ article, onOpen, onEdit }) {
               className="icon-button"
               aria-label="Edit article"
             >
-              <Icon name="edit" />
+              <Icon name="edit_square" />
             </Button>
+            {article.highlights_count > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onViewHighlights}
+                className="icon-button"
+                aria-label="View highlights"
+              >
+                <Icon name="ink_highlighter" />
+              </Button>
+            )}
             <Button
               variant="ghost"
               size="sm"

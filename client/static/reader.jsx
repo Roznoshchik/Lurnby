@@ -6,6 +6,9 @@ import './css/reader.css'
 import { Layout } from './components/Layout/Layout'
 import { ReaderContent } from './components/ReaderContent/ReaderContent'
 import { NotesPanel } from './components/NotesPanel/NotesPanel'
+import HighlightPopover from './components/HighlightPopover/HighlightPopover'
+import HighlightAddModal from './components/HighlightAddModal/HighlightAddModal'
+import HighlightEditModal from './components/HighlightEditModal/HighlightEditModal'
 import Button from './components/Button/Button'
 import Icon from './components/Icon/Icon'
 import RequireAuth from './components/RequireAuth/RequireAuth'
@@ -14,6 +17,7 @@ import { api } from './services/api'
 import { ROUTES } from './services/routes'
 import { useReaderProgress } from './hooks/useReaderProgress'
 import { useReaderBookmarks } from './hooks/useReaderBookmarks'
+import { useReaderHighlights } from './hooks/useReaderHighlights'
 
 function ReaderPage() {
   const [article, setArticle] = useState(null)
@@ -24,6 +28,13 @@ function ReaderPage() {
   const [notesOpen, setNotesOpen] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [bookmarksOpen, setBookmarksOpen] = useState(false)
+  const [highlightModalOpen, setHighlightModalOpen] = useState(false)
+  const [highlightSelectionData, setHighlightSelectionData] = useState(null)
+  const [editModalOpen, setEditModalOpen] = useState(false)
+  const [editingHighlight, setEditingHighlight] = useState(null)
+
+  // Tags for highlight creation
+  const [allTags, setAllTags] = useState([])
 
   // Reader settings
   const [readerSettings, setReaderSettings] = useState(() => {
@@ -42,11 +53,78 @@ function ReaderPage() {
     localStorage.setItem('readerSettings', JSON.stringify(readerSettings))
   }, [readerSettings])
 
+  // Close popouts on outside click
+  useEffect(() => {
+    if (!settingsOpen && !bookmarksOpen) return
+
+    const handleClickOutside = (e) => {
+      if (settingsOpen && settingsPopoutRef.current && !settingsPopoutRef.current.contains(e.target)) {
+        setSettingsOpen(false)
+      }
+      if (bookmarksOpen && bookmarksPopoutRef.current && !bookmarksPopoutRef.current.contains(e.target)) {
+        setBookmarksOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [settingsOpen, bookmarksOpen])
+
   const contentRef = useRef(null)
   const bookmarkInputRef = useRef(null)
+  const settingsPopoutRef = useRef(null)
+  const bookmarksPopoutRef = useRef(null)
 
   const articleUuid = window.location.pathname.split('/').pop()
-  const hasContentTree = article?.content_tree && Array.isArray(article.content_tree)
+  const highlightUuid = new URLSearchParams(window.location.search).get('highlight')
+
+  // Callback for when a highlight is created (used by hook and modal)
+  const handleHighlightCreated = useCallback((highlight) => {
+    setHighlightModalOpen(false)
+    setHighlightSelectionData(null)
+    if (highlight) {
+      setArticle((prev) => ({
+        ...prev,
+        highlights: [...(prev.highlights || []), highlight],
+      }))
+    }
+  }, [])
+
+  // Callback for highlight click in reader
+  const handleHighlightClick = useCallback(
+    (highlightId) => {
+      const highlight = article?.highlights?.find((h) => h.uuid === highlightId)
+      if (highlight) {
+        setEditingHighlight(highlight)
+        setEditModalOpen(true)
+      }
+    },
+    [article?.highlights],
+  )
+
+  // Callback for highlight update
+  const handleHighlightSave = useCallback((updatedHighlight) => {
+    setEditModalOpen(false)
+    setEditingHighlight(null)
+    if (updatedHighlight) {
+      setArticle((prev) => ({
+        ...prev,
+        highlights: prev.highlights.map((h) => (h.uuid === updatedHighlight.uuid ? updatedHighlight : h)),
+      }))
+    }
+  }, [])
+
+  // Callback for highlight removal
+  const handleHighlightRemove = useCallback((removedHighlight) => {
+    setEditModalOpen(false)
+    setEditingHighlight(null)
+    if (removedHighlight) {
+      setArticle((prev) => ({
+        ...prev,
+        highlights: prev.highlights.filter((h) => h.uuid !== removedHighlight.uuid),
+      }))
+    }
+  }, [])
 
   // Hooks
   const { progress } = useReaderProgress(contentRef, articleUuid, loading, article?.progress || 0)
@@ -62,10 +140,12 @@ function ReaderPage() {
     contentRef,
     articleUuid,
     loading,
-    hasContentTree,
     article?.bookmarks,
     setArticle,
   )
+
+  const { popoverOpen, setPopoverOpen, selectionRect, createHighlight, openHighlightModal } =
+    useReaderHighlights(contentRef, articleUuid, loading, handleHighlightCreated)
 
   const fetchArticle = async () => {
     try {
@@ -85,6 +165,19 @@ function ReaderPage() {
     fetchArticle()
   }, [articleUuid])
 
+  // Fetch tags for highlight creation modal
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { data } = await api.get(ROUTES.API.TAGS)
+        setAllTags(data.tags || [])
+      } catch (err) {
+        console.error('Error fetching tags:', err)
+      }
+    }
+    fetchTags()
+  }, [])
+
   const saveNotes = useCallback(
     async (notes) => {
       try {
@@ -103,6 +196,18 @@ function ReaderPage() {
     if (addBookmark(name)) {
       bookmarkInputRef.current.value = ''
     }
+  }
+
+  const handleOpenHighlightModal = () => {
+    const data = openHighlightModal()
+    if (data) {
+      setHighlightSelectionData(data)
+      setHighlightModalOpen(true)
+    }
+  }
+
+  const handleTagCreate = (newTag) => {
+    setAllTags((prev) => [...prev, newTag])
   }
 
   // Line height SVG icons
@@ -273,11 +378,11 @@ function ReaderPage() {
         className={`nav-link ${!isExpanded ? 'centered' : ''} ${notesOpen ? 'active' : ''}`}
         title={!isExpanded ? 'Notes' : undefined}
       >
-        <Icon name="edit_note" className="icon" />
+        <Icon name="edit_document" className="icon" />
         {isExpanded && <span>Notes</span>}
       </button>
 
-      <div className="sidebar-popout-wrapper">
+      <div ref={settingsPopoutRef} className="sidebar-popout-wrapper">
         <button
           type="button"
           onClick={() => {
@@ -287,14 +392,14 @@ function ReaderPage() {
           className={`nav-link ${!isExpanded ? 'centered' : ''} ${settingsOpen ? 'active' : ''}`}
           title={!isExpanded ? 'Settings' : undefined}
         >
-          <Icon name="text_format" className="icon" />
+          <Icon name="serif" className="icon" />
           {isExpanded && <span>Settings</span>}
         </button>
 
         {settingsOpen && <SettingsPopout />}
       </div>
 
-      <div className="sidebar-popout-wrapper">
+      <div ref={bookmarksPopoutRef} className="sidebar-popout-wrapper">
         <button
           type="button"
           onClick={() => {
@@ -346,15 +451,21 @@ function ReaderPage() {
     )
   }
 
+  // Get container ref for popover bounds
+  const readerContainerRef = useRef(null)
+
   return (
     <Layout sidebarContent={sidebarContent}>
-      <div className={`reader-wrapper ${notesOpen ? 'with-notes' : ''}`}>
+      <div ref={readerContainerRef} className={`reader-wrapper ${notesOpen ? 'with-notes' : ''}`}>
         <ReaderContent
           ref={contentRef}
           article={article}
           progress={progress}
           settings={readerSettings}
           bookmarks={article?.bookmarks || []}
+          highlights={article?.highlights || []}
+          onHighlightClick={handleHighlightClick}
+          scrollToHighlight={highlightUuid}
         />
 
         {notesOpen && (
@@ -364,6 +475,41 @@ function ReaderPage() {
             onClose={() => setNotesOpen(false)}
           />
         )}
+
+        <HighlightPopover
+          isOpen={popoverOpen}
+          onClose={() => setPopoverOpen(false)}
+          anchorRect={selectionRect}
+          containerRef={readerContainerRef}
+          onHighlight={createHighlight}
+          onHighlightWithNotes={handleOpenHighlightModal}
+        />
+
+        <HighlightAddModal
+          isOpen={highlightModalOpen}
+          onClose={() => {
+            setHighlightModalOpen(false)
+            setHighlightSelectionData(null)
+          }}
+          selectionData={highlightSelectionData}
+          articleUuid={articleUuid}
+          allTags={allTags}
+          onSave={handleHighlightCreated}
+          onTagCreate={handleTagCreate}
+        />
+
+        <HighlightEditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false)
+            setEditingHighlight(null)
+          }}
+          highlight={editingHighlight}
+          allTags={allTags}
+          onSave={handleHighlightSave}
+          onRemove={handleHighlightRemove}
+          onTagCreate={handleTagCreate}
+        />
       </div>
     </Layout>
   )

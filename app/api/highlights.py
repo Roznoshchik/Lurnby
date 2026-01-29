@@ -17,7 +17,7 @@ from app.api.helpers.add_highlight_methods import (
 )
 from app.api.helpers.query_maker import apply_pagination, get_total_count
 from app.api.helpers.update_tags import update_tags
-from app.models import Highlight, Event, Tag
+from app.models import Article, Highlight, Event, Tag
 from app.models.event import EventName
 
 
@@ -42,6 +42,8 @@ def get_highlights():
         e.g. 1,5,71
     tag_status: Tagged || Untagged || all (default)
         defaults to all
+    article_uuid : filter by specific article UUID
+        e.g. abc123
     q : search query. This is applied after filtering by status and tags.
         e.g. hello old friend
 
@@ -62,6 +64,7 @@ def get_highlights():
         status = request.args.get("status", None)
         tag_status = request.args.get("tag_status", None)
         tag_ids = request.args.get("tag_ids", None)
+        article_uuid = request.args.get("article_uuid", None)
 
         # Build query with SQLAlchemy 2.0 select
         # Eager load non-archived tags to avoid N+1 queries
@@ -73,6 +76,7 @@ def get_highlights():
 
         # Apply filters
         stmt = hqm.filter_by_status(stmt, status)
+        stmt = hqm.filter_by_article(stmt, article_uuid)
         stmt = hqm.filter_by_tag_status(stmt, tag_status)
         stmt = hqm.filter_by_tags(stmt, tag_ids)
         stmt = hqm.filter_by_search_phrase(stmt, search_phrase)
@@ -204,7 +208,7 @@ def delete_highlight(uuid):
 
         db.session.commit()
 
-        return jsonify()
+        return jsonify(highlight=highlight.to_dict())
 
     except Exception as e:
         if isinstance(e, LurnbyValueError):

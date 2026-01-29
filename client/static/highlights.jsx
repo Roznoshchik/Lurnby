@@ -30,8 +30,13 @@ const PER_PAGE_OPTIONS = [
 ]
 
 function HighlightsList() {
+  // Get article_uuid from URL params if present
+  const urlParams = new URLSearchParams(window.location.search)
+  const articleUuid = urlParams.get('article')
+
   const [highlights, setHighlights] = useState([])
   const [allTags, setAllTags] = useState([])
+  const [articleInfo, setArticleInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [hasNext, setHasNext] = useState(false)
@@ -49,6 +54,7 @@ function HighlightsList() {
     q: '',
     tag_status: '',
     tag_ids: '',
+    article_uuid: articleUuid || '',
   })
 
   // Modal states
@@ -103,6 +109,7 @@ function HighlightsList() {
       q: searchQuery,
       tag_status: tagStatusFilter,
       tag_ids: selectedTags.join(','),
+      article_uuid: articleUuid || '',
     })
   }
 
@@ -136,8 +143,8 @@ function HighlightsList() {
   }
 
   const handleViewInArticle = (highlight) => {
-    if (highlight.id) {
-      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, highlight.id)
+    if (highlight.uuid) {
+      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, highlight.uuid)
     }
   }
 
@@ -308,6 +315,7 @@ function HighlightsList() {
           isOpen={!!editingHighlight}
           onClose={() => setEditingHighlight(null)}
           onSave={handleHighlightSaved}
+          onRemove={handleHighlightSaved}
           onTagCreate={(tag) => setAllTags((prev) => [...prev, tag])}
         />
       )}

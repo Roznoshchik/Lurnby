@@ -43,7 +43,7 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
             className="icon-button"
             aria-label="Edit article"
           >
-            <Icon name="edit" />
+            <Icon name="edit_square" />
           </Button>
           <Button
             variant="ghost"

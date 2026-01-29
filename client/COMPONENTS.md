@@ -112,6 +112,42 @@ import Modal from './components/Modal/Modal'
 - `footer`: JSX for footer actions
 - `className`: additional CSS classes
 
+### Popover
+Positioned popover anchored to a rect, constrained within a container.
+
+```jsx
+import Popover from './components/Popover/Popover'
+
+// Get selection rect
+const rect = window.getSelection().getRangeAt(0).getBoundingClientRect()
+
+<Popover
+  isOpen={showPopover}
+  onClose={() => setShowPopover(false)}
+  anchorRect={rect}
+  containerRef={readerContentRef}
+  placement="top"
+>
+  <div className="popover-toolbar">
+    <button onClick={handleAction}>Action</button>
+  </div>
+</Popover>
+```
+
+**Props:**
+- `isOpen`: boolean - controls visibility
+- `onClose`: callback when popover should close
+- `anchorRect`: DOMRect or `{top, left, width, height, right, bottom}` to position relative to
+- `containerRef`: ref to container element (popover stays within bounds)
+- `placement`: 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'right'
+- `offset`: gap between anchor and popover (default: 8)
+- `className`: additional CSS classes
+
+**CSS classes for content:**
+- `.popover-toolbar`: horizontal button row
+- `.popover-content`: padded content wrapper
+- `.popover-divider`: vertical divider between button groups
+
 ## Layout Components
 
 ### Layout
