@@ -110,7 +110,7 @@ def apply_default_sorting(stmt: sa.Select) -> sa.Select:
     )
 
     stmt = stmt.order_by(
-        Article.article_created_date.desc(),
+        Article.article_created_date.desc().nulls_last(),
         status_order.asc(),
         sa.func.lower(Article.title).asc(),
     )

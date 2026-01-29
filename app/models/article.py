@@ -25,7 +25,7 @@ class Article(db.Model):
     source_url = db.Column(db.String(500))
     content = db.Column(db.Text)
     date_read = db.Column(db.DateTime)
-    date_read_date = db.Column(db.Date)
+    date_read_date = db.Column(db.Date)  # legacy: use date_read instead
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
     highlights = db.relationship("Highlight", backref="article")
     archived = db.Column(db.Boolean, index=True, default=False)
@@ -317,17 +317,13 @@ class Article(db.Model):
                 highlight.end = None
 
     def build_content_tree(self):
-        """Build a content tree with text offsets for highlighting and bookmarking.
-
-        Returns True if legacy highlight spans were found and stripped.
-        """
+        """Build a content tree with text offsets for highlighting and bookmarking."""
         VOID_ELEMENTS = {"br", "hr"}
         ANCHOR_ELEMENTS = {"img"}
         BLOCK_CONTENT = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "figcaption"}
 
         soup = BeautifulSoup(self.content or "", "lxml")
         offset = 0
-        found_legacy = False
 
         def is_legacy_highlight_span(node):
             if node.name != "span":
@@ -336,7 +332,7 @@ class Article(db.Model):
             return node_id.startswith("highlight")
 
         def process(node):
-            nonlocal offset, found_legacy
+            nonlocal offset
 
             if isinstance(node, NavigableString):
                 text = str(node)
@@ -349,7 +345,6 @@ class Article(db.Model):
             if isinstance(node, Tag):
                 # Legacy highlight span - unwrap (keep children, discard span)
                 if is_legacy_highlight_span(node):
-                    found_legacy = True
                     children = []
                     for child in node.children:
                         child_node = process(child)
@@ -414,7 +409,6 @@ class Article(db.Model):
                     tree.append(node)
 
         self.content_tree = tree
-        return found_legacy
 
     def add_tag(self, tag):
         if not self.is_added_tag(tag):
