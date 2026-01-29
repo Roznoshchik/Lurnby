@@ -316,3 +316,8 @@
   color: var(--foreground);
   background-color: var(--accent);
 }
+
+/* Hide "View in article" button when already on reader page */
+.reader-wrapper .view-in-article-btn {
+  display: none;
+}
