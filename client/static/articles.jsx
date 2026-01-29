@@ -148,6 +148,10 @@ function ArticlesList() {
     setEditingArticle(article)
   }
 
+  const handleViewHighlights = (article) => {
+    window.location.href = ROUTES.PAGES.articleHighlights(article.uuid)
+  }
+
   const handleArticleSaved = (updatedArticle) => {
     const isViewingArchived = appliedFilters.status === 'archived'
     const articleIsArchived = updatedArticle.archived
@@ -312,6 +316,7 @@ function ArticlesList() {
                       }}
                       onOpen={() => handleArticleOpen(article)}
                       onEdit={() => handleArticleEdit(article)}
+                      onViewHighlights={() => handleViewHighlights(article)}
                     />
                   ))}
                 </div>

@@ -14,10 +14,11 @@ export const ROUTES = {
     SETTINGS: '/client/settings',
     // Dynamic routes
     article: (uuid) => `/client/articles/${uuid}`,
-    reader: (articleUuid, highlightId = null) =>
-      highlightId
-        ? `/client/articles/${articleUuid}?highlight_id=highlight${highlightId}`
+    reader: (articleUuid, highlightUuid = null) =>
+      highlightUuid
+        ? `/client/articles/${articleUuid}?highlight=${highlightUuid}`
         : `/client/articles/${articleUuid}`,
+    articleHighlights: (uuid) => `/client/highlights?article=${uuid}`,
   },
   API: {
     LOGIN: '/api/auth/login',
