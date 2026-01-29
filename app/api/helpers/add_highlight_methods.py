@@ -32,8 +32,9 @@ def populate_highlight(highlight, data: dict):
         highlight(app.models.Highlight): updated highlight
     """
     article = None
-    if "article_id" in data:
-        uuid = UUID(data.get("article_id"))
+    article_uuid = data.get("article_uuid") or data.get("article_id")
+    if article_uuid:
+        uuid = UUID(article_uuid)
         article = Article.query.filter_by(uuid=uuid).first()
 
     if article:
@@ -46,6 +47,16 @@ def populate_highlight(highlight, data: dict):
     highlight.text = data.get("text")
     highlight.note = data.get("note")
     highlight.source = data.get("source", highlight.source)
-    highlight.prompt = highlight.create_prompt()
+    highlight.start = data.get("start")
+    highlight.end = data.get("end")
+
+    if "do_not_review" in data:
+        highlight.do_not_review = data.get("do_not_review")
+
+    autogenerate_prompt = data.get("autogenerate_prompt", True)
+    if autogenerate_prompt:
+        highlight.prompt = highlight.create_prompt()
+    elif data.get("prompt"):
+        highlight.prompt = data.get("prompt")
 
     return highlight

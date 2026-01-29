@@ -96,6 +96,22 @@ def filter_by_search_phrase(stmt: sa.Select, search_phrase: str) -> sa.Select:
     return stmt
 
 
+def filter_by_article(stmt: sa.Select, article_uuid: str) -> sa.Select:
+    """Filter highlights by article UUID.
+
+    Args:
+        stmt: SQLAlchemy select statement
+        article_uuid: UUID of the article
+    Returns:
+        Modified select statement
+    """
+    if article_uuid:
+        article_subq = sa.select(Article.id).where(Article.uuid == article_uuid).scalar_subquery()
+        stmt = stmt.where(Highlight.article_id == article_subq)
+
+    return stmt
+
+
 def apply_default_sorting(stmt: sa.Select, created_sort: str = None) -> sa.Select:
     """Apply sorting for highlights list.
 
