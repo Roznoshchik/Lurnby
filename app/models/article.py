@@ -179,7 +179,7 @@ class Article(db.Model):
             "title": self.title,
             "filetype": self.filetype,
             "content": self.content if with_content else None,
-            "content_tree": self.content_tree if with_content else None,
+            "content_tree": self._get_or_build_content_tree() if with_content else None,
             "unread": self.unread,
             "archived": self.archived,
             "done": self.done,
@@ -191,6 +191,7 @@ class Article(db.Model):
             "bookmarks": json.loads(self.bookmarks) if self.bookmarks else [],
             "created_at": self.article_created_date,
             "highlights_count": len(self.highlights),
+            "highlights": [h.to_dict() for h in self.highlights if not h.archived] if with_content else None,
             "tags": [tag.to_dict() for tag in self.tags],
         }
         return data
@@ -257,17 +258,85 @@ class Article(db.Model):
 
         self.read_time = f"{high}-{low} read"
 
+    def _get_or_build_content_tree(self):
+        """Return content_tree, building it on-demand if missing."""
+        if self.content_tree is None and self.content:
+            self.build_content_tree()
+            self.reanchor_highlights()
+            db.session.commit()
+        return self.content_tree
+
+    def get_flat_text(self):
+        """Extract plain text from content tree for text search.
+
+        Void/anchor elements use a placeholder to preserve offset alignment.
+        """
+        if not self.content_tree:
+            return ""
+
+        def extract(node):
+            if node["type"] == "text":
+                return node["text"]
+            if node["type"] in ("void", "anchor"):
+                return "\x00"  # placeholder to preserve offset
+            if node["type"] == "element":
+                return "".join(extract(child) for child in node.get("children", []))
+            return ""
+
+        return "".join(extract(node) for node in self.content_tree)
+
+    def reanchor_highlights(self):
+        """Re-anchor highlights by searching for their text in content.
+
+        Updates start/end offsets for highlights. Sets offsets to None if
+        text is not found (orphaned highlight).
+        """
+        flat_text = self.get_flat_text()
+        if not flat_text:
+            return
+
+        for highlight in self.highlights:
+            if not highlight.text:
+                continue
+
+            # Strip HTML from highlight text
+            highlight_soup = BeautifulSoup(highlight.text, "lxml")
+            search_text = highlight_soup.get_text()
+
+            if not search_text.strip():
+                continue
+
+            # Search for text in content
+            pos = flat_text.find(search_text)
+            if pos != -1:
+                highlight.start = pos
+                highlight.end = pos + len(search_text)
+            else:
+                # Orphaned - text not found
+                highlight.start = None
+                highlight.end = None
+
     def build_content_tree(self):
-        """Build a content tree with text offsets for highlighting and bookmarking."""
+        """Build a content tree with text offsets for highlighting and bookmarking.
+
+        Returns True if legacy highlight spans were found and stripped.
+        """
         VOID_ELEMENTS = {"br", "hr"}
         ANCHOR_ELEMENTS = {"img"}
         BLOCK_CONTENT = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "figcaption"}
 
         soup = BeautifulSoup(self.content or "", "lxml")
         offset = 0
+        found_legacy = False
+
+        def is_legacy_highlight_span(node):
+            if node.name != "span":
+                return False
+            node_id = node.get("id", "")
+            return node_id.startswith("highlight")
 
         def process(node):
-            nonlocal offset
+            nonlocal offset, found_legacy
 
             if isinstance(node, NavigableString):
                 text = str(node)
@@ -278,6 +347,21 @@ class Article(db.Model):
                 return {"type": "text", "text": text, "start": start, "length": len(text)}
 
             if isinstance(node, Tag):
+                # Legacy highlight span - unwrap (keep children, discard span)
+                if is_legacy_highlight_span(node):
+                    found_legacy = True
+                    children = []
+                    for child in node.children:
+                        child_node = process(child)
+                        if child_node:
+                            if isinstance(child_node, list):
+                                children.extend(child_node)
+                            else:
+                                children.append(child_node)
+                    if children:
+                        return children if len(children) > 1 else children[0]
+                    return None
+
                 if node.name in VOID_ELEMENTS:
                     start = offset
                     offset += 1
@@ -299,7 +383,10 @@ class Article(db.Model):
                 for child in node.children:
                     child_node = process(child)
                     if child_node:
-                        children.append(child_node)
+                        if isinstance(child_node, list):
+                            children.extend(child_node)
+                        else:
+                            children.append(child_node)
 
                 if not children:
                     return None
@@ -321,9 +408,13 @@ class Article(db.Model):
         for child in root.children:
             node = process(child)
             if node:
-                tree.append(node)
+                if isinstance(node, list):
+                    tree.extend(node)
+                else:
+                    tree.append(node)
 
         self.content_tree = tree
+        return found_legacy
 
     def add_tag(self, tag):
         if not self.is_added_tag(tag):
