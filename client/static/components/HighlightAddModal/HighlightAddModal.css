@@ -1,0 +1,63 @@
+.highlight-add-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.highlight-add-form .error-banner {
+  padding: var(--space-3) var(--space-4);
+  background-color: color-mix(in oklch, var(--destructive) 15%, transparent);
+  border: 1px solid var(--destructive);
+  border-radius: var(--radius-md);
+  color: var(--destructive);
+  font-size: var(--font-size-sm);
+}
+
+.highlight-add-form .selected-text {
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--muted);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--foreground);
+  max-height: 200px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+}
+
+.highlight-add-form .selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.highlight-add-form .selected-tags .tag-remove {
+  font-size: var(--font-size-sm);
+  margin-left: var(--space-1);
+  cursor: pointer;
+}
+
+.highlight-add-form .editor-note .ql-editor {
+  min-height: 100px;
+  max-height: calc(100vh - (var(--space-30) * 2));
+  overflow-y: auto;
+}
+
+.highlight-add-form .toggle-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.highlight-add-form .toggle-group span {
+  font-weight: var(--font-weight-normal);
+}
+
+.highlight-add-form .editor-prompt {
+  margin-top: var(--space-3);
+}
+
+.highlight-add-form .editor-prompt .ql-editor {
+  min-height: 80px;
+}

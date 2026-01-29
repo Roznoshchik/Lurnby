@@ -168,6 +168,17 @@
   line-height: 1.9;
 }
 
+/* Highlights */
+.reader-highlight {
+  background-color: var(--highlight, oklch(0.9 0.1 100));
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.reader-highlight.highlight-active {
+  background-color: var(--highlight-hover, oklch(0.85 0.12 100));
+}
+
 /* Bottom bar - fixed at bottom */
 .reader-bottom-bar {
   position: fixed;

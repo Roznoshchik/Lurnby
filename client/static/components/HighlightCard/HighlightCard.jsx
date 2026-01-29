@@ -68,7 +68,7 @@ export default function HighlightCard({ highlight, onEdit, onViewInArticle }) {
               className="icon-button"
               aria-label="Edit highlight"
             >
-              <Icon name="edit" />
+              <Icon name="edit_square" />
             </Button>
             {highlight.article_uuid && (
               <Button

@@ -16,6 +16,7 @@ export default function HighlightEditModal({
   isOpen,
   onClose,
   onSave,
+  onRemove,
   onTagCreate,
 }) {
   const [loading, setLoading] = useState(true)
@@ -25,6 +26,7 @@ export default function HighlightEditModal({
   const [note, setNote] = useState('')
   const [source, setSource] = useState('')
   const [selectedTagIds, setSelectedTagIds] = useState([])
+  const [appearsInReviews, setAppearsInReviews] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState(null)
 
@@ -48,6 +50,7 @@ export default function HighlightEditModal({
         setNote(data.note || '')
         setSource(data.source || '')
         setSelectedTagIds(data.tags?.map((t) => t.id) || [])
+        setAppearsInReviews(!data.do_not_review)
       } catch (err) {
         console.error('Error fetching highlight:', err)
         setError('Failed to load highlight details.')
@@ -102,6 +105,7 @@ export default function HighlightEditModal({
         source,
         note: noteRef.current?.root.innerHTML || note,
         tags: selectedTagIds,
+        do_not_review: !appearsInReviews,
       }
 
       const { data: response } = await api.patch(ROUTES.API.highlight(highlight.uuid), data)
@@ -117,19 +121,19 @@ export default function HighlightEditModal({
     }
   }
 
-  const handleArchive = async () => {
+  const handleRemove = async () => {
     setSaving(true)
     setError(null)
 
     try {
       const { data: response } = await api.delete(ROUTES.API.highlight(highlight.uuid))
-      onSave?.(response.highlight)
+      onRemove?.(response.highlight)
       alert.success('Highlight archived')
       onClose()
     } catch (err) {
       console.error('Error archiving highlight:', err)
-      alert.error(`Failed to archive highlight`)
-      setError(`Failed to archive highlight. Please try again.`)
+      alert.error('Failed to archive highlight')
+      setError('Failed to archive highlight. Please try again.')
     } finally {
       setSaving(false)
     }
@@ -149,12 +153,12 @@ export default function HighlightEditModal({
     <>
       <Button
         variant="ghost"
-        onClick={handleArchive}
+        onClick={handleRemove}
         disabled={saving || loading}
         className="archive-btn"
       >
         <Icon name="archive" />
-        'Archive'
+        Remove
       </Button>
       <div className="footer-spacer" />
       <Button variant="outline" onClick={onClose} disabled={saving}>
@@ -163,8 +167,9 @@ export default function HighlightEditModal({
       <Button variant="default" onClick={handleSave} disabled={saving || loading}>
         {saving ? 'Saving...' : 'Save changes'}
       </Button>
+      {/* Hidden via CSS on reader page where we're already viewing the article */}
       {hasArticle && (
-        <Button variant="primary" onClick={handleViewInArticle}>
+        <Button variant="primary" onClick={handleViewInArticle} className="view-in-article-btn">
           <Icon name="visibility" />
           View in article
         </Button>
@@ -259,6 +264,19 @@ export default function HighlightEditModal({
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Review options */}
+            <div className="form-group toggle-group">
+              <label>
+                <input
+                  type="checkbox"
+                  className="toggle"
+                  checked={appearsInReviews}
+                  onChange={(e) => setAppearsInReviews(e.target.checked)}
+                />
+                <span>Appears in reviews</span>
+              </label>
             </div>
 
             {/* Note */}

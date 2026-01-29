@@ -59,6 +59,17 @@
   cursor: pointer;
 }
 
+.highlight-edit-form .toggle-group label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+}
+
+.highlight-edit-form .toggle-group span {
+  font-weight: var(--font-weight-normal);
+}
+
 .editor-note .ql-editor {
   min-height: 100px;
   max-height: calc(100vh - (var(--space-30) * 2));
