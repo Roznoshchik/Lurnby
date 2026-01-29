@@ -16,6 +16,7 @@ import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import { api } from './services/api'
 import { ROUTES } from './services/routes'
 import { getReadableSource } from './utils/sourceFormatter'
+import { useUrlParams } from './hooks/useUrlParams'
 
 const TAG_STATUS_OPTIONS = [
   { value: '', label: 'All' },
@@ -30,32 +31,29 @@ const PER_PAGE_OPTIONS = [
 ]
 
 function HighlightsList() {
-  // Get article_uuid from URL params if present
-  const urlParams = new URLSearchParams(window.location.search)
-  const articleUuid = urlParams.get('article')
-
   const [highlights, setHighlights] = useState([])
   const [allTags, setAllTags] = useState([])
-  const [articleInfo, setArticleInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [hasNext, setHasNext] = useState(false)
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState('15')
 
-  // Filter state (local, applied on button click)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [tagStatusFilter, setTagStatusFilter] = useState('')
-  const [selectedTags, setSelectedTags] = useState([])
-
-  // Applied filters (sent to server)
-  const [appliedFilters, setAppliedFilters] = useState({
+  // URL-synced pagination and filters
+  const [params, setParams] = useUrlParams({
+    page: 1,
+    perPage: '15',
     q: '',
     tag_status: '',
     tag_ids: '',
-    article_uuid: articleUuid || '',
+    article: '',
   })
+
+  // Local filter state (for form inputs, applied on button click)
+  const [searchQuery, setSearchQuery] = useState(params.q)
+  const [tagStatusFilter, setTagStatusFilter] = useState(params.tag_status)
+  const [selectedTags, setSelectedTags] = useState(
+    params.tag_ids ? params.tag_ids.split(',').map(Number) : [],
+  )
 
   // Modal states
   const [editingHighlight, setEditingHighlight] = useState(null)
@@ -66,22 +64,25 @@ function HighlightsList() {
 
   useEffect(() => {
     fetchHighlights()
-  }, [page, perPage, appliedFilters])
+  }, [params.page, params.perPage, params.q, params.tag_status, params.tag_ids, params.article])
 
   const fetchHighlights = async () => {
     try {
       setLoading(true)
-      const params = {
-        page,
-        per_page: perPage,
-        ...appliedFilters,
+      const queryParams = {
+        page: params.page,
+        per_page: params.perPage,
+        q: params.q,
+        tag_status: params.tag_status,
+        tag_ids: params.tag_ids,
+        article_uuid: params.article,
       }
       // Remove empty params
-      Object.keys(params).forEach((key) => {
-        if (!params[key]) delete params[key]
+      Object.keys(queryParams).forEach((key) => {
+        if (!queryParams[key]) delete queryParams[key]
       })
 
-      const { data } = await api.get(ROUTES.API.HIGHLIGHTS, params)
+      const { data } = await api.get(ROUTES.API.HIGHLIGHTS, queryParams)
       setHighlights(data.highlights || [])
       setHasNext(data.has_next || false)
       setTotal(data.total || 0)
@@ -104,12 +105,11 @@ function HighlightsList() {
   }
 
   const applyFilters = () => {
-    setPage(1)
-    setAppliedFilters({
+    setParams({
+      page: 1,
       q: searchQuery,
       tag_status: tagStatusFilter,
       tag_ids: selectedTags.join(','),
-      article_uuid: articleUuid || '',
     })
   }
 
@@ -120,8 +120,7 @@ function HighlightsList() {
   }
 
   const handlePerPageChange = (value) => {
-    setPerPage(value)
-    setPage(1)
+    setParams({ perPage: value, page: 1 })
   }
 
   const tagOptions = useMemo(
@@ -149,18 +148,9 @@ function HighlightsList() {
   }
 
   const handleHighlightSaved = (updatedHighlight) => {
-    const isViewingArchived = appliedFilters.status === 'archived'
-    const highlightIsArchived = updatedHighlight.archived
-
-    // If archive status doesn't match current filter, remove from list
-    if (isViewingArchived !== highlightIsArchived) {
-      setHighlights((prev) => prev.filter((h) => h.id !== updatedHighlight.id))
-    } else {
-      // Update the highlight in the list
-      setHighlights((prev) =>
-        prev.map((h) => (h.id === updatedHighlight.id ? updatedHighlight : h)),
-      )
-    }
+    setHighlights((prev) =>
+      prev.map((h) => (h.id === updatedHighlight.id ? updatedHighlight : h)),
+    )
   }
 
   return (
@@ -252,8 +242,8 @@ function HighlightsList() {
             {/* Highlights Count */}
             {total > 0 && (
               <div className="highlights-count">
-                Showing {(page - 1) * parseInt(perPage, 10) + 1}-
-                {Math.min(page * parseInt(perPage, 10), total)} of {total} highlights
+                Showing {(params.page - 1) * parseInt(params.perPage, 10) + 1}-
+                {Math.min(params.page * parseInt(params.perPage, 10), total)} of {total} highlights
               </div>
             )}
           </div>
@@ -280,21 +270,21 @@ function HighlightsList() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => setParams({ page: Math.max(1, params.page - 1) })}
+                  disabled={params.page === 1}
                 >
                   <Icon name="chevron_left" />
                 </Button>
-                <span className="pagination-info">Page {page}</span>
+                <span className="pagination-info">Page {params.page}</span>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => setParams({ page: params.page + 1 })}
                   disabled={!hasNext}
                 >
                   <Icon name="chevron_right" />
                 </Button>
-                <Select options={PER_PAGE_OPTIONS} value={perPage} onChange={handlePerPageChange} />
+                <Select options={PER_PAGE_OPTIONS} value={params.perPage} onChange={handlePerPageChange} />
               </div>
             </>
           ) : (

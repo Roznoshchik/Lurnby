@@ -13,6 +13,7 @@ import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import { api } from './services/api'
 import { ROUTES } from './services/routes'
+import { useUrlParams } from './hooks/useUrlParams'
 
 const STATUS_OPTIONS = [
   { value: 'unarchived', label: 'Active' },
@@ -32,40 +33,41 @@ function TagsList() {
   const [error, setError] = useState(null)
   const [hasNext, setHasNext] = useState(false)
   const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(1)
-  const [perPage, setPerPage] = useState('30')
 
-  // Filter state (local, applied on button click)
-  const [searchQuery, setSearchQuery] = useState('')
-  const [statusFilter, setStatusFilter] = useState('unarchived')
-
-  // Applied filters (sent to server)
-  const [appliedFilters, setAppliedFilters] = useState({
+  // URL-synced pagination and filters
+  const [params, setParams] = useUrlParams({
+    page: 1,
+    perPage: '30',
     q: '',
     status: 'unarchived',
   })
+
+  // Local filter state (for form inputs, applied on button click)
+  const [searchQuery, setSearchQuery] = useState(params.q)
+  const [statusFilter, setStatusFilter] = useState(params.status)
 
   // Modal states
   const [editingTag, setEditingTag] = useState(null)
 
   useEffect(() => {
     fetchTags()
-  }, [page, perPage, appliedFilters])
+  }, [params.page, params.perPage, params.q, params.status])
 
   const fetchTags = async () => {
     try {
       setLoading(true)
-      const params = {
-        page,
-        per_page: perPage,
-        ...appliedFilters,
+      const queryParams = {
+        page: params.page,
+        per_page: params.perPage,
+        q: params.q,
+        status: params.status,
       }
       // Remove empty params
-      Object.keys(params).forEach((key) => {
-        if (!params[key]) delete params[key]
+      Object.keys(queryParams).forEach((key) => {
+        if (!queryParams[key]) delete queryParams[key]
       })
 
-      const { data } = await api.get(ROUTES.API.TAGS, params)
+      const { data } = await api.get(ROUTES.API.TAGS, queryParams)
       setTags(data.tags || [])
       setHasNext(data.has_next || false)
       setTotal(data.total || 0)
@@ -79,16 +81,15 @@ function TagsList() {
   }
 
   const applyFilters = () => {
-    setPage(1)
-    setAppliedFilters({
+    setParams({
+      page: 1,
       q: searchQuery,
       status: statusFilter,
     })
   }
 
   const handlePerPageChange = (value) => {
-    setPerPage(value)
-    setPage(1)
+    setParams({ perPage: value, page: 1 })
   }
 
   const handleTagEdit = (tag) => {
@@ -99,9 +100,9 @@ function TagsList() {
     if (editingTag) {
       // Update existing tag
       const statusMatch =
-        appliedFilters.status === 'all' ||
-        (appliedFilters.status === 'archived' && savedTag.archived) ||
-        (appliedFilters.status === 'unarchived' && !savedTag.archived)
+        params.status === 'all' ||
+        (params.status === 'archived' && savedTag.archived) ||
+        (params.status === 'unarchived' && !savedTag.archived)
 
       if (statusMatch) {
         setTags((prev) => prev.map((t) => (t.id === savedTag.id ? savedTag : t)))
@@ -111,7 +112,7 @@ function TagsList() {
       }
     } else {
       // New tag created - add to list if it matches current filter
-      if (appliedFilters.status === 'unarchived' || appliedFilters.status === 'all') {
+      if (params.status === 'unarchived' || params.status === 'all') {
         setTags((prev) => [savedTag, ...prev])
       }
     }
@@ -172,8 +173,8 @@ function TagsList() {
 
             {total > 0 && (
               <div className="tags-count">
-                Showing {(page - 1) * parseInt(perPage, 10) + 1}-
-                {Math.min(page * parseInt(perPage, 10), total)} of {total} tags
+                Showing {(params.page - 1) * parseInt(params.perPage, 10) + 1}-
+                {Math.min(params.page * parseInt(params.perPage, 10), total)} of {total} tags
               </div>
             )}
           </div>
@@ -192,21 +193,21 @@ function TagsList() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={page === 1}
+                  onClick={() => setParams({ page: Math.max(1, params.page - 1) })}
+                  disabled={params.page === 1}
                 >
                   <Icon name="chevron_left" />
                 </Button>
-                <span className="pagination-info">Page {page}</span>
+                <span className="pagination-info">Page {params.page}</span>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => setParams({ page: params.page + 1 })}
                   disabled={!hasNext}
                 >
                   <Icon name="chevron_right" />
                 </Button>
-                <Select options={PER_PAGE_OPTIONS} value={perPage} onChange={handlePerPageChange} />
+                <Select options={PER_PAGE_OPTIONS} value={params.perPage} onChange={handlePerPageChange} />
               </div>
             </>
           ) : (
@@ -214,7 +215,7 @@ function TagsList() {
               <Icon name="sell" />
               <h3>No tags found</h3>
               <p>
-                {appliedFilters.q
+                {params.q
                   ? 'Try a different search term'
                   : 'Create tags when adding highlights or articles'}
               </p>

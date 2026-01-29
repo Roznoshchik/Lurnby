@@ -153,6 +153,12 @@ function ReaderPage() {
       const { data } = await api.get(ROUTES.API.article(articleUuid), { with_content: 'true' })
       setArticle(data.article)
       setError(null)
+
+      // Mark article as opened (fire-and-forget)
+      api.patch(ROUTES.API.article(articleUuid), {
+        date_read: new Date().toISOString(),
+        unread: false,
+      }).catch(() => {})
     } catch (err) {
       console.error('Error fetching article:', err)
       setError('Failed to load article')

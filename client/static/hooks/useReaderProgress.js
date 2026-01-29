@@ -19,7 +19,10 @@ export function useReaderProgress(contentRef, articleUuid, loading, initialProgr
 
       saveTimeoutRef.current = setTimeout(async () => {
         try {
-          await api.patch(ROUTES.API.article(articleUuid), { progress: newProgress })
+          await api.patch(ROUTES.API.article(articleUuid), {
+            progress: newProgress,
+            done: newProgress >= 100,
+          })
         } catch (err) {
           console.error('Error saving progress:', err)
         }
