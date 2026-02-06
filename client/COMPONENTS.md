@@ -66,6 +66,36 @@ import Progress from './components/Progress/Progress'
 - `value`: 0-100 percentage
 - `className`: additional CSS classes
 
+### Loader
+Loading indicator with three display modes.
+
+```jsx
+import Loader from './components/Loader/Loader'
+
+// Card mode (default): replaces children when loading
+<Loader isLoading={loading} text="Loading...">
+  <Content />
+</Loader>
+
+// Inline mode: small spinner for buttons
+<Button>
+  Save
+  <Loader isLoading={saving} mode="inline" />
+</Button>
+
+// Overlay mode: covers children with semi-transparent overlay
+<Loader isLoading={submitting} mode="overlay" text="Submitting...">
+  <Form />
+</Loader>
+```
+
+**Props:**
+- `isLoading`: boolean - whether to show the loader
+- `mode`: 'card' (default) | 'inline' | 'overlay'
+- `text`: optional text to display with spinner
+- `className`: additional CSS classes
+- `children`: content to wrap (not used for inline mode)
+
 ### Card
 Base card component with variants and padding options.
 
