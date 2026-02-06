@@ -11,13 +11,7 @@ from app.helpers.pdf import (
     process_images_and_get_url_dict,
     create_sizes_to_header_tags_dict,
 )
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-    MAIL_SUPPRESS_SEND = True
+from config import TestConfig
 
 
 class PDFProcessingTests(unittest.TestCase):

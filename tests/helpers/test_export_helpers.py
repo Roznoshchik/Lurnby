@@ -17,13 +17,8 @@ from app.helpers.export_helpers import (
 )
 from app.models import Article, User, Tag, Highlight
 
-from config import Config
+from config import TestConfig
 from tests.mocks.mocks import mock_articles, mock_tags, mock_highlight
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
 
 
 class ExportArticleTests(unittest.TestCase):

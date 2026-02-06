@@ -1,53 +1,61 @@
 import copy
-from datetime import datetime, timezone
+from datetime import datetime, date, timezone
 import json
 import math
 import re
+from typing import Any, TYPE_CHECKING
+from uuid import UUID, uuid4
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 from flask import url_for
 from flask_login import current_user
+import sqlalchemy as sa
+import sqlalchemy.orm as so
 from sqlalchemy import desc, func, Index, select
-from sqlalchemy_utils import UUIDType
-import uuid
+from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
 from app.models.base import db
 from app.models.article_chunk import ArticleChunk
 from app.models.associations import tags_articles
 
+if TYPE_CHECKING:
+    from app.models.highlight import Highlight
+
 
 class Article(db.Model):
     __mapper_args__ = {"confirm_deleted_rows": False}
 
-    id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(UUIDType(), default=uuid.uuid4, index=True, unique=True)
-    unread = db.Column(db.Boolean, index=True, default=True)
-    title = db.Column(db.String(255), default="Something went wrong", index=True)
-    filetype = db.Column(db.String(32))
-    source = db.Column(db.String(500))
-    source_url = db.Column(db.String(500))
-    content = db.Column(db.Text)
-    date_read = db.Column(db.DateTime)
-    date_read_date = db.Column(db.Date)  # legacy: use date_read instead
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), index=True)
-    highlights = db.relationship("Highlight", backref="article")
-    archived = db.Column(db.Boolean, index=True, default=False)
-    highlightedText = db.Column(db.String, default="")
-    tags = db.relationship("Tag", secondary=tags_articles, back_populates="articles")
-    progress = db.Column(db.Float, index=True, default=0.0)
-    bookmarks = db.Column(db.String)
-    done = db.Column(db.Boolean, default=False)
-    notes = db.Column(db.Text, default="")
-    reflections = db.Column(db.Text, default="")
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    uuid: so.Mapped[UUID] = so.mapped_column("uuid", PG_UUID(as_uuid=True), default=uuid4, index=True, unique=True)
+    unread: so.Mapped[bool] = so.mapped_column(sa.Boolean, index=True, default=True)
+    title: so.Mapped[str] = so.mapped_column(sa.String(255), default="Something went wrong", index=True)
+    filetype: so.Mapped[str | None] = so.mapped_column(sa.String(32))
+    source: so.Mapped[str | None] = so.mapped_column(sa.String(500))
+    source_url: so.Mapped[str | None] = so.mapped_column(sa.String(500))
+    content: so.Mapped[str | None] = so.mapped_column(sa.Text)
+    date_read: so.Mapped[datetime | None] = so.mapped_column(sa.DateTime)
+    date_read_date: so.Mapped[date | None] = so.mapped_column(sa.Date)  # legacy: use date_read instead
+    user_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("user.id"), index=True)
+    highlights: so.Mapped[list["Highlight"]] = so.relationship(backref="article")
+    archived: so.Mapped[bool] = so.mapped_column(sa.Boolean, index=True, default=False)
+    highlightedText: so.Mapped[str | None] = so.mapped_column(sa.String, default="")
+    tags: so.Mapped[list["Tag"]] = so.relationship(secondary=tags_articles, back_populates="articles")
+    progress: so.Mapped[float] = so.mapped_column(sa.Float, index=True, default=0.0)
+    bookmarks: so.Mapped[list[dict] | None] = so.mapped_column(JSONB, default=[])
+    done: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
+    notes: so.Mapped[str] = so.mapped_column(sa.Text, default="")
+    reflections: so.Mapped[str] = so.mapped_column(sa.Text, default="")
 
-    article_created_date = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    read_time = db.Column(db.String)
-    processing = db.Column(db.Boolean, default=False)
-    content_tree = db.Column(db.JSON)
-    chunk_count = db.Column(db.Integer)
-    total_length = db.Column(db.Integer)
-    chunks = db.relationship(
-        "ArticleChunk",
+    article_created_date: so.Mapped[datetime | None] = so.mapped_column(
+        sa.DateTime, default=lambda: datetime.now(timezone.utc)
+    )
+    read_time: so.Mapped[str | None] = so.mapped_column(sa.String)
+    processing: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
+    content_tree: so.Mapped[Any | None] = so.mapped_column(sa.JSON)
+    chunk_count: so.Mapped[int | None] = so.mapped_column(sa.Integer)
+    total_length: so.Mapped[int | None] = so.mapped_column(sa.Integer)
+    chunks: so.Mapped[list["ArticleChunk"]] = so.relationship(
         back_populates="article",
         order_by="ArticleChunk.idx",
         cascade="all, delete-orphan",
@@ -200,7 +208,7 @@ class Article(db.Model):
             "reflections": self.reflections if not preview else None,
             "read_time": self.read_time,
             "progress": progress,
-            "bookmarks": json.loads(self.bookmarks) if self.bookmarks else [],
+            "bookmarks": self.bookmarks or [],
             "created_at": self.article_created_date,
             "highlights_count": len(self.highlights),
             "tags": [tag.to_dict() for tag in self.tags],
@@ -285,11 +293,19 @@ class Article(db.Model):
         if not self.bookmarks or not self.chunks:
             return
 
-        try:
-            bookmarks = json.loads(self.bookmarks)
-        except json.JSONDecodeError:
+        # Handle string format from old String column (parse if needed)
+        bookmarks = self.bookmarks
+        if isinstance(bookmarks, str):
+            try:
+                bookmarks = json.loads(bookmarks)
+            except json.JSONDecodeError:
+                return
+
+        # Already migrated if it's a list
+        if isinstance(bookmarks, list):
             return
 
+        # Legacy format was a dict {name: percentage}
         if not isinstance(bookmarks, dict):
             return
 
@@ -308,7 +324,7 @@ class Article(db.Model):
                     )
                     break
 
-        self.bookmarks = json.dumps(migrated)
+        self.bookmarks = migrated
 
     def get_flat_text(self):
         """Extract plain text from content tree for text search.

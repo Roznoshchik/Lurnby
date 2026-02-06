@@ -3,13 +3,7 @@ import unittest
 from unittest.mock import patch
 from app import db, create_app
 from app.email import send_email, mail
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-    MAIL_SUPPRESS_SEND = True
+from config import TestConfig
 
 
 class SendEmail(unittest.TestCase):

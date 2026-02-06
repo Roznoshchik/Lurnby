@@ -4,12 +4,7 @@ from unittest.mock import patch
 
 from app import create_app, db
 from app.models import Article, User, Task
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
+from config import TestConfig
 
 
 class TasksApiTests(unittest.TestCase):
