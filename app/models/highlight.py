@@ -30,12 +30,18 @@ class Highlight(db.Model):
     no_topics: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=True, index=True)
     note: so.Mapped[str | None] = so.mapped_column(sa.String, index=True)
     tags = db.relationship("Tag", secondary=tags_highlights, back_populates="highlights")
+    start_chunk: so.Mapped[int | None] = so.mapped_column(sa.Integer)
     start: so.Mapped[int | None] = so.mapped_column(sa.Integer)
+    end_chunk: so.Mapped[int | None] = so.mapped_column(sa.Integer)
     end: so.Mapped[int | None] = so.mapped_column(sa.Integer)
     created_date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, default=datetime.utcnow)
     review_date: so.Mapped[datetime] = so.mapped_column(sa.DateTime, default=datetime.utcnow)
     review_schedule: so.Mapped[int] = so.mapped_column(sa.Integer, default=0)
     do_not_review: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
+
+    def __repr__(self):
+        arch = " ARCHIVED" if self.archived else ""
+        return f"<Highlight {self.id}: chunk[{self.start_chunk}:{self.start}]-[{self.end_chunk}:{self.end}]{arch}>"
 
     def to_dict(self):
         source = self.article.source or self.article.source_url if self.article else "unknown"
@@ -51,7 +57,9 @@ class Highlight(db.Model):
             "article_title": self.article.title if self.article else None,
             "article_uuid": self.article.uuid if self.article else None,
             "user_id": self.user_id,
+            "start_chunk": self.start_chunk,
             "start": self.start,
+            "end_chunk": self.end_chunk,
             "end": self.end,
             "created_date": self.created_date,
             "review_date": self.review_date,

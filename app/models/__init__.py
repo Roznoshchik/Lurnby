@@ -5,6 +5,7 @@ from app.models.approved_sender import Approved_Sender
 from app.models.notification import Notification
 from app.models.task import Task
 from app.models.article import Article, articles_lower_title_key
+from app.models.article_chunk import ArticleChunk
 from app.models.message import Message
 from app.models.suggestion import Suggestion
 from app.models.associations import highlights_topics, tags_highlights, tags_articles, tags_topics
@@ -21,6 +22,7 @@ __all__ = [
     "Notification",
     "Task",
     "Article",
+    "ArticleChunk",
     "tags_articles",
     "articles_lower_title_key",
     "Message",

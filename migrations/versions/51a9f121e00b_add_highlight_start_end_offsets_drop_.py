@@ -1,7 +1,7 @@
 """add highlight start end offsets drop position
 
 Revision ID: 51a9f121e00b
-Revises: 4ec7d74236b2
+Revises: 2b58a74fd255
 Create Date: 2026-01-25 00:07:51.855494
 
 """
@@ -13,7 +13,7 @@ import uuid
 
 # revision identifiers, used by Alembic.
 revision = "51a9f121e00b"
-down_revision = "4ec7d74236b2"
+down_revision = "2b58a74fd255"
 branch_labels = None
 depends_on = None
 
