@@ -142,8 +142,18 @@ function HighlightsList() {
   }
 
   const handleViewInArticle = (highlight) => {
-    if (highlight.uuid) {
-      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, highlight.uuid)
+    if (!highlight.article_uuid) return
+
+    if (highlight.start_chunk != null) {
+      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, {
+        chunk: highlight.start_chunk,
+        offset: highlight.start ?? 0,
+      })
+    } else {
+      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, {
+        unprocessed: true,
+        highlight: highlight.uuid,
+      })
     }
   }
 

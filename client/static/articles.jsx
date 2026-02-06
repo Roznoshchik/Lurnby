@@ -145,7 +145,15 @@ function ArticlesList() {
   )
 
   const handleArticleOpen = (article) => {
-    window.location.href = ROUTES.PAGES.reader(article.uuid)
+    if (!article.chunk_count) {
+      window.location.href = ROUTES.PAGES.reader(article.uuid, { unprocessed: true })
+      return
+    }
+    const furthest = article.bookmarks?.find((b) => b.name === 'furthest')
+    window.location.href = ROUTES.PAGES.reader(article.uuid, {
+      chunk: furthest?.chunk ?? 0,
+      offset: furthest?.offset ?? 0,
+    })
   }
 
   const handleArticleEdit = (article) => {
