@@ -32,16 +32,23 @@ export function useReaderHighlights(contentRef, articleUuid, loading, onHighligh
       return
     }
 
-    // Get offsets from text nodes with __start
+    // Get offsets from text nodes with __start and __chunkIdx
     const startNode = range.startContainer
     const endNode = range.endContainer
 
-    if (startNode.__start == null || endNode.__start == null) {
+    if (
+      startNode.__start == null ||
+      endNode.__start == null ||
+      startNode.__chunkIdx == null ||
+      endNode.__chunkIdx == null
+    ) {
       setPopoverOpen(false)
       return
     }
 
+    const startChunk = startNode.__chunkIdx
     const start = startNode.__start + range.startOffset
+    const endChunk = endNode.__chunkIdx
     const end = endNode.__start + range.endOffset
     const text = selection.toString().trim()
 
@@ -50,8 +57,8 @@ export function useReaderHighlights(contentRef, articleUuid, loading, onHighligh
       return
     }
 
-    // Store selection data for highlight creation
-    selectionDataRef.current = { text, start, end }
+    // Store selection data for highlight creation (chunk-based offsets)
+    selectionDataRef.current = { text, start_chunk: startChunk, start, end_chunk: endChunk, end }
 
     // Position popover at end of selection (last line for multi-line)
     const rects = range.getClientRects()
@@ -90,7 +97,9 @@ export function useReaderHighlights(contentRef, articleUuid, loading, onHighligh
       const { data: response } = await api.post(ROUTES.API.HIGHLIGHTS, {
         article_uuid: articleUuid,
         text: data.text,
+        start_chunk: data.start_chunk,
         start: data.start,
+        end_chunk: data.end_chunk,
         end: data.end,
       })
       alert.success('Highlight created')

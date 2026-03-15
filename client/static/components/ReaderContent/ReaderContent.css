@@ -65,22 +65,35 @@
 }
 
 .reader-article pre {
+  white-space: pre-wrap;
+  margin-bottom: var(--space-4);
+}
+
+/* Code blocks - pre containing code gets styling */
+.reader-article pre:has(code) {
   background-color: var(--muted);
   padding: var(--space-4);
   border-radius: var(--radius);
   overflow-x: auto;
 }
 
-.reader-article code {
+.reader-article pre code {
+  display: inline;
+  background: none;
+  padding: 0;
+  font-size: 0.9em;
+  font-family: monospace;
+  white-space-collapse: preserve;
+}
+
+/* Inline code (not in pre) */
+.reader-article :not(pre) > code {
+  display: inline;
   background-color: var(--muted);
   padding: var(--space-0-5) var(--space-1);
   border-radius: var(--radius-sm);
   font-size: 0.9em;
-}
-
-.reader-article pre code {
-  background: none;
-  padding: 0;
+  font-family: monospace;
 }
 
 /* Font settings */
@@ -179,12 +192,10 @@
   background-color: var(--highlight-hover, oklch(0.85 0.12 100));
 }
 
-/* Bottom bar - fixed at bottom */
+/* Bottom bar - sticky at bottom of reader content */
 .reader-bottom-bar {
-  position: fixed;
+  position: sticky;
   bottom: 0;
-  left: 0;
-  right: 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -209,18 +220,13 @@
   font-weight: 500;
 }
 
-/* Adjust for sidebar on desktop */
+/* Adjust progress bar for sidebar on desktop */
 @media (min-width: 768px) {
   .reader-progress-bar {
     left: 4rem;
   }
 
-  .reader-bottom-bar {
-    left: 4rem;
-  }
-
-  .sidebar-expanded ~ .main-content .reader-progress-bar,
-  .sidebar-expanded ~ .main-content .reader-bottom-bar {
+  .sidebar-expanded ~ .main-content .reader-progress-bar {
     left: 16rem;
   }
 }

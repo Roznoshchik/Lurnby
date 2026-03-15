@@ -1,5 +1,5 @@
 import { render } from 'preact'
-import { useEffect, useState, useRef, useCallback } from 'preact/hooks'
+import { useEffect, useState, useRef, useCallback, useMemo } from 'preact/hooks'
 import alert from './services/alertService'
 import './css/globals.css'
 import './css/reader.css'
@@ -11,18 +11,57 @@ import HighlightAddModal from './components/HighlightAddModal/HighlightAddModal'
 import HighlightEditModal from './components/HighlightEditModal/HighlightEditModal'
 import Button from './components/Button/Button'
 import Icon from './components/Icon/Icon'
+import Loader from './components/Loader/Loader'
 import RequireAuth from './components/RequireAuth/RequireAuth'
 import { AuthProvider } from './contexts/AuthContext/AuthContext'
 import { api } from './services/api'
 import { ROUTES } from './services/routes'
-import { useReaderProgress } from './hooks/useReaderProgress'
-import { useReaderBookmarks } from './hooks/useReaderBookmarks'
 import { useReaderHighlights } from './hooks/useReaderHighlights'
+import { useChunkWindow } from './hooks/useChunkWindow'
+
+// Parse URL params for reader
+function getReaderParams() {
+  const params = new URLSearchParams(window.location.search)
+  return {
+    chunk: params.get('chunk') ? parseInt(params.get('chunk'), 10) : 0,
+    offset: params.get('offset') ? parseInt(params.get('offset'), 10) : 0,
+    unprocessed: params.get('unprocessed') === '1',
+    highlight: params.get('highlight'),
+  }
+}
+
+// Normalize bookmarks to array format (handles legacy object format)
+function normalizeBookmarks(bookmarks) {
+  let normalized = []
+
+  if (Array.isArray(bookmarks)) {
+    normalized = bookmarks
+  } else if (bookmarks && typeof bookmarks === 'object') {
+    // Legacy format: {furthest: 40.5, "Ch5": 25.2} - ignore for now, will be migrated on backend
+    normalized = []
+  } else {
+    normalized = []
+  }
+
+  // Ensure furthest bookmark always exists
+  const hasFurthest = normalized.some((b) => b.name === 'furthest')
+  if (!hasFurthest) {
+    normalized.push({ name: 'furthest', chunk: 0, offset: 0 })
+  }
+
+  return normalized
+}
 
 function ReaderPage() {
   const [article, setArticle] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [chunkLoading, setChunkLoading] = useState(false)
   const [error, setError] = useState(null)
+
+  // State
+  const [bookmarks, setBookmarks] = useState([])
+  const [highlights, setHighlights] = useState([])
+  const [progress, setProgress] = useState(0)
 
   // UI state
   const [notesOpen, setNotesOpen] = useState(false)
@@ -70,36 +109,73 @@ function ReaderPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [settingsOpen, bookmarksOpen])
 
+  // Focus bookmark input when popout opens
+  useEffect(() => {
+    if (bookmarksOpen && bookmarkInputRef.current) {
+      bookmarkInputRef.current.focus()
+    }
+  }, [bookmarksOpen])
+
+  // Refs
   const contentRef = useRef(null)
   const bookmarkInputRef = useRef(null)
   const settingsPopoutRef = useRef(null)
   const bookmarksPopoutRef = useRef(null)
 
   const articleUuid = window.location.pathname.split('/').pop()
-  const highlightUuid = new URLSearchParams(window.location.search).get('highlight')
+  const urlParams = useMemo(() => getReaderParams(), [])
+  const { chunk: initialChunk, offset: initialOffset, unprocessed: isUnprocessed, highlight: highlightUuid } = urlParams
+
+  // Callback for when highlights are loaded with chunks
+  const handleHighlightsLoaded = useCallback((newHighlights) => {
+    setHighlights((prev) => {
+      const existing = new Set(prev.map((h) => h.uuid))
+      const filtered = newHighlights.filter((h) => !existing.has(h.uuid))
+      return [...prev, ...filtered]
+    })
+  }, [])
+
+  // Use chunk window hook for automatic chunk management
+  const { chunks, jumpToPosition } = useChunkWindow({
+    contentRef,
+    articleUuid,
+    article,
+    onHighlightsLoaded: handleHighlightsLoaded,
+  })
+
+  // Jump to bookmark using hook
+  const handleJumpToBookmark = useCallback(
+    async (bookmark) => {
+      if (bookmark.chunk == null || bookmark.offset == null) return
+      setChunkLoading(true)
+      try {
+        await jumpToPosition({ chunk: bookmark.chunk, offset: bookmark.offset })
+      } finally {
+        setChunkLoading(false)
+      }
+    },
+    [jumpToPosition],
+  )
 
   // Callback for when a highlight is created (used by hook and modal)
   const handleHighlightCreated = useCallback((highlight) => {
     setHighlightModalOpen(false)
     setHighlightSelectionData(null)
     if (highlight) {
-      setArticle((prev) => ({
-        ...prev,
-        highlights: [...(prev.highlights || []), highlight],
-      }))
+      setHighlights((prev) => [...prev, highlight])
     }
   }, [])
 
   // Callback for highlight click in reader
   const handleHighlightClick = useCallback(
     (highlightId) => {
-      const highlight = article?.highlights?.find((h) => h.uuid === highlightId)
+      const highlight = highlights.find((h) => h.uuid === highlightId)
       if (highlight) {
         setEditingHighlight(highlight)
         setEditModalOpen(true)
       }
     },
-    [article?.highlights],
+    [highlights],
   )
 
   // Callback for highlight update
@@ -107,10 +183,9 @@ function ReaderPage() {
     setEditModalOpen(false)
     setEditingHighlight(null)
     if (updatedHighlight) {
-      setArticle((prev) => ({
-        ...prev,
-        highlights: prev.highlights.map((h) => (h.uuid === updatedHighlight.uuid ? updatedHighlight : h)),
-      }))
+      setHighlights((prev) =>
+        prev.map((h) => (h.uuid === updatedHighlight.uuid ? updatedHighlight : h)),
+      )
     }
   }, [])
 
@@ -119,42 +194,138 @@ function ReaderPage() {
     setEditModalOpen(false)
     setEditingHighlight(null)
     if (removedHighlight) {
-      setArticle((prev) => ({
-        ...prev,
-        highlights: prev.highlights.filter((h) => h.uuid !== removedHighlight.uuid),
-      }))
+      setHighlights((prev) => prev.filter((h) => h.uuid !== removedHighlight.uuid))
     }
   }, [])
 
-  // Hooks
-  const { progress } = useReaderProgress(contentRef, articleUuid, loading, article?.progress || 0)
+  // Derive bookmark lists from state
+  const furthestBookmark = useMemo(
+    () => bookmarks.find((b) => b.name === 'furthest'),
+    [bookmarks],
+  )
+  const userBookmarks = useMemo(
+    () => bookmarks.filter((b) => b.name !== 'furthest'),
+    [bookmarks],
+  )
 
-  const {
-    addBookmark,
-    deleteBookmark,
-    jumpToBookmark,
-    resetFurthest,
-    furthestBookmark,
-    userBookmarks,
-  } = useReaderBookmarks(
-    contentRef,
-    articleUuid,
-    loading,
-    article?.bookmarks,
-    setArticle,
+  // Bookmark CRUD operations
+  const addBookmark = useCallback(
+    async (name) => {
+      if (!name?.trim()) return false
+      const position = contentRef.current?.getReaderLocation()
+      if (!position) return false
+
+      try {
+        const newBookmark = { name: name.trim(), chunk: position.chunk, offset: position.offset }
+        const updatedBookmarks = [...bookmarks, newBookmark]
+        await api.patch(ROUTES.API.article(articleUuid), { bookmarks: updatedBookmarks })
+        setBookmarks(updatedBookmarks)
+        return true
+      } catch (err) {
+        console.error('Error adding bookmark:', err)
+        alert.error('Failed to add bookmark')
+        return false
+      }
+    },
+    [articleUuid, bookmarks],
+  )
+
+  const deleteBookmark = useCallback(
+    async (name) => {
+      try {
+        const updatedBookmarks = bookmarks.filter((b) => b.name !== name)
+        await api.patch(ROUTES.API.article(articleUuid), { bookmarks: updatedBookmarks })
+        setBookmarks(updatedBookmarks)
+      } catch (err) {
+        console.error('Error deleting bookmark:', err)
+        alert.error('Failed to delete bookmark')
+      }
+    },
+    [articleUuid, bookmarks],
+  )
+
+  const resetFurthest = useCallback(async () => {
+    const position = contentRef.current?.getReaderLocation()
+    if (!position) return
+
+    try {
+      const updatedBookmarks = bookmarks.map((b) =>
+        b.name === 'furthest' ? { ...b, chunk: position.chunk, offset: position.offset } : b,
+      )
+      await api.patch(ROUTES.API.article(articleUuid), { bookmarks: updatedBookmarks })
+      setBookmarks(updatedBookmarks)
+    } catch (err) {
+      console.error('Error resetting furthest:', err)
+      alert.error('Failed to reset furthest')
+    }
+  }, [articleUuid, bookmarks])
+
+  const reorderBookmarks = useCallback(
+    async (reorderedUserBookmarks) => {
+      try {
+        // Combine furthest bookmark with reordered user bookmarks
+        const updatedBookmarks = [furthestBookmark, ...reorderedUserBookmarks].filter(Boolean)
+        await api.patch(ROUTES.API.article(articleUuid), { bookmarks: updatedBookmarks })
+        setBookmarks(updatedBookmarks)
+      } catch (err) {
+        console.error('Error reordering bookmarks:', err)
+        alert.error('Failed to reorder bookmarks')
+      }
+    },
+    [articleUuid, furthestBookmark],
   )
 
   const { popoverOpen, setPopoverOpen, selectionRect, createHighlight, openHighlightModal } =
     useReaderHighlights(contentRef, articleUuid, loading, handleHighlightCreated)
 
+  // Ref for initial position to navigate to after article loads
+  const initialPositionRef = useRef(null)
+  const hasJumpedRef = useRef(false)
+
   const fetchArticle = async () => {
     try {
       setLoading(true)
-      const { data } = await api.get(ROUTES.API.article(articleUuid), { with_content: 'true' })
-      setArticle(data.article)
-      setError(null)
+      hasJumpedRef.current = false
 
-      // Mark article as opened (fire-and-forget)
+      if (isUnprocessed) {
+        setChunkLoading(true)
+        const params = highlightUuid ? { highlight: highlightUuid } : {}
+        const { data } = await api.post(ROUTES.API.articleProcess(articleUuid), null, params)
+
+        setArticle(data.article)
+        const normalizedBookmarks = normalizeBookmarks(data.article.bookmarks)
+        setBookmarks(normalizedBookmarks)
+        setHighlights(data.highlights || [])
+
+        let scrollPosition = { chunk: data.position.chunk, offset: data.position.offset }
+        if (!highlightUuid) {
+          const furthest = normalizedBookmarks.find((b) => b.name === 'furthest')
+          if (furthest && furthest.chunk != null && furthest.offset != null) {
+            scrollPosition = { chunk: furthest.chunk, offset: furthest.offset }
+          }
+        }
+
+        const newUrl = ROUTES.PAGES.reader(articleUuid, scrollPosition)
+        window.history.replaceState({}, '', newUrl)
+        initialPositionRef.current = scrollPosition
+      } else {
+        const { data } = await api.get(ROUTES.API.article(articleUuid))
+        const normalizedBookmarks = normalizeBookmarks(data.article.bookmarks)
+
+        setArticle(data.article)
+        setBookmarks(normalizedBookmarks)
+
+        let scrollPosition = { chunk: initialChunk, offset: initialOffset }
+        if (highlightUuid) {
+          const highlight = data.article.highlights?.find((h) => h.uuid === highlightUuid)
+          if (highlight?.start_chunk != null) {
+            scrollPosition = { chunk: highlight.start_chunk, offset: highlight.start || 0 }
+          }
+        }
+        initialPositionRef.current = scrollPosition
+      }
+
+      setError(null)
       api.patch(ROUTES.API.article(articleUuid), {
         date_read: new Date().toISOString(),
         unread: false,
@@ -170,6 +341,131 @@ function ReaderPage() {
   useEffect(() => {
     fetchArticle()
   }, [articleUuid])
+
+  // Initial jump after article loads - hook handles chunk loading + text node indexing + scroll
+  useEffect(() => {
+    if (loading || !article || hasJumpedRef.current || !initialPositionRef.current) return
+
+    hasJumpedRef.current = true
+    const position = initialPositionRef.current
+    initialPositionRef.current = null
+
+    jumpToPosition(position).finally(() => setChunkLoading(false))
+  }, [loading, article, jumpToPosition])
+
+  // Mirror chunks in a ref for use in scroll handler (avoids stale closure)
+  const chunksForProgressRef = useRef([])
+  useEffect(() => {
+    chunksForProgressRef.current = chunks
+  }, [chunks])
+
+  // Progress tracking via scroll
+  useEffect(() => {
+    if (loading || !article?.chunks_meta) return
+
+    const container = contentRef.current?.contentContainer
+    if (!container) return
+
+    let rafId = null
+
+    const handleScroll = () => {
+      if (rafId) return
+      rafId = requestAnimationFrame(() => {
+        rafId = null
+
+        const currentChunks = chunksForProgressRef.current
+        if (currentChunks.length === 0) return
+
+        const scrollableHeight = container.scrollHeight - container.clientHeight
+
+        if (scrollableHeight <= 0) {
+          const lastChunk = currentChunks[currentChunks.length - 1]
+          if (lastChunk.idx === article.chunks_meta.length - 1) {
+            setProgress(100)
+          } else {
+            const loadedEnd = article.chunks_meta
+              .slice(0, lastChunk.idx + 1)
+              .reduce((sum, c) => sum + c.text_length, 0)
+            setProgress((loadedEnd / article.total_length) * 100)
+          }
+        } else {
+          const scrollPct = container.scrollTop / scrollableHeight
+          const firstChunk = currentChunks[0]
+          const loadedTextLength = currentChunks.reduce((sum, c) => sum + c.text_length, 0)
+          const offsetInLoaded = scrollPct * loadedTextLength
+
+          let cumulativeLength = 0
+          let currentChunkIdx = firstChunk.idx
+          let currentOffset = 0
+
+          for (const chunk of currentChunks) {
+            if (offsetInLoaded <= cumulativeLength + chunk.text_length) {
+              currentChunkIdx = chunk.idx
+              currentOffset = offsetInLoaded - cumulativeLength
+              break
+            }
+            cumulativeLength += chunk.text_length
+          }
+
+          if (offsetInLoaded > loadedTextLength) {
+            const lastChunk = currentChunks[currentChunks.length - 1]
+            currentChunkIdx = lastChunk.idx
+            currentOffset = lastChunk.text_length
+          }
+
+          const articlePos =
+            article.chunks_meta.slice(0, currentChunkIdx).reduce((sum, c) => sum + c.text_length, 0) + currentOffset
+          setProgress(Math.min(100, Math.max(0, (articlePos / article.total_length) * 100)))
+        }
+      })
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
+  }, [loading, article])
+
+  // Debounced progress saving + furthest bookmark update
+  const savedProgressRef = useRef(0)
+  useEffect(() => {
+    if (loading || progress <= savedProgressRef.current) return
+
+    const timeout = setTimeout(async () => {
+      // Get position at top of viewport for furthest tracking
+      const position = contentRef.current?.getReaderLocation('top')
+      if (!position) return
+
+      try {
+        // Only update furthest if current position is further than saved
+        const currentFurthest = bookmarks.find((b) => b.name === 'furthest')
+        const isFurther = !currentFurthest ||
+          position.chunk > currentFurthest.chunk ||
+          (position.chunk === currentFurthest.chunk && position.offset > currentFurthest.offset)
+
+        const updates = { progress }
+        if (isFurther) {
+          const updatedBookmarks = bookmarks.map((b) =>
+            b.name === 'furthest' ? { ...b, chunk: position.chunk, offset: position.offset } : b,
+          )
+          updates.bookmarks = updatedBookmarks
+          setBookmarks(updatedBookmarks)
+        }
+
+        if (progress >= 100) updates.done = true
+
+        await api.patch(ROUTES.API.article(articleUuid), updates)
+        savedProgressRef.current = progress
+      } catch (err) {
+        console.error('Error saving progress:', err)
+      }
+    }, 2000)
+
+    return () => clearTimeout(timeout)
+  }, [loading, progress, articleUuid, bookmarks])
 
   // Fetch tags for highlight creation modal
   useEffect(() => {
@@ -314,62 +610,112 @@ function ReaderPage() {
   )
 
   // Bookmarks popout component
-  const BookmarksPopout = () => (
-    <div className="reader-bookmarks-popout">
-      <div className="bookmarks-add">
-        <input
-          ref={bookmarkInputRef}
-          type="text"
-          placeholder="Bookmark name..."
-          onKeyDown={(e) => e.key === 'Enter' && handleAddBookmark()}
-        />
-        <Button variant="default" size="sm" onClick={handleAddBookmark}>
-          Add
-        </Button>
-      </div>
+  const BookmarksPopout = () => {
+    const [draggedIndex, setDraggedIndex] = useState(null)
+    const [dragOverIndex, setDragOverIndex] = useState(null)
 
-      <div className="bookmarks-list">
-        {furthestBookmark && (
-          <div className="bookmark-item">
-            <button
-              type="button"
-              className="bookmark-name"
-              onClick={() => jumpToBookmark(furthestBookmark)}
-            >
-              Furthest read
-            </button>
-            <button
-              type="button"
-              className="bookmark-reset"
-              onClick={resetFurthest}
-              title="Reset to current position"
-            >
-              <Icon name="restart_alt" />
-            </button>
-          </div>
-        )}
+    const handleDragStart = (e, index) => {
+      setDraggedIndex(index)
+      e.dataTransfer.effectAllowed = 'move'
+    }
 
-        {userBookmarks.map((bookmark) => (
-          <div key={bookmark.name} className="bookmark-item">
-            <button
-              type="button"
-              className="bookmark-name"
-              onClick={() => jumpToBookmark(bookmark)}
+    const handleDragOver = (e, index) => {
+      e.preventDefault()
+      e.dataTransfer.dropEffect = 'move'
+      if (index !== draggedIndex) {
+        setDragOverIndex(index)
+      }
+    }
+
+    const handleDrop = (e, dropIndex) => {
+      e.preventDefault()
+      if (draggedIndex === null || draggedIndex === dropIndex) {
+        setDraggedIndex(null)
+        setDragOverIndex(null)
+        return
+      }
+
+      const reordered = [...userBookmarks]
+      const [movedBookmark] = reordered.splice(draggedIndex, 1)
+      reordered.splice(dropIndex, 0, movedBookmark)
+
+      reorderBookmarks(reordered)
+      setDraggedIndex(null)
+      setDragOverIndex(null)
+    }
+
+    const handleDragEnd = () => {
+      setDraggedIndex(null)
+      setDragOverIndex(null)
+    }
+
+    return (
+      <div className="reader-bookmarks-popout">
+        <div className="bookmarks-add">
+          <input
+            ref={bookmarkInputRef}
+            type="text"
+            placeholder="Bookmark name..."
+            autoFocus
+            onKeyDown={(e) => e.key === 'Enter' && handleAddBookmark()}
+          />
+          <Button variant="default" size="sm" onClick={handleAddBookmark}>
+            Add
+          </Button>
+        </div>
+
+        <div className="bookmarks-list">
+          {furthestBookmark && (
+            <div className="bookmark-item">
+              <button
+                type="button"
+                className="bookmark-name"
+                onClick={() => handleJumpToBookmark(furthestBookmark)}
+              >
+                Furthest read
+              </button>
+              <button
+                type="button"
+                className="bookmark-reset"
+                onClick={resetFurthest}
+                title="Reset to current position"
+              >
+                <Icon name="restart_alt" />
+              </button>
+            </div>
+          )}
+
+          {userBookmarks.map((bookmark, index) => (
+            <div
+              key={bookmark.name}
+              className={`bookmark-item ${draggedIndex === index ? 'dragging' : ''} ${dragOverIndex === index ? 'drag-over' : ''}`}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={(e) => handleDragOver(e, index)}
+              onDrop={(e) => handleDrop(e, index)}
+              onDragEnd={handleDragEnd}
             >
-              {bookmark.name}
-            </button>
-            <button
-              type="button"
-              className="bookmark-delete"
-              onClick={() => deleteBookmark(bookmark.name)}
-            >
-              <Icon name="close" />
-            </button>
-          </div>
-        ))}
+              <button
+                type="button"
+                className="bookmark-name"
+                onClick={() => handleJumpToBookmark(bookmark)}
+              >
+                <Icon name="drag_indicator" className="drag-handle" />
+                {bookmark.name}
+              </button>
+              <button
+                type="button"
+                className="bookmark-delete"
+                onClick={() => deleteBookmark(bookmark.name)}
+              >
+                <Icon name="close" />
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   // Sidebar content for reader
   const sidebarContent = ({ isExpanded }) => (
@@ -439,9 +785,7 @@ function ReaderPage() {
   if (loading) {
     return (
       <Layout>
-        <div className="reader-loading">
-          <p>Loading article...</p>
-        </div>
+        <Loader isLoading={true} text="Loading article..." />
       </Layout>
     )
   }
@@ -463,16 +807,18 @@ function ReaderPage() {
   return (
     <Layout sidebarContent={sidebarContent}>
       <div ref={readerContainerRef} className={`reader-wrapper ${notesOpen ? 'with-notes' : ''}`}>
-        <ReaderContent
-          ref={contentRef}
-          article={article}
-          progress={progress}
-          settings={readerSettings}
-          bookmarks={article?.bookmarks || []}
-          highlights={article?.highlights || []}
-          onHighlightClick={handleHighlightClick}
-          scrollToHighlight={highlightUuid}
-        />
+        <Loader isLoading={chunkLoading} mode="overlay" text="Loading...">
+          <ReaderContent
+            ref={contentRef}
+            title={article?.title}
+            chunks={chunks}
+            progress={progress}
+            settings={readerSettings}
+            bookmarks={bookmarks}
+            highlights={highlights}
+            onHighlightClick={handleHighlightClick}
+          />
+        </Loader>
 
         {notesOpen && (
           <NotesPanel

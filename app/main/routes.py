@@ -1282,6 +1282,7 @@ def updateArticle(uuid):
                 article.reflections = data["reflections"]
             if "content" in data:
                 article.content = data["content"]
+                article.build_chunks()
 
             for tag in data["tags"]:
                 t = Tag.query.filter_by(name=tag, user_id=current_user.id).first()

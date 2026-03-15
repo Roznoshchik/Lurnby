@@ -290,40 +290,81 @@ class Article(db.Model):
 
     def _migrate_legacy_bookmarks(self):
         """Convert legacy bookmarks {name: percentage} to [{name, chunk, offset}]."""
-        if not self.bookmarks or not self.chunks:
+        if not self.chunks:
+            print(f"[BookmarkMigration] Skipping - no chunks")
+            return
+
+        # If no bookmarks but progress exists, create furthest from progress
+        if not self.bookmarks and self.progress > 0:
+            print(f"[BookmarkMigration] No bookmarks but progress={self.progress}%, creating furthest from progress")
+            bookmarks = {"furthest": self.progress}
+        else:
+            bookmarks = self.bookmarks
+
+        if not bookmarks:
+            print(f"[BookmarkMigration] No bookmarks and no progress, skipping")
             return
 
         # Handle string format from old String column (parse if needed)
-        bookmarks = self.bookmarks
         if isinstance(bookmarks, str):
             try:
                 bookmarks = json.loads(bookmarks)
             except json.JSONDecodeError:
+                print(f"[BookmarkMigration] Failed to parse JSON: {bookmarks}")
                 return
 
         # Already migrated if it's a list
         if isinstance(bookmarks, list):
+            print(f"[BookmarkMigration] Already migrated (list format): {bookmarks}")
             return
 
         # Legacy format was a dict {name: percentage}
         if not isinstance(bookmarks, dict):
+            print(f"[BookmarkMigration] Unknown format: {type(bookmarks)}")
             return
+
+        print(f"[BookmarkMigration] Migrating legacy bookmarks: {bookmarks}")
+        print(f"[BookmarkMigration] Total length: {self.total_length}, Chunk count: {len(self.chunks)}")
 
         migrated = []
         for name, percentage in bookmarks.items():
-            global_offset = int((percentage / 100) * self.total_length)
+            # Clamp percentage to 100% max
+            clamped_percentage = min(percentage, 100.0)
+            global_offset = int((clamped_percentage / 100) * self.total_length)
+
+            if percentage != clamped_percentage:
+                print(f"[BookmarkMigration] {name}: {percentage}% (clamped to {clamped_percentage}%) → global_offset: {global_offset}")
+            else:
+                print(f"[BookmarkMigration] {name}: {percentage}% → global_offset: {global_offset}")
+
+            # Handle edge case: offset at or past end of article
+            if global_offset >= self.total_length:
+                last_chunk = self.chunks[-1]
+                local_offset = last_chunk.text_length - 1  # Last character of last chunk
+                print(f"[BookmarkMigration]   At end of article, using last chunk {last_chunk.idx}, offset: {local_offset}")
+                migrated.append(
+                    {
+                        "name": name,
+                        "chunk": last_chunk.idx,
+                        "offset": local_offset,
+                    }
+                )
+                continue
 
             for chunk in self.chunks:
                 if chunk.start_offset <= global_offset < chunk.start_offset + chunk.text_length:
+                    local_offset = global_offset - chunk.start_offset
+                    print(f"[BookmarkMigration]   Found in chunk {chunk.idx} (start: {chunk.start_offset}, length: {chunk.text_length}), local_offset: {local_offset}")
                     migrated.append(
                         {
                             "name": name,
                             "chunk": chunk.idx,
-                            "offset": global_offset - chunk.start_offset,
+                            "offset": local_offset,
                         }
                     )
                     break
 
+        print(f"[BookmarkMigration] Migration complete: {migrated}")
         self.bookmarks = migrated
 
     def get_flat_text(self):

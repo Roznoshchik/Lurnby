@@ -173,6 +173,11 @@
   justify-content: flex-start;
 }
 
+.sidebar-content .nav-link:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
 .sidebar-content .nav-link.active {
   background-color: var(--accent);
 }
