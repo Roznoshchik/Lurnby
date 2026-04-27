@@ -47,7 +47,9 @@ def populate_highlight(highlight, data: dict):
     highlight.text = data.get("text")
     highlight.note = data.get("note")
     highlight.source = data.get("source", highlight.source)
+    highlight.start_chunk = data.get("start_chunk")
     highlight.start = data.get("start")
+    highlight.end_chunk = data.get("end_chunk")
     highlight.end = data.get("end")
 
     if "do_not_review" in data:
