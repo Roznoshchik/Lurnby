@@ -10,7 +10,7 @@ const hasContent = (html) => {
   return text.length > 0
 }
 
-export default function HighlightCard({ highlight, onEdit, onViewInArticle }) {
+export default function HighlightCard({ highlight, onEdit, viewInArticleHref }) {
   return (
     <Card as="article" className="highlight-card" padding="lg">
       <div className="highlight-card-content">
@@ -70,16 +70,14 @@ export default function HighlightCard({ highlight, onEdit, onViewInArticle }) {
             >
               <Icon name="edit_square" />
             </Button>
-            {highlight.article_uuid && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onViewInArticle}
-                className="icon-button"
+            {highlight.article_uuid && viewInArticleHref && (
+              <a
+                href={viewInArticleHref}
+                className="btn btn-ghost btn-sm icon-button"
                 aria-label="View in article"
               >
                 <Icon name="visibility" />
-              </Button>
+              </a>
             )}
           </div>
         </div>

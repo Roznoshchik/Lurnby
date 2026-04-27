@@ -5,7 +5,7 @@ import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticleCard.css'
 
-export default function ArticleCard({ article, onOpen, onEdit, onViewHighlights }) {
+export default function ArticleCard({ article, openHref, onEdit, onViewHighlights }) {
   const getStatusIcon = () => {
     if (article.done) {
       return <Icon name="check_circle" className="icon status-done" />
@@ -81,15 +81,13 @@ export default function ArticleCard({ article, onOpen, onEdit, onViewHighlights 
                 <Icon name="ink_highlighter" />
               </Button>
             )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onOpen}
-              className="icon-button"
+            <a
+              href={openHref}
+              className="btn btn-ghost btn-sm icon-button"
               aria-label="Read article"
             >
               <Icon name="visibility" />
-            </Button>
+            </a>
           </div>
         </div>
       </div>

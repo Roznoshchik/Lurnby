@@ -4,7 +4,7 @@ import Icon from '../Icon/Icon'
 import Progress from '../Progress/Progress'
 import './ArticlePreview.css'
 
-export default function ArticlePreview({ article, onOpen, onEdit }) {
+export default function ArticlePreview({ article, openHref, onEdit }) {
   const getStatusIcon = () => {
     if (article.done) {
       return <Icon name="check_circle" className="status-icon status-done" />
@@ -45,18 +45,14 @@ export default function ArticlePreview({ article, onOpen, onEdit }) {
           >
             <Icon name="edit_square" />
           </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              e.stopPropagation()
-              onOpen()
-            }}
-            className="icon-button"
+          <a
+            href={openHref}
+            className="btn btn-ghost btn-sm icon-button"
             aria-label="Read article"
+            onClick={(e) => e.stopPropagation()}
           >
             <Icon name="visibility" />
-          </Button>
+          </a>
         </div>
       </div>
     </Card>

@@ -70,7 +70,9 @@ export default function HighlightAddModal({
     try {
       const data = {
         text: selectionData.text,
+        start_chunk: selectionData.start_chunk,
         start: selectionData.start,
+        end_chunk: selectionData.end_chunk,
         end: selectionData.end,
         article_uuid: articleUuid,
         note: noteRef.current?.root.innerHTML || '',
