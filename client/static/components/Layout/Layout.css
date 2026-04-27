@@ -9,6 +9,10 @@
   transition: margin-left 300ms ease-in-out;
 }
 
+.main-content.no-transition {
+  transition: none;
+}
+
 @media (min-width: 768px) {
   .main-content.sidebar-expanded {
     margin-left: 16rem; /* 256px sidebar width */

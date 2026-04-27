@@ -11,6 +11,7 @@ export function Sidebar({
   isExpanded = false,
   onToggle,
   sidebarContent = null,
+  noTransition = false,
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -37,7 +38,7 @@ export function Sidebar({
   ]
 
   return (
-    <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'}`}>
+    <aside className={`sidebar ${isExpanded ? 'expanded' : 'collapsed'} ${noTransition ? 'no-transition' : ''}`}>
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
