@@ -3,7 +3,7 @@ from datetime import datetime, date, timezone
 import json
 import math
 import re
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
 from bs4 import BeautifulSoup, NavigableString, Tag
@@ -52,7 +52,6 @@ class Article(db.Model):
     )
     read_time: so.Mapped[str | None] = so.mapped_column(sa.String)
     processing: so.Mapped[bool] = so.mapped_column(sa.Boolean, default=False)
-    content_tree: so.Mapped[Any | None] = so.mapped_column(sa.JSON)
     chunk_count: so.Mapped[int | None] = so.mapped_column(sa.Integer)
     total_length: so.Mapped[int | None] = so.mapped_column(sa.Integer)
     chunks: so.Mapped[list["ArticleChunk"]] = so.relationship(
@@ -376,25 +375,6 @@ class Article(db.Model):
         print(f"[BookmarkMigration] Migration complete: {migrated}")
         self.bookmarks = migrated
 
-    def get_flat_text(self):
-        """Extract plain text from content tree for text search.
-
-        Void/anchor elements use a placeholder to preserve offset alignment.
-        """
-        if not self.content_tree:
-            return ""
-
-        def extract(node):
-            if node["type"] == "text":
-                return node["text"]
-            if node["type"] in ("void", "anchor"):
-                return "\x00"  # placeholder to preserve offset
-            if node["type"] == "element":
-                return "".join(extract(child) for child in node.get("children", []))
-            return ""
-
-        return "".join(extract(node) for node in self.content_tree)
-
     def reanchor_highlights(self):
         """Re-anchor highlights by searching for their text in chunks.
 
@@ -622,20 +602,18 @@ class Article(db.Model):
             self.total_length = 0
             return
 
-        self.content_tree = self.build_content_tree()
-        if not self.content_tree:
+        full_tree = self.build_content_tree()
+        if not full_tree:
             self.chunk_count = 0
             self.total_length = 0
             return
 
-        full_tree = self.content_tree
         total_length = self._get_tree_end_offset(full_tree)
 
         if total_length <= min_size:
             self._create_chunk_from_tree(full_tree, idx=0, start_offset=0)
             self.chunk_count = 1
             self.total_length = total_length
-            self.content_tree = None
             self.reanchor_highlights()
             return
 
@@ -651,7 +629,6 @@ class Article(db.Model):
 
         self.chunk_count = len(chunks_trees)
         self.total_length = total_length
-        self.content_tree = None
         self.reanchor_highlights()
 
     def _get_tree_end_offset(self, tree):
