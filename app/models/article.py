@@ -1,4 +1,3 @@
-import copy
 from datetime import datetime, date, timezone
 import json
 import math
@@ -6,7 +5,7 @@ import re
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from bs4 import BeautifulSoup, NavigableString, Tag
+from bs4 import BeautifulSoup
 from flask import url_for
 from flask_login import current_user
 import sqlalchemy as sa
@@ -15,12 +14,22 @@ from sqlalchemy import desc, func, Index, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 
+
+from app.helpers.content_tree import (
+    build_content_tree,
+    get_flat_text,
+    get_tree_end_offset,
+    find_split_points,
+    slice_tree_at_offsets,
+    rebase_tree_offsets,
+)
 from app.models.base import db
 from app.models.article_chunk import ArticleChunk
 from app.models.associations import tags_articles
 
 if TYPE_CHECKING:
     from app.models.highlight import Highlight
+    from app.models.tag import Tag
 
 
 class Article(db.Model):
@@ -356,14 +365,14 @@ class Article(db.Model):
 
         chunks = sorted(self.chunks, key=lambda c: c.idx)
         # Normalize \n to space; keep \x00 (void element placeholder) for offset accuracy
-        chunk_texts = [(c.idx, self._get_chunk_flat_text(c.content_tree).replace("\n", " ")) for c in chunks]
+        chunk_texts = [(c.idx, get_flat_text(c.content_tree).replace("\n", " ")) for c in chunks]
 
         for highlight in self.highlights:
             if highlight.archived or not highlight.text:
                 continue
 
-            highlight_tree = self.build_content_tree(content=highlight.text)
-            search_text = self._get_chunk_flat_text(highlight_tree).replace("\n", " ").rstrip(" ")
+            highlight_tree = build_content_tree(highlight.text)
+            search_text = get_flat_text(highlight_tree).replace("\n", " ").rstrip(" ")
 
             if not search_text:
                 continue
@@ -405,158 +414,6 @@ class Article(db.Model):
                 highlight.end_chunk = None
                 highlight.end = None
 
-    def _get_chunk_flat_text(self, content_tree):
-        """Extract plain text from a chunk's content tree."""
-        if not content_tree:
-            return ""
-
-        def extract(node):
-            if node["type"] == "text":
-                return node["text"]
-            if node["type"] in ("void", "anchor"):
-                return "\x00"
-            if node["type"] == "element":
-                return "".join(extract(child) for child in node.get("children", []))
-            return ""
-
-        return "".join(extract(node) for node in content_tree)
-
-    def build_content_tree(self, content=None):
-        """Build a content tree with text offsets from HTML content.
-
-        Args:
-            content: HTML string to parse. Defaults to self.content.
-
-        Returns:
-            List of tree nodes with text offsets.
-        """
-        VOID_ELEMENTS = {"br", "hr"}
-        ANCHOR_ELEMENTS = {"img"}
-        BLOCK_CONTENT = {"p", "li", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "figcaption"}
-
-        source = content if content is not None else self.content
-        soup = BeautifulSoup(source or "", "lxml")
-        offset = 0
-        # Track boundary state for smart spacing
-        last_char = [None]  # Last character emitted (use list for nonlocal mutation)
-        pending_space = [False]  # Whether whitespace was stripped that might need reinserting
-
-        def is_legacy_highlight_span(node):
-            if node.name != "span":
-                return False
-            node_id = node.get("id", "")
-            if node_id.startswith("highlight"):
-                return True
-            node_class = node.get("class", [])
-            if isinstance(node_class, str):
-                node_class = [node_class]
-            return any("highlight" in c for c in node_class)
-
-        def process(node):
-            nonlocal offset
-
-            if isinstance(node, NavigableString):
-                raw = str(node)
-                had_leading_ws = raw and raw[0] in " \t\n\r\xa0"
-                had_trailing_ws = raw and raw[-1] in " \t\n\r\xa0"
-                # Normalize typographic characters
-                raw = raw.replace("\u2019", "'").replace("\u2018", "'")  # curly single quotes
-                raw = raw.replace("\u201c", '"').replace("\u201d", '"')  # curly double quotes
-                raw = raw.replace("\u2013", "-").replace("\u2014", "-")  # en-dash, em-dash
-                text = re.sub(r"[\xa0\s]+", " ", raw).strip()
-                if not text:
-                    if had_leading_ws or had_trailing_ws:
-                        pending_space[0] = True
-                    return None
-                # Insert space if whitespace was present between content
-                # But don't insert space before closing punctuation or after opening punctuation
-                first_char = text[0] if text else ""
-                before_closing = first_char not in ",.;:!?)\"']"
-                after_opening = last_char[0] not in "\"'([" if last_char[0] else True
-                needs_space = (
-                    (pending_space[0] or had_leading_ws) and last_char[0] and before_closing and after_opening
-                )
-                if needs_space:
-                    text = " " + text
-                pending_space[0] = had_trailing_ws
-                last_char[0] = text[-1] if text else None
-                start = offset
-                offset += len(text)
-                return {"type": "text", "text": text, "start": start, "length": len(text)}
-
-            if isinstance(node, Tag):
-                # Legacy highlight span - unwrap (keep children, discard span)
-                if is_legacy_highlight_span(node):
-                    children = []
-                    for child in node.children:
-                        child_node = process(child)
-                        if child_node:
-                            if isinstance(child_node, list):
-                                children.extend(child_node)
-                            else:
-                                children.append(child_node)
-                    if children:
-                        return children if len(children) > 1 else children[0]
-                    return None
-
-                if node.name in VOID_ELEMENTS:
-                    start = offset
-                    offset += 1
-                    return {"type": "void", "tag": node.name, "start": start, "length": 1}
-
-                if node.name in ANCHOR_ELEMENTS:
-                    start = offset
-                    offset += 1
-                    return {
-                        "type": "anchor",
-                        "tag": node.name,
-                        "src": node.get("src"),
-                        "alt": node.get("alt"),
-                        "start": start,
-                        "length": 1,
-                    }
-
-                # Reset spacing state at block boundaries
-                if node.name in BLOCK_CONTENT:
-                    pending_space[0] = False
-                    last_char[0] = None
-
-                children = []
-                for child in node.children:
-                    child_node = process(child)
-                    if child_node:
-                        if isinstance(child_node, list):
-                            children.extend(child_node)
-                        else:
-                            children.append(child_node)
-
-                if not children:
-                    return None
-
-                if node.name in BLOCK_CONTENT:
-                    children.append({"type": "text", "text": "\n", "start": offset, "length": 1})
-                    offset += 1
-
-                first = children[0]
-                last = children[-1]
-                end = last["end"] if "end" in last else last["start"] + last["length"]
-
-                return {"type": "element", "tag": node.name, "children": children, "start": first["start"], "end": end}
-
-            return None
-
-        tree = []
-        root = soup.body or soup
-        for child in root.children:
-            node = process(child)
-            if node:
-                if isinstance(node, list):
-                    tree.extend(node)
-                else:
-                    tree.append(node)
-
-        return tree
-
     def build_chunks(self, min_size=8000, max_size=15000):
         """Split content into chunks and build content_tree for each.
 
@@ -570,13 +427,13 @@ class Article(db.Model):
             self.total_length = 0
             return
 
-        full_tree = self.build_content_tree()
+        full_tree = build_content_tree(self.content)
         if not full_tree:
             self.chunk_count = 0
             self.total_length = 0
             return
 
-        total_length = self._get_tree_end_offset(full_tree)
+        total_length = get_tree_end_offset(full_tree)
 
         if total_length <= min_size:
             self._create_chunk_from_tree(full_tree, idx=0, start_offset=0)
@@ -585,13 +442,13 @@ class Article(db.Model):
             self.reanchor_highlights()
             return
 
-        split_offsets = self._find_split_points(full_tree, total_length, min_size, max_size)
-        chunks_trees = self._slice_tree_at_offsets(full_tree, split_offsets)
+        split_offsets = find_split_points(full_tree, total_length, min_size, max_size)
+        chunks_trees = slice_tree_at_offsets(full_tree, split_offsets)
 
         global_offset = 0
         for idx, chunk_tree in enumerate(chunks_trees):
-            rebased_tree = self._rebase_tree_offsets(chunk_tree)
-            chunk_length = self._get_tree_end_offset(rebased_tree)
+            rebased_tree = rebase_tree_offsets(chunk_tree)
+            chunk_length = get_tree_end_offset(rebased_tree)
             self._create_chunk_from_tree(rebased_tree, idx=idx, start_offset=global_offset)
             global_offset += chunk_length
 
@@ -599,234 +456,9 @@ class Article(db.Model):
         self.total_length = total_length
         self.reanchor_highlights()
 
-    def _get_tree_end_offset(self, tree):
-        """Get the end offset of a tree (offset after last character)."""
-        if not tree:
-            return 0
-        last = tree[-1]
-        return last.get("end") or (last.get("start", 0) + last.get("length", 0))
-
-    def _find_split_points(self, tree, total_length, min_size, max_size):
-        """Find optimal split points in the tree."""
-        split_points = []
-        current_start = 0
-
-        while current_start + min_size < total_length:
-            search_start = current_start + min_size
-            search_end = min(current_start + max_size, total_length)
-
-            best = self._find_best_split_in_range(tree, search_start, search_end)
-            if best is None:
-                best = search_end
-
-            split_points.append(best)
-            current_start = best
-
-        return split_points
-
-    def _find_best_split_in_range(self, tree, start, end):
-        """Find the best split point between start and end offsets."""
-        candidates = []
-
-        def walk(node, depth):
-            node_start = node.get("start", 0)
-            node_end = node.get("end") or (node_start + node.get("length", 0))
-
-            if node_end <= start or node_start >= end:
-                return
-
-            if node["type"] == "text":
-                text = node["text"]
-                text_start = node["start"]
-
-                for i, char in enumerate(text):
-                    offset = text_start + i
-                    if offset < start or offset >= end:
-                        continue
-
-                    if char in ".!?" and i + 1 < len(text) and text[i + 1] == " ":
-                        candidates.append((offset + 2, 2, depth))
-                    elif char == " ":
-                        candidates.append((offset + 1, 1, depth))
-
-            elif node["type"] == "element":
-                tag = node["tag"]
-
-                if tag in {"h1", "h2", "h3"} and node_start >= start and node_start < end:
-                    candidates.append((node_start, 4, depth))
-                elif tag in {"p", "div", "blockquote", "li", "pre", "figcaption"}:
-                    if node_end >= start and node_end < end:
-                        candidates.append((node_end, 3, depth))
-
-                for child in node.get("children", []):
-                    walk(child, depth + 1)
-
-        for node in tree:
-            walk(node, 0)
-
-        if not candidates:
-            return None
-
-        candidates.sort(key=lambda x: (-x[1], x[2]))
-        return candidates[0][0]
-
-    def _slice_tree_at_offsets(self, tree, split_offsets):
-        """Slice tree at given offsets, adding continues/continuation flags."""
-        if not split_offsets:
-            return [tree]
-
-        chunks = []
-        remaining = copy.deepcopy(tree)
-
-        for split_offset in split_offsets:
-            left, right = self._split_tree_at_offset(remaining, split_offset)
-            chunks.append(left)
-            remaining = right
-
-        chunks.append(remaining)
-        return chunks
-
-    def _split_tree_at_offset(self, tree, offset):
-        """Split tree at offset, returning (left, right) trees."""
-        left = []
-        right = []
-
-        for node in tree:
-            node_start = node.get("start", 0)
-            node_end = node.get("end") or (node_start + node.get("length", 0))
-
-            if node_end <= offset:
-                left.append(copy.deepcopy(node))
-            elif node_start >= offset:
-                right.append(copy.deepcopy(node))
-            else:
-                left_part, right_part = self._split_node_at_offset(node, offset)
-                if left_part:
-                    left.append(left_part)
-                if right_part:
-                    right.append(right_part)
-
-        return left, right
-
-    def _split_node_at_offset(self, node, offset):
-        """Split a single node at offset, adding continues/continuation flags."""
-        node_start = node.get("start", 0)
-
-        if node["type"] == "text":
-            text = node["text"]
-            split_idx = offset - node_start
-            left_text = text[:split_idx]
-            right_text = text[split_idx:]
-
-            left_node = None
-            right_node = None
-
-            if left_text:
-                left_node = {
-                    "type": "text",
-                    "text": left_text,
-                    "start": node_start,
-                    "length": len(left_text),
-                }
-            if right_text:
-                right_node = {
-                    "type": "text",
-                    "text": right_text,
-                    "start": offset,
-                    "length": len(right_text),
-                }
-
-            return left_node, right_node
-
-        elif node["type"] == "element":
-            children = node.get("children", [])
-            left_children = []
-            right_children = []
-
-            for child in children:
-                child_start = child.get("start", 0)
-                child_end = child.get("end") or (child_start + child.get("length", 0))
-
-                if child_end <= offset:
-                    left_children.append(copy.deepcopy(child))
-                elif child_start >= offset:
-                    right_children.append(copy.deepcopy(child))
-                else:
-                    left_part, right_part = self._split_node_at_offset(child, offset)
-                    if left_part:
-                        left_children.append(left_part)
-                    if right_part:
-                        right_children.append(right_part)
-
-            left_node = None
-            right_node = None
-
-            if left_children:
-                first = left_children[0]
-                last = left_children[-1]
-                left_end = last.get("end") or (last.get("start", 0) + last.get("length", 0))
-                left_node = {
-                    "type": "element",
-                    "tag": node["tag"],
-                    "children": left_children,
-                    "start": first.get("start", node_start),
-                    "end": left_end,
-                    "continues": True,
-                }
-                # Preserve continuation flag from original node
-                if node.get("continuation"):
-                    left_node["continuation"] = True
-
-            if right_children:
-                first = right_children[0]
-                last = right_children[-1]
-                right_end = last.get("end") or (last.get("start", 0) + last.get("length", 0))
-                right_node = {
-                    "type": "element",
-                    "tag": node["tag"],
-                    "children": right_children,
-                    "start": first.get("start", offset),
-                    "end": right_end,
-                    "continuation": True,
-                }
-                # Preserve continues flag from original node
-                if node.get("continues"):
-                    right_node["continues"] = True
-
-            return left_node, right_node
-
-        else:
-            if node_start < offset:
-                return copy.deepcopy(node), None
-            else:
-                return None, copy.deepcopy(node)
-
-    def _rebase_tree_offsets(self, tree):
-        """Rebase tree offsets to start at 0."""
-        if not tree:
-            return tree
-
-        base_offset = tree[0].get("start", 0)
-        if base_offset == 0:
-            return tree
-
-        def rebase(node):
-            if "start" in node:
-                node["start"] -= base_offset
-            if "end" in node:
-                node["end"] -= base_offset
-            for child in node.get("children", []):
-                rebase(child)
-
-        rebased = copy.deepcopy(tree)
-        for node in rebased:
-            rebase(node)
-
-        return rebased
-
     def _create_chunk_from_tree(self, tree, idx, start_offset):
         """Create an ArticleChunk from a tree."""
-        text_length = self._get_tree_end_offset(tree)
+        text_length = get_tree_end_offset(tree)
         chunk = ArticleChunk(
             article_id=self.id,
             idx=idx,
