@@ -1,0 +1,10 @@
+{
+  "entry": [
+    "static/login.jsx",
+    "static/articles.jsx",
+    "static/highlights.jsx",
+    "static/tags.jsx",
+    "static/reader.jsx"
+  ],
+  "project": ["static/**/*.{js,jsx}"]
+}
