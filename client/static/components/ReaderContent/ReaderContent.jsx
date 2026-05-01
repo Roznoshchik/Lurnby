@@ -1,5 +1,5 @@
 import { forwardRef } from 'preact/compat'
-import { useRef, useImperativeHandle, useEffect } from 'preact/hooks'
+import { useRef, useImperativeHandle, useEffect, useMemo } from 'preact/hooks'
 import Progress from '../Progress/Progress'
 import './ReaderContent.css'
 
@@ -66,7 +66,14 @@ function buildHighlightSegments(highlights) {
 // Merge-scan finder for highlight segments (relies on document order traversal)
 function createHighlightSegmentFinder(segments) {
   let idx = 0
+  let lastStart = -1
   return function findSegmentsInRange(start, end) {
+    // Reset if we're going backwards (new traversal from beginning)
+    if (start < lastStart) {
+      idx = 0
+    }
+    lastStart = start
+
     // Advance past segments that end before our range
     while (idx < segments.length && segments[idx].end <= start) {
       idx++
@@ -83,7 +90,7 @@ function createHighlightSegmentFinder(segments) {
   }
 }
 
-function renderTextSpan(text, start, end, bookmarkName, highlights, annotations, key) {
+function renderTextSpan(text, start, end, chunkIdx, bookmarkName, highlights, annotations, key) {
   const highlightIds = highlights.length > 0 ? highlights.map((h) => h.uuid).join(' ') : undefined
 
   return (
@@ -97,6 +104,7 @@ function renderTextSpan(text, start, end, bookmarkName, highlights, annotations,
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
         const textNode = walker.nextNode()
         if (textNode) {
+          textNode.__chunkIdx = chunkIdx
           textNode.__start = start
           annotations.textNodeIndex.push({ node: textNode, start, end })
         }
@@ -107,7 +115,7 @@ function renderTextSpan(text, start, end, bookmarkName, highlights, annotations,
   )
 }
 
-function renderNode(node, key, annotations) {
+function renderNode(node, key, chunkIdx, annotations) {
   if (node.type === 'text') {
     if (node.text === '\n') return null
 
@@ -118,7 +126,7 @@ function renderNode(node, key, annotations) {
 
     // No highlights - render simple span
     if (segments.length === 0) {
-      return renderTextSpan(node.text, textStart, textEnd, bookmark?.name, [], annotations, key)
+      return renderTextSpan(node.text, textStart, textEnd, chunkIdx, bookmark?.name, [], annotations, key)
     }
 
     // Build pieces from segment boundaries clipped to text range
@@ -165,7 +173,7 @@ function renderNode(node, key, annotations) {
     // Assign bookmark to the piece that contains it
     return pieces.map((p, i) => {
       const hasBookmark = bookmark && bookmark.start >= p.start && bookmark.start < p.end
-      return renderTextSpan(p.text, p.start, p.end, hasBookmark ? bookmark.name : null, p.highlights, annotations, `${key}-${i}`)
+      return renderTextSpan(p.text, p.start, p.end, chunkIdx, hasBookmark ? bookmark.name : null, p.highlights, annotations, `${key}-${i}`)
     })
   }
 
@@ -184,7 +192,10 @@ function renderNode(node, key, annotations) {
         alt={node.alt || ''}
         data-bookmark={bookmark?.name || undefined}
         ref={(el) => {
-          if (el) el.__start = node.start
+          if (el) {
+            el.__chunkIdx = chunkIdx
+            el.__start = node.start
+          }
         }}
       />
     )
@@ -192,56 +203,97 @@ function renderNode(node, key, annotations) {
 
   if (node.type === 'element') {
     const Tag = node.tag
-    const children = node.children.map((c, i) => renderNode(c, i, annotations)).filter(Boolean)
+    const children = node.children.map((c, i) => renderNode(c, i, chunkIdx, annotations)).filter(Boolean)
     return <Tag key={key}>{children}</Tag>
   }
 
   return null
 }
 
-function renderContentTree(tree, annotations) {
+function renderContentTree(tree, chunkIdx, annotations) {
   if (!tree || !Array.isArray(tree)) return null
-  return tree.map((node, i) => renderNode(node, i, annotations)).filter(Boolean)
+  return tree.map((node, i) => renderNode(node, i, chunkIdx, annotations)).filter(Boolean)
 }
 
 export const ReaderContent = forwardRef(function ReaderContent(
-  { article, progress, settings, bookmarks = [], highlights = [], onHighlightClick, scrollToHighlight },
+  { title, chunks = [], progress, settings, bookmarks = [], highlights = [], onHighlightClick },
   ref,
 ) {
   const { font, size, spacing } = settings
   const containerRef = useRef(null)
-  const textNodeIndexRef = useRef([])
+  // Text node index per chunk: { [chunkIdx]: [{ node, start, end }] }
+  const textNodeIndicesRef = useRef({})
 
-  // Precompute bookmark segments (exclude furthest - it doesn't need data-bookmark)
-  const bookmarkSegments = Array.isArray(bookmarks)
-    ? bookmarks
-        .filter((b) => b.start != null && b.name !== 'furthest')
-        .map((b) => ({ start: b.start, name: b.name }))
+  // Track which chunks we've seen to detect actual chunk changes
+  const seenChunksRef = useRef(new Set())
+
+  // Build per-chunk annotations (finders + text node array)
+  const chunkAnnotations = useMemo(() => {
+    const result = {}
+    const currentChunks = new Set(chunks.map(c => c.idx))
+
+    for (const chunk of chunks) {
+      // Reset text node array if this is a new chunk (not seen before)
+      if (!seenChunksRef.current.has(chunk.idx)) {
+        textNodeIndicesRef.current[chunk.idx] = []
+        seenChunksRef.current.add(chunk.idx)
+      }
+
+      // Filter bookmarks for this chunk (exclude furthest - it doesn't need data-bookmark)
+      const chunkBookmarks = bookmarks
+        .filter((b) => b.chunk === chunk.idx && b.offset != null && b.name !== 'furthest')
+        .map((b) => ({ start: b.offset, name: b.name }))
         .sort((a, b) => a.start - b.start)
-    : []
 
-  // Precompute highlight segments using sweep line
-  const highlightSegments = buildHighlightSegments(highlights)
+      // Filter highlights that touch this chunk
+      const chunkHighlights = highlights.filter(
+        (h) => h.start_chunk != null && h.start_chunk <= chunk.idx && h.end_chunk >= chunk.idx,
+      )
 
-  // Clear text node index before each render
-  textNodeIndexRef.current = []
+      // Clip highlight offsets to this chunk's boundaries
+      const clippedHighlights = chunkHighlights.map((h) => ({
+        ...h,
+        start: h.start_chunk === chunk.idx ? h.start : 0,
+        end: h.end_chunk === chunk.idx ? h.end : chunk.text_length,
+      }))
 
-  const annotations = {
-    findBookmark: createBookmarkFinder(bookmarkSegments),
-    findHighlightSegments: createHighlightSegmentFinder(highlightSegments),
-    textNodeIndex: textNodeIndexRef.current,
-  }
+      const segments = buildHighlightSegments(clippedHighlights)
+
+      result[chunk.idx] = {
+        findBookmark: createBookmarkFinder(chunkBookmarks),
+        findHighlightSegments: createHighlightSegmentFinder(segments),
+        textNodeIndex: textNodeIndicesRef.current[chunk.idx],
+      }
+    }
+
+    // Clean up text node indices for chunks that are no longer loaded
+    for (const idx of seenChunksRef.current) {
+      if (!currentChunks.has(idx)) {
+        delete textNodeIndicesRef.current[idx]
+        seenChunksRef.current.delete(idx)
+      }
+    }
+
+    return result
+  }, [chunks, bookmarks, highlights])
 
   // --- Private helpers ---
 
-  // Binary search for text node containing offset
-  const findTextNodeByOffset = (offset) => {
-    const arr = textNodeIndexRef.current
-    if (arr.length === 0) return null
+  // Binary search for text node containing offset in a specific chunk
+  const findTextNodeInChunk = (chunkIdx, offset) => {
+    const arr = textNodeIndicesRef.current[chunkIdx]
+    if (!arr || arr.length === 0) {
+      return null
+    }
 
-    // Clamp to last node if offset is past end of content
+    // Clamp to last node if offset is past end
     if (offset >= arr[arr.length - 1].end) {
       return arr[arr.length - 1]
+    }
+
+    // Clamp to first node if offset is before start
+    if (offset < arr[0].start) {
+      return arr[0]
     }
 
     let low = 0
@@ -251,35 +303,50 @@ export const ReaderContent = forwardRef(function ReaderContent(
       const entry = arr[mid]
       if (offset < entry.start) {
         high = mid - 1
-      } else if (offset >= entry.end) {
+      } else if (offset > entry.end) {
         low = mid + 1
       } else {
         return entry
       }
     }
-    return null
+
+    // Binary search failed - offset is in a gap (void element)
+    // Return the closest node
+    let closestIdx = Math.min(low, arr.length - 1)
+    return arr[closestIdx]
   }
 
-  // Probe viewport to find first fully visible text node's offset
-  const getFirstVisibleOffset = () => {
+  // Probe viewport to find text position at specified location (top/middle/bottom)
+  const getFirstVisiblePosition = (position = 'top') => {
     const container = containerRef.current
     if (!container) return null
 
     const rect = container.getBoundingClientRect()
     const x = rect.left + rect.width / 2
 
-    // Start 50px down to skip partially-scrolled text at the top
-    for (let y = rect.top + 50; y < rect.bottom; y += 10) {
-      const range = document.caretRangeFromPoint?.(x, y)
-      const caret = document.caretPositionFromPoint?.(x, y)
+    let y
+    if (position === 'top') {
+      y = rect.top + 20 // Small offset from top to avoid header/padding
+    } else if (position === 'middle') {
+      y = rect.top + rect.height / 2
+    } else if (position === 'bottom') {
+      y = rect.bottom - 20 // Small offset from bottom to avoid footer/padding
+    }
 
-      const textNode = range?.startContainer ?? caret?.offsetNode
-      const localOffset = range?.startOffset ?? caret?.offset
+    // Probe at specified position
+    const range = document.caretRangeFromPoint?.(x, y)
+    const caret = document.caretPositionFromPoint?.(x, y)
 
-      if (textNode?.nodeType === Node.TEXT_NODE && textNode.__start != null) {
-        return textNode.__start + localOffset
+    const textNode = range?.startContainer ?? caret?.offsetNode
+    const localOffset = range?.startOffset ?? caret?.offset
+
+    if (textNode?.nodeType === Node.TEXT_NODE && textNode.__chunkIdx != null && textNode.__start != null) {
+      return {
+        chunk: textNode.__chunkIdx,
+        offset: textNode.__start + localOffset,
       }
     }
+
     return null
   }
 
@@ -289,70 +356,36 @@ export const ReaderContent = forwardRef(function ReaderContent(
       return containerRef.current
     },
 
+    // Returns current reading position { chunk, offset }
     getReaderLocation() {
-      return getFirstVisibleOffset()
+      return getFirstVisiblePosition()
     },
 
-    jumpToBookmark(bookmark) {
+    // Returns number of text nodes indexed for a chunk
+    getTextNodeCount(chunkIdx) {
+      return textNodeIndicesRef.current[chunkIdx]?.length || 0
+    },
+
+    // Scrolls to position (assumes chunk is already rendered)
+    scrollToPosition({ chunk, offset, behavior = 'smooth' }) {
+      const entry = findTextNodeInChunk(chunk, offset)
+      if (!entry?.node) return false
       const container = containerRef.current
       if (!container) return false
-
-      // Offset-based bookmark
-      if (bookmark.start != null) {
-        // Furthest has no data-bookmark attr, use binary search
-        if (bookmark.name === 'furthest') {
-          const entry = findTextNodeByOffset(bookmark.start)
-          if (entry?.node?.parentElement) {
-            entry.node.parentElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            return true
-          }
-        } else {
-          // User bookmarks have data-bookmark attribute
-          const el = container.querySelector(`[data-bookmark="${bookmark.name}"]`)
-          if (el) {
-            el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-            return true
-          }
-        }
-      }
-
-      // Legacy percentage-based bookmark
-      if (bookmark.legacy != null) {
-        const scrollHeight = container.scrollHeight - container.clientHeight
-        const scrollTop = (bookmark.legacy / 100) * scrollHeight
-        container.scrollTo({ top: scrollTop, behavior: 'smooth' })
-        return true
-      }
-
-      return false
+      const charOffset = Math.min(Math.max(0, offset - entry.start), entry.node.textContent.length)
+      const range = document.createRange()
+      range.setStart(entry.node, charOffset)
+      range.collapse(true)
+      const rect = range.getBoundingClientRect()
+      const containerRect = container.getBoundingClientRect()
+      const targetScrollTop = container.scrollTop + rect.top - containerRect.top - 80
+      container.scrollTo({ top: Math.max(0, targetScrollTop), behavior })
+      return true
     },
   }))
 
-  // Jump to highlight (if specified) or furthest on article load
-  useEffect(() => {
-    if (textNodeIndexRef.current.length === 0) return
-    const container = containerRef.current
-    if (!container) return
-
-    // If scrollToHighlight is set, scroll to that highlight
-    if (scrollToHighlight) {
-      const el = container.querySelector(`[data-highlights~="${scrollToHighlight}"]`)
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-        el.classList.add('highlight-active')
-      }
-      return
-    }
-
-    // Otherwise scroll to furthest bookmark
-    const furthest = bookmarks?.find((b) => b.name === 'furthest')
-    if (!furthest?.start) return
-
-    const entry = findTextNodeByOffset(furthest.start)
-    if (entry?.node?.parentElement) {
-      entry.node.parentElement.scrollIntoView({ behavior: 'instant', block: 'start' })
-    }
-  }, [article?.uuid, scrollToHighlight])
+  // Initial scroll is now handled by reader.jsx after ensuring chunks are loaded
+  // ReaderContent just exposes scrollToPosition() and scrollToHighlight()
 
   // Highlight hover and click handlers
   useEffect(() => {
@@ -411,12 +444,15 @@ export const ReaderContent = forwardRef(function ReaderContent(
       <Progress value={progress} className="reader-progress-bar" />
 
       <article className={`reader-article ${font} size-${size} ${spacing}`}>
-        <h1>{article?.title}</h1>
-        <div>{renderContentTree(article?.content_tree || [], annotations)}</div>
+        {chunks.map((chunk) => (
+          <div key={chunk.idx} data-chunk={chunk.idx}>
+            {renderContentTree(chunk.content_tree, chunk.idx, chunkAnnotations[chunk.idx])}
+          </div>
+        ))}
       </article>
 
       <div className="reader-bottom-bar">
-        <span className="reader-bottom-title">{article?.title}</span>
+        <span className="reader-bottom-title">{title}</span>
         <span className="reader-bottom-progress">{Math.round(progress)}%</span>
       </div>
     </div>

@@ -144,8 +144,15 @@ function ArticlesList() {
     [allTags, selectedTags],
   )
 
-  const handleArticleOpen = (article) => {
-    window.location.href = ROUTES.PAGES.reader(article.uuid)
+  const getReaderHref = (article) => {
+    if (!article.chunk_count) {
+      return ROUTES.PAGES.reader(article.uuid, { unprocessed: true })
+    }
+    const furthest = article.bookmarks?.find((b) => b.name === 'furthest')
+    return ROUTES.PAGES.reader(article.uuid, {
+      chunk: furthest?.chunk ?? 0,
+      offset: furthest?.offset ?? 0,
+    })
   }
 
   const handleArticleEdit = (article) => {
@@ -220,7 +227,7 @@ function ArticlesList() {
                       ...article,
                       source: getReadableSource(article.source),
                     }}
-                    onOpen={() => handleArticleOpen(article)}
+                    openHref={getReaderHref(article)}
                     onEdit={() => handleArticleEdit(article)}
                   />
                 ))}
@@ -318,7 +325,7 @@ function ArticlesList() {
                         ...article,
                         source: getReadableSource(article.source),
                       }}
-                      onOpen={() => handleArticleOpen(article)}
+                      openHref={getReaderHref(article)}
                       onEdit={() => handleArticleEdit(article)}
                       onViewHighlights={() => handleViewHighlights(article)}
                     />

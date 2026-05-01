@@ -25,26 +25,45 @@
   height: 100vh;
   width: 100%;
   overflow: hidden;
+  position: relative;
 }
 
-/* Full-width mode when notes are closed */
-.reader-wrapper:not(.with-notes) .reader-content {
+/* Loader overlay wrapper needs to fill available space */
+.reader-wrapper > .loader-overlay-wrapper {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  height: 100%;
+}
+
+.reader-wrapper > .loader-overlay-wrapper > .reader-content {
+  flex: 1;
   width: 100%;
+}
+
+/* Notes panel container - absolutely positioned, slides in from left */
+.notes-panel-container {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 40%;
+  transform: translateX(-100%);
+  transition: transform 300ms ease-in-out;
+  z-index: 1;
+}
+
+.reader-wrapper.with-notes .notes-panel-container {
+  transform: translateX(0);
+}
+
+.reader-wrapper.with-notes > .loader-overlay-wrapper {
+  margin-left: 40%;
 }
 
 .reader-wrapper:not(.with-notes) .reader-article {
   padding-left: var(--space-8);
   padding-right: var(--space-8);
-}
-
-/* Side-by-side mode when notes are open */
-.reader-wrapper.with-notes {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-}
-
-.reader-wrapper.with-notes > * {
-  min-height: 0;
 }
 
 .reader-wrapper.with-notes .reader-article {
@@ -53,11 +72,22 @@
   padding-right: var(--space-4);
 }
 
-/* Mobile: Stack notes below content */
+/* Mobile: notes above content */
 @media (max-width: 1024px) {
-  .reader-wrapper.with-notes {
-    display: flex;
-    flex-direction: column;
+  .notes-panel-container {
+    width: 100%;
+    height: 40%;
+    transform: translateY(-100%);
+    transition: transform 300ms ease-in-out;
+  }
+
+  .reader-wrapper.with-notes .notes-panel-container {
+    transform: translateY(0);
+  }
+
+  .reader-wrapper.with-notes > .loader-overlay-wrapper {
+    margin-left: 0;
+    margin-top: 40%;
   }
 }
 
@@ -199,8 +229,13 @@
   flex-shrink: 0;
 }
 
-/* Active state for sidebar buttons */
-.sidebar-content .btn-ghost.active {
+/* Reader sidebar action buttons */
+.reader-wrapper .sidebar-content button.nav-link:hover {
+  background-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.reader-wrapper .sidebar-content button.nav-link.active {
   background-color: var(--accent);
 }
 
@@ -254,32 +289,63 @@
 .bookmark-item {
   display: flex;
   align-items: stretch;
-  gap: 0;
+  gap: var(--space-1);
   border-radius: var(--radius);
   background: none;
   border: none;
   text-align: left;
   color: var(--foreground);
   width: 100%;
+  cursor: grab;
+  transition: opacity 200ms, transform 200ms;
 }
 
-.bookmark-item:hover {
-  background-color: var(--accent);
+.bookmark-item.dragging {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+.bookmark-item.drag-over {
+  transform: translateY(2px);
+  border-top: 2px solid var(--primary);
+}
+
+.bookmark-name,
+.bookmark-delete,
+.bookmark-reset {
+  background: none;
+  border: none;
+  color: inherit;
+  padding: var(--space-2);
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius);
 }
 
 .bookmark-name {
   flex: 1;
   font-size: var(--font-size-sm);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: inherit;
   text-align: left;
-  padding: var(--space-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+}
+
+.bookmark-name .drag-handle {
+  font-size: var(--font-size-base);
+  color: var(--muted-foreground);
+  cursor: grab;
+}
+
+.bookmark-item.dragging .drag-handle {
+  cursor: grabbing;
 }
 
 .bookmark-name:hover {
   background-color: var(--accent);
+  cursor: pointer;
 }
 
 .bookmark-position {
@@ -288,33 +354,25 @@
 }
 
 .bookmark-delete {
-  background: none;
-  border: none;
-  cursor: pointer;
   color: var(--muted-foreground);
-  padding: var(--space-2);
-  display: flex;
-  align-items: center;
+  cursor: pointer;
 }
 
 .bookmark-delete:hover {
   color: var(--destructive);
   background-color: var(--accent);
+  cursor: pointer;
 }
 
 .bookmark-reset {
-  background: none;
-  border: none;
-  cursor: pointer;
   color: var(--muted-foreground);
-  padding: var(--space-2);
-  display: flex;
-  align-items: center;
+  cursor: pointer;
 }
 
 .bookmark-reset:hover {
   color: var(--foreground);
   background-color: var(--accent);
+  cursor: pointer;
 }
 
 /* Hide "View in article" button when already on reader page */

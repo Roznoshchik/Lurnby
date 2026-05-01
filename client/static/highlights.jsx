@@ -141,10 +141,19 @@ function HighlightsList() {
     setEditingHighlight(highlight)
   }
 
-  const handleViewInArticle = (highlight) => {
-    if (highlight.uuid) {
-      window.location.href = ROUTES.PAGES.reader(highlight.article_uuid, highlight.uuid)
+  const getViewInArticleHref = (highlight) => {
+    if (!highlight.article_uuid) return null
+
+    if (highlight.start_chunk != null) {
+      return ROUTES.PAGES.reader(highlight.article_uuid, {
+        chunk: highlight.start_chunk,
+        offset: highlight.start ?? 0,
+      })
     }
+    return ROUTES.PAGES.reader(highlight.article_uuid, {
+      unprocessed: true,
+      highlight: highlight.uuid,
+    })
   }
 
   const handleHighlightSaved = (updatedHighlight) => {
@@ -260,7 +269,7 @@ function HighlightsList() {
                       source: getReadableSource(highlight.source),
                     }}
                     onEdit={() => handleHighlightEdit(highlight)}
-                    onViewInArticle={() => handleViewInArticle(highlight)}
+                    viewInArticleHref={getViewInArticleHref(highlight)}
                   />
                 ))}
               </div>

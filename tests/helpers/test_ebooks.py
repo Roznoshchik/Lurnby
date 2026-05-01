@@ -8,13 +8,7 @@ from unittest.mock import patch
 from app import db, create_app
 from app.models import User
 from app.helpers.ebooks import process_images, process_links
-from config import Config
-
-
-class TestConfig(Config):
-    TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
-    MAIL_SUPPRESS_SEND = True
+from config import TestConfig
 
 
 class EbookProcessingTests(unittest.TestCase):

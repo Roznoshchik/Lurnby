@@ -10,6 +10,9 @@ export function Layout({ children, showAppDashboard = false, sidebarContent = nu
     return saved === 'true'
   })
   const [sidebarExpanded, setSidebarExpanded] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
 
   // Apply dark mode class to document root and persist
   useEffect(() => {
@@ -50,6 +53,7 @@ export function Layout({ children, showAppDashboard = false, sidebarContent = nu
         isExpanded={sidebarExpanded}
         onToggle={() => setSidebarExpanded(!sidebarExpanded)}
         sidebarContent={sidebarContent}
+        noTransition={!mounted}
       />
 
       <MobileNav
@@ -58,7 +62,7 @@ export function Layout({ children, showAppDashboard = false, sidebarContent = nu
         showAppDashboard={showAppDashboard}
       />
 
-      <div className={`main-content ${sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'}`}>
+      <div className={`main-content ${sidebarExpanded ? 'sidebar-expanded' : 'sidebar-collapsed'} ${mounted ? '' : 'no-transition'}`}>
         {children}
       </div>
     </div>

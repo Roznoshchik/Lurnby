@@ -1,27 +1,26 @@
+from http import HTTPStatus
+import json
+import traceback
+from uuid import UUID
+
 import sqlalchemy as sa
 from sqlalchemy.orm import selectinload
+from flask import jsonify, request, url_for
 
 from app import db, CustomLogger
 from app.api import bp
 from app.api.auth import token_auth
-from app.api.errors import LurnbyValueError
-
-import app.api.helpers.article_query_maker as aqm
+from app.api.errors import LurnbyValueError, bad_request, error_response
 from app.api.helpers.query_maker import apply_pagination, get_total_count
+from app.api.helpers.update_tags import update_tags
 from app.api.helpers.add_article_methods import (
     process_manual_entry,
     process_url_entry,
     process_file_upload,
 )
-from app.models import Article, Event, Tag
+import app.api.helpers.article_query_maker as aqm
+from app.models import Article, ArticleChunk, Event, Highlight, Tag
 from app.models.event import EventName
-from app.api.errors import bad_request, error_response
-from app.api.helpers.update_tags import update_tags
-
-from flask import jsonify, request, url_for
-import json
-import traceback
-from uuid import UUID
 
 
 logger = CustomLogger("API")
@@ -188,8 +187,195 @@ def get_article(article_uuid):
             return bad_request("The resource can't be found")
 
         with_content = request.args.get("with_content", "").lower() == "true"
+        if with_content:
+            article._ensure_chunks_built()
         response = jsonify(article=article.to_dict(preview=False, with_content=with_content))
         response.status_code = 200
+        return response
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ############################ """
+""" ##     get article chunk  ## """
+""" ############################ """
+
+
+@bp.route("/articles/<article_uuid>/chunks/<int:chunk_idx>", methods=["GET"])
+@token_auth.login_required
+def get_article_chunk(article_uuid, chunk_idx):
+    """Get a specific chunk of an article by index."""
+    try:
+        stmt = sa.select(Article).where(Article.uuid == UUID(article_uuid))
+        article = db.session.scalar(stmt)
+
+        if not article or article.user_id != token_auth.current_user().id:
+            return bad_request("The resource can't be found")
+
+        # Build chunks lazily on first access
+        article._ensure_chunks_built()
+
+        chunk_stmt = sa.select(ArticleChunk).where(
+            ArticleChunk.article_id == article.id,
+            ArticleChunk.idx == chunk_idx,
+        )
+        chunk = db.session.scalar(chunk_stmt)
+
+        if not chunk:
+            return error_response(404, f"Chunk {chunk_idx} not found")
+
+        # TODO: Filter highlights by chunk position once model is updated
+        highlights = [h.to_dict() for h in article.highlights if not h.archived]
+
+        response = jsonify(
+            chunk=chunk.to_dict(),
+            highlights=highlights,
+        )
+        response.status_code = 200
+        return response
+
+    except Exception as e:
+        if isinstance(e, LurnbyValueError):
+            return bad_request(str(e))
+        else:
+            logger.error(e)
+            return bad_request("Something went wrong.")
+
+
+""" ############################ """
+""" ##     process article    ## """
+""" ############################ """
+
+
+@bp.route("/articles/<article_uuid>/process", methods=["POST"])
+@token_auth.login_required
+def process_article(article_uuid):
+    """
+    Build chunks for an unprocessed article and return initial chunks.
+
+    Query params:
+        highlight: UUID of highlight to navigate to (optional)
+
+    Returns smart chunk loading based on position:
+        - 20-80% within chunk: return just that chunk
+        - <20%: return prev + current chunk
+        - >80%: return current + next chunk
+        - If highlight spans chunks: return both chunks
+    """
+    try:
+        stmt = sa.select(Article).where(Article.uuid == UUID(article_uuid))
+        article = db.session.scalar(stmt)
+
+        if not article or article.user_id != token_auth.current_user().id:
+            return error_response(HTTPStatus.NOT_FOUND, "Article not found")
+
+        # Build chunks, migrate bookmarks, reanchor highlights
+        article._ensure_chunks_built()
+
+        chunk_count = len(article.chunks)
+        if chunk_count == 0:
+            return error_response(HTTPStatus.INTERNAL_SERVER_ERROR, "Failed to build chunks")
+
+        # Determine starting position
+        target_chunk_idx = 0
+        offset_within_chunk = 0
+        highlight_data = None
+        unanchorable = False
+
+        body = request.get_json(silent=True) or {}
+        highlight_uuid = body.get("highlight")
+        if highlight_uuid:
+            # Navigate to specific highlight
+            stmt = sa.select(Highlight).where(
+                Highlight.uuid == highlight_uuid,
+                Highlight.article_id == article.id,
+            )
+            highlight = db.session.scalar(stmt)
+            if highlight:
+                highlight_data = highlight.to_dict()
+                if highlight.start_chunk is not None:
+                    target_chunk_idx = highlight.start_chunk
+                    offset_within_chunk = highlight.start or 0
+                else:
+                    # Highlight couldn't be anchored to chunks
+                    unanchorable = True
+        else:
+            # No highlight - use furthest bookmark if available
+            if article.bookmarks and isinstance(article.bookmarks, list):
+                furthest = next((b for b in article.bookmarks if b.get("name") == "furthest"), None)
+                if furthest and furthest.get("chunk") is not None:
+                    target_chunk_idx = furthest["chunk"]
+                    offset_within_chunk = furthest.get("offset", 0)
+                    print(
+                        f"[ProcessArticle] Using furthest bookmark: chunk={target_chunk_idx}, offset={offset_within_chunk}"
+                    )
+
+        # Get target chunk to calculate position percentage
+        target_chunk = article.chunks[target_chunk_idx] if target_chunk_idx < chunk_count else article.chunks[0]
+        chunk_text_length = target_chunk.text_length or 1
+        position_pct = (offset_within_chunk / chunk_text_length) * 100
+
+        # Determine which chunks to return
+        chunk_indices = []
+        if highlight_data and not unanchorable:
+            # If highlight spans multiple chunks, include both
+            start_chunk = highlight_data.get("start_chunk", target_chunk_idx)
+            end_chunk = highlight_data.get("end_chunk", start_chunk)
+            if end_chunk is not None and end_chunk != start_chunk:
+                chunk_indices = list(range(start_chunk, end_chunk + 1))
+            elif position_pct < 20 and target_chunk_idx > 0:
+                chunk_indices = [target_chunk_idx - 1, target_chunk_idx]
+            elif position_pct > 80 and target_chunk_idx < chunk_count - 1:
+                chunk_indices = [target_chunk_idx, target_chunk_idx + 1]
+            else:
+                chunk_indices = [target_chunk_idx]
+        elif position_pct < 20 and target_chunk_idx > 0:
+            chunk_indices = [target_chunk_idx - 1, target_chunk_idx]
+        elif position_pct > 80 and target_chunk_idx < chunk_count - 1:
+            chunk_indices = [target_chunk_idx, target_chunk_idx + 1]
+        else:
+            chunk_indices = [target_chunk_idx]
+
+        # Fetch the chunks
+        chunks_stmt = (
+            sa.select(ArticleChunk)
+            .where(
+                ArticleChunk.article_id == article.id,
+                ArticleChunk.idx.in_(chunk_indices),
+            )
+            .order_by(ArticleChunk.idx)
+        )
+        chunks = db.session.scalars(chunks_stmt).all()
+
+        # Get highlights for these chunks
+        highlight_stmt = sa.select(Highlight).where(
+            Highlight.article_id == article.id,
+            Highlight.archived.is_(False),
+            sa.or_(
+                Highlight.start_chunk.in_(chunk_indices),
+                Highlight.end_chunk.in_(chunk_indices),
+            ),
+        )
+        highlights = [h.to_dict() for h in db.session.scalars(highlight_stmt)]
+
+        response = jsonify(
+            article=article.to_dict(preview=False),
+            chunks=[c.to_dict() for c in chunks],
+            chunk_indices=chunk_indices,
+            position={
+                "chunk": target_chunk_idx,
+                "offset": offset_within_chunk,
+            },
+            highlight=highlight_data,
+            unanchorable=unanchorable,
+            highlights=highlights,
+        )
+        response.status_code = HTTPStatus.OK
         return response
 
     except Exception as e:
@@ -225,8 +411,7 @@ def update_article(article_uuid):
             article = update_tags(tag_ids=data["tags"], resource=article)
 
         if "content" in data:
-            article.build_content_tree()
-            article.reanchor_highlights()
+            article.build_chunks()
 
         ev = Event.add(EventName.UPDATED_ARTICLE, user=token_auth.current_user())
         db.session.add(ev)

@@ -113,8 +113,9 @@ class AddArticleApiTests(BaseTestCase):
 
     @patch("app.models.User.check_token")
     def test_article_uploaded_returns_error_without_query_args(self, mock_check_token):
-        mock_check_token.return_value = User.query.first()
-        article = Article(processing=True)
+        user = User.query.first()
+        mock_check_token.return_value = user
+        article = Article(processing=True, user_id=user.id)
         db.session.add(article)
         db.session.commit()
 

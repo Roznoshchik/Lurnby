@@ -14,10 +14,14 @@ export const ROUTES = {
     SETTINGS: '/client/settings',
     // Dynamic routes
     article: (uuid) => `/client/articles/${uuid}`,
-    reader: (articleUuid, highlightUuid = null) =>
-      highlightUuid
-        ? `/client/articles/${articleUuid}?highlight=${highlightUuid}`
-        : `/client/articles/${articleUuid}`,
+    reader: (articleUuid, { chunk = 0, offset = 0, unprocessed = false, highlight = null } = {}) => {
+      if (unprocessed) {
+        return highlight
+          ? `/client/articles/${articleUuid}?unprocessed=1&highlight=${highlight}`
+          : `/client/articles/${articleUuid}?unprocessed=1`
+      }
+      return `/client/articles/${articleUuid}?chunk=${chunk}&offset=${offset}`
+    },
     articleHighlights: (uuid) => `/client/highlights?article=${uuid}`,
   },
   API: {
@@ -31,6 +35,8 @@ export const ROUTES = {
     TAGS: '/api/tags',
     // Dynamic routes
     article: (uuid) => `/api/articles/${uuid}`,
+    articleProcess: (uuid) => `/api/articles/${uuid}/process`,
+    articleChunk: (uuid, idx) => `/api/articles/${uuid}/chunks/${idx}`,
     highlight: (uuid) => `/api/highlights/${uuid}`,
     task: (taskId) => `/api/tasks/${taskId}`,
   },
